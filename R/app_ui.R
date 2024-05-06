@@ -126,7 +126,7 @@ app_ui <- function(request) {
           ),
           br(),
           div(
-            style = "padding-left: 20%;",
+            style = "padding-left: 12%;",
             shinyWidgets::materialSwitch(
               inputId = "color_palette",
               p(
