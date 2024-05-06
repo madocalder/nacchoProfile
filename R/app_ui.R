@@ -92,11 +92,41 @@ app_ui <- function(request) {
         div(
           class = "col-sm-3",
           div(
-            class = "color-block"
+            class = "row color-block",
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "about",
+                p("About", style = "font-size: 16px; font-weight: 700;"),
+                icon = icon("circle-info"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "context",
+                p("Context", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-list"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "more",
+                p("More", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-key"),
+                class = "link-no-underline"
+              )
+            )
           ),
           br(),
           div(
-            style = "padding-left: 110px;",
+            style = "padding-left: 20%;",
             shinyWidgets::materialSwitch(
               inputId = "color_palette",
               p(

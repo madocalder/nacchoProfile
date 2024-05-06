@@ -96,4 +96,21 @@
   z-index: -1; /* Place behind other content */
  }
 
+.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
+  display: block !important;
+  font-size: xx-large !important;
+}
 
+
+.link-no-underline {
+  text-decoration: none !important;
+  align-content: center !important;
+  text-align: center !important;
+  justify-content: center !important;
+  color: #212F5B !important;
+}
+
+
+#more:hover, #more:focus, #about:hover, #about:focus, #context:hover, #context:focus {
+  color: #AB6143 !important;
+}

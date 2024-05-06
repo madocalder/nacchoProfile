@@ -22,6 +22,7 @@ attachment::att_amend_desc()
 usethis::use_package("highcharter")
 usethis::use_package("bslib")
 usethis::use_package("shinyWidgets")
+usethis::use_package("fontawesome")
 
 ## Add modules ----
 golem::add_module(name = "key_findings", with_test = TRUE, open = FALSE)
