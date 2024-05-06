@@ -37,69 +37,50 @@ app_ui <- function(request) {
             style = "position: absolute; left: 19%; top: 0;")
         ),
 
-        div(
+        tabsetPanel(
+          id = "tabs",
 
-          tabsetPanel(
-            id = "tabs",
+          tabPanel(
+            "Key Findings",
+            value = "key_findings_tab"
+          ),
 
-            tabPanel(
-              "Key Findings",
-              value = "key_findings_tab",
-            ),
+          tabPanel(
+            "Data Stories",
+            value = "data_stories_tab"
+          ),
 
-            tabPanel(
-              "Data Stories",
-              value = "data_stories_tab"
-            ),
+          tabPanel(
+            "Workforce",
+            value = "workforce_tab"
+          ),
 
-            tabPanel(
-              "Workforce",
-              value = "workforce_tab"
-            ),
+          tabPanel(
+            "Finance",
+            value = "finance_tab"
+          ),
 
-            tabPanel(
-              "Finance",
-              value = "finance_tab"
-            ),
+          tabPanel(
+            "Services",
+            value = "services_tab"
+          ),
 
-            tabPanel(
-              "Services",
-              value = "services_tab"
-            ),
+          tabPanel(
+            "Policy",
+            value = "policy_tab"
+          ),
 
-            tabPanel(
-              "Policy",
-              value = "policy_tab"
-            ),
+          tabPanel(
+            "Topics",
+            value = "topics_tab"
+          ),
 
-            tabPanel(
-              "Topics",
-              value = "topics_tab"
-            ),
-
-            tabPanel(
-              actionButton("playground_button", "Data Playground", class = "pill-button"),
-              value = "playground_tab"
-            )
+          tabPanel(
+            actionButton("playground_button", "Data Playground", class = "pill-button"),
+            value = "playground_tab"
           )
         )
-      ),
-
-      div(
-        class = "row",
-        div(
-          class = "col-sm-9",
-          h4("Column 1"),
-          p("Content for column 1")
-        ),
-        div(
-          class = "col-sm-3",
-          div(
-            class = "color-block",
-            p("test"))
-        )
       )
-
     )
   )
 }

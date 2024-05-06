@@ -17,14 +17,27 @@
 
 
 .bslib-sidebar-layout>.sidebar>.sidebar-content {
-  padding-top: 70% !important;
+  padding-top: 80% !important;
 }
 
 .nav-tabs {
   justify-content: center !important;
   text-transform: uppercase;
-  padding-left: 1.2em;
-  padding-right: 1.2em;
+}
+
+.nav:not(.nav-hidden):not(.nav-stacked):not(.flex-column) {
+  border: none !important;
+}
+
+
+.bslib-sidebar-layout>.sidebar>.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    /* gap: var(--bslib-spacer, 1rem); */
+    /* padding: var(--_padding); */
+    padding-top: var(--_padding-icon);
+    padding-left: 40px !important;
+    padding-right: 0px !important;
 }
 
 .nav {
@@ -32,14 +45,17 @@
 }
 
 .nav-item:nth-child(8) .nav-link {
-  padding-top: 100px !important;
+  padding-top: 120px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+
 }
 
 .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
   border: none !important;
   box-shadow: none !important;
   color: white !important;
-  padding-bottom: 1.8em; !important
+  padding-bottom: 1.9em; !important
 }
 
 
@@ -80,3 +96,8 @@
   z-index: -1; /* Place behind other content */
  }
 
+
+.bslib-gap-spacing {
+  gap: 0px !important;
+}
+}
