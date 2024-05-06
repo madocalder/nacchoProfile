@@ -80,6 +80,33 @@ app_ui <- function(request) {
             value = "playground_tab"
           )
         )
+      ),
+
+      div(
+        class = "row",
+        div(
+          class = "col-sm-9",
+          h4("Column 1"),
+          p("Content for column 1")
+        ),
+        div(
+          class = "col-sm-3",
+          div(
+            class = "color-block"
+          ),
+          br(),
+          div(
+            style = "padding-left: 110px;",
+            shinyWidgets::materialSwitch(
+              inputId = "color_palette",
+              p(
+                HTML("<b>Enable Color Patters?</b> <br>
+                   This allows you to distinguish columns using a pattern fill."
+                ), style = "margin-bottom: -20px;"
+              )
+            )
+          )
+        )
       )
     )
   )

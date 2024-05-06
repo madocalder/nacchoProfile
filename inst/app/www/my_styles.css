@@ -17,7 +17,7 @@
 
 
 .bslib-sidebar-layout>.sidebar>.sidebar-content {
-  padding-top: 80% !important;
+  padding-top: 70% !important;
 }
 
 .nav-tabs {
@@ -90,14 +90,10 @@
 
 .color-block {
   background-color: #EEEAE5;
-  height: 70vh; /* 70% of the page height */
+  height: 80vh; /* 70% of the page height */
   border-radius: 0 50px 50px 50px; /* Top left: 0, Other sides: 50px */
   width: 100%;
   z-index: -1; /* Place behind other content */
  }
 
 
-.bslib-gap-spacing {
-  gap: 0px !important;
-}
-}
