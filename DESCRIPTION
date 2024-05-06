@@ -1,0 +1,13 @@
+Package: nacchoProfile
+Title: NACCHO Profile Study Dashboard
+Version: 0.0.0.9000
+Authors@R: person('Lindsay', 'Jorgenson', email = 'ljorgenson@astho.org', role = c('cre', 'aut'))
+Description: A Shiny application that visualizes findings from NACCHO's National Profile of Local Health Departments.
+License: file LICENSE
+Imports: 
+    config (>= 0.3.2),
+    golem (>= 0.4.1),
+    shiny (>= 1.8.1.1)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
