@@ -1,4 +1,4 @@
-# Building a Prod-Ready, Robust Shiny Application.
+# NACCHO's Profile Study Application
 #
 # README: each step of the dev files is optional, and you don't have to
 # fill every dev scripts before getting started.
@@ -18,26 +18,38 @@
 ## install.packages('attachment') # if needed.
 attachment::att_amend_desc()
 
+## Add Packages
+usethis::use_package("highcharter")
+usethis::use_package("bslib")
+
 ## Add modules ----
-## Create a module infrastructure in R/
-golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
-golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
+golem::add_module(name = "key_findings", with_test = TRUE, open = FALSE)
+golem::add_module(name = "data_stories", with_test = TRUE, open = FALSE)
+golem::add_module(name = "workforce", with_test = TRUE, open = FALSE)
+golem::add_module(name = "finance", with_test = TRUE, open = FALSE)
+golem::add_module(name = "services", with_test = TRUE, open = FALSE)
+golem::add_module(name = "policy", with_test = TRUE, open = FALSE)
+golem::add_module(name = "topic_areas", with_test = TRUE, open = FALSE)
+golem::add_module(name = "playground", with_test = TRUE, open = FALSE)
+
 
 ## Add helper functions ----
-## Creates fct_* and utils_*
-golem::add_fct("helpers", with_test = TRUE)
-golem::add_utils("helpers", with_test = TRUE)
+golem::add_fct("helpers", with_test = TRUE, open = FALSE)
+golem::add_utils("helpers", with_test = TRUE, open = FALSE)
+
+
+
+
+# come back ---------------------------------------------------------------
+
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file("script")
 golem::add_js_handler("handlers")
-golem::add_css_file("custom")
+golem::add_css_file("my_styles")
 golem::add_sass_file("custom")
 
-## Add internal datasets ----
-## If you have data in your package
-usethis::use_data_raw(name = "my_dataset", open = FALSE)
 
 ## Tests ----
 ## Add one line by test you want to create
@@ -48,6 +60,8 @@ usethis::use_test("app")
 ## Vignette ----
 usethis::use_vignette("nacchoProfile")
 devtools::build_vignettes()
+
+
 
 ## Code Coverage----
 ## Set the code coverage service ("codecov" or "coveralls")
@@ -60,36 +74,21 @@ covrpage::covrpage()
 ## Use this part of the script if you need to set up a CI
 ## service for your application
 ##
+
+
+
+# come back up ------------------------------------------------------------
+
+
 ## (You'll need GitHub there)
 usethis::use_github()
 
+
 # GitHub Actions
 usethis::use_github_action()
-# Chose one of the three
-# See https://usethis.r-lib.org/reference/use_github_action.html
-usethis::use_github_action_check_release()
-usethis::use_github_action_check_standard()
-usethis::use_github_action_check_full()
-# Add action for PR
-usethis::use_github_action_pr_commands()
+# pr-commands
+# check-standard
 
-# Travis CI
-usethis::use_travis()
-usethis::use_travis_badge()
-
-# AppVeyor
-usethis::use_appveyor()
-usethis::use_appveyor_badge()
-
-# Circle CI
-usethis::use_circleci()
-usethis::use_circleci_badge()
-
-# Jenkins
-usethis::use_jenkins()
-
-# GitLab CI
-usethis::use_gitlab_ci()
 
 # You're now set! ----
 # go to dev/03_deploy.R

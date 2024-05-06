@@ -1,4 +1,4 @@
-# Building a Prod-Ready, Robust Shiny Application.
+# NACCHO's Profile Study Application
 #
 # README: each step of the dev files is optional, and you don't have to
 # fill every dev scripts before getting started.
@@ -39,7 +39,7 @@ golem::install_dev_deps()
 usethis::use_proprietary_license("@National Association of City & County Health Officials (NACCHO), all rights reserved") # You can set another license here
 usethis::use_readme_rmd(open = FALSE)
 devtools::build_readme()
-usethis::use_code_of_conduct(contact = "Golem User")
+usethis::use_code_of_conduct(contact = "ljorgenson@astho.org")
 usethis::use_lifecycle_badge("Experimental")
 usethis::use_news_md(open = FALSE)
 
@@ -51,8 +51,7 @@ usethis::use_git()
 golem::use_recommended_tests()
 
 ## Favicon ----
-# If you want to change the favicon (default is golem's one)
-golem::use_favicon() # path = "path/to/ico". Can be an online file.
+golem::use_favicon("inst/app/www/favicon.ico") # path = "path/to/ico". Can be an online file.
 # golem::remove_favicon() # Uncomment to remove the default favicon
 
 ## Add helper functions ----

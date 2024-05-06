@@ -1,0 +1,82 @@
+
+.sidebar {
+  background-color: #212F5B !important;
+}
+
+.bslib-sidebar-layout>.collapse-toggle {
+  /*top: calc(var(--_icon-size, 1rem) / .3) !important;*/
+  color: #fff !important;
+  left: 100% !important;
+  background-color: #008A96 !important;
+  border-radius: 0% 50% 50% 0% !important;
+}
+
+.bslib-sidebar-layout>.collapse-toggle>.collapse-icon {
+  opacity: 1 !important;
+}
+
+
+.bslib-sidebar-layout>.sidebar>.sidebar-content {
+  padding-top: 70% !important;
+}
+
+.nav-tabs {
+  justify-content: center !important;
+  text-transform: uppercase;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+}
+
+.nav {
+  font-size: 1.1em !important;
+}
+
+.nav-item:nth-child(8) .nav-link {
+  padding-top: 100px !important;
+}
+
+.nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
+  border: none !important;
+  box-shadow: none !important;
+  color: white !important;
+  padding-bottom: 1.8em; !important
+}
+
+
+.nav-tabs .nav-link.active, .nav-tabs>li>a.active, .nav-tabs .nav-pills>li>a.active, .nav-tabs :where(ul.nav.navbar-nav > li)>a.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item.in .nav-link, .nav-tabs .nav-item.show .nav-tabs>li>a, .nav-tabs .nav-item.in .nav-tabs>li>a, .nav-tabs .nav-item.show .nav-pills>li>a, .nav-tabs .nav-item.in .nav-pills>li>a, .nav-tabs>li.show .nav-link, .nav-tabs>li.in .nav-link, .nav-tabs>li.show .nav-tabs>li>a, .nav-tabs>li.in .nav-tabs>li>a, .nav-tabs>li.show .nav-pills>li>a, .nav-tabs>li.in .nav-pills>li>a, .nav-tabs .nav-pills>li.show .nav-link, .nav-tabs .nav-pills>li.in .nav-link, .nav-tabs .nav-pills>li.show .nav-tabs>li>a, .nav-tabs .nav-pills>li.in .nav-tabs>li>a, .nav-tabs .nav-pills>li.show .nav-pills>li>a, .nav-tabs .nav-pills>li.in .nav-pills>li>a, .nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+    background-color: transparent !important;
+  }
+
+.pill-button {
+  border: 2px solid #80A14E;
+  border-radius: 50px; /* Make it pill-shaped */
+  padding: 10px 15px;
+  background-color: #80A14E;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
+  box-shadow: none !important;
+  font-size: .8em !important;
+  font-weight: 700 !important;
+  /* position: absolute !important; */
+  /*bottom: 50px !important; */
+  /* left: 18% !important; */
+}
+
+.pill-button:hover, .pill-button:focus {
+  background-color: white !important;
+  color: #212F5B !important;
+  box-shadow: none !important;
+  border: 2px solid #80A14E !important;
+
+}
+
+
+.color-block {
+  background-color: #EEEAE5;
+  height: 70vh; /* 70% of the page height */
+  border-radius: 0 50px 50px 50px; /* Top left: 0, Other sides: 50px */
+  width: 100%;
+  z-index: -1; /* Place behind other content */
+ }
+

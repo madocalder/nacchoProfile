@@ -4,13 +4,102 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+#'
+
+theme <- bslib::bs_theme(
+  version = 5L,
+  bootswatch = "lux",
+  base_font = bslib::font_google("Heebo", local = FALSE, wght = "300..800"),
+  bg = "#fff",
+  fg = "#212F5B",
+  primary = "#008A96",
+  secondary = "#212F5B",
+  success = "#80A14E",
+  info = "#80648E",
+  warning = "#AB6143"
+)
+
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
+
     # Your application UI logic
-    fluidPage(
-      h1("nacchoProfile")
+    bslib::page_sidebar(
+      theme = theme,
+      window_title = "NACCHO Profile Study",
+      sidebar = bslib::sidebar(
+        title = div(
+          img(
+            src = "www/logo.png",
+            height = 120,
+            style = "position: absolute; left: 19%; top: 0;")
+        ),
+
+        div(
+
+          tabsetPanel(
+            id = "tabs",
+
+            tabPanel(
+              "Key Findings",
+              value = "key_findings_tab",
+            ),
+
+            tabPanel(
+              "Data Stories",
+              value = "data_stories_tab"
+            ),
+
+            tabPanel(
+              "Workforce",
+              value = "workforce_tab"
+            ),
+
+            tabPanel(
+              "Finance",
+              value = "finance_tab"
+            ),
+
+            tabPanel(
+              "Services",
+              value = "services_tab"
+            ),
+
+            tabPanel(
+              "Policy",
+              value = "policy_tab"
+            ),
+
+            tabPanel(
+              "Topics",
+              value = "topics_tab"
+            ),
+
+            tabPanel(
+              actionButton("playground_button", "Data Playground", class = "pill-button"),
+              value = "playground_tab"
+            )
+          )
+        )
+      ),
+
+      div(
+        class = "row",
+        div(
+          class = "col-sm-9",
+          h4("Column 1"),
+          p("Content for column 1")
+        ),
+        div(
+          class = "col-sm-3",
+          div(
+            class = "color-block",
+            p("test"))
+        )
+      )
+
     )
   )
 }

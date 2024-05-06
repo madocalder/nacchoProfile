@@ -1,4 +1,4 @@
-# Building a Prod-Ready, Robust Shiny Application.
+# NACCHO's Profile Study Application
 #
 # README: each step of the dev files is optional, and you don't have to
 # fill every dev scripts before getting started.
@@ -16,7 +16,8 @@
 ## Run checks ----
 ## Check the package before sending to prod
 devtools::check()
-rhub::check_for_cran()
+# rhub::check_for_cran()
+
 
 # Deploy
 
@@ -27,19 +28,10 @@ devtools::build()
 
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
-golem::add_rstudioconnect_file()
 golem::add_shinyappsio_file()
-golem::add_shinyserver_file()
-
-## Docker ----
-## If you want to deploy via a generic Dockerfile
-golem::add_dockerfile_with_renv()
-
-## If you want to deploy to ShinyProxy
-golem::add_dockerfile_with_renv_shinyproxy()
 
 
-# Deploy to Posit Connect or ShinyApps.io
+# Deploy to ShinyApps.io
 # In command line.
 rsconnect::deployApp(
   appName = desc::desc_get_field("Package"),
