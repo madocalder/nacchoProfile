@@ -91,6 +91,7 @@ app_ui <- function(request) {
         class = "row",
         div(
           class = "col-sm-9 col-pad",
+          openMenu(),
           h4("Test"),
           conditionalPanel(
             condition = "input.tabs == 'home_tab'",

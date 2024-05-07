@@ -16,7 +16,7 @@
 }
 
 
-.bslib-sidebar-layout>.sidebar>.sidebar-content {
+.sidebar-content {
   padding-top: 70% !important;
 }
 
@@ -34,7 +34,7 @@
 }
 
 
-.bslib-sidebar-layout>.sidebar>.sidebar-content {
+.sidebar>.sidebar-content {
     display: flex;
     flex-direction: column;
     /* gap: var(--bslib-spacer, 1rem); */
@@ -133,3 +133,21 @@
   padding-right: 40px !important;
 }
 
+.offcanvas-body {
+  padding: 0;
+}
+
+.sidebar {
+  min-height: 100%;
+}
+
+
+.offcanvas-menu-trigger{
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+}
+
+#offcanvas-menu{
+  width: 250px;
+}
