@@ -24,7 +24,7 @@ mod_workforce_ui <- function(id){
               class = "col-sm-4",
               br(),
               selectInput(
-                inputId = "topic",
+                inputId = ns("topic"),
                 strong("Select Topic"),
                 choices = c(
                   "Expenditures",
@@ -38,7 +38,7 @@ mod_workforce_ui <- function(id){
               class = "col-sm-4",
               br(),
               selectInput(
-                inputId = "view",
+                inputId = ns("view"),
                 strong("Select View"),
                 choices = c(
                   "Bar Graph",
@@ -52,7 +52,7 @@ mod_workforce_ui <- function(id){
               class = "col-sm-4",
               br(),
               selectInput(
-                inputId = "filter",
+                inputId = ns("filter"),
                 strong("Filter"),
                 choices = c(
                   "Rurality",
@@ -82,30 +82,33 @@ mod_workforce_ui <- function(id){
             class = "row color-block",
             div(
               class = "col-sm-4",
+              align = "center",
               br(),
               actionLink(
                 inputId = ns("about"),
-                p("About", style = "font-size: 16px; font-weight: 700;"),
+                "About",
                 icon = icon("circle-info"),
                 class = "link-no-underline"
               )
             ),
             div(
               class = "col-sm-4",
+              align = "center",
               br(),
               actionLink(
                 inputId = ns("context"),
-                p("Context", style = "font-size: 16px; font-weight: 700;"),
+                "Context",
                 icon = tags$i(class = "fa-solid fa-list"),
                 class = "link-no-underline"
               )
             ),
             div(
               class = "col-sm-4",
+              align = "center",
               br(),
               actionLink(
                 inputId = ns("more"),
-                p("More", style = "font-size: 16px; font-weight: 700;"),
+                "More",
                 icon = tags$i(class = "fa-solid fa-key"),
                 class = "link-no-underline"
               )
