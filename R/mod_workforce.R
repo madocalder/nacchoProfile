@@ -4,28 +4,143 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
+#' @importFrom shiny NS tagList
+
 mod_workforce_ui <- function(id){
   ns <- NS(id)
   tagList(
- 
+    conditionalPanel(
+      condition = "input.tabs == 'workforce_tab'",
+
+      div(
+        class = "row",
+        div(
+          class = "col-sm-9 col-pad",
+          div(
+            class = "row",
+            div(
+              class = "col-sm-4",
+              br(),
+              selectInput(
+                inputId = "topic",
+                strong("Select Topic"),
+                choices = c(
+                  "Expenditures",
+                  "Funding",
+                  "Other thing"
+                ),
+                selected = "Expenditures"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              selectInput(
+                inputId = "view",
+                strong("Select View"),
+                choices = c(
+                  "Bar Graph",
+                  "Map",
+                  "Table"
+                ),
+                selected = "Bar Graph"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              selectInput(
+                inputId = "filter",
+                strong("Filter"),
+                choices = c(
+                  "Rurality",
+                  "Governance",
+                  "LHD Size"
+                ),
+                selected = "Rurality"
+              )
+            )
+          ),
+
+          br(),
+          hr(),
+          br(),
+          br(),
+
+# add main page content here ----------------------------------------------
+
+          p("This is the workforce Page"),
+
+# end of main content -----------------------------------------------------
+
+        ),
+        div(
+          class = "col-sm-3",
+          div(
+            class = "row color-block",
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = ns("about"),
+                p("About", style = "font-size: 16px; font-weight: 700;"),
+                icon = icon("circle-info"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = ns("context"),
+                p("Context", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-list"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = ns("more"),
+                p("More", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-key"),
+                class = "link-no-underline"
+              )
+            )
+          ),
+          br(),
+          div(
+            style = "padding-left: 12%;",
+            shinyWidgets::materialSwitch(
+              inputId = ns("color_palette"),
+              p(
+                HTML("<b>Enable Color Patters?</b> <br>
+                   This allows you to distinguish columns using a pattern fill."
+                ), style = "margin-bottom: -20px;"
+              )
+            )
+          )
+        )
+      )
+    )
   )
 }
-    
+
 #' workforce Server Functions
 #'
-#' @noRd 
+#' @noRd
 mod_workforce_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
- 
+
   })
 }
-    
+
 ## To be copied in the UI
 # mod_workforce_ui("workforce_1")
-    
+
 ## To be copied in the server
 # mod_workforce_server("workforce_1")

@@ -11,7 +11,13 @@
 mod_key_findings_ui <- function(id){
   ns <- NS(id)
   tagList(
-
+    conditionalPanel(
+      condition = "input.tabs == 'key_findings_tab'",
+      div(
+        class = "col-pad",
+        p("This is the Key Findings Page")
+      )
+    )
   )
 }
 

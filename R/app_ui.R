@@ -87,69 +87,10 @@ app_ui <- function(request) {
         )
       ),
 
-      div(
-        class = "row",
-        div(
-          class = "col-sm-9 col-pad",
-          h4("Test"),
-          conditionalPanel(
-            condition = "input.tabs == 'home_tab'",
-            p("This is the Home Page")
-          ),
-          conditionalPanel(
-            condition = "input.tabs == 'key_findings_tab'",
-            p("This is the Key Findings")
-          )
-        ),
-        div(
-          class = "col-sm-3",
-          div(
-            class = "row color-block",
-            div(
-              class = "col-sm-4",
-              br(),
-              actionLink(
-                inputId = "about",
-                p("About", style = "font-size: 16px; font-weight: 700;"),
-                icon = icon("circle-info"),
-                class = "link-no-underline"
-              )
-            ),
-            div(
-              class = "col-sm-4",
-              br(),
-              actionLink(
-                inputId = "context",
-                p("Context", style = "font-size: 16px; font-weight: 700;"),
-                icon = tags$i(class = "fa-solid fa-list"),
-                class = "link-no-underline"
-              )
-            ),
-            div(
-              class = "col-sm-4",
-              br(),
-              actionLink(
-                inputId = "more",
-                p("More", style = "font-size: 16px; font-weight: 700;"),
-                icon = tags$i(class = "fa-solid fa-key"),
-                class = "link-no-underline"
-              )
-            )
-          ),
-          br(),
-          div(
-            style = "padding-left: 12%;",
-            shinyWidgets::materialSwitch(
-              inputId = "color_palette",
-              p(
-                HTML("<b>Enable Color Patters?</b> <br>
-                   This allows you to distinguish columns using a pattern fill."
-                ), style = "margin-bottom: -20px;"
-              )
-            )
-          )
-        )
-      )
+      mod_home_ui("home_1"),
+      mod_key_findings_ui("key_findings_1"),
+      mod_workforce_ui("workforce_1")
+
     )
   )
 }

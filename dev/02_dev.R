@@ -25,6 +25,7 @@ usethis::use_package("shinyWidgets")
 usethis::use_package("fontawesome")
 
 ## Add modules ----
+golem::add_module(name = "home", with_test = TRUE, open = FALSE)
 golem::add_module(name = "key_findings", with_test = TRUE, open = FALSE)
 golem::add_module(name = "data_stories", with_test = TRUE, open = FALSE)
 golem::add_module(name = "workforce", with_test = TRUE, open = FALSE)
