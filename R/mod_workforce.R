@@ -64,7 +64,6 @@ mod_workforce_ui <- function(id){
             )
           ),
 
-          br(),
           hr(),
           br(),
           br(),
@@ -77,7 +76,7 @@ mod_workforce_ui <- function(id){
 
         ),
         div(
-          class = "col-sm-3",
+          class = "col-sm-3 learn-more",
           div(
             class = "row color-block",
             div(

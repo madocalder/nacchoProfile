@@ -126,29 +126,10 @@
 }
 
 
-#{{ns("more")}}:hover {
+#workforce_1-more:hover, #workforce_1-more:focus, #workforce_1-about:hover, #workforce_1-about:focus, #workforce_1-context:hover, #workforce_1-context:focus {
   color: #AB6143 !important;
 }
 
-#{{ns("more")}}:focus {
-  color: #AB6143 !important;
-}
-
-#{{ns("about")}}:hover {
-  color: #AB6143 !important;
-}
-
-#{{ns("about")}}:focus {
-  color: #AB6143 !important;
-}
-
-#{{ns("context")}}:hover {
-  color: #AB6143 !important;
-}
-
-#{{ns("context")}}:focus {
-  color: #AB6143 !important;
-}
 
 .col-pad {
   padding-left: 40px !important;
@@ -160,6 +141,7 @@ hr {
   border-top: 2px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
+  padding-top: 10px !important;
 }
 
 p {
