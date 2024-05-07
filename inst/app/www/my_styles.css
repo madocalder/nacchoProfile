@@ -49,7 +49,7 @@
 }
 
 
-.nav-item:nth-child(8) .nav-link {
+.nav-item:nth-child(9) .nav-link {
   padding-top: 120px !important;
   padding-left: 0px !important;
   padding-right: 0px !important;
@@ -63,13 +63,18 @@
   padding-top: 2.0em; !important
 }
 
-
-.nav-tabs .nav-link.active, .nav-tabs>li>a.active, .nav-tabs .nav-pills>li>a.active, .nav-tabs :where(ul.nav.navbar-nav > li)>a.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item.in .nav-link, .nav-tabs .nav-item.show .nav-tabs>li>a, .nav-tabs .nav-item.in .nav-tabs>li>a, .nav-tabs .nav-item.show .nav-pills>li>a, .nav-tabs .nav-item.in .nav-pills>li>a, .nav-tabs>li.show .nav-link, .nav-tabs>li.in .nav-link, .nav-tabs>li.show .nav-tabs>li>a, .nav-tabs>li.in .nav-tabs>li>a, .nav-tabs>li.show .nav-pills>li>a, .nav-tabs>li.in .nav-pills>li>a, .nav-tabs .nav-pills>li.show .nav-link, .nav-tabs .nav-pills>li.in .nav-link, .nav-tabs .nav-pills>li.show .nav-tabs>li>a, .nav-tabs .nav-pills>li.in .nav-tabs>li>a, .nav-tabs .nav-pills>li.show .nav-pills>li>a, .nav-tabs .nav-pills>li.in .nav-pills>li>a, .nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+.nav-tabs .nav-link.active {
     background-color: transparent !important;
-    color: #80A14E !important;
-    font-weight: 500 !important;
-    border-bottom: 1px solid #80A14E !important;
+    color: #008A96 !important;
+    font-weight: 700 !important;
+    border-bottom: 1px solid #008A96 !important;
   }
+
+.nav-item:nth-child(1) .nav-tabs .nav-link.active {
+    border-bottom: 0px solid #008A96 !important;
+  }
+
+  /* I took these out from the class above ----->  .nav-tabs>li>a.active, .nav-tabs .nav-pills>li>a.active, .nav-tabs :where(ul.nav.navbar-nav > li)>a.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item.in .nav-link, .nav-tabs .nav-item.show .nav-tabs>li>a, .nav-tabs .nav-item.in .nav-tabs>li>a, .nav-tabs .nav-item.show .nav-pills>li>a, .nav-tabs .nav-item.in .nav-pills>li>a, .nav-tabs>li.show .nav-link, .nav-tabs>li.in .nav-link, .nav-tabs>li.show .nav-tabs>li>a, .nav-tabs>li.in .nav-tabs>li>a, .nav-tabs>li.show .nav-pills>li>a, .nav-tabs>li.in .nav-pills>li>a, .nav-tabs .nav-pills>li.show .nav-link, .nav-tabs .nav-pills>li.in .nav-link, .nav-tabs .nav-pills>li.show .nav-tabs>li>a, .nav-tabs .nav-pills>li.in .nav-tabs>li>a, .nav-tabs .nav-pills>li.show .nav-pills>li>a, .nav-tabs .nav-pills>li.in .nav-pills>li>a, .nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a */
 
 .pill-button {
   border: 2px solid #80A14E;
@@ -122,3 +127,9 @@
 #more:hover, #more:focus, #about:hover, #about:focus, #context:hover, #context:focus {
   color: #AB6143 !important;
 }
+
+.col-pad {
+  padding-left: 40px !important;
+  padding-right: 40px !important;
+}
+

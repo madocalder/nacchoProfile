@@ -30,15 +30,20 @@ app_ui <- function(request) {
       theme = theme,
       window_title = "NACCHO Profile Study",
       sidebar = bslib::sidebar(
-        title = div(
-          img(
-            src = "www/logo.png",
-            height = 120,
-            style = "position: absolute; left: 19%; top: 0;")
-        ),
 
         tabsetPanel(
           id = "tabs",
+
+          tabPanel(
+            div(
+                img(
+                  src = "www/logo.png",
+                  height = 120,
+                  style = "position: absolute; left: 19%; top: 0;")
+              ),
+            value = "home_tab",
+            class = "no-underline",
+            ),
 
           tabPanel(
             "Key Findings",
@@ -85,9 +90,16 @@ app_ui <- function(request) {
       div(
         class = "row",
         div(
-          class = "col-sm-9",
-          h4("Column 1"),
-          p("Content for column 1")
+          class = "col-sm-9 col-pad",
+          h4("Test"),
+          conditionalPanel(
+            condition = "input.tabs == 'home_tab'",
+            p("This is the Home Page")
+          ),
+          conditionalPanel(
+            condition = "input.tabs == 'key_findings_tab'",
+            p("This is the Key Findings")
+          )
         ),
         div(
           class = "col-sm-3",
