@@ -122,10 +122,31 @@
   text-align: center !important;
   justify-content: center !important;
   color: #212F5B !important;
+  font-weight: 600 !important;
 }
 
 
-#more:hover, #more:focus, #about:hover, #about:focus, #context:hover, #context:focus {
+#{{ns("more")}}:hover {
+  color: #AB6143 !important;
+}
+
+#{{ns("more")}}:focus {
+  color: #AB6143 !important;
+}
+
+#{{ns("about")}}:hover {
+  color: #AB6143 !important;
+}
+
+#{{ns("about")}}:focus {
+  color: #AB6143 !important;
+}
+
+#{{ns("context")}}:hover {
+  color: #AB6143 !important;
+}
+
+#{{ns("context")}}:focus {
   color: #AB6143 !important;
 }
 
@@ -139,4 +160,32 @@ hr {
   border-top: 2px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
+}
+
+p {
+  color: #212F5B !important;
+  font-weight: 500 !important;
+}
+
+label {
+  color: #212F5B !important;
+  font-weight: 500 !important;
+}
+
+
+.selectize-input.full {
+  background-color: #F9F8F7 !important;
+}
+
+.selectize-input {
+  border: 1.5px solid #008A96 !important;
+  border-radius: 50px !important;
+}
+
+.selectize-control.single .selectize-input:not(.no-arrow):after {
+  border-top-color: #AB6143 !important; /* Change border color to red */
+  border-width: 11px 11px 0 11px !important;
+  top: 48% !important;
+  right: 10% !important;
+  color: #AB6143 !important;
 }
