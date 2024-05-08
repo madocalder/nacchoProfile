@@ -13,6 +13,7 @@ mod_home_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'home_tab'",
+<<<<<<< HEAD
       div(
         class = "col-pad row home-content",
         div(
@@ -54,6 +55,60 @@ mod_home_ui <- function(id){
         ),
         div(
           class = "col-sm-4 col-pad-left"
+=======
+      flexlayout::flexlayout(
+        left = NULL,
+        center = div(
+          h4("Test"),
+          openMenu(),
+          p("This is the home page")
+        ),
+        right = div(
+          div(
+            class = "row color-block",
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "about",
+                p("About", style = "font-size: 16px; font-weight: 700;"),
+                icon = icon("circle-info"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "context",
+                p("Context", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-list"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "more",
+                p("More", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-key"),
+                class = "link-no-underline"
+              )
+            )
+          ),
+          div(
+            style = "padding-left: 12%;",
+            shinyWidgets::materialSwitch(
+              inputId = "color_palette",
+              p(
+                HTML("<b>Enable Color Patters?</b> <br>
+                   This allows you to distinguish columns using a pattern fill."
+                ), style = "margin-bottom: -20px;"
+              )
+            )
+          )
+>>>>>>> a279d5c4edcf9f7324add51ae188a2aa50a8248a
         )
       )
     )
