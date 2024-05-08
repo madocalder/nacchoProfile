@@ -13,9 +13,59 @@ mod_key_findings_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'key_findings_tab'",
-      div(
-        class = "col-pad",
-        p("This is the Key Findings Page")
+      flexlayout::flexlayout(
+        left = NULL,
+        center = div(
+          h4("Key Findings"),
+          openMenu(),
+          p("This is the Key findings page")
+        ),
+        right = div(
+          div(
+            class = "row color-block",
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "about",
+                p("About", style = "font-size: 16px; font-weight: 700;"),
+                icon = icon("circle-info"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "context",
+                p("Context", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-list"),
+                class = "link-no-underline"
+              )
+            ),
+            div(
+              class = "col-sm-4",
+              br(),
+              actionLink(
+                inputId = "more",
+                p("More", style = "font-size: 16px; font-weight: 700;"),
+                icon = tags$i(class = "fa-solid fa-key"),
+                class = "link-no-underline"
+              )
+            )
+          ),
+          div(
+            style = "padding-left: 12%;",
+            shinyWidgets::materialSwitch(
+              inputId = "color_palette",
+              p(
+                HTML("<b>Enable Color Patters?</b> <br>
+                   This allows you to distinguish columns using a pattern fill."
+                ), style = "margin-bottom: -20px;"
+              )
+            )
+          )
+        )
       )
     )
   )
