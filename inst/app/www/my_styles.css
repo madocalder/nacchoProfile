@@ -183,7 +183,6 @@ h2 {
   color: #AB6143 !important;
 }
 
-<<<<<<< HEAD
 .home-content {
   padding-top: 8em !important;
   padding-left: 6em !important;
@@ -212,7 +211,9 @@ h2 {
   background-color: #fff !important;
   border: none !important;
   box-shadow: none !important;
-=======
+}
+
+
 .offcanvas-body {
   padding: 0;
 }
