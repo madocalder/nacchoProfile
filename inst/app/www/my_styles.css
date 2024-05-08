@@ -136,6 +136,14 @@
   padding-right: 45px !important;
 }
 
+.col-pad-left {
+  padding-left: 5% !important;
+}
+
+.col-pad-right {
+  padding-right: 5% !important;
+}
+
 
 hr {
   border-top: 2px solid !important;
@@ -154,6 +162,9 @@ label {
   font-weight: 500 !important;
 }
 
+h2 {
+  text-transform: none !important;
+}
 
 .selectize-input.full {
   background-color: #F9F8F7 !important;
@@ -170,4 +181,34 @@ label {
   top: 48% !important;
   right: 10% !important;
   color: #AB6143 !important;
+}
+
+.home-content {
+  padding-top: 8em !important;
+  padding-left: 6em !important;
+}
+
+.accordion-button {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.accordion-button .collapsed {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.accordion-item {
+  border-left: none !important;
+  border-right: none !important;
+  border: var(--bs-accordion-border-width) solid #008A96;
+}
+
+
+.accordion .accordion-button:not(.collapsed):focus {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
 }
