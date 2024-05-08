@@ -16,7 +16,7 @@
 }
 
 
-.bslib-sidebar-layout>.sidebar>.sidebar-content {
+.sidebar-content {
   padding-top: 70% !important;
 }
 
@@ -34,7 +34,7 @@
 }
 
 
-.bslib-sidebar-layout>.sidebar>.sidebar-content {
+.sidebar>.sidebar-content {
     display: flex;
     flex-direction: column;
     /* gap: var(--bslib-spacer, 1rem); */
@@ -183,6 +183,7 @@ h2 {
   color: #AB6143 !important;
 }
 
+<<<<<<< HEAD
 .home-content {
   padding-top: 8em !important;
   padding-left: 6em !important;
@@ -211,4 +212,23 @@ h2 {
   background-color: #fff !important;
   border: none !important;
   box-shadow: none !important;
+=======
+.offcanvas-body {
+  padding: 0;
+}
+
+.sidebar {
+  min-height: 100%;
+}
+
+
+.offcanvas-menu-trigger{
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+}
+
+#offcanvas-menu{
+  width: 250px;
+>>>>>>> a279d5c4edcf9f7324add51ae188a2aa50a8248a
 }
