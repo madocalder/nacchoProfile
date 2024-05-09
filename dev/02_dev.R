@@ -19,10 +19,11 @@
 attachment::att_amend_desc()
 
 ## Add Packages
-usethis::use_package("highcharter")
-usethis::use_package("bslib")
-usethis::use_package("shinyWidgets")
-usethis::use_package("fontawesome")
+# usethis::use_package("highcharter")
+# usethis::use_package("bslib")
+# usethis::use_package("shinyWidgets")
+# usethis::use_package("fontawesome")
+
 
 ## Add modules ----
 golem::add_module(name = "home", with_test = TRUE, open = FALSE)
