@@ -13,13 +13,14 @@ mod_workforce_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'workforce_tab'",
-
-      div(
-        class = "row",
-        div(
-          class = "col-sm-9 col-pad",
+      flexlayout::flexlayout(
+        left = NULL,
+        center = div(
+          class = "col-pad",
+          openMenu(),
           div(
             class = "row",
+            align = "center",
             div(
               class = "col-sm-4",
               br(),
@@ -68,15 +69,14 @@ mod_workforce_ui <- function(id){
           br(),
           br(),
 
-# add main page content here ----------------------------------------------
+          # add main page content here ----------------------------------------------
 
           p("This is the workforce Page"),
 
-# end of main content -----------------------------------------------------
+          # end of main content -----------------------------------------------------
 
         ),
-        div(
-          class = "col-sm-3 learn-more",
+        right = div(
           div(
             class = "row color-block",
             div(
