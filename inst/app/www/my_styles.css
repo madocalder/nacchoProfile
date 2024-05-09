@@ -17,7 +17,7 @@
 
 
 .sidebar-content {
-  padding-top: 70% !important;
+  padding-top: 60% !important;
 }
 
 
@@ -130,6 +130,10 @@
   color: #AB6143 !important;
 }
 
+#key_findings_1-download:hover, #key_findings_1-download:focus {
+  color: #AB6143 !important;
+}
+
 
 .col-pad {
   padding-left: 40px !important;
@@ -144,6 +148,9 @@
   padding-right: 5% !important;
 }
 
+a {
+  color: #fff !important
+}
 
 hr {
   border-top: 2px solid !important;
@@ -202,6 +209,18 @@ h2 {
   padding-left: 2em !important;
   padding-right: 3em !important;
   border-left: 1.5px solid #008A96 !important;
+}
+
+.key-findings-head {
+  padding-top: 2em !important;
+  padding-left: 8em !important;
+  padding-right: 8em !important;
+}
+
+.key-findings-content {
+  padding-top: 10em !important;
+  padding-left: 8em !important;
+  padding-right: 8em !important;
 }
 
 .accordion-button {
@@ -265,3 +284,47 @@ h2 {
 .selectize-dropdown-content {
     text-align: left !important;
 }
+
+
+.key-findings-cards .html-fill-container {
+  background-color: #fff !important;
+  margin-top: 0px;
+  padding: 0px;
+}
+
+.key-findings-cards .card-header {
+  background-color: #fff !important;
+  margin-top: 10px;
+  box-shadow: none;
+}
+
+.key-findings-cards .card-footer {
+  background-color: #fff;
+  padding-top: 20px;
+  box-shadow: none;
+  margin-bottom: 10px;
+}
+
+.key-findings-cards {
+  box-shadow: none !important;
+  border-color: #6EC4E9 !important;
+  border: 0px solid !important;
+}
+
+
+.footer {
+  background-color: #008A96 !important;
+  height: 5vh;
+  position: absolute;
+  bottom: 0px;
+  width: 100vw;
+  padding-top: .8em;
+  color: #fff !important;
+}
+
+.naccho-links {
+  position: absolute;
+  right: 4em;
+  top: 2em;
+}
+

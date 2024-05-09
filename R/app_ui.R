@@ -38,6 +38,7 @@ app_ui <- function(request) {
             div(
                 img(
                   src = "www/logo.png",
+                  alt = "NACCHO logo, Home page",
                   height = 120,
                   style = "position: absolute; left: 19%; top: 0;")
               ),
@@ -89,8 +90,42 @@ app_ui <- function(request) {
 
       mod_home_ui("home_1"),
       mod_key_findings_ui("key_findings_1"),
+      mod_data_stories_ui("data_stories_1"),
       mod_workforce_ui("workforce_1")
 
+    ),
+
+    div(
+      class = "footer",
+      align = "right",
+      p(
+        tags$a(
+          href = "https://naccho.org/", "NACCHO Home", target="_blank"),
+        "  |  ",
+        tags$a(
+          href = "mailto:info@naccho.org", "Contact Us"),
+        "  |  ",
+        actionLink(
+          inputId = "citation",
+          "Citation"
+        ), style = "font-size: .8em !important; padding-right: 2%;"
+      )
+    ),
+
+    # modal for key findings download
+    bsutils::modal(
+      id = "modal",
+      bsutils::modalHeader(
+        bsutils::modalTitle(
+          p(strong("Suggested Citation"))
+        )
+      ),
+      bsutils::modalBody(
+        p("2022 National Profile of Local Health Departments. National
+        Association of County and City Health Officials. Washington, DC.
+        (2024). Accessed from www.naccho.org/profile on [date]."
+        )
+      )
     )
   )
 }
