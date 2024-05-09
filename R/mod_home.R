@@ -16,12 +16,11 @@ mod_home_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad row home-content",
-          div(
-            class = "col-sm-8 col-pad-right",
-            p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
-            h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
-            br(),
+          class = "home-content",
+          openMenu(),
+          p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
+          h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
+          br(),
             bslib::accordion(
               id = "cord",
               open = FALSE,
@@ -53,9 +52,32 @@ mod_home_ui <- function(id){
                 value = "cord_contact"
               )
             )
-          ),
-          right = div(
-            class = "col-sm-4 col-pad-left"
+        ),
+        right = div(
+          class = "home-content-carousel",
+          bsutils::carousel(
+            class = "carousel-dark",
+            indicators = TRUE,
+            controls = FALSE,
+            bsutils::carouselItem(
+              p("“User quote about the amazing dashboard! This makes my life so
+                much easier!”",
+                style = "font-size: 1.6em;
+                        font-weight: 700;
+                        font-style: italic;
+                        color: #AB6143 !important;"),
+              p("- Firstname McGee",
+                style = "text-align: left;"),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              p("This is a second test"),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              p("This is a third test"),
+              interval = 60000L
+            )
           )
         )
       )
