@@ -150,6 +150,8 @@ hr {
   color: #008A96 !important;
   opacity: 1 !important;
   padding-top: 10px !important;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 p {
@@ -157,14 +159,20 @@ p {
   font-weight: 500 !important;
 }
 
-label {
+label:not(.material-switch label) {
   color: #212F5B !important;
   font-weight: 500 !important;
+  display: block !important;
+  text-align: left !important;
 }
 
 h2 {
   text-transform: none !important;
+  font-size: 1.4em !important;
+  letter-spacing: 1px !important;
+  padding-top: 10px !important;
 }
+
 
 .selectize-input.full {
   background-color: #F9F8F7 !important;
@@ -186,6 +194,14 @@ h2 {
 .home-content {
   padding-top: 8em !important;
   padding-left: 6em !important;
+  padding-right: 6em !important;
+}
+
+.home-content-carousel {
+  margin-top: 23em !important;
+  padding-left: 2em !important;
+  padding-right: 3em !important;
+  border-left: 1.5px solid #008A96 !important;
 }
 
 .accordion-button {
@@ -231,5 +247,21 @@ h2 {
 
 #offcanvas-menu{
   width: 250px;
->>>>>>> a279d5c4edcf9f7324add51ae188a2aa50a8248a
+}
+
+.carousel-dark .carousel-indicators [data-bs-target] {
+  color: #AB6143 !important;
+}
+
+.carousel {
+  height: 23em !important;
+}
+
+.selectize-input {
+  text-align: left !important;
+  display: block;
+}
+
+.selectize-dropdown-content {
+    text-align: left !important;
 }
