@@ -7,6 +7,23 @@
 app_server <- function(input, output, session) {
   # Your application server logic
 
+  # stories server
+  mod_data_stories_server("data_stories_1")
+
+
+  # add urls for the pages
+  observe({
+    query <- parseQueryString(session$clientData$url_search)
+
+    if(is.null(query$tab))
+      return()
+
+    updateTabsetPanel(session,
+                      "tabs",
+                      selected = query$tab)
+  })
+
+
   # footer modal
   # modal
   observeEvent(

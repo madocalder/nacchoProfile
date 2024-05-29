@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-
+#'
 mod_key_findings_ui <- function(id){
   ns <- NS(id)
   tagList(
@@ -213,14 +213,12 @@ mod_key_findings_ui <- function(id){
                 br(),
                 downloadLink(
                   outputId = ns("download_slides"),
-                  label = p("Download our key findings slide deck"),
-                  class = "link-no-underline"
+                  label = p("Download our key findings slide deck")
                 ),
                 br(),
                 downloadLink(
                   outputId = ns("download_pdf"),
-                  label = p("Download our key findings brief"),
-                  class = "link-no-underline"
+                  label = p("Download our key findings brief")
                 )
               )
             )

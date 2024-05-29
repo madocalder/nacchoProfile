@@ -60,13 +60,13 @@ mod_home_ui <- function(id){
             indicators = TRUE,
             controls = FALSE,
             bsutils::carouselItem(
-              p("“User quote about the amazing dashboard! This makes my life so
-                much easier!”",
+              p("User quote about the amazing dashboard! This makes my life so
+                much easier!",
                 style = "font-size: 1.6em;
                         font-weight: 700;
                         font-style: italic;
                         color: #AB6143 !important;"),
-              p("- Firstname McGee",
+              p("Firstname McGee",
                 style = "text-align: left;"),
               interval = 60000L
             ),

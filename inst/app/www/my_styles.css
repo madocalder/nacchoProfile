@@ -58,6 +58,7 @@
 
 .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
   border: none !important;
+  border-bottom: 2px solid #212F5B !important;
   box-shadow: none !important;
   color: white !important;
   padding-top: 2.0em; !important
@@ -71,7 +72,7 @@
   }
 
 .nav-item:nth-child(1) .nav-link.active, .nav-item:nth-child(9) .nav-link.active {
-    border-bottom: 0px solid #80A14E !important;
+    border-bottom: none !important;
   }
 
 
@@ -100,6 +101,32 @@
   border: 2px solid #80A14E !important;
 
 }
+
+.my-button {
+  border: .75px solid #C1C1C1 !important;
+  border-radius: 5px !important; /* Make it pill-shaped */
+  padding: 0px 3px !important;
+  background-color: white !important;
+  color: #666;
+  cursor: pointer;
+  box-shadow: none !important;
+  font-size: .7em !important;
+  font-weight: 400 !important;
+}
+
+.my-button:focus, .my-button:hover {
+  border: .75px solid #C1C1C1 !important;
+  border-radius: 5px !important; /* Make it pill-shaped */
+  padding: 0px 3px !important;
+  background-color: white !important;
+  color: #666 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  font-size: .7em !important;
+  font-weight: 400 !important;
+}
+
+
 
 
 .color-block {
@@ -148,9 +175,8 @@
   padding-right: 5% !important;
 }
 
-a {
-  color: #fff !important
-}
+/* a {
+  color: #fff !important } */
 
 hr {
   border-top: 2px solid !important;
@@ -199,7 +225,7 @@ h2 {
 }
 
 .home-content {
-  padding-top: 8em !important;
+  padding-top: 7em !important;
   padding-left: 6em !important;
   padding-right: 6em !important;
 }
@@ -313,7 +339,7 @@ h2 {
 
 
 .footer {
-  background-color: #008A96 !important;
+  background-color: #008489 !important;
   height: 5vh;
   position: absolute;
   bottom: 0px;
@@ -326,5 +352,28 @@ h2 {
   position: absolute;
   right: 4em;
   top: 2em;
+}
+
+#fixed_button {
+    position: fixed;
+    top: 50%;
+    font-weight: 400;
+    right: 0%;
+}
+
+.side_button {
+  border-radius: 50px 0px 0px 50px;
+  padding-right: 1em;
+}
+
+#top_fixed_button {
+    position: fixed;
+    top: 0%;
+    left: 20%;
+    font-weight: 400;
+}
+
+.top_button {
+  border-radius: 0px 0px 50px 50px;
 }
 
