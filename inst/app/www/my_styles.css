@@ -112,6 +112,7 @@
   box-shadow: none !important;
   font-size: .7em !important;
   font-weight: 400 !important;
+  margin-bottom: 5em;
 }
 
 .my-button:focus, .my-button:hover {
@@ -375,5 +376,42 @@ h2 {
 
 .top_button {
   border-radius: 0px 0px 50px 50px;
+}
+
+
+.scroll-desc {
+  min-height: 5em;
+  max-height: 5em;
+  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-x: hidden; /* Hides horizontal scrolling */
+  padding: 0.5em; /* Optional: Adds some padding inside the div */
+  margin-bottom: 1.5em;
+}
+
+.form-control {
+  background-color: transparent !important;
+  border-radius: 50px !important;
+}
+
+.search-input {
+  position: relative;
+  display: inline-block;
+}
+
+.search-input input[type="text"] {
+  padding-left: 3em; /* Adjust as necessary for the icon size */
+  padding-top: 1em;
+}
+
+.search-input::before {
+  padding-left: 1em; /* Adjust as necessary for the icon size */
+  padding-bottom: .3em;
+  content: "\f002"; /* Unicode for the FontAwesome search icon */
+  font-family: "FontAwesome";
+  position: absolute;
+  left: 0.5em; /* Adjust as necessary */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 

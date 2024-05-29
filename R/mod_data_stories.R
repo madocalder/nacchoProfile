@@ -19,8 +19,30 @@ mod_data_stories_ui <- function(id){
           openMenu(),
           div(
             class = "key-findings-head",
-            uiOutput(ns("cards_output")),
-            uiOutput(ns("full_page_content"))
+            div(
+              class = "row",
+              div(
+                class = "col-xl-9",
+                align = "left",
+                h1("Data Stories")
+              ),
+              div(
+                class = "col-xl-3",
+                align = "right",
+                div(class = "search-input",
+                    textInput(ns("search"), NULL, placeholder = "Search tags")
+                )
+              )
+            ),
+            div(
+              class = "row",
+              style = "padding-top: 20%",
+              uiOutput(ns("cards_output"))
+            ),
+            div(
+              style = "padding-top: 20%",
+              uiOutput(ns("full_page_content"))
+            )
           )
         ),
         right = div()
@@ -33,11 +55,10 @@ mod_data_stories_ui <- function(id){
 #'
 #' @noRd
 mod_data_stories_server <- function(id){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-
-############################## CARD SCRIPTS HERE ###############################
+    ############################## CARD SCRIPTS HERE ###############################
 
     # card list ---------------------------------------------------------------
     card_data <- list(
@@ -49,14 +70,10 @@ mod_data_stories_server <- function(id){
       )
     )
 
-########################### END EDITING CARD SCRIPTS ###########################
-
-
-
+    ########################### END EDITING CARD SCRIPTS ###########################
 
     # value for card content --------------------------------------------------
     card_content <- reactiveVal(NULL)
-
 
     # open card content -------------------------------------------------------
     selected_card <- function(input_id, card) {
@@ -65,14 +82,12 @@ mod_data_stories_server <- function(id){
                        selected = "data_stories_tab")
     }
 
-
     # back button scroll to top -----------------------------------------------
     observeEvent(input$back_btn, {
       shinyjs::runjs("window.scrollTo(0, 0)")
     })
 
-
-############################# ADD NEW CARDS HERE ###############################
+    ############################# ADD NEW CARDS HERE ###############################
 
     # events to "open" the card -----------------------------------------------
     observeEvent(input$story_link, selected_card("story_one"))
@@ -80,76 +95,106 @@ mod_data_stories_server <- function(id){
     # when you want to add a new card, you need to add the line of code above,
     # which causes the card to open when the link is selected
 
+    cards_displayed <- reactive({
+      list(
+        list(
+          thumbnail = card_thumbnail(
+            image = "www/small_town.jpeg",
+            date = "08/01/2024"
+          ),
+          title = actionLink(ns("story_link"), "This is the title of the first story"),
+          description =
+            "This is an amazing story, you have to check it out! It
+            is about rural health.",
+          tags = list(
+            actionButton(ns("tag"), "rural health", class = "my-button"),
+            actionButton(ns("tag"), "finance", class = "my-button"),
+            actionButton(ns("tag"), "trends", class = "my-button")
+          )
+        ),
+        list(
+          thumbnail = card_thumbnail(
+            image = "www/small_town.jpeg",
+            date = "08/01/2024"
+          ),
+          title = actionLink(ns("story_link"), "This is the title of the second story"),
+          description =
+            "Wow, such interesting information in this story about
+            urban health versus rural health in local agencies.",
+          tags = list(
+            actionButton(ns("tag"), "urban health", class = "my-button"),
+            actionButton(ns("tag"), "rural health", class = "my-button")
+          )
+        ),
+        list(
+          thumbnail = card_thumbnail(
+            image = "www/small_town.jpeg",
+            date = "08/01/2024"
+          ),
+          title = actionLink(ns("story_link"), "This is the title of the third story"),
+          description =
+            "Oh boy, this is a really good story about some things and
+            you should read it.",
+          tags = list(
+            actionButton(ns("tag"), "workforce", class = "my-button")
+          )
+        )
+      )
+    })
 
+    # Extract unique tags for the dropdown menu
+    observe({
+      unique_tags <- unique(unlist(lapply(cards_displayed(), function(card) {
+        sapply(card$tags, function(tag) tag$children[[1]])
+      })))
+      updateSelectInput(session, "search", choices = c("All", unique_tags))
+    })
+
+    filtered_cards <- reactive({
+      if (input$search == "All" || input$search == "") {
+        return(cards_displayed())
+      } else {
+        search_term <- tolower(input$search)
+        card_list <- lapply(cards_displayed(), function(card) {
+          if (any(sapply(card$tags, function(tag) grepl(search_term, tolower(tag$children[[1]]))))) {
+            return(card)
+          } else {
+            return(NULL)
+          }
+        })
+        card_list[!sapply(card_list, is.null)]
+      }
+    })
 
     # display the cards -------------------------------------------------------
     output$cards_output <- renderUI({
+      card_list <- filtered_cards()
 
-        # if no card is selected, the "cards" will display
-        if (is.null(card_content())) {
-          div(
-            div(
-              class = "row",
-              div(
-                class = "col-xl-9",
-                h1("Data Stories")
-              ),
-              div(
-                class = "col-xl-3",
-                align = "left",
-                textInput(ns("search"), "Search cards"),
-              )
-            ),
-
-            # first row of cards
-            div(
-              class = "row",
-              style = "padding-top: 5%;",
-              div(
-                class = "col-xl-4",
-                card_function(
-                  tags = 2,
-                  link = ns("story_link"),
-                  image_file = "www/small_town.jpeg",
-                  date = "08/01/2024",
-                  tag_one = "rural",
-                  tag_two = "finance"
-                )
-              ),
-              div(
-                class = "col-xl-4",
-                card_function(
-                  tags = 2,
-                  link = ns("story_link"),
-                  image_file = "www/small_town.jpeg",
-                  date = "08/01/2024",
-                  tag_one = "informatics",
-                  tag_two = "workforce"
-                )
-              ),
-              div(
-                class = "col-xl-4",
-                card_function(
-                  tags = 3,
-                  link = ns("story_link"),
-                  image_file = "www/small_town.jpeg",
-                  date = "08/01/2024",
-                  tag_one = "urban",
-                  tag_two = "retention",
-                  tag_three = "workforce"
-                )
-              )
-            )
-          )
+      # if no card is selected, the "cards" will display
+      if (is.null(card_content())) {
+        if (length(card_list) == 0) {
+          return(h3("No stories with this tag"))
         }
-    })
 
+        lapply(card_list, function(card) {
+          div(class = "col-xl-4 col-lg-6 col-md-6 col-sm-12",
+              div(
+                card$thumbnail,
+                card$title,
+                div(
+                  p(card$description),
+                  class = "scroll-desc"
+                ),
+                do.call(tagList, card$tags)
+              )
+          )
+        })
+      }
+    })
 
     # display card content upon selection -------------------------------------
     output$full_page_content <- renderUI({
-
       if (!is.null(card_content())) {
-
         div(
           div(
             actionButton( # this sends you back to the top
@@ -160,11 +205,10 @@ mod_data_stories_server <- function(id){
             ),
             id = "top_fixed_button"
           ),
-
           p(card_content()),
           div(
             actionButton( # this sends you back to the top
-              "back_btn",
+              ns("back_btn"),
               "Top",
               icon = icon("arrow-up"),
               class = "side_button"
@@ -175,12 +219,10 @@ mod_data_stories_server <- function(id){
       }
     })
 
-
     # reset card content ------------------------------------------------------
     observeEvent(input$back_to_stories, {
       card_content(NULL) # Reset the selected card content
     })
-
   })
 }
 
