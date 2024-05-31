@@ -13,39 +13,36 @@ mod_data_stories_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'data_stories_tab'",
-      flexlayout::flexlayout(
-        left = NULL,
-        center = div(
-          openMenu(),
+      div(
+        openMenu(),
+        div(
+          class = "data-stories-head",
           div(
-            class = "key-findings-head",
+            class = "row",
             div(
-              class = "row",
-              div(
-                class = "col-xl-9",
-                align = "left",
-                h1("Data Stories")
-              ),
-              div(
-                class = "col-xl-3",
-                align = "right",
-                div(class = "search-input",
-                    textInput(ns("search"), NULL, placeholder = "Search tags")
-                )
+              class = "col-xl-9",
+              align = "left",
+              h1("Data Stories")
+            ),
+            div(
+              class = "col-xl-3",
+              align = "right",
+              div(class = "search-input",
+                  textInput(ns("search"), NULL, placeholder = "Search tags"),
+                  style = "margin-right: 5em;"
               )
-            ),
-            div(
-              class = "row",
-              style = "padding-top: 20%",
-              uiOutput(ns("cards_output"))
-            ),
-            div(
-              style = "padding-top: 20%",
-              uiOutput(ns("full_page_content"))
             )
+          ),
+          div(
+            class = "row",
+            style = "padding-top: 10%",
+            uiOutput(ns("cards_output"))
+          ),
+          div(
+            style = "padding-top: 10%",
+            uiOutput(ns("full_page_content"))
           )
-        ),
-        right = div()
+        )
       )
     )
   )

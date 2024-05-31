@@ -12,10 +12,9 @@ Imports:
     bslib,
     bsutils,
     config (>= 0.3.2),
-    fontawesome,
     golem (>= 0.4.1),
-    highcharter,
     shiny (>= 1.8.1.1),
+    shinyjs,
     shinyWidgets,
     flexlayout,
     htmltools

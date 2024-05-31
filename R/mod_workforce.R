@@ -30,7 +30,7 @@ mod_workforce_ui <- function(id){
                 choices = c(
                   "Expenditures",
                   "Funding",
-                  "Other thing"
+                  "Other lightg"
                 ),
                 selected = "Expenditures"
               )
@@ -80,37 +80,40 @@ mod_workforce_ui <- function(id){
           div(
             class = "row color-block",
             div(
-              class = "col-sm-4",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
                 inputId = ns("about"),
-                "About",
-                icon = icon("circle-info"),
-                class = "link-no-underline"
-              )
+                "",
+                icon = tags$i(class = "fa-light fa-circle-info",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline"),
+              span(class = "hover-text-content-side", "About")
             ),
             div(
-              class = "col-sm-4",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
                 inputId = ns("context"),
-                "Context",
-                icon = tags$i(class = "fa-solid fa-list"),
-                class = "link-no-underline"
-              )
+                "",
+                icon = tags$i(class = "fa-light fa-list",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline"),
+              span(class = "hover-text-content-side", "Definitions and Notes")
             ),
             div(
-              class = "col-sm-4",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
                 inputId = ns("more"),
-                "More",
-                icon = tags$i(class = "fa-solid fa-key"),
-                class = "link-no-underline"
-              )
+                "",
+                icon = tags$i(class = "fa-light fa-key",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline"),
+              span(class = "hover-text-content-side", "Key Takeaways")
             )
           ),
           br(),
@@ -119,7 +122,7 @@ mod_workforce_ui <- function(id){
             shinyWidgets::materialSwitch(
               inputId = ns("color_palette"),
               p(
-                HTML("<b>Enable Color Patters?</b> <br>
+                HTML("<b>Enable Color Patterns?</b> <br>
                    This allows you to distinguish columns using a pattern fill."
                 ), style = "margin-bottom: -20px;"
               )

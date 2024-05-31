@@ -24,11 +24,16 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
+    htmltools::htmlDependency(
+      name = "fontawesome", version = "99.0",
+      src = "inst/app/www/fontawesome",
+      stylesheet = "css/all.min.css"
+    ),
+
 
     # Your application UI logic
     bslib::page_sidebar(
       theme = theme,
-      window_title = "NACCHO Profile Study",
       sidebar = bslib::sidebar(
 
         tabsetPanel(
@@ -91,26 +96,41 @@ app_ui <- function(request) {
       mod_home_ui("home_1"),
       mod_key_findings_ui("key_findings_1"),
       mod_data_stories_ui("data_stories_1"),
-      mod_workforce_ui("workforce_1")
+      mod_workforce_ui("workforce_1"),
+      mod_finance_ui("finance_1"),
+      mod_services_ui("services_1"),
+      mod_policy_ui("policy_1"),
+      mod_topic_areas_ui("topic_areas_1")
 
     ),
 
     div(
       class = "footer",
-      align = "right",
+      align = "center",
       p(
         tags$a(
           href = "https://naccho.org/", "NACCHO Home", target="_blank"),
-        "  |  ",
+        HTML("&nbsp", " | ", "&nbsp"),
+        tags$a(
+          href = "https://www.naccho.org/resources/lhd-research", "NACCHO Research", target="_blank"),
+        HTML("&nbsp", " | ", "&nbsp"),
+        tags$a(
+          href = "https://www.naccho.org/uploads/downloadable-resources/NACCHO_2022_Profile_Report.pdf", "2022 Profile Report", target="_blank"),
+        HTML("&nbsp", " | ", "&nbsp"),
         tags$a(
           href = "mailto:info@naccho.org", "Contact Us"),
-        "  |  ",
+        HTML("&nbsp", " | ", "&nbsp"),
         actionLink(
           inputId = "citation",
-          "Citation"
-        ), style = "font-size: .8em !important; padding-right: 2%;"
-      )
-    ),
+          "Citation"),
+        HTML("&nbsp", " | ", "&nbsp"),
+          actionButton("linkedin",
+                       label="",
+                       class = "linkedin-button",
+                       icon = icon("linkedin"),
+                       onclick ="window.open('https://www.linkedin.com/showcase/naccho-research', '_blank')"),
+        style = "font-size: 13px; font-weight: 700; color: white !important;")
+      ),
 
     # modal for key findings download
     bsutils::modal(
@@ -148,7 +168,7 @@ golem_add_external_resources <- function() {
     favicon(),
     bundle_resources(
       path = app_sys("app/www"),
-      app_title = "nacchoProfile"
+      app_title = "NACCHO Profile Study"
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()

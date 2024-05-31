@@ -1,4 +1,7 @@
+/* MY STYLES */
 
+
+/* -------------------------------------------------- SIDEBAR AND NAVIGATION */
 .sidebar {
   background-color: #212F5B !important;
 }
@@ -15,24 +18,19 @@
   opacity: 1 !important;
 }
 
-
 .sidebar-content {
   padding-top: 60% !important;
 }
 
-
 .nav-tabs {
   justify-content: center !important;
   text-transform: uppercase;
-  font-weight: 300;
+  padding-top: 50px !important;
 }
-
-
 
 .nav:not(.nav-hidden):not(.nav-stacked):not(.flex-column) {
   border: none !important;
 }
-
 
 .sidebar>.sidebar-content {
     display: flex;
@@ -48,17 +46,14 @@
   font-size: 1.0em !important;
 }
 
-
 .nav-item:nth-child(9) .nav-link {
-  padding-top: 120px !important;
+  padding-top: 160px !important;
   padding-left: 0px !important;
   padding-right: 0px !important;
 }
 
-
 .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
   border: none !important;
-  border-bottom: 2px solid #212F5B !important;
   box-shadow: none !important;
   color: white !important;
   padding-top: 2.0em; !important
@@ -68,16 +63,14 @@
     background-color: transparent !important;
     color: #80A14E !important;
     font-weight: 700 !important;
-    border-bottom: 2px solid #80A14E !important;
+    border-bottom: none !important;
   }
 
 .nav-item:nth-child(1) .nav-link.active, .nav-item:nth-child(9) .nav-link.active {
     border-bottom: none !important;
   }
 
-
-  /* I took these out from the class above ----->  .nav-tabs>li>a.active, .nav-tabs .nav-pills>li>a.active, .nav-tabs :where(ul.nav.navbar-nav > li)>a.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item.in .nav-link, .nav-tabs .nav-item.show .nav-tabs>li>a, .nav-tabs .nav-item.in .nav-tabs>li>a, .nav-tabs .nav-item.show .nav-pills>li>a, .nav-tabs .nav-item.in .nav-pills>li>a, .nav-tabs>li.show .nav-link, .nav-tabs>li.in .nav-link, .nav-tabs>li.show .nav-tabs>li>a, .nav-tabs>li.in .nav-tabs>li>a, .nav-tabs>li.show .nav-pills>li>a, .nav-tabs>li.in .nav-pills>li>a, .nav-tabs .nav-pills>li.show .nav-link, .nav-tabs .nav-pills>li.in .nav-link, .nav-tabs .nav-pills>li.show .nav-tabs>li>a, .nav-tabs .nav-pills>li.in .nav-tabs>li>a, .nav-tabs .nav-pills>li.show .nav-pills>li>a, .nav-tabs .nav-pills>li.in .nav-pills>li>a, .nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a, .nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a, .nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a, .nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a */
-
+/* this is for the data playground button */
 .pill-button {
   border: 2px solid #80A14E;
   border-radius: 50px; /* Make it pill-shaped */
@@ -89,23 +82,364 @@
   box-shadow: none !important;
   font-size: .8em !important;
   font-weight: 700 !important;
-  /* position: absolute !important; */
-  /*bottom: 50px !important; */
-  /* left: 18% !important; */
 }
 
+/* this is for the data playground button */
 .pill-button:hover, .pill-button:focus {
   background-color: white !important;
   color: #212F5B !important;
   box-shadow: none !important;
   border: 2px solid #80A14E !important;
-
 }
+
+
+
+
+/* ----------------------------------------------------- HOME PAGE ACCORDION */
+.accordion-body {
+  font-weight: 500 !important;
+}
+
+.accordion-button {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.accordion-button .collapsed {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.accordion-item {
+  border-left: none !important;
+  border-right: none !important;
+  border: var(--bs-accordion-border-width) solid #008A96;
+}
+
+
+.accordion .accordion-button:not(.collapsed):focus {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+/* -------------------------------------------------------- HOME PAGE QUOTES */
+.carousel-dark .carousel-indicators [data-bs-target] {
+  color: #AB6143 !important;
+}
+
+.carousel {
+  height: 30em !important;
+}
+
+.home-content-carousel {
+  margin-top: 21.5em !important;
+  padding-right: 2em !important;
+  /* border-left: 1.5px solid #008A96 !important; */
+}
+
+
+
+/* ---------------------------------------------------- KEY FINDINGS CONTENT */
+.key-findings-cards .html-fill-container {
+  background-color: #fff !important;
+  margin-top: 0px;
+  padding: 0px;
+}
+
+.key-findings-cards .card-header {
+  background-color: #fff !important;
+  margin-top: 10px;
+  box-shadow: none;
+}
+
+.key-findings-cards .card-footer {
+  background-color: #fff;
+  padding-top: 20px;
+  box-shadow: none;
+  margin-bottom: 10px;
+}
+
+.key-findings-cards {
+  box-shadow: none !important;
+  border: 0px solid !important;
+  padding-right: 3em;
+  padding-left: 3em;
+}
+
+.key-findings-head {
+  padding-top: 2em;
+  padding-left: 8em;
+  padding-right: 8em;
+}
+
+.key-findings-content {
+  padding-top: 10em;
+  padding-left: 5em;
+  padding-right: 5em;
+}
+
+
+/* ---------------------------------------------------- DATA STORIES CONTENT */
+.data-stories-head {
+  padding-top: 2em;
+  padding-left: 8em;
+}
+
+
+/*------------------------------------------- FOOTER AND LINKS IN THE FOOTER */
+/* this changes the color of the links in the footer */
+a {
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+a:hover, a:focus {
+  color: #fff !important;
+  text-decoration: underline !important;
+}
+
+.linkedin-button {
+  background-color: transparent !important;
+  font-size: 13px !important;
+  color: white !important;
+  border: none !important;
+  padding: 0px !important;
+}
+
+.footer {
+  background-color: #008489 !important;
+  height: 5vh;
+  position: absolute;
+  bottom: 0px;
+  width: 100vw;
+  padding-top: 1.05em;
+  color: #fff !important;
+  justify-content: center !important;
+}
+
+
+
+/* -------------------------------------------- BUTTONS FOR THE DATA STORIES */
+.side_button {
+  border-radius: 50px 0px 0px 50px;
+  padding-right: 1em;
+}
+
+#fixed_button {
+    position: fixed;
+    top: 50%;
+    font-weight: 400;
+    right: 0%;
+}
+
+#top_fixed_button {
+    position: fixed;
+    top: 0%;
+    left: 20%;
+    font-weight: 400;
+}
+
+.top_button {
+  border-radius: 0px 0px 50px 50px;
+}
+
+
+
+/* ------------------------------------------------ KEY FINDINGS - SCROLLBAR */
+.scroll-desc::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-desc {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.scroll-desc {
+    min-height: 5em;
+    max-height: 5em;
+    overflow-y: auto; /* Enables vertical scrolling */
+    overflow-x: hidden; /* Hides horizontal scrolling */
+    padding-right: 8em; /* Optional: Adds some padding inside the div */
+    margin-bottom: 1.5em;
+}
+
+
+
+/* ------------------------------------------- HOVER BUTTONS FOR TOPICS PAGE */
+.hover-text {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-text .hover-text-content {
+  visibility: hidden;
+  min-width: 120px;
+  background-color: #212F5B;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 15px;
+  position: absolute;
+  top: 60%;
+  transform: translateY(-50%);
+  z-index: 1;
+  left: 120%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.hover-text .hover-text-content::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 100%; /* Position the triangle */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+
+.hover-text:hover .hover-text-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.icon-button {
+  width: 100px;
+  background-color: #008489 !important;
+  border: none !important;
+  border-radius: 0px 50px 50px 0px !important;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.vertical-layout {
+  padding-top: 20.6%;
+  margin-left: -2.6%;
+}
+
+.icon-button:hover, .icon-button:focus {
+  background-color: #80A14E !important;
+}
+
+
+/* ----------------------------------------------------- RIGHT SIDEBAR ICONS */
+.hover-text-side {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-text-side .icon {
+  display: inline-block;
+  /* Add any specific styles for the icon */
+}
+
+.hover-text-side .hover-text-content-side {
+  visibility: hidden;
+  min-width: 120px;
+  background-color: #212F5B;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 15px;
+  position: absolute;
+  top: 8%; /* Position the hover text below the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.hover-text-side .hover-text-content-side::before {
+  content: '';
+  position: absolute;
+  top: -10px; /* Adjust as needed to position the triangle */
+  left: 50%; /* Center the triangle horizontally */
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #212F5B transparent; /* Triangle pointing down */
+}
+
+.hover-text-side:hover .hover-text-content-side {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+/* ------------------------------------------------------- THESE NEED LABELS */
+.form-control {
+  background-color: transparent !important;
+  border-radius: 50px !important;
+}
+
+.search-input {
+  position: relative;
+  display: inline-block;
+}
+
+.search-input input[type="text"] {
+  padding-left: 3em; /* Adjust as necessary for the icon size */
+  padding-top: 1em;
+}
+
+.search-input::before {
+  padding-left: 1em; /* Adjust as necessary for the icon size */
+  padding-bottom: .3em;
+  content: "\f002"; /* Unicode for the FontAwesome search icon */
+  font-family: "FontAwesome";
+  position: absolute;
+  left: 0.5em; /* Adjust as necessary */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+
+.offcanvas-body {
+  padding: 0;
+}
+
+.sidebar {
+  min-height: 100%;
+}
+
+
+.offcanvas-menu-trigger{
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+}
+
+#offcanvas-menu{
+  width: 250px;
+}
+
+
+.selectize-input {
+  text-align: left !important;
+  display: block;
+}
+
+.selectize-dropdown-content {
+    text-align: left !important;
+}
+
 
 .my-button {
   border: .75px solid #C1C1C1 !important;
   border-radius: 5px !important; /* Make it pill-shaped */
-  padding: 0px 3px !important;
+  padding: 0px 6px !important;
   background-color: white !important;
   color: #666;
   cursor: pointer;
@@ -118,7 +452,7 @@
 .my-button:focus, .my-button:hover {
   border: .75px solid #C1C1C1 !important;
   border-radius: 5px !important; /* Make it pill-shaped */
-  padding: 0px 3px !important;
+  padding: 0px 6px !important;
   background-color: white !important;
   color: #666 !important;
   cursor: pointer;
@@ -140,7 +474,6 @@
 
 .fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
   display: block !important;
-  font-size: xx-large !important;
 }
 
 
@@ -176,8 +509,6 @@
   padding-right: 5% !important;
 }
 
-/* a {
-  color: #fff !important } */
 
 hr {
   border-top: 2px solid !important;
@@ -231,187 +562,4 @@ h2 {
   padding-right: 6em !important;
 }
 
-.home-content-carousel {
-  margin-top: 23em !important;
-  padding-left: 2em !important;
-  padding-right: 3em !important;
-  border-left: 1.5px solid #008A96 !important;
-}
-
-.key-findings-head {
-  padding-top: 2em !important;
-  padding-left: 8em !important;
-  padding-right: 8em !important;
-}
-
-.key-findings-content {
-  padding-top: 10em !important;
-  padding-left: 8em !important;
-  padding-right: 8em !important;
-}
-
-.accordion-button {
-  background-color: #fff !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.accordion-button .collapsed {
-  background-color: #fff !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.accordion-item {
-  border-left: none !important;
-  border-right: none !important;
-  border: var(--bs-accordion-border-width) solid #008A96;
-}
-
-
-.accordion .accordion-button:not(.collapsed):focus {
-  background-color: #fff !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-
-.offcanvas-body {
-  padding: 0;
-}
-
-.sidebar {
-  min-height: 100%;
-}
-
-
-.offcanvas-menu-trigger{
-  position: absolute;
-  top: 0.25rem;
-  left: 0.25rem;
-}
-
-#offcanvas-menu{
-  width: 250px;
-}
-
-.carousel-dark .carousel-indicators [data-bs-target] {
-  color: #AB6143 !important;
-}
-
-.carousel {
-  height: 23em !important;
-}
-
-.selectize-input {
-  text-align: left !important;
-  display: block;
-}
-
-.selectize-dropdown-content {
-    text-align: left !important;
-}
-
-
-.key-findings-cards .html-fill-container {
-  background-color: #fff !important;
-  margin-top: 0px;
-  padding: 0px;
-}
-
-.key-findings-cards .card-header {
-  background-color: #fff !important;
-  margin-top: 10px;
-  box-shadow: none;
-}
-
-.key-findings-cards .card-footer {
-  background-color: #fff;
-  padding-top: 20px;
-  box-shadow: none;
-  margin-bottom: 10px;
-}
-
-.key-findings-cards {
-  box-shadow: none !important;
-  border-color: #6EC4E9 !important;
-  border: 0px solid !important;
-}
-
-
-.footer {
-  background-color: #008489 !important;
-  height: 5vh;
-  position: absolute;
-  bottom: 0px;
-  width: 100vw;
-  padding-top: .8em;
-  color: #fff !important;
-}
-
-.naccho-links {
-  position: absolute;
-  right: 4em;
-  top: 2em;
-}
-
-#fixed_button {
-    position: fixed;
-    top: 50%;
-    font-weight: 400;
-    right: 0%;
-}
-
-.side_button {
-  border-radius: 50px 0px 0px 50px;
-  padding-right: 1em;
-}
-
-#top_fixed_button {
-    position: fixed;
-    top: 0%;
-    left: 20%;
-    font-weight: 400;
-}
-
-.top_button {
-  border-radius: 0px 0px 50px 50px;
-}
-
-
-.scroll-desc {
-  min-height: 5em;
-  max-height: 5em;
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: hidden; /* Hides horizontal scrolling */
-  padding: 0.5em; /* Optional: Adds some padding inside the div */
-  margin-bottom: 1.5em;
-}
-
-.form-control {
-  background-color: transparent !important;
-  border-radius: 50px !important;
-}
-
-.search-input {
-  position: relative;
-  display: inline-block;
-}
-
-.search-input input[type="text"] {
-  padding-left: 3em; /* Adjust as necessary for the icon size */
-  padding-top: 1em;
-}
-
-.search-input::before {
-  padding-left: 1em; /* Adjust as necessary for the icon size */
-  padding-bottom: .3em;
-  content: "\f002"; /* Unicode for the FontAwesome search icon */
-  font-family: "FontAwesome";
-  position: absolute;
-  left: 0.5em; /* Adjust as necessary */
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
 

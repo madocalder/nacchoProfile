@@ -13,218 +13,214 @@ mod_key_findings_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'key_findings_tab'",
-      flexlayout::flexlayout(
-        left = NULL,
-        center = div(
-          div(
-            class = "key-findings-head",
-            h1("Key Findings")
-          ),
-          openMenu(),
-          div(
-            class = "key-findings-content",
+      div(
+        div(
+          class = "key-findings-head",
+          h1("Key Findings")
+        ),
+        openMenu(),
+        div(
+          class = "key-findings-content",
 
-            # carousel
-            bsutils::carousel(
-              indicators = TRUE,
-              controls = FALSE,
-              class = "carousel-dark",
-              bsutils::carouselItem(
+          # carousel
+          bsutils::carousel(
+            indicators = TRUE,
+            controls = FALSE,
+            class = "carousel-dark",
+            bsutils::carouselItem(
+              div(
+                class = "row",
                 div(
-                  class = "row",
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
                     )
                   )
                 ),
-                interval = 60000L
-              ),
-              bsutils::carouselItem(
                 div(
-                  class = "row",
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
                     )
                   )
                 ),
-                interval = 60000L
-              ),
-              bsutils::carouselItem(
                 div(
-                  class = "row",
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
-                    )
-                  ),
-                  div(
-                    class = "col-lg-4",
-                    align = "center",
-                    bslib::card(
-                      height = 350,
-                      class = "key-findings-cards",
-                      bslib::card_header(
-                        fill = FALSE,
-                        h2("This is a Key Findings."),
-                      ),
-                      bslib::card_body(
-                        p("This is the text for the Key Finding")
-                      )
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
                     )
                   )
-                ),
-                interval = 60000L
-              )
-            ),
-
-            # download key findings
-            div(
-              align = "center",
-              br(),
-              br(),
-              actionLink(
-                inputId = ns("download"),
-                p("Download our key findings", style = "padding-top: 20px;"),
-                icon = tags$i(class = "fa-solid fa-circle-down"),
-                class = "link-no-underline"
-              )
-            ),
-
-            # modal for key findings download
-            bsutils::modal(
-              id = ns("modal"),
-              bsutils::modalHeader(
-                bsutils::modalTitle(
-                  p("What do you want to download?")
                 )
               ),
-              bsutils::modalBody(
-                p("Some information about how you can use this information
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              div(
+                class = "row",
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                ),
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                ),
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              div(
+                class = "row",
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                ),
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                ),
+                div(
+                  class = "col-lg-4",
+                  align = "center",
+                  bslib::card(
+                    height = 350,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE,
+                      h2("This is a Key Findings."),
+                    ),
+                    bslib::card_body(
+                      p("This is the text for the Key Finding")
+                    )
+                  )
+                )
+              ),
+              interval = 60000L
+            )
+          ),
+
+          # download key findings
+          div(
+            align = "center",
+            br(),
+            br(),
+            actionLink(
+              inputId = ns("download"),
+              p("Download our key findings", style = "padding-top: 20px;"),
+              icon = tags$i(class = "fa-solid fa-circle-down"),
+              class = "link-no-underline"
+            )
+          ),
+
+          # modal for key findings download
+          bsutils::modal(
+            id = ns("modal"),
+            bsutils::modalHeader(
+              bsutils::modalTitle(
+                p("What do you want to download?")
+              )
+            ),
+            bsutils::modalBody(
+              p("Some information about how you can use this information
                   for example you can add more visualizations or use it to
                   do this and that."),
-                br(),
-                br(),
-                downloadLink(
-                  outputId = ns("download_slides"),
-                  label = p("Download our key findings slide deck")
-                ),
-                br(),
-                downloadLink(
-                  outputId = ns("download_pdf"),
-                  label = p("Download our key findings brief")
-                )
+              br(),
+              br(),
+              downloadLink(
+                outputId = ns("download_slides"),
+                label = p("Download our key findings slide deck")
+              ),
+              br(),
+              downloadLink(
+                outputId = ns("download_pdf"),
+                label = p("Download our key findings brief")
               )
             )
           )
-        ),
-        right = NULL
+        )
       )
     )
   )
