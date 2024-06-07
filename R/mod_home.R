@@ -99,7 +99,7 @@ mod_home_ui <- function(id){
         right = div(
           class = "home-content-carousel",
           bsutils::carousel(
-            class = "carousel-dark",
+            class = "carousel-dark alt",
             indicators = TRUE,
             controls = FALSE,
             bsutils::carouselItem(

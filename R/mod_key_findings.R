@@ -14,27 +14,75 @@ mod_key_findings_ui <- function(id){
     conditionalPanel(
       condition = "input.tabs == 'key_findings_tab'",
       div(
+        openMenu(),
         div(
           class = "key-findings-head",
-          h1("Key Findings")
+          div(
+            class = "row",
+            div(
+              class = "col-sm-8",
+              align = "left",
+              h1("Key Findings")
+            ),
+            div(
+              class = "col-sm-3 findings-align",
+                  actionLink(class = "download-input link-no-underline",
+                    inputId = ns("download"),
+                    "Download Key Findings"
+              )
+            )
+          )
         ),
-        openMenu(),
         div(
           class = "key-findings-content",
 
           # carousel
           bsutils::carousel(
-            indicators = TRUE,
-            controls = FALSE,
-            class = "carousel-dark",
+            indicators = FALSE,
+            controls = TRUE,
+            class = "carousel-dark alt-2",
             bsutils::carouselItem(
               div(
                 class = "row",
                 div(
-                  class = "col-lg-4",
+                  class = "col-xl-6 col-lg-12",
                   align = "center",
                   bslib::card(
-                    height = 350,
+                    height = 600,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE
+                    ),
+                    bslib::card_body(
+                      highcharter::highchartOutput(ns("finding_one")),
+                    )
+                  )
+                ),
+                div(
+                  class = "col-xl-6 col-lg-12",
+                  align = "center",
+                  bslib::card(
+                    height = 600,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE
+                    ),
+                    bslib::card_body(
+                      highcharter::highchartOutput(ns("finding_two")),
+                    )
+                  )
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              div(
+                class = "row",
+                div(
+                  class = "col-lg-6",
+                  align = "center",
+                  bslib::card(
+                    height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
                       fill = FALSE,
@@ -46,25 +94,10 @@ mod_key_findings_ui <- function(id){
                   )
                 ),
                 div(
-                  class = "col-lg-4",
+                  class = "col-lg-6",
                   align = "center",
                   bslib::card(
-                    height = 350,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
-                    ),
-                    bslib::card_body(
-                      p("This is the text for the Key Finding")
-                    )
-                  )
-                ),
-                div(
-                  class = "col-lg-4",
-                  align = "center",
-                  bslib::card(
-                    height = 350,
+                    height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
                       fill = FALSE,
@@ -82,10 +115,10 @@ mod_key_findings_ui <- function(id){
               div(
                 class = "row",
                 div(
-                  class = "col-lg-4",
+                  class = "col-lg-6",
                   align = "center",
                   bslib::card(
-                    height = 350,
+                    height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
                       fill = FALSE,
@@ -97,25 +130,10 @@ mod_key_findings_ui <- function(id){
                   )
                 ),
                 div(
-                  class = "col-lg-4",
+                  class = "col-lg-6",
                   align = "center",
                   bslib::card(
-                    height = 350,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
-                    ),
-                    bslib::card_body(
-                      p("This is the text for the Key Finding")
-                    )
-                  )
-                ),
-                div(
-                  class = "col-lg-4",
-                  align = "center",
-                  bslib::card(
-                    height = 350,
+                    height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
                       fill = FALSE,
@@ -128,70 +146,6 @@ mod_key_findings_ui <- function(id){
                 )
               ),
               interval = 60000L
-            ),
-            bsutils::carouselItem(
-              div(
-                class = "row",
-                div(
-                  class = "col-lg-4",
-                  align = "center",
-                  bslib::card(
-                    height = 350,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
-                    ),
-                    bslib::card_body(
-                      p("This is the text for the Key Finding")
-                    )
-                  )
-                ),
-                div(
-                  class = "col-lg-4",
-                  align = "center",
-                  bslib::card(
-                    height = 350,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
-                    ),
-                    bslib::card_body(
-                      p("This is the text for the Key Finding")
-                    )
-                  )
-                ),
-                div(
-                  class = "col-lg-4",
-                  align = "center",
-                  bslib::card(
-                    height = 350,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
-                    ),
-                    bslib::card_body(
-                      p("This is the text for the Key Finding")
-                    )
-                  )
-                )
-              ),
-              interval = 60000L
-            )
-          ),
-
-          # download key findings
-          div(
-            align = "center",
-            br(),
-            br(),
-            actionLink(
-              inputId = ns("download"),
-              p("Download our key findings", style = "padding-top: 20px;"),
-              icon = tags$i(class = "fa-solid fa-circle-down"),
-              class = "link-no-underline"
             )
           ),
 
@@ -256,6 +210,84 @@ mod_key_findings_server <- function(id){
           file.copy("", file) # add content www/
         }
       )
+
+    # finding one - workforce
+    output$finding_one <- highcharter::renderHighchart({
+
+      data <- data.frame(
+        year = c("2019", "2022", "2019", "2022", "2019", "2022", "2019", "2022"),
+        value = c(129000, 138000, 17600, 14700, 8000, 22000, 2300, 3400),
+        job_type = c("Full-time",
+                     "Full-time",
+                     "Part-time",
+                     "Part-time",
+                     "Contractual",
+                     "Contractual",
+                     "Seasonal",
+                     "Seasonal"),
+        perc_change = c("+7%", "+7%", "-16%", "-16%", "+175%", "+175%", "+48%", "+48%")
+      )
+
+      data <- data %>%
+        dplyr::mutate(job_type = factor(job_type, levels = c("Seasonal", "Contractual", "Part-time", "Full-time"))) %>%
+        dplyr::arrange(job_type)
+
+      naccho.viz::create_stacked_bar(
+        data = data,
+        my_colors = c(naccho.viz::naccho_pink, naccho.viz::naccho_blue, naccho.viz::naccho_green, naccho.viz::naccho_teal),
+        x_variable = "year",
+        y_variable = "value",
+        title_text = "Workforce Growth During the Pandemic Is Likely
+                         Temporary.",
+        subtitle_text = "The LHD workforce grew by 19% between 2019 and 2022,
+                        fueled by a 175% increase in contractual employees.",
+        x_group = "job_type",
+        y_label = "employees",
+        y_max = 200000,
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "<b> Employees: </b> {point.value:,.0f} <br>
+                   <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
+                   <b> Job Type: </b> {point.job_type}",
+        allow_export = FALSE
+      )
+    })
+
+    # finding two - revenues
+    output$finding_two <- highcharter::renderHighchart({
+      data <- data.frame(
+        year = c("2019", "2022", "2019", "2022"),
+        value = c(17, 31, 10, 18),
+        stat = c("Mean", "Mean", "Median", "Median"),
+        perc_change = c("+45%", "+45%", "+44%", "+44%")
+      )
+
+      data$year <- factor(data$year)
+
+      naccho.viz::create_grouped_line(
+        data = data,
+        x_variable = "year",
+        y_variable = "value",
+        title_text = "Average per capita revenues from federal sources nearly
+        doubled between 2019 and 2022, from $17 to $31.",
+        subtitle_text = "Increases were at least in part due to the influx of
+        supplemental COVID-19 federal funding available; however, nearly one in
+        five LHDs foresaw budget cuts in their next fiscal year, as those federal
+        resources are expected to expire.",
+        x_group = "stat",
+        y_label = "Per Capita Revenue",
+        x_label = "Year",
+        y_max = 35,
+        y_format = "${value:,.0f}",
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "<b> Per Capita Revenue: </b> ${point.value:,.0f} <br>
+                   <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
+                   <b> Statistic: </b> {point.stat}",
+        allow_export = FALSE
+      )
+
+    })
 
   })
 }

@@ -20,19 +20,21 @@ mod_data_stories_ui <- function(id){
           div(
             class = "row",
             div(
-              class = "col-xl-9",
+              class = "col-sm-9",
               align = "left",
               h1("Data Stories")
             ),
             div(
-              class = "col-xl-3",
-              align = "right",
+              class = "col-sm-3 findings-align",
               div(class = "search-input",
                   textInput(ns("search"), NULL, placeholder = "Search tags"),
-                  style = "margin-right: 5em;"
+                  style = "margin-right: 5%;"
               )
             )
-          ),
+          )
+        ),
+        div(
+          class = "data-stories-content",
           div(
             class = "row",
             style = "padding-top: 10%",

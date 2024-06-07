@@ -19,7 +19,10 @@
 }
 
 .sidebar-content {
-  padding-top: 60% !important;
+    display: flex;
+    align-items: center; /* Vertically center */
+    justify-content: center; /* Horizontally center, optional */
+    height: 100vh; /* Full viewport height */
 }
 
 .nav-tabs {
@@ -46,9 +49,11 @@
   font-size: 1.0em !important;
 }
 
+.nav-item:nth-child(9) {
+  padding-top: 60% !important;
+}
+
 .nav-item:nth-child(9) .nav-link {
-  padding-top: 160px !important;
-  padding-left: 0px !important;
   padding-right: 0px !important;
 }
 
@@ -131,8 +136,8 @@
   color: #AB6143 !important;
 }
 
-.carousel {
-  height: 30em !important;
+.carousel-dark:not(.alt-2) {
+  height: 400px !important;
 }
 
 .home-content-carousel {
@@ -156,6 +161,10 @@
   box-shadow: none;
 }
 
+.card-header {
+  border-bottom: none !important;
+}
+
 .key-findings-cards .card-footer {
   background-color: #fff;
   padding-top: 20px;
@@ -173,14 +182,89 @@
 .key-findings-head {
   padding-top: 2em;
   padding-left: 8em;
-  padding-right: 8em;
+  padding-right: 3em;
 }
 
 .key-findings-content {
-  padding-top: 10em;
+  padding-top: 6em;
   padding-left: 5em;
   padding-right: 5em;
 }
+
+.carousel-control-prev {
+  justify-content: left !important;
+  margin-left: -4em !important;
+}
+
+.carousel-control-next {
+  justify-content: right !important;
+  margin-right: -4em !important;
+}
+
+@media (max-width: 1300px) {
+  .key-findings-head {
+    padding-top: 2em;
+    padding-left: 1.5em;
+    padding-right: .5em;
+  }
+
+  .key-findings-content {
+    padding-top: 6em;
+    padding-left: .5em;
+    padding-right: .5em;
+  }
+
+.carousel-control-prev {
+    justify-content: left !important;
+    margin-left: 0em !important;
+
+  }
+
+  .carousel-control-next {
+    justify-content: right !important;
+    margin-right: 0em !important;
+  }
+}
+
+@media (max-width: 1199px) {
+  .carousel-indicators {
+    position: relative !important;
+  }
+}
+
+.carousel-dark:not(.alt) {
+  height: 700px !important;
+}
+
+
+.findings-align {
+  text-align: right;
+}
+
+@media (max-width: 575px) {
+  .findings-align {
+    text-align: left !important;
+  }
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  height: 3em !important;
+  width: 3em !important;
+}
+
+.carousel-control-next-icon {
+    background-image: url("circle-chevron-right-light.svg") !important;
+}
+
+
+.carousel-dark .carousel-control-prev-icon, .carousel-dark .carousel-control-next-icon {
+  filter: none !important;
+}
+
+.carousel-control-prev-icon {
+    background-image: url("circle-chevron-left-light.svg") !important;
+}
+
 
 
 /* ---------------------------------------------------- DATA STORIES CONTENT */
@@ -189,11 +273,30 @@
   padding-left: 8em;
 }
 
+.data-stories-content {
+  padding-top: 4em;
+  padding-left: 8em;
+  padding-right: 6em;
+}
+
+
+@media (max-width: 1400px) {
+.data-stories-head {
+    padding-top: 2em;
+    padding-left: 3em;
+  }
+
+  .data-stories-content {
+    padding-top: 4em;
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+}
 
 /*------------------------------------------- FOOTER AND LINKS IN THE FOOTER */
 /* this changes the color of the links in the footer */
 a {
-  color: #fff !important;
+  color: #fff;
   text-decoration: none !important;
 }
 
@@ -386,6 +489,7 @@ a:hover, a:focus {
 .search-input {
   position: relative;
   display: inline-block;
+  margin-left: 10%;
 }
 
 .search-input input[type="text"] {
@@ -476,14 +580,37 @@ a:hover, a:focus {
   display: block !important;
 }
 
+.fas {
+  color: #008A96;
+}
 
 .link-no-underline {
   text-decoration: none !important;
-  align-content: center !important;
-  text-align: center !important;
-  justify-content: center !important;
   color: #212F5B !important;
   font-weight: 600 !important;
+}
+
+.link-no-underline:hover {
+  text-decoration: none !important;
+}
+
+.download-input {
+  position: relative;
+  display: inline-block;
+}
+
+.download-input input[type="text"] {
+}
+
+.download-input::before {
+  content: "\f063"; /* Unicode for the FontAwesome search icon */
+  font-family: "FontAwesome";
+  position: absolute;
+  left: 0em; /* Adjust as necessary */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  margin-left: -20px;
 }
 
 
@@ -538,6 +665,9 @@ h2 {
   padding-top: 10px !important;
 }
 
+h1 {
+  color: #008489;
+}
 
 .selectize-input.full {
   background-color: #F9F8F7 !important;
