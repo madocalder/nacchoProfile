@@ -37,7 +37,6 @@ mod_data_stories_ui <- function(id){
           class = "data-stories-content",
           div(
             class = "row",
-            style = "padding-top: 10%",
             uiOutput(ns("cards_output"))
           ),
           div(

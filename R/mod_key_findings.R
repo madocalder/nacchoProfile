@@ -242,7 +242,7 @@ mod_key_findings_server <- function(id){
         subtitle_text = "The LHD workforce grew by 19% between 2019 and 2022,
                         fueled by a 175% increase in contractual employees.",
         x_group = "job_type",
-        y_label = "employees",
+        y_label = "Employees",
         y_max = 200000,
         legend_enable = TRUE,
         legend_title = "",
@@ -250,7 +250,93 @@ mod_key_findings_server <- function(id){
                    <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
                    <b> Job Type: </b> {point.job_type}",
         allow_export = FALSE
-      )
+      ) %>%
+        highcharter::hc_add_annotation(
+          labels = list(
+            list(
+              point =
+                list(
+                  x = 1.42,
+                  y = 60000,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "+7%",
+              align = "left",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              style = list(
+                color = "#008A96",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            ),
+            list(
+              point =
+                list(
+                  x = 1.45,
+                  y = 126000,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "-16%",
+              align = "left",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              style = list(
+                color = "#6C7E26",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            ),
+            list(
+              point =
+                list(
+                  x = 1.49,
+                  y = 145000,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "+175%",
+              align = "left",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              allowOverlap = TRUE,
+              style = list(
+                color = "#212F5B",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            ),
+            list(
+              point =
+                list(
+                  x = 1.45,
+                  y = 180000,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "+48%",
+              align = "left",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              allowOverlap = TRUE,
+              style = list(
+                color = "#9A639F",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            )
+          )
+        )
     })
 
     # finding two - revenues
@@ -269,11 +355,9 @@ mod_key_findings_server <- function(id){
         x_variable = "year",
         y_variable = "value",
         title_text = "Average per capita revenues from federal sources nearly
-        doubled between 2019 and 2022, from $17 to $31.",
-        subtitle_text = "Increases were at least in part due to the influx of
-        supplemental COVID-19 federal funding available; however, nearly one in
-        five LHDs foresaw budget cuts in their next fiscal year, as those federal
-        resources are expected to expire.",
+        doubled from 2019 to 2022.",
+        subtitle_text = "Nonetheless, nearly one in five LHDs foresaw budget
+        cuts their next fiscal year as federal resources expire.",
         x_group = "stat",
         y_label = "Per Capita Revenue",
         x_label = "Year",
@@ -285,8 +369,31 @@ mod_key_findings_server <- function(id){
                    <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
                    <b> Statistic: </b> {point.stat}",
         allow_export = FALSE
-      )
-
+      ) %>%
+        highcharter::hc_add_annotation(
+          labels = list(
+            list(
+              point =
+                list(
+                  x = 1,
+                  y = 30,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "+45%",
+              align = "center",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              style = list(
+                color = "#008A96",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            )
+          )
+        )
     })
 
   })
