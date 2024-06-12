@@ -186,7 +186,7 @@
 }
 
 .key-findings-content {
-  padding-top: 4em;
+  padding-top: 5em;
   padding-left: 4em;
   padding-right: 5em;
 }
@@ -209,7 +209,7 @@
   }
 
   .key-findings-content {
-    padding-top: 4em;
+    padding-top: 5em;
     padding-left: .5em;
     padding-right: .5em;
   }
@@ -296,12 +296,10 @@
 /*------------------------------------------- FOOTER AND LINKS IN THE FOOTER */
 /* this changes the color of the links in the footer */
 a {
-  color: #fff;
   text-decoration: none !important;
 }
 
 a:hover, a:focus {
-  color: #fff !important;
   text-decoration: underline !important;
 }
 
@@ -324,6 +322,9 @@ a:hover, a:focus {
   justify-content: center !important;
 }
 
+.footer a {
+  color: white !important;
+}
 
 
 /* -------------------------------------------- BUTTONS FOR THE DATA STORIES */
@@ -669,6 +670,10 @@ h1 {
   color: #008489;
 }
 
+b, strong {
+  font-weight: 800;
+}
+
 .selectize-input.full {
   background-color: #F9F8F7 !important;
 }
@@ -691,5 +696,4 @@ h1 {
   padding-left: 6em !important;
   padding-right: 6em !important;
 }
-
 

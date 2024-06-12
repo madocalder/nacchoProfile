@@ -54,7 +54,7 @@ mod_key_findings_ui <- function(id){
                       fill = FALSE
                     ),
                     bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_one")),
+                      highcharter::highchartOutput(ns("finding_one"))
                     )
                   )
                 ),
@@ -68,7 +68,41 @@ mod_key_findings_ui <- function(id){
                       fill = FALSE
                     ),
                     bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_two")),
+                      highcharter::highchartOutput(ns("finding_two"))
+                    )
+                  )
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              div(
+                class = "row",
+                div(
+                  class = "col-xl-6 col-lg-12",
+                  align = "center",
+                  bslib::card(
+                    height = 600,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE
+                    ),
+                    bslib::card_body(
+                     highcharter::highchartOutput(ns("finding_three"))
+                    )
+                  )
+                ),
+                div(
+                  class = "col-xl-6 col-lg-12",
+                  align = "center",
+                  bslib::card(
+                    height = 600,
+                    class = "key-findings-cards",
+                    bslib::card_header(
+                      fill = FALSE
+                    ),
+                    bslib::card_body(
+                      highcharter::highchartOutput(ns("finding_four"))
                     )
                   )
                 )
@@ -85,11 +119,10 @@ mod_key_findings_ui <- function(id){
                     height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
+                      fill = FALSE
                     ),
                     bslib::card_body(
-                      p("This is the text for the Key Finding")
+                      highcharter::highchartOutput(ns("finding_five"))
                     )
                   )
                 ),
@@ -100,11 +133,10 @@ mod_key_findings_ui <- function(id){
                     height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
+                      fill = FALSE
                     ),
                     bslib::card_body(
-                      p("This is the text for the Key Finding")
+                      highcharter::highchartOutput(ns("finding_six"))
                     )
                   )
                 )
@@ -115,32 +147,30 @@ mod_key_findings_ui <- function(id){
               div(
                 class = "row",
                 div(
-                  class = "col-lg-6",
+                  class = "col-xl-6 col-lg-12",
                   align = "center",
                   bslib::card(
                     height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
+                      fill = FALSE
                     ),
                     bslib::card_body(
-                      p("This is the text for the Key Finding")
+                      highcharter::highchartOutput(ns("finding_seven"))
                     )
                   )
                 ),
                 div(
-                  class = "col-lg-6",
+                  class = "col-xl-6 col-lg-12",
                   align = "center",
                   bslib::card(
                     height = 600,
                     class = "key-findings-cards",
                     bslib::card_header(
-                      fill = FALSE,
-                      h2("This is a Key Findings."),
+                      fill = FALSE
                     ),
                     bslib::card_body(
-                      p("This is the text for the Key Finding")
+                      highcharter::highchartOutput(ns("finding_eight"))
                     )
                   )
                 )
@@ -234,11 +264,12 @@ mod_key_findings_server <- function(id){
 
       naccho.viz::create_stacked_bar(
         data = data,
-        my_colors = c(naccho.viz::naccho_pink, naccho.viz::naccho_blue, naccho.viz::naccho_green, naccho.viz::naccho_teal),
+        my_colors = c(naccho.viz::naccho_pink, naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_blue),
         x_variable = "year",
         y_variable = "value",
-        title_text = "Workforce Growth During the Pandemic Is Likely
-                         Temporary.",
+        title_text = "Workforce grew during the pandemic, but mostly among <span
+        style='color:#AB6143;font-weight:bold;'>contract</span> and <span
+        style='color:#9A639F;font-weight:bold;'>seasonal</span> workers.",
         subtitle_text = "The LHD workforce grew by 19% between 2019 and 2022,
                         fueled by a 175% increase in contractual employees.",
         x_group = "job_type",
@@ -267,7 +298,7 @@ mod_key_findings_server <- function(id){
               borderRadius = 50,
               borderWidth = 0,
               style = list(
-                color = "#008A96",
+                color = naccho.viz::naccho_blue,
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -308,7 +339,7 @@ mod_key_findings_server <- function(id){
               borderWidth = 0,
               allowOverlap = TRUE,
               style = list(
-                color = "#212F5B",
+                color = naccho.viz::naccho_orange,
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -354,13 +385,14 @@ mod_key_findings_server <- function(id){
         data = data,
         x_variable = "year",
         y_variable = "value",
-        title_text = "Average per capita revenues from federal sources nearly
+        title_text = "<span style='color:#AB6143;font-weight:bold;'>Average per capita revenues</span> from federal sources nearly
         doubled from 2019 to 2022.",
         subtitle_text = "Nonetheless, nearly one in five LHDs foresaw budget
         cuts their next fiscal year as federal resources expire.",
         x_group = "stat",
         y_label = "Per Capita Revenue",
-        x_label = "Year",
+        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+        x_label = "",
         y_max = 35,
         y_format = "${value:,.0f}",
         legend_enable = TRUE,
@@ -386,7 +418,7 @@ mod_key_findings_server <- function(id){
               borderRadius = 50,
               borderWidth = 0,
               style = list(
-                color = "#008A96",
+                color = naccho.viz::naccho_orange,
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -396,6 +428,361 @@ mod_key_findings_server <- function(id){
         )
     })
 
+
+    # finding three - expenditures
+    output$finding_three <- highcharter::renderHighchart({
+      data <- data.frame(
+        year = c("2019", "2022", "2019", "2022"),
+        value = c(8380000, 9400000, NA, 3100000),
+        type = c("Expenditures",
+                     "Expenditures",
+                     "COVID-19 expenditures",
+                     "COVID-19 expenditures")
+      )
+
+      data$year <- factor(data$year)
+
+      naccho.viz::create_stacked_bar(
+        data = data,
+        x_variable = "year",
+        y_variable = "value",
+        my_colors = c(naccho.viz::naccho_green, naccho.viz::naccho_orange),
+        title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>spent
+        an average</span> of $12.5 million in 2022, with most of the $4.12 million increase
+        due to <span style='color:#80A14E;font-weight:bold;'>COVID-19.</span>",
+        subtitle_text = "COVID-19 expenditures averaged $3.10
+        million across LHDs, accounting for most of the increase.",
+        x_group = "type",
+        y_label = "Total Spending",
+        y_max = 15000000,
+        y_format = "${value:,.0f}",
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "<b> Total Expenditures: </b> ${point.value:,.0f} <br>
+                   <b> Type: </b> {point.type}",
+        allow_export = FALSE
+      ) %>%
+        highcharter::hc_add_annotation(
+          labels = list(
+            list(
+              point =
+                list(
+                  x = 1,
+                  y = 9750000,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "COVID-19",
+              align = "center",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              style = list(
+                color = "#fff",
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "14px"
+              )
+            )
+          )
+        )
+    })
+
+
+
+    # immunizations -----------------------------------------------------------
+    output$finding_four <- highcharter::renderHighchart({
+
+      data <- data.frame(
+        value = c(11, 47, 65, 11),
+        type = c("Expanded",
+                 "Reduced",
+                 "Expanded",
+                 "Reduced"),
+        year = c("2019", "2019", "2022", "2022")
+      )
+
+
+      naccho.viz::create_grouped_bar(
+        data = data,
+        x_variable = "year",
+        y_variable = "value",
+        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_pink),
+        y_format = "{value}%",
+        y_label = "Percent of LHDs",
+        x_group = "type",
+        allow_export = FALSE,
+        tooltip = "<b> {point.type}</b> <br>
+        <b>Percent of LHDs:</b> {point.value}%",
+        legend_enable = TRUE,
+        title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
+        immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
+        subtitle_text = "In 2022, 65% of LHDs expanded immunization services, compared to 11% that expanded immunizations in 2020 and 21% in 2019."
+      )
+    })
+
+
+    # policy engagement -------------------------------------------------------
+    output$finding_five <- highcharter::renderHighchart({
+
+      data <- data.frame(
+        value = c(8, 2),
+        description = c("Involved in policy activities", "Not involved in policy activities"),
+        percent = c(80, 20)
+      )
+
+      naccho.viz::create_icon_item(
+        data = data,
+        y_variable = "value",
+        item_group = "description",
+        legend_enable = TRUE,
+        tooltip =
+          "{point.percent}%",
+        color_one = naccho.viz::naccho_orange,
+        color_two = "#ddd",
+        title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID-19 emergency preparedness/response and infectious disease.",
+        subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID-19.",
+        caption_align = "left",
+        allow_export = FALSE
+      )
+    })
+
+
+    # informatics -------------------------------------------------------------
+    output$finding_six <- highcharter::renderHighchart({
+
+      data <- data.frame(
+        year = c(2008, 2010, 2013, 2016, 2019, 2022, 2008, 2010, 2013, 2016, 2019, 2022),
+        type = c("Electronic Health Records",
+                 "Electronic Health Records",
+                 "Electronic Health Records",
+                 "Electronic Health Records",
+                 "Electronic Health Records",
+                 "Electronic Health Records",
+                 "Health Information Exchanges",
+                 "Health Information Exchanges",
+                 "Health Information Exchanges",
+                 "Health Information Exchanges",
+                 "Health Information Exchanges",
+                 "Health Information Exchanges"),
+        value = c(19, 19, 23, 37, 59, 61,
+                    8, 6, 14, 17, 21, 32)
+      )
+
+      data$year <- factor(data$year)
+
+      naccho.viz::create_grouped_line(
+        data = data,
+        x_variable = "year",
+        y_variable = "value",
+        title_text = "Implementation of <span style='color:#AB6143;font-weight:bold;'>electronic health records</span> increased by 42 percentage points between 2008 and 2022.",
+        subtitle_text = "Participation in health information exchanges increased 24 percentage points over the same period, with fewer small LHDs using these systems.",
+        x_group = "type",
+        y_label = "Percent of LHDs",
+        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+        y_format = "{value}%",
+        legend_enable = TRUE,
+        legend_title = "",
+        x_label = "",
+        tooltip = "<b> Technology Implemented: </b> ${point.type} <br>
+                   <b> Percent of LHDs: </b> {point.percent}",
+        allow_export = FALSE
+      )
+    })
+
+
+    # clinical services -------------------------------------------------------
+    output$finding_seven <- highcharter::renderHighchart({
+
+      data <- data.frame(
+        rurality = c("Rural",
+                     "Rural",
+                     "Rural",
+                     "Rural",
+                     "Rural",
+                     "Urban",
+                     "Urban",
+                     "Urban",
+                     "Urban",
+                     "Urban"),
+        service = c("Oral Health",
+                 "Home Health Care",
+                 "Substance Use",
+                 "Mental Health",
+                 "Primary Care",
+                 "Oral Health",
+                 "Home Health Care",
+                 "Substance Use",
+                 "Mental Health",
+                 "Primary Care"),
+        perc = c(18, 21, 12, 8, 7,
+                    25, 12, 21, 16, 8)
+      )
+
+      data$rurality <- factor(data$rurality)
+
+      naccho.viz::create_grouped_bar(
+        data = data,
+        x_variable = "rurality",
+        y_variable = "perc",
+        title_text = "Provision of direct clinical services varies across rural and urban LHDs.",
+        subtitle_text = "In general, fewer rural LHDs provide direct clinical services.",
+        x_group = "service",
+        y_label = "",
+        y_max = 30,
+        y_format = "{value}%",
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "<b> Technology Implemented: </b> {point.type} <br>
+                   <b> Percent of LHDs: </b> {point.perc}%",
+        allow_export = FALSE,
+        select_theme = naccho.viz::naccho_bare_theme
+      ) %>%
+        highcharter::hc_plotOptions(
+          series = list(
+            dataLabels = list(
+              enabled = TRUE,
+              align = 'center',
+              verticalAlign = 'bottom',
+              style = list(
+                fontWeight = "500",
+                fontSize = "11px",
+                fontFamily = "Heebo",
+                textOutline = "none"),
+              format = "{point.perc}%",
+              formatter = highcharter::JS("function() {
+                        var color = (this.point.color === '#008489' || this.point.color === '#80A14E') ? '#333' : '#FFF';
+                        return '<span style=\"color:' + color + '\">' + this.x + ': ' + this.y + '</span>';
+                      }"),
+              inside = TRUE
+            )
+          )
+        )
+    })
+
+    output$finding_eight <- highcharter::renderHighchart({
+      # First chart data
+      data_2008 <- list(
+        list(name = "Under 50", y = 42, color = naccho.viz::naccho_orange),
+        list(name = "Over 50", y = 58, color = "#ddd")
+      )
+
+      # Second chart data
+      data_2022 <- list(
+        list(name = "Under 50", y = 34, color = naccho.viz::naccho_orange),
+        list(name = "Over 50", y = 66, color = "#ddd")
+      )
+
+      # Legend data
+      legend_data <- list(
+        list(name = "Under 50", y = 0, color = naccho.viz::naccho_orange),
+        list(name = "Over 50", y = 0, color = "#ddd")
+      )
+
+      highcharter::highchart() %>%
+        highcharter::hc_title(text = "Combined Pie Charts") %>%
+        highcharter::hc_chart(type = "pie") %>%
+        highcharter::hc_plotOptions(pie = list(
+          innerSize = '70%',
+          point = list(
+            events = list(
+              legendItemClick = highcharter::JS("function() {
+              var name = this.name;
+              var series = this.series.chart.series;
+              Highcharts.each(series, function(ob) {
+                Highcharts.each(ob.data, function(p) {
+                  if (p.name === name) {
+                    if (p.visible === true) {
+                      p.setVisible(false);
+                    } else {
+                      p.setVisible(true);
+                    }
+                  }
+                });
+              });
+              return false;
+            }")
+            )
+          )
+        )) %>%
+        highcharter::hc_add_series(
+          data = data_2008,
+          name = "Series 1",
+          center = c('25%', '50%'),
+          size = '40%',
+          showInLegend = FALSE
+        ) %>%
+        highcharter::hc_add_series(
+          data = data_2022,
+          name = "Series 2",
+          center = c('75%', '50%'),
+          size = '40%',
+          showInLegend = FALSE
+        ) %>%
+        highcharter::hc_add_series(
+          data = legend_data,
+          name = "Legend",
+          size = 0,
+          showInLegend = TRUE,
+          enableMouseTracking = FALSE,
+          dataLabels = list(enabled = FALSE)
+        ) %>%
+        highcharter::hc_legend(
+          enabled = TRUE,
+          title = list(
+            text = "Top Executive Is..."
+          )
+          ) %>%
+        highcharter::hc_add_series(
+          data = list(
+            list(y = 0, x = 0.25, name = "2019"),
+            list(y = 0, x = 0.75, name = "2022")
+          ),
+          type = "scatter",
+          marker = list(enabled = FALSE),
+          dataLabels = list(
+            enabled = TRUE,
+            format = '{point.name}',
+            align = 'center',
+            verticalAlign = 'bottom',
+            style = list(fontSize = "14px")
+          ),
+          enableMouseTracking = FALSE,
+          showInLegend = FALSE
+        ) %>%
+        highcharter::hc_add_theme(
+          naccho.viz::naccho_bare_theme
+        ) %>%
+        highcharter::hc_plotOptions(
+          series = list(
+            dataLabels = list(
+              enabled = TRUE,
+              align = 'center',
+              verticalAlign = 'bottom',
+              style = list(
+                fontWeight = "500",
+                fontSize = "11px",
+                fontFamily = "Heebo",
+                textOutline = "none"),
+              format = "{point.y}%",
+              distance = 5)
+          )
+        ) %>%
+        highcharter::hc_xAxis(
+          visible = FALSE
+        ) %>%
+        highcharter::hc_yAxis(
+          visible = FALSE
+        ) %>%
+        highcharter::hc_title(
+          text = "Top executives are slightly younger and less tenured now than in 2008.", # title text
+          margin = 40,
+          widthAdjust = -60
+        ) %>%
+        highcharter::hc_subtitle(
+          text = "In 2022, 42% of LHDs had a top executive younger than 50 – an increase from the 34% in 2008. During the same period, the average tenure decreased from 8.7 years to 6.6 years." # text under title
+        )
+    })
   })
 }
 
