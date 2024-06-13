@@ -287,18 +287,18 @@ mod_key_findings_server <- function(id){
             list(
               point =
                 list(
-                  x = 1.42,
+                  x = 1,
                   y = 60000,
                   xAxis = 0,
                   yAxis = 0
                 ),
               text = "+7%",
-              align = "left",
+              align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
               borderWidth = 0,
               style = list(
-                color = naccho.viz::naccho_blue,
+                color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -307,18 +307,18 @@ mod_key_findings_server <- function(id){
             list(
               point =
                 list(
-                  x = 1.45,
-                  y = 126000,
+                  x = 1,
+                  y = 125000,
                   xAxis = 0,
                   yAxis = 0
                 ),
               text = "-16%",
-              align = "left",
+              align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
               borderWidth = 0,
               style = list(
-                color = "#6C7E26",
+                color = "#000",
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -327,19 +327,19 @@ mod_key_findings_server <- function(id){
             list(
               point =
                 list(
-                  x = 1.49,
-                  y = 145000,
+                  x = 1,
+                  y = 144100,
                   xAxis = 0,
                   yAxis = 0
                 ),
               text = "+175%",
-              align = "left",
+              align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
               borderWidth = 0,
               allowOverlap = TRUE,
               style = list(
-                color = naccho.viz::naccho_orange,
+                color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -348,13 +348,13 @@ mod_key_findings_server <- function(id){
             list(
               point =
                 list(
-                  x = 1.45,
-                  y = 180000,
+                  x = 1,
+                  y = 182000,
                   xAxis = 0,
                   yAxis = 0
                 ),
               text = "+48%",
-              align = "left",
+              align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
               borderWidth = 0,
@@ -433,7 +433,7 @@ mod_key_findings_server <- function(id){
     output$finding_three <- highcharter::renderHighchart({
       data <- data.frame(
         year = c("2019", "2022", "2019", "2022"),
-        value = c(8380000, 9400000, NA, 3100000),
+        value = c(8.38, 9.4, NA, 3.1),
         type = c("Expenditures",
                      "Expenditures",
                      "COVID-19 expenditures",
@@ -454,11 +454,11 @@ mod_key_findings_server <- function(id){
         million across LHDs, accounting for most of the increase.",
         x_group = "type",
         y_label = "Total Spending",
-        y_max = 15000000,
-        y_format = "${value:,.0f}",
+        y_max = 15,
+        y_format = "${value:,.0f} m.",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "<b> Total Expenditures: </b> ${point.value:,.0f} <br>
+        tooltip = "<b> Total Expenditures: </b> ${point.value:,.2f} million.<br>
                    <b> Type: </b> {point.type}",
         allow_export = FALSE
       ) %>%
@@ -468,7 +468,7 @@ mod_key_findings_server <- function(id){
               point =
                 list(
                   x = 1,
-                  y = 9750000,
+                  y = 9.75,
                   xAxis = 0,
                   yAxis = 0
                 ),
