@@ -26,9 +26,9 @@ mod_key_findings_ui <- function(id){
             ),
             div(
               class = "col-sm-3 findings-align",
-                  actionLink(class = "download-input link-no-underline",
-                    inputId = ns("download"),
-                    "Download Key Findings"
+              actionLink(class = "download-input link-no-underline",
+                         inputId = ns("download"),
+                         "Download Key Findings"
               )
             )
           )
@@ -88,7 +88,7 @@ mod_key_findings_ui <- function(id){
                       fill = FALSE
                     ),
                     bslib::card_body(
-                     highcharter::highchartOutput(ns("finding_three"))
+                      highcharter::highchartOutput(ns("finding_three"))
                     )
                   )
                 ),
@@ -277,9 +277,8 @@ mod_key_findings_server <- function(id){
         y_max = 200000,
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "<b> Employees: </b> {point.value:,.0f} <br>
-                   <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
-                   <b> Job Type: </b> {point.job_type}",
+        tooltip = "{point.job_type} employees: <b> {point.value:,.0f} </b><br>
+                   Change from 2019-2022: <b> {point.perc_change}</b> <br>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -397,9 +396,8 @@ mod_key_findings_server <- function(id){
         y_format = "${value:,.0f}",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "<b> Per Capita Revenue: </b> ${point.value:,.0f} <br>
-                   <b> Percent Change from 2019 to 2022: </b> {point.perc_change} <br>
-                   <b> Statistic: </b> {point.stat}",
+        tooltip = " {point.stat} per capita revenue:  <b>${point.value:,.0f}</b> <br>
+                   Change from 2019-2022: <b> {point.perc_change</b>}",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -434,10 +432,10 @@ mod_key_findings_server <- function(id){
       data <- data.frame(
         year = c("2019", "2022", "2019", "2022"),
         value = c(8.38, 9.4, NA, 3.1),
-        type = c("Expenditures",
-                     "Expenditures",
-                     "COVID-19 expenditures",
-                     "COVID-19 expenditures")
+        type = c("Expenditures (non-COVID-19)",
+                 "Expenditures (non-COVID-19)",
+                 "COVID-19 expenditures",
+                 "COVID-19 expenditures")
       )
 
       data$year <- factor(data$year)
@@ -458,8 +456,7 @@ mod_key_findings_server <- function(id){
         y_format = "${value:,.0f} m.",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "<b> Total Expenditures: </b> ${point.value:,.2f} million.<br>
-                   <b> Type: </b> {point.type}",
+        tooltip = "{point.type}: <b>${point.value:,.2f} million </b>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -512,8 +509,7 @@ mod_key_findings_server <- function(id){
         y_label = "Percent of LHDs",
         x_group = "type",
         allow_export = FALSE,
-        tooltip = "<b> {point.type}</b> <br>
-        <b>Percent of LHDs:</b> {point.value}%",
+        tooltip = "{point.value}% of LHDs {point.type} <br> immunization services in {point.year}",
         legend_enable = TRUE,
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
         immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
@@ -536,8 +532,7 @@ mod_key_findings_server <- function(id){
         y_variable = "value",
         item_group = "description",
         legend_enable = TRUE,
-        tooltip =
-          "{point.percent}%",
+        tooltip = "{point.percent}% of LHDs were {point.description} <br> related to COVID-19 in 2022",
         color_one = naccho.viz::naccho_orange,
         color_two = "#ddd",
         title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID-19 emergency preparedness/response and infectious disease.",
@@ -566,7 +561,7 @@ mod_key_findings_server <- function(id){
                  "Health Information Exchanges",
                  "Health Information Exchanges"),
         value = c(19, 19, 23, 37, 59, 61,
-                    8, 6, 14, 17, 21, 32)
+                  8, 6, 14, 17, 21, 32)
       )
 
       data$year <- factor(data$year)
@@ -584,8 +579,7 @@ mod_key_findings_server <- function(id){
         legend_enable = TRUE,
         legend_title = "",
         x_label = "",
-        tooltip = "<b> Technology Implemented: </b> ${point.type} <br>
-                   <b> Percent of LHDs: </b> {point.percent}",
+        tooltip = "{point.value}% of LHDs implemented <br> {point.type} in {point.year}",
         allow_export = FALSE
       )
     })
@@ -606,17 +600,17 @@ mod_key_findings_server <- function(id){
                      "Urban",
                      "Urban"),
         service = c("Oral Health",
-                 "Home Health Care",
-                 "Substance Use",
-                 "Mental Health",
-                 "Primary Care",
-                 "Oral Health",
-                 "Home Health Care",
-                 "Substance Use",
-                 "Mental Health",
-                 "Primary Care"),
+                    "Home Health Care",
+                    "Substance Use",
+                    "Mental Health",
+                    "Primary Care",
+                    "Oral Health",
+                    "Home Health Care",
+                    "Substance Use",
+                    "Mental Health",
+                    "Primary Care"),
         perc = c(18, 21, 12, 8, 7,
-                    25, 12, 21, 16, 8)
+                 25, 12, 21, 16, 8)
       )
 
       data$rurality <- factor(data$rurality)
@@ -633,8 +627,7 @@ mod_key_findings_server <- function(id){
         y_format = "{value}%",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "<b> Technology Implemented: </b> {point.type} <br>
-                   <b> Percent of LHDs: </b> {point.perc}%",
+        tooltip = "{point.perc}% of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
         allow_export = FALSE,
         select_theme = naccho.viz::naccho_bare_theme
       ) %>%
@@ -663,14 +656,14 @@ mod_key_findings_server <- function(id){
     output$finding_eight <- highcharter::renderHighchart({
       # First chart data
       data_2008 <- list(
-        list(name = "Under 50", y = 42, color = naccho.viz::naccho_orange),
-        list(name = "Over 50", y = 58, color = "#ddd")
+        list(name = "Under 50", y = 34, color = naccho.viz::naccho_orange),
+        list(name = "Over 50", y = 66, color = "#ddd")
       )
 
       # Second chart data
       data_2022 <- list(
-        list(name = "Under 50", y = 34, color = naccho.viz::naccho_orange),
-        list(name = "Over 50", y = 66, color = "#ddd")
+        list(name = "Under 50", y = 42, color = naccho.viz::naccho_orange),
+        list(name = "Over 50", y = 58, color = "#ddd")
       )
 
       # Legend data
@@ -707,14 +700,14 @@ mod_key_findings_server <- function(id){
         )) %>%
         highcharter::hc_add_series(
           data = data_2008,
-          name = "Series 1",
+          name = "2008",
           center = c('25%', '50%'),
           size = '40%',
           showInLegend = FALSE
         ) %>%
         highcharter::hc_add_series(
           data = data_2022,
-          name = "Series 2",
+          name = "2022",
           center = c('75%', '50%'),
           size = '40%',
           showInLegend = FALSE
@@ -732,10 +725,10 @@ mod_key_findings_server <- function(id){
           title = list(
             text = "Top Executive Is..."
           )
-          ) %>%
+        ) %>%
         highcharter::hc_add_series(
           data = list(
-            list(y = 0, x = 0.25, name = "2019"),
+            list(y = 0, x = 0.25, name = "2008"),
             list(y = 0, x = 0.75, name = "2022")
           ),
           type = "scatter",
