@@ -245,8 +245,14 @@ mod_key_findings_server <- function(id){
     output$finding_one <- highcharter::renderHighchart({
 
       data <- data.frame(
-        year = c("2019", "2022", "2019", "2022", "2019", "2022", "2019", "2022"),
-        value = c(129000, 138000, 17600, 14700, 8000, 22000, 2300, 3400),
+        year = c("2019", "2022",
+                 "2019", "2022",
+                 "2019", "2022",
+                 "2019", "2022"),
+        value = c(129000, 138000,
+                  17600, 14700,
+                  8000, 22000,
+                  2300, 3400),
         job_type = c("Full-time",
                      "Full-time",
                      "Part-time",
@@ -255,30 +261,38 @@ mod_key_findings_server <- function(id){
                      "Contractual",
                      "Seasonal",
                      "Seasonal"),
-        perc_change = c("+7%", "+7%", "-16%", "-16%", "+175%", "+175%", "+48%", "+48%")
+        perc_change = c("\u002b7\u0025",
+                        "\u002b7\u0025",
+                        "\u221216\u0025",
+                        "\u221216\u0025",
+                        "\u002b175\u0025",
+                        "\u002b175\u0025",
+                        "\u002b48\u0025",
+                        "\u002b48\u0025")
       )
 
-      data <- data %>%
-        dplyr::mutate(job_type = factor(job_type, levels = c("Seasonal", "Contractual", "Part-time", "Full-time"))) %>%
-        dplyr::arrange(job_type)
+      data$job_type <- factor(data$job_type, levels = c("Seasonal", "Contractual", "Part-time", "Full-time"))
 
       naccho.viz::create_stacked_bar(
         data = data,
-        my_colors = c(naccho.viz::naccho_pink, naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_blue),
+        my_colors = c(naccho.viz::naccho_pink,
+                      naccho.viz::naccho_orange,
+                      naccho.viz::naccho_green,
+                      naccho.viz::naccho_blue),
         x_variable = "year",
         y_variable = "value",
         title_text = "Workforce grew during the pandemic, but mostly among <span
         style='color:#AB6143;font-weight:bold;'>contract</span> and <span
         style='color:#9A639F;font-weight:bold;'>seasonal</span> workers.",
-        subtitle_text = "The LHD workforce grew by 19% between 2019 and 2022,
-                        fueled by a 175% increase in contractual employees.",
+        subtitle_text = "The LHD workforce grew by 19\u0025 between 2019 and 2022,
+                        fueled by a 175\u0025 increase in contractual employees.",
         x_group = "job_type",
         y_label = "Employees",
         y_max = 200000,
         legend_enable = TRUE,
         legend_title = "",
         tooltip = "{point.job_type} employees: <b> {point.value:,.0f} </b><br>
-                   Change from 2019-2022: <b> {point.perc_change}</b> <br>",
+                   Change from 2019 to 2022: <b> {point.perc_change}</b> <br>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -291,7 +305,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "+7%",
+              text = "\u002b 7\u0025",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -311,7 +325,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "-16%",
+              text = "\u2212 16\u0025",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -331,7 +345,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "+175%",
+              text = "\u002b 175\u0025",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -352,7 +366,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "+48%",
+              text = "\u002b 48\u0025",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -375,7 +389,7 @@ mod_key_findings_server <- function(id){
         year = c("2019", "2022", "2019", "2022"),
         value = c(17, 31, 10, 18),
         stat = c("Mean", "Mean", "Median", "Median"),
-        perc_change = c("+45%", "+45%", "+44%", "+44%")
+        perc_change = c("\u002b45\u0025", "\u002b45\u0025", "\u002b44\u0025", "\u002b44\u0025")
       )
 
       data$year <- factor(data$year)
@@ -393,11 +407,11 @@ mod_key_findings_server <- function(id){
         my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
         x_label = "",
         y_max = 35,
-        y_format = "${value:,.0f}",
+        y_format = "\u0024{value:,.0f}",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = " {point.stat} per capita revenue:  <b>${point.value:,.0f}</b> <br>
-                   Change from 2019-2022: <b> {point.perc_change</b>}",
+        tooltip = " {point.stat} per capita revenue:  <b>\u0024{point.value:,.0f}</b> <br>
+                   Change from 2019 to 2022: <b> {point.perc_change}</b>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -410,7 +424,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "+45%",
+              text = "\u002b45\u0025",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -432,10 +446,10 @@ mod_key_findings_server <- function(id){
       data <- data.frame(
         year = c("2019", "2022", "2019", "2022"),
         value = c(8.38, 9.4, NA, 3.1),
-        type = c("Expenditures (non-COVID-19)",
-                 "Expenditures (non-COVID-19)",
-                 "COVID-19 expenditures",
-                 "COVID-19 expenditures")
+        type = c("Expenditures (non\u2212COVID\u221219)",
+                 "Expenditures (non\u2212COVID\u221219)",
+                 "COVID\u221219 expenditures",
+                 "COVID\u221219 expenditures")
       )
 
       data$year <- factor(data$year)
@@ -446,17 +460,17 @@ mod_key_findings_server <- function(id){
         y_variable = "value",
         my_colors = c(naccho.viz::naccho_green, naccho.viz::naccho_orange),
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>spent
-        an average</span> of $12.5 million in 2022, with most of the $4.12 million increase
-        due to <span style='color:#80A14E;font-weight:bold;'>COVID-19.</span>",
-        subtitle_text = "COVID-19 expenditures averaged $3.10
+        an average</span> of \u002412.5 million in 2022, with most of the \u00244.12 million increase
+        due to <span style='color:#80A14E;font-weight:bold;'>COVID\u221219.</span>",
+        subtitle_text = "COVID\u221219 expenditures averaged \u00243.10
         million across LHDs, accounting for most of the increase.",
         x_group = "type",
         y_label = "Total Spending",
         y_max = 15,
-        y_format = "${value:,.0f} m.",
+        y_format = "\u0024{value:,.0f} m",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "{point.type}: <b>${point.value:,.2f} million </b>",
+        tooltip = "{point.type}: <b>\u0024{point.value:,.2f} million </b>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -469,7 +483,7 @@ mod_key_findings_server <- function(id){
                   xAxis = 0,
                   yAxis = 0
                 ),
-              text = "COVID-19",
+              text = "COVID\u221219",
               align = "center",
               backgroundColor = "transparent",
               borderRadius = 50,
@@ -505,15 +519,15 @@ mod_key_findings_server <- function(id){
         x_variable = "year",
         y_variable = "value",
         my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_pink),
-        y_format = "{value}%",
+        y_format = "{value}\u0025",
         y_label = "Percent of LHDs",
         x_group = "type",
         allow_export = FALSE,
-        tooltip = "{point.value}% of LHDs {point.type} <br> immunization services in {point.year}",
+        tooltip = "{point.value}\u0025 of LHDs {point.type} <br> immunization services in {point.year}",
         legend_enable = TRUE,
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
         immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
-        subtitle_text = "In 2022, 65% of LHDs expanded immunization services, compared to 11% that expanded immunizations in 2020 and 21% in 2019."
+        subtitle_text = "In 2022, 65\u0025 of LHDs expanded immunization services, compared to 11\u0025 that expanded immunizations in 2020 and 21\u0025 in 2019."
       )
     })
 
@@ -532,11 +546,11 @@ mod_key_findings_server <- function(id){
         y_variable = "value",
         item_group = "description",
         legend_enable = TRUE,
-        tooltip = "{point.percent}% of LHDs were {point.description} <br> related to COVID-19 in 2022",
+        tooltip = "{point.percent}\u0025 of LHDs were {point.description} <br> related to COVID\u221219 in 2022",
         color_one = naccho.viz::naccho_orange,
         color_two = "#ddd",
-        title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID-19 emergency preparedness/response and infectious disease.",
-        subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID-19.",
+        title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
+        subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219.",
         caption_align = "left",
         allow_export = FALSE
       )
@@ -575,11 +589,11 @@ mod_key_findings_server <- function(id){
         x_group = "type",
         y_label = "Percent of LHDs",
         my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
-        y_format = "{value}%",
+        y_format = "{value}\u0025",
         legend_enable = TRUE,
         legend_title = "",
         x_label = "",
-        tooltip = "{point.value}% of LHDs implemented <br> {point.type} in {point.year}",
+        tooltip = "{point.value}\u0025 of LHDs implemented <br> {point.type} in {point.year}",
         allow_export = FALSE
       )
     })
@@ -624,10 +638,10 @@ mod_key_findings_server <- function(id){
         x_group = "service",
         y_label = "",
         y_max = 30,
-        y_format = "{value}%",
+        y_format = "{value}\u0025",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "{point.perc}% of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
+        tooltip = "{point.perc}\u0025 of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
         allow_export = FALSE,
         select_theme = naccho.viz::naccho_bare_theme
       ) %>%
@@ -642,7 +656,7 @@ mod_key_findings_server <- function(id){
                 fontSize = "11px",
                 fontFamily = "Heebo",
                 textOutline = "none"),
-              format = "{point.perc}%",
+              format = "{point.perc}\u0025",
               formatter = highcharter::JS("function() {
                         var color = (this.point.color === '#008489' || this.point.color === '#80A14E') ? '#333' : '#FFF';
                         return '<span style=\"color:' + color + '\">' + this.x + ': ' + this.y + '</span>';
@@ -676,7 +690,7 @@ mod_key_findings_server <- function(id){
         highcharter::hc_title(text = "Combined Pie Charts") %>%
         highcharter::hc_chart(type = "pie") %>%
         highcharter::hc_plotOptions(pie = list(
-          innerSize = '70%',
+          innerSize = '70\u0025',
           point = list(
             events = list(
               legendItemClick = highcharter::JS("function() {
@@ -757,7 +771,7 @@ mod_key_findings_server <- function(id){
                 fontSize = "11px",
                 fontFamily = "Heebo",
                 textOutline = "none"),
-              format = "{point.y}%",
+              format = "{point.y}\u0025",
               distance = 5)
           )
         ) %>%
@@ -773,7 +787,7 @@ mod_key_findings_server <- function(id){
           widthAdjust = -60
         ) %>%
         highcharter::hc_subtitle(
-          text = "In 2022, 42% of LHDs had a top executive younger than 50 – an increase from the 34% in 2008. During the same period, the average tenure decreased from 8.7 years to 6.6 years." # text under title
+          text = "In 2022, 42\u0025 of LHDs had a top executive younger than 50 \u002D an increase from the 34\u0025 in 2008. During the same period, the average tenure decreased from 8.7 years to 6.6 years." # text under title
         )
     })
   })
