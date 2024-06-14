@@ -162,22 +162,7 @@ mod_landscape_server <- function(id){
     })
 
     output$figure <- highcharter::renderHighchart({
-      naccho.viz::create_grouped_bar(
-        data = data,
-        x_variable = "rurality",
-        y_variable = "perc",
-        title_text = "Provision of direct clinical services varies across rural and urban LHDs.",
-        subtitle_text = "In general, fewer rural LHDs provide direct clinical services.",
-        x_group = "service",
-        y_label = "",
-        y_max = 30,
-        y_format = "{value}%",
-        legend_enable = TRUE,
-        legend_title = "",
-        tooltip = "{point.perc}% of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
-        allow_export = FALSE,
-        select_theme = naccho.viz::naccho_bare_theme
-      )
+
     })
 
 
