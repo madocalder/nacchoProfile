@@ -3,7 +3,6 @@
 #' @author National Association of City and County Health Officials (NACCHO)
 #' @references \email{research@@naccho.org}
 #' @references \url{www.naccho.org}
-#' @references \address{1201 Eye St. NW, Suite 400, Washington, D.C.}
 #'
 #'
 #' @format data.frame
