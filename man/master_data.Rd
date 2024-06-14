@@ -27,8 +27,6 @@ The National Profile of Local Health Departments, 2022
 \email{research@naccho.org}
 
 \url{www.naccho.org}
-
-\address{1201 Eye St. NW, Suite 400, Washington, D.C.}
 }
 \author{
 National Association of City and County Health Officials (NACCHO)
