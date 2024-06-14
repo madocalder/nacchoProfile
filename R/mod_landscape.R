@@ -1,4 +1,4 @@
-#' policy UI Function
+#' landscape UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,11 +7,11 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_policy_ui <- function(id){
+mod_landscape_ui <- function(id){
   ns <- NS(id)
   tagList(
     conditionalPanel(
-      condition = "input.tabs == 'policy_tab'",
+      condition = "input.tabs == 'landscape_tab'",
       flexlayout::flexlayout(
         left = NULL,
         center = div(
@@ -26,10 +26,12 @@ mod_policy_ui <- function(id){
               selectInput(
                 inputId = ns("topic"),
                 strong("Select Topic"),
-                choices = c(
-                  "Expenditures",
-                  "Funding",
-                  "Other lightg"
+                choices = list(
+                  "Population Served" = "totpop",
+                  "Geographies Served",
+                  "Governance",
+                  "Structure",
+                  "Board of Health"
                 ),
                 selected = "Expenditures"
               )
@@ -42,6 +44,8 @@ mod_policy_ui <- function(id){
                 strong("Select View"),
                 choices = c(
                   "Bar Graph",
+                  "Line Graph",
+                  "Pie Chart",
                   "Map",
                   "Table"
                 ),
@@ -70,7 +74,7 @@ mod_policy_ui <- function(id){
 
           # add main page content here ----------------------------------------------
 
-          p("This is the policy Page"),
+          # highcharter::highchartOutput(ns("figure"))
 
           # end of main content -----------------------------------------------------
 
@@ -133,19 +137,55 @@ mod_policy_ui <- function(id){
   )
 }
 
-
-#' policy Server Functions
+#' landscape Server Functions
 #'
 #' @noRd
-mod_policy_server <- function(id){
+mod_landscape_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+    # selected by user from input$filter
+    data_filter <- reactive({
+      get(input$filter)
+    })
+
+    var <- reactive ({
+      get(input$topic)
+    })
+
+    data <- reactive({
+      master_data %>%
+        dplyr::group_by(filter) %>%
+        dplyr::summarise(value = sum(vay())) %>%
+        dplyr::mutate(perc = paste0(round(value/sum(value)*100,1), "%"))
+
+    })
+
+    output$figure <- highcharter::renderHighchart({
+      naccho.viz::create_grouped_bar(
+        data = data,
+        x_variable = "rurality",
+        y_variable = "perc",
+        title_text = "Provision of direct clinical services varies across rural and urban LHDs.",
+        subtitle_text = "In general, fewer rural LHDs provide direct clinical services.",
+        x_group = "service",
+        y_label = "",
+        y_max = 30,
+        y_format = "{value}%",
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "{point.perc}% of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
+        allow_export = FALSE,
+        select_theme = naccho.viz::naccho_bare_theme
+      )
+    })
+
 
   })
 }
 
 ## To be copied in the UI
-# mod_policy_ui("policy_1")
+# mod_landscape_ui("landscape_1")
 
 ## To be copied in the server
-# mod_policy_server("policy_1")
+# mod_landscape_server("landscape_1")

@@ -28,7 +28,7 @@ devtools::build()
 
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
-golem::add_shinyappsio_file()
+# golem::add_shinyappsio_file()
 
 
 # Deploy to ShinyApps.io

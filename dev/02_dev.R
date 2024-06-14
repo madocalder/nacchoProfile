@@ -32,7 +32,7 @@ golem::add_module(name = "data_stories", with_test = TRUE, open = FALSE)
 golem::add_module(name = "workforce", with_test = TRUE, open = FALSE)
 golem::add_module(name = "finance", with_test = TRUE, open = FALSE)
 golem::add_module(name = "services", with_test = TRUE, open = FALSE)
-golem::add_module(name = "policy", with_test = TRUE, open = FALSE)
+golem::add_module(name = "landscape", with_test = TRUE, open = FALSE)
 golem::add_module(name = "topic_areas", with_test = TRUE, open = FALSE)
 golem::add_module(name = "playground", with_test = TRUE, open = FALSE)
 

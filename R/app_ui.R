@@ -52,6 +52,11 @@ app_ui <- function(request) {
             ),
 
           tabPanel(
+            "Landscape",
+            value = "landscape_tab"
+          ),
+
+          tabPanel(
             "Key Findings",
             value = "key_findings_tab"
           ),
@@ -77,11 +82,6 @@ app_ui <- function(request) {
           ),
 
           tabPanel(
-            "Policy",
-            value = "policy_tab"
-          ),
-
-          tabPanel(
             "Topics",
             value = "topics_tab"
           ),
@@ -94,13 +94,14 @@ app_ui <- function(request) {
       ),
 
       mod_home_ui("home_1"),
+      mod_landscape_ui("landscape_1"),
       mod_key_findings_ui("key_findings_1"),
       mod_data_stories_ui("data_stories_1"),
       mod_workforce_ui("workforce_1"),
       mod_finance_ui("finance_1"),
       mod_services_ui("services_1"),
-      mod_policy_ui("policy_1"),
       mod_topic_areas_ui("topic_areas_1")
+
 
     ),
 
