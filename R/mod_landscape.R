@@ -154,25 +154,39 @@ mod_landscape_server <- function(id){
         dplyr::summarise(value = sum(value)) %>%
         dplyr::mutate(perc = round(value/sum(value)*100,1))
 
-      naccho.viz::create_single_bar(
-        data = master_data,
-        x_variable = "fig_filter",
-        y_variable = "perc",
-        title_text = "Percent of U.S. Population Served by LHDs",
-        subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-        caption_text = "<b> Source: </b> 2022 National Profile of Local Health
-        Departments. National Association of County and City Health Officials.
-        Washington, DC. (2024).",
-        y_label = "",
-        y_max = 100,
-        y_format = "{value}%",
-        my_colors = naccho.viz::naccho_orange,
-        legend_enable = TRUE,
-        legend_title = "",
-        tooltip = "Topic: {point.fig_filter} <br> Percent: {point.perc}%",
-        allow_export = FALSE,
-        select_theme = naccho.viz::naccho_minimal_theme
-      )
+      if (input$view == "Bar Graph") {
+        naccho.viz::create_single_bar(
+          data = master_data,
+          x_variable = "fig_filter",
+          y_variable = "perc",
+          title_text = "Percent of U.S. Population Served by LHDs",
+          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+          caption_text = "<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",
+          y_label = "Percent of LHDs",
+          y_max = 100,
+          y_format = "{value}%",
+          my_colors = naccho.viz::naccho_orange,
+          legend_enable = FALSE,
+          legend_title = "",
+          tooltip = "{point.perc}% of LHDs serve {point.fig_filter} populations",
+          allow_export = FALSE,
+          select_theme = naccho.viz::naccho_minimal_theme
+        )
+      } else if (input$view == "Pie Chart") {
+        naccho.viz::create_pie(
+          data = master_data,
+          variable = "fig_filter",
+          value = "perc",
+          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_blue, naccho.viz::naccho_pink, naccho.viz::naccho_teal),
+          legend_enable = TRUE,
+          title_text = "Percent of U.S. Population Served by LHDs",
+          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+          caption_text = "<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials."
+        )
+      }
     })
 
   })
