@@ -75,7 +75,10 @@ mod_landscape_ui <- function(id){
 
           # add main page content here ----------------------------------------------
 
-          highcharter::highchartOutput(ns("figure"))
+          div(
+            class = "viz_content",
+            highcharter::highchartOutput(ns("figure"), height = 500)
+          )
 
           # end of main content -----------------------------------------------------
 
@@ -173,6 +176,7 @@ mod_landscape_server <- function(id){
         y_label = "",
         y_max = 100,
         y_format = "{value}%",
+        my_colors = naccho.viz::naccho_orange,
         legend_enable = TRUE,
         legend_title = "",
         tooltip = "Topic: {point.fig_filter} <br> Percent: {point.perc}%",

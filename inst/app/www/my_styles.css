@@ -697,3 +697,7 @@ b, strong {
   padding-right: 6em !important;
 }
 
+.viz_content {
+  padding-left: 4em !important;
+  padding-right: 4em !important;
+}
