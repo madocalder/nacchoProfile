@@ -26,14 +26,8 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("topic"),
                 strong("Select Topic"),
-                choices = list(
-                  "Population Served" = "totpop",
-                  "Geographies Served",
-                  "Governance",
-                  "Structure",
-                  "Board of Health"
-                ),
-                selected = "Population Served"
+                choices = landscape_topics,
+                selectize = TRUE
               )
             ),
             div(
@@ -58,12 +52,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = list(
-                  "Rurality" = "urbanrural2022",
-                  "Governance" = "c0govcat",
-                  "LHD Size" = "c0popcat3",
-                  "Region" = "censusregion"
-                ),
+                choices = landscape_filters,
                 selected = "LHD Size"
               )
             )
@@ -148,12 +137,14 @@ mod_landscape_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+
     filter_data <- reactive({
       master_data %>%
         haven::as_factor() %>%
         dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
         dplyr::mutate(value = get(input$topic))
     })
+
 
     output$figure <- highcharter::renderHighchart({
 
@@ -163,13 +154,12 @@ mod_landscape_server <- function(id){
         dplyr::summarise(value = sum(value)) %>%
         dplyr::mutate(perc = round(value/sum(value)*100,1))
 
-
       naccho.viz::create_single_bar(
         data = master_data,
         x_variable = "fig_filter",
         y_variable = "perc",
-        title_text = "Test",
-        subtitle_text = "Test",
+        title_text = "Percent of U.S. Population Served by LHDs",
+        subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
         caption_text = "<b> Source: </b> 2022 National Profile of Local Health
         Departments. National Association of County and City Health Officials.
         Washington, DC. (2024).",
