@@ -33,7 +33,7 @@ mod_landscape_ui <- function(id){
                   "Structure",
                   "Board of Health"
                 ),
-                selected = "Expenditures"
+                selected = "Population Served"
               )
             ),
             div(
@@ -145,7 +145,41 @@ mod_landscape_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    filter_data <- reactive({
+      master_data %>%
+        haven::as_factor() %>%
+        dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
+        dplyr::mutate(value = get(input$topic))
+    })
 
+    output$figure <- highcharter::renderHighchart({
+
+      master_data <-
+        filter_data() %>%
+        dplyr::group_by(fig_filter) %>%
+        dplyr::summarise(value = sum(value)) %>%
+        dplyr::mutate(perc = round(value/sum(value)*100,1))
+
+
+      naccho.viz::create_single_bar(
+        data = master_data,
+        x_variable = "fig_filter",
+        y_variable = "perc",
+        title_text = "Test",
+        subtitle_text = "Test",
+        caption_text = "<b> Source: </b> 2022 National Profile of Local Health
+        Departments. National Association of County and City Health Officials.
+        Washington, DC. (2024).",
+        y_label = "",
+        y_max = 100,
+        y_format = "{value}%",
+        legend_enable = TRUE,
+        legend_title = "",
+        tooltip = "Topic: {point.fig_filter} <br> Percent: {point.perc}%",
+        allow_export = FALSE,
+        select_theme = naccho.viz::naccho_minimal_theme
+      )
+    })
 
   })
 }

@@ -33,5 +33,6 @@ app_server <- function(input, output, session) {
 
   # key findings
   mod_key_findings_server("key_findings_1")
+  mod_landscape_server("landscape_1")
 
 }

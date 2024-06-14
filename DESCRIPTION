@@ -21,11 +21,12 @@ Imports:
     htmltools,
     highcharter,
     magrittr,
-    naccho.viz
+    naccho.viz,
+    stringr,
+    haven
 Suggests: 
     spelling,
-    testthat (>= 3.0.0),
-    haven
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
