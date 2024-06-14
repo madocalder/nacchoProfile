@@ -58,12 +58,13 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = c(
-                  "Rurality",
-                  "Governance",
-                  "LHD Size"
+                choices = list(
+                  "Rurality" = "urbanrural2022",
+                  "Governance" = "c0govcat",
+                  "LHD Size" = "c0popcat3",
+                  "Region" = "censusregion"
                 ),
-                selected = "Rurality"
+                selected = "LHD Size"
               )
             )
           ),
@@ -74,7 +75,7 @@ mod_landscape_ui <- function(id){
 
           # add main page content here ----------------------------------------------
 
-          # highcharter::highchartOutput(ns("figure"))
+          highcharter::highchartOutput(ns("figure"))
 
           # end of main content -----------------------------------------------------
 
@@ -144,26 +145,6 @@ mod_landscape_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    # selected by user from input$filter
-    data_filter <- reactive({
-      get(input$filter)
-    })
-
-    var <- reactive ({
-      get(input$topic)
-    })
-
-    data <- reactive({
-      master_data %>%
-        dplyr::group_by(filter) %>%
-        dplyr::summarise(value = sum(vay())) %>%
-        dplyr::mutate(perc = paste0(round(value/sum(value)*100,1), "%"))
-
-    })
-
-    output$figure <- highcharter::renderHighchart({
-
-    })
 
 
   })
