@@ -142,7 +142,8 @@ mod_landscape_server <- function(id){
       master_data %>%
         haven::as_factor() %>%
         dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-        dplyr::mutate(value = get(input$topic))
+        dplyr::mutate(value = get(input$topic)) %>%
+        dplyr::left_join(add_weights(input$topic), by = "c0popcat7")
     })
 
 
