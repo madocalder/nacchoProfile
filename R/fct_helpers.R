@@ -18,3 +18,4 @@ card_thumbnail <- function(
     p(as.Date(date, format = "%m/%d/%Y"), style = "padding-top: .6em")
   )
 }
+

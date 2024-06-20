@@ -1,5 +1,15 @@
 /* MY STYLES */
 
+/* Dropdowns */
+
+.min-height-400 .selectize-dropdown-content {
+  min-height: 400px;
+}
+
+.optgroup-header {
+  font-weight: 700;
+    color: #212F5B !important;
+}
 
 /* -------------------------------------------------- SIDEBAR AND NAVIGATION */
 .sidebar {

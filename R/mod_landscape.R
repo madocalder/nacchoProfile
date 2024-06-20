@@ -21,7 +21,7 @@ mod_landscape_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-4",
+              class = "col-sm-4 min-height-400",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -52,7 +52,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters,
+                choices = landscape_filters[-1],
                 selected = "LHD Size"
               )
             )
@@ -138,57 +138,148 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
-    filter_data <- reactive({
-      master_data %>%
-        haven::as_factor() %>%
-        dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-        dplyr::mutate(value = get(input$topic))
+    # update inputs based on selections ---------------------------------------
+    observe({
+      if (input$topic %in% c("totpop", "tenure")) {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[-1]
+        )
+      } else {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters
+        )
+      }
     })
 
 
+    # filter data -------------------------------------------------------------
+    filter_data <- reactive({
+
+      if (input$topic == "totpop") {
+        req(input$filter != "No Filter") # prevent error message from popping
+        master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
+          dplyr::mutate(fig_value = get(input$topic)) %>%
+          dplyr::group_by(fig_filter) %>%
+          dplyr::summarise(fig_value = sum(fig_value)) %>%
+          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
+          dplyr::mutate(fig_filter = factor(fig_filter)) %>% # factor for correct ordering
+          dplyr::arrange(fig_filter) %>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup()
+
+
+      } else if (input$topic == "tenure") {
+        req(input$filter != "No Filter") # prevent error message from popping
+        master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
+          dplyr::mutate(fig_value = get(input$topic)) %>%
+          dplyr::group_by(fig_filter) %>%
+          dplyr::summarise(n = mean(fig_value, na.rm = TRUE)) %>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup()
+
+
+      } else if (input$filter == "No Filter") {
+        master_data %>%
+          dplyr::mutate(fig_filter = get(input$topic)) %>%
+          tidyr::drop_na(fig_filter) %>%
+          haven::as_factor() %>%
+          dplyr::group_by(fig_filter) %>%
+          dplyr::summarise(value = dplyr::n()) %>%
+          dplyr::mutate(n = round(value/sum(value)*100,1)) %>%
+          dplyr::mutate(subtitle = "Across All LHDs") %>%
+          dplyr::ungroup()
+
+
+        # nested if/else: if any other filter is selected...
+      } else {
+        req(input$filter != "No Filter") # prevent error message from popping
+        master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
+          dplyr::mutate(fig_cat = get(input$topic)) %>%
+          tidyr::drop_na(fig_cat) %>%
+          dplyr::group_by(fig_filter, fig_cat) %>%
+          dplyr::summarise(fig_value = dplyr::n()) %>%
+          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
+          dplyr::mutate(fig_filter = factor(fig_filter)) %>%
+          dplyr::arrange(fig_filter) %>%
+          dplyr::ungroup()
+
+      }  # close topic class if/else
+    })
+
+
+    # filter meta data --------------------------------------------------------
+    filter_meta <- reactive({
+      meta %>%
+        dplyr::filter(field == input$topic)
+    })
+
+
+    # figure output -----------------------------------------------------------
     output$figure <- highcharter::renderHighchart({
 
-      master_data <-
-        filter_data() %>%
-        dplyr::group_by(fig_filter) %>%
-        dplyr::summarise(value = sum(value)) %>%
-        dplyr::mutate(perc = round(value/sum(value)*100,1))
+      req(filter_data()) # prevents error message from popping
 
-      if (input$view == "Bar Graph") {
+      if (input$view == "Bar Graph" & (input$topic %in% c("totpop", "tenure") | input$filter == "No Filter")) {
         naccho.viz::create_single_bar(
-          data = master_data,
+          data = filter_data(),
           x_variable = "fig_filter",
-          y_variable = "perc",
-          title_text = "Percent of U.S. Population Served by LHDs",
-          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = "<b> Source: </b> 2022 National Profile of Local Health
-          Departments. National Association of County and City Health Officials.
-          Washington, DC. (2024).",
-          y_label = "Percent of LHDs",
-          y_max = 100,
-          y_format = "{value}%",
+          y_variable = "n",
+          title_text = filter_meta()$title,
+          subtitle_text = filter_data()$subtitle[[1]],
+          caption_text = filter_meta()$caption,
+          y_label = filter_meta()$y_label,
+          y_max = filter_meta()$y_max,
+          y_format = filter_meta()$y_format,
           my_colors = naccho.viz::naccho_orange,
           legend_enable = FALSE,
           legend_title = "",
-          tooltip = "{point.perc}% of LHDs serve {point.fig_filter} populations",
+          tooltip = "",
+          allow_export = FALSE,
+          select_theme = naccho.viz::naccho_minimal_theme
+        )
+      } else if (input$view == "Bar Graph" & input$filter != "No Filter") {
+        naccho.viz::create_grouped_bar(
+          data = filter_data(),
+          x_variable = "fig_cat",
+          y_variable = "n",
+          x_group = "fig_filter",
+          title_text = filter_meta()$title,
+          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+          caption_text = filter_meta()$caption,
+          y_label = filter_meta()$y_label,
+          y_max = filter_meta()$y_max,
+          y_format = filter_meta()$y_format,
+          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_blue, naccho.viz::naccho_pink, naccho.viz::naccho_teal),
+          legend_enable = TRUE,
+          legend_title = "",
+          tooltip = "",
           allow_export = FALSE,
           select_theme = naccho.viz::naccho_minimal_theme
         )
       } else if (input$view == "Pie Chart") {
         naccho.viz::create_pie(
-          data = master_data,
+          data = filter_data(),
           variable = "fig_filter",
-          value = "perc",
+          value = "n",
           my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_blue, naccho.viz::naccho_pink, naccho.viz::naccho_teal),
           legend_enable = TRUE,
-          title_text = "Percent of U.S. Population Served by LHDs",
+          title_text = filter_meta()$title,
           subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = "<b> Source: </b> 2022 National Profile of Local Health
-          Departments. National Association of County and City Health Officials."
-        )
+          caption_text = filter_meta()$caption
+        ) %>%
+          naccho.viz::add_logo(
+            "https://www.naccho.org/img/footerlog.svg",
+            width = 240L,
+            height = 80L
+          )
       }
-    })
-
+    }) %>% debounce(100)
   })
 }
 

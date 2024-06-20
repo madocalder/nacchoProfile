@@ -23,7 +23,8 @@ Imports:
     magrittr,
     naccho.viz,
     stringr,
-    haven
+    haven,
+    tidyr
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
