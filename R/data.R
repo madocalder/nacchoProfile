@@ -52,3 +52,19 @@
 #' @source National Association of City and County Health Officials (NACCHO)
 "spec_data"
 
+
+
+
+#' Dataset for definitions for The National Profile
+#'  of Local Health Departments, 2022 master data
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format data.frame
+#'
+#' A data frame with 46 observations of 11 variables
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"context"
