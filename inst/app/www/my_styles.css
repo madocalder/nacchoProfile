@@ -465,7 +465,7 @@ a:hover, a:focus {
   border-radius: 6px;
   padding: 15px;
   position: absolute;
-  top: 8%; /* Position the hover text below the icon */
+  top: 128% !important; /* Position the hover text below the icon */
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
@@ -585,6 +585,7 @@ a:hover, a:focus {
   border-radius: 0 50px 50px 50px; /* Top left: 0, Other sides: 50px */
   width: 100%;
   z-index: -1; /* Place behind other content */
+  align-content: baseline;
  }
 
 .fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
@@ -625,12 +626,8 @@ a:hover, a:focus {
 }
 
 
-#workforce_1-more:hover, #workforce_1-more:focus, #workforce_1-about:hover, #workforce_1-about:focus, #workforce_1-context:hover, #workforce_1-context:focus {
-  color: #AB6143 !important;
-}
-
 #key_findings_1-download:hover, #key_findings_1-download:focus {
-  color: #AB6143 !important;
+  color: #AB6143;
 }
 
 
@@ -710,4 +707,13 @@ b, strong {
 .viz_content {
   padding-left: 4em !important;
   padding-right: 4em !important;
+}
+
+.context-content {
+  padding-left: 2.5em !important;
+  padding-right: 2em !important;
+}
+
+.clicked-link {
+    color: #AB6143 !important;
 }

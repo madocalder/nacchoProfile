@@ -10,7 +10,7 @@ landscape_topics <- list(
                           "Race" = "race",
                           "Tenure" = "tenure",
                           "Highest Degree" = "c4q34",
-                          "Field" = "field",
+                          "Specialization" = "field",
                           "Gender" = "c4q29")
 )
 

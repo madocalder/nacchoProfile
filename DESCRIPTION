@@ -24,7 +24,9 @@ Imports:
     naccho.viz,
     stringr,
     haven,
-    tidyr
+    tidyr,
+    tidyselect,
+    reshape2
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

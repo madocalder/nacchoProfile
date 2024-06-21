@@ -31,7 +31,8 @@ meta <- data.frame(
               "% of Top Executives"),
   y_max = c(100, 100, 100, 100, 100, 100, 100, 10, 100, 100, 100),
   y_format = c("{value}%", "{value}%", "{value}%", "{value}%", "{value}%",
-               "{value}%", "{value}%", "{value}", "{value}%", "{value}%", "{value}%")
+               "{value}%", "{value}%", "{value}", "{value}%", "{value}%", "{value}%"),
+  tooltip = c("{point.n}% of the U.S. population is served by {point.fig_filter} LHDs")
 
 )
 

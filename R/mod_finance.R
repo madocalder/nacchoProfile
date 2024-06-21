@@ -122,7 +122,7 @@ mod_finance_ui <- function(id){
               inputId = ns("color_palette"),
               p(
                 HTML("<b>Enable Color Patterns?</b> <br>
-                   This allows you to distinguish columns using a pattern fill."
+                   Distinguish bars with patterns."
                 ), style = "margin-bottom: -20px;"
               )
             )
