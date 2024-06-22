@@ -364,7 +364,7 @@ mod_landscape_server <- function(id){
           accessible_desc = ""
         )
       }
-    }) %>% debounce(100)
+    })
 
 
 

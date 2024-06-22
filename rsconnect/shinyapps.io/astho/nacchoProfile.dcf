@@ -5,6 +5,6 @@ account: astho
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 11943866
-bundleId: 8743821
+bundleId: 8774096
 url: https://astho.shinyapps.io/nacchoProfile/
 version: 1
