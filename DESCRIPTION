@@ -23,7 +23,12 @@ Imports:
     magrittr,
     naccho.viz,
     stringr,
-    haven
+    haven,
+    tibble,
+    survey,
+    srvyr,
+    tidyr,
+    purrr
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

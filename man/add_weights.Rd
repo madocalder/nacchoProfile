@@ -4,13 +4,21 @@
 \alias{add_weights}
 \title{Calculate Weights}
 \usage{
-add_weights(q_label)
+add_weights(q_label, popcat = "c0popcat7")
 }
 \arguments{
-\item{q_label}{The question label}
+\item{q_label}{The question column name in the data set}
 
-\item{dt_sel}{A data frame with the selected data.}
+\item{popcat}{Based on which categories to calculate the weights (popcat3 or popcat7).}
+}
+\value{
+tibble
 }
 \description{
-Calculate post-stratification weights.
+Calculate LHD post-stratification weights for a given question.
+}
+\examples{
+add_weights("c3q15")
+add_weights("totexp_percap", popcat = "c0popcat3")
+
 }
