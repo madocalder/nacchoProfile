@@ -19,6 +19,8 @@ label_remap <- c(
     "<50,000" = "Small (<50,000)",
     "50,000—499,999" = "Medium (50,000-499,999)",
     "500,000+" = "Large (500,000+)",
+    "urban" = "Urban",
+    "rural" = "Rural",
     "associates" = "Associate's",
     "bachelors" = "Bachelor's",
     "masters" = "Master's",
@@ -106,5 +108,16 @@ q_remap <- c(
     "c6q147a" = "COVID-19 adult immunizations", 
     "c6q56a" = "Routine childhood immunizations", 
     "c6q55a" = "Routine adult immunizations", 
-    "c6q148a" = "COVID-19 childhood immunizations"
+    "c6q148a" = "COVID-19 childhood immunizations",
+    "c6q59a" = "Screening - Tubercolosis", 
+    "c6q58a" = "Screening - Other STDs", 
+    "c6q57a" = "Screening - HIV/AIDS", 
+    "c6q63a" = "Screening - High blood pressure", 
+    "c6q142a" = "Screening - Body Mass Index (BMI)",
+    "c6q62a" = "Screening - Diabetes", 
+    "c6q60a" = "Screening - Cancer", 
+    "c6q61a" = "Screening - Cardiovascular disease",
+    "c6q67a" = "Treatment - Tubercolosis",
+    "c6q66a" = "Treatment - Other STDs", 
+    "c6q65a" = "Treatment - HIV/AIDS"
 )

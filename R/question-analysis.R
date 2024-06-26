@@ -1,6 +1,7 @@
 
 #' @importFrom dplyr filter mutate
 #' @importFrom purrr map_dfr
+#' @noRd
 report2022_leadership_fig4.1 <- function() {
 
     questions <- c("c4q26", "c4q28", "c4q29", "racenotwhite")
@@ -18,12 +19,14 @@ report2022_leadership_fig4.1 <- function() {
 }
 
 #' @importFrom dplyr mutate
+#' @noRd
 report2022_leadership_fig4.2 <- function() {
     return_survey_weighted_counts("age_cat") %>%
         mutate(AnswerLabel = label_remap[as.character(.data$Answer)])
 }
 
 #' @importFrom dplyr bind_rows mutate
+#' @noRd
 report2022_leadership_fig4.4 <- function() {
 
     all_lhds <- return_survey_weighted_statistics("tenure")
@@ -37,30 +40,40 @@ report2022_leadership_fig4.4 <- function() {
 }
 
 #' @importFrom dplyr bind_rows mutate
+#' @noRd
 report2022_leadership_fig4.5 <- function() {
     
     all_lhds <- return_survey_weighted_counts("c4q34")
     split_lhds <- return_survey_weighted_counts("c4q34", grps = "c0popcat3", popcat = "c0popcat3")
+    split_urb <- return_survey_weighted_counts("c4q34", grps = "urbanrural2022", popcat = "c0popcat3")
 
-    bind_rows(all_lhds, split_lhds) %>%
+    bind_rows(all_lhds, split_lhds, split_urb) %>%
         mutate(AnswerLabel = label_remap[as.character(.data$Answer)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
 }
 
 #' @importFrom dplyr bind_rows filter mutate
 #' @importFrom purrr map_dfr pmap_dfr
+#' @noRd
 report2022_leadership_fig4.6 <- function() {
 
-    args <- list(
+    args1 <- list(
         c("c4q502a", "c4q502b", "c4q502c"), 
         grps = "c0popcat3", 
         popcat = "c0popcat3"
         )
+
+    args2 <- list(
+        c("c4q502a", "c4q502b", "c4q502c"), 
+        grps = "urbanrural2022", 
+        popcat = "c0popcat3"
+        )
     
-    all_lhds <- map_dfr(args[[1]], return_survey_weighted_counts)
-    split_lhds <- pmap_dfr(args, return_survey_weighted_counts)
+    all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
+    split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
+    split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
     
-    bind_rows(all_lhds, split_lhds) %>%
+    bind_rows(all_lhds, split_lhds, split_urb) %>%
         filter(.data$Answer == "checked") %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
@@ -68,6 +81,7 @@ report2022_leadership_fig4.6 <- function() {
 }
 
 #' @importFrom dplyr mutate case_when
+#' @noRd
 report2022_workforce_fig5.1 <- function() {
 
     return_survey_weighted_counts("FTE_numcat") %>%
@@ -81,6 +95,7 @@ report2022_workforce_fig5.1 <- function() {
 
 #' @importFrom dplyr bind_rows mutate rename select all_of
 #' @importFrom tidyr pivot_wider
+#' @noRd
 report2022_workforce_fig5.2 <- function() {
 
     args <- list(
@@ -111,6 +126,7 @@ report2022_workforce_fig5.2 <- function() {
 #' @importFrom dplyr bind_rows mutate rename select all_of
 #' @importFrom tidyr pivot_wider
 #' @importFrom purrr pmap_dfr
+#' @noRd
 report2022_workforce_fig5.6 <- function() {
 
     args <- list(
@@ -125,6 +141,7 @@ report2022_workforce_fig5.6 <- function() {
 }
 
 #' @importFrom dplyr bind_rows mutate
+#' @noRd
 report2022_workforce_fig5.8 <- function() {
 
     all_lhds <- return_survey_weighted_statistics("fte_bypop")
@@ -136,6 +153,7 @@ report2022_workforce_fig5.8 <- function() {
 }
 
 #' @importFrom dplyr mutate filter
+#' @noRd
 report2022_workforce_fig5.10 <- function() {
 
     return_survey_weighted_counts("jobsgoneany") %>%
@@ -148,6 +166,7 @@ report2022_workforce_fig5.10 <- function() {
 #' @importFrom dplyr bind_rows mutate select all_of
 #' @importFrom tidyr pivot_wider
 #' @importFrom purrr map_dfr
+#' @noRd
 report2022_workforce_fig5.12 <- function() {
 
     args <- list(
@@ -180,6 +199,7 @@ report2022_workforce_fig5.12 <- function() {
 
 #' @importFrom dplyr mutate
 #' @importFrom purrr map_dfr
+#' @noRd
 report2022_workforce_fig5.13 <- function() {
 
     # still some issues with the 95% confidence interval calculation
@@ -212,6 +232,7 @@ report2022_workforce_fig5.13 <- function() {
 
 #' @importFrom dplyr mutate bind_rows
 #' @importFrom purrr map_dfr
+#' @noRd
 report2022_finance_fig6.2 <- function() {
 
     # still some issues with the percentile calculations
@@ -232,6 +253,7 @@ report2022_finance_fig6.2 <- function() {
 }
 
 #' @importFrom dplyr mutate
+#' @noRd
 report2022_finance_fig6.6 <- function() {
     return_survey_weighted_statistics("totexp_percap") %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
@@ -240,6 +262,7 @@ report2022_finance_fig6.6 <- function() {
 }
 
 #' @importFrom dplyr mutate
+#' @noRd
 report2022_finance_fig6.7 <- function() {
     
     args <- list(
@@ -261,6 +284,7 @@ report2022_finance_fig6.7 <- function() {
 
 #' @importFrom dplyr mutate
 #' @importFrom purrr pmap_dfr
+#' @noRd
 report2022_finance_fig6.9 <- function() {
 
     args <- list(
@@ -279,6 +303,7 @@ report2022_finance_fig6.9 <- function() {
 }
 
 #' @importFrom dplyr filter mutate select all_of
+#' @noRd
 report2022_finance_fig6.10 <- function() {
 
     # special case, we need to exclude an answer to get the right percentage
@@ -306,23 +331,75 @@ report2022_finance_fig6.10 <- function() {
 #' @importFrom dplyr bind_rows mutate select all_of
 #' @importFrom tidyr pivot_wider
 #' @importFrom purrr map_dfr pmap_dfr
+#' @noRd
 report2022_program_fig7.3 <- function() {
 
-    args <- list(
+    args1 <- list(
         c("c6q147a", "c6q56a", "c6q55a", "c6q148a"), 
         grps = "c0popcat3", 
         popcat = "c0popcat3"
         )
 
-    all_lhds <- purrr::map_dfr(args[[1]], return_survey_weighted_counts)
-    split_lhds <- purrr::pmap_dfr(args, return_survey_weighted_counts)
+     args2 <- list(
+        c("c6q147a", "c6q56a", "c6q55a", "c6q148a"), 
+        grps = "urbanrural2022", 
+        popcat = "c0popcat3"
+        )
+
+    all_lhds <- purrr::map_dfr(args1[[1]], return_survey_weighted_counts)
+    split_lhds <- purrr::pmap_dfr(args1, return_survey_weighted_counts)
+    split_urb <- purrr::pmap_dfr(args2, return_survey_weighted_counts)
     
     sel_cols <- c(
         "GroupLabel", 
         "AnswerLabel", 
         "Percentage")
 
-    bind_rows(all_lhds, split_lhds) %>%
+    bind_rows(all_lhds, split_lhds, split_urb) %>%
+        filter(.data$Answer == "checked") %>%
+        mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
+        mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
+        select(all_of(sel_cols)) %>%
+        pivot_wider(names_from = .data$GroupLabel, values_from = .data$Percentage)
+    
+}
+
+#' @importFrom dplyr bind_rows mutate select all_of
+#' @importFrom tidyr pivot_wider
+#' @importFrom purrr map_dfr pmap_dfr
+#' @noRd
+report2022_program_fig7.4 <- function() {
+
+    args1 <- list(
+        c(
+            "c6q59a", "c6q58a", "c6q57a", 
+            "c6q63a", "c6q142a", "c6q62a", 
+            "c6q60a", "c6q61a", "c6q67a",
+            "c6q66a", "c6q65a"), 
+        grps = "c0popcat3", 
+        popcat = "c0popcat3"
+        )
+
+    args2 <- list(
+        c(
+            "c6q59a", "c6q58a", "c6q57a", 
+            "c6q63a", "c6q142a", "c6q62a", 
+            "c6q60a", "c6q61a", "c6q67a",
+            "c6q66a", "c6q65a"), 
+        grps = "urbanrural2022", 
+        popcat = "c0popcat3"
+        )
+
+    all_lhds <- purrr::map_dfr(args1[[1]], return_survey_weighted_counts)
+    split_lhds <- purrr::pmap_dfr(args1, return_survey_weighted_counts)
+    split_urb <- purrr::pmap_dfr(args2, return_survey_weighted_counts)
+    
+    sel_cols <- c(
+        "GroupLabel", 
+        "AnswerLabel", 
+        "Percentage")
+
+    bind_rows(all_lhds, split_lhds, split_urb) %>%
         filter(.data$Answer == "checked") %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
