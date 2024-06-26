@@ -20,7 +20,7 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
     grps <- c(popcat, "core_denom")
 
     master_data %>%
-        haven::as_factor() %>%
+        as_factor() %>%
         as_tibble() %>% 
         group_by_at(grps) %>% 
         summarise(
@@ -153,7 +153,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         master_data %>%
             as_factor() %>%
             left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-            as_survey_design(ids = popcat, weights = wtype) %>%
+            as_survey_design() %>%
             group_by_at(grps) %>%
             summarise(
                 N = n(),

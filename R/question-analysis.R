@@ -33,7 +33,7 @@ report2022_leadership_fig4.4 <- function() {
     split_lhds <- return_survey_weighted_statistics("tenure", grps = "c0popcat3", popcat = "c0popcat3")
 
     bind_rows(all_lhds, split_lhds) %>%
-        mutate(AnswerLabel = q_remap[as.character(.data$Question)])
+        mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
 
 
@@ -98,10 +98,14 @@ report2022_workforce_fig5.1 <- function() {
 #' @noRd
 report2022_workforce_fig5.2 <- function() {
 
+    # does not match on the actual non weighted data
+    # when grouping
+
     args <- list(
         c("c5q36", "c5q37"), 
         grps = "c0popcat7", 
-        popcat = "c0popcat7"
+        popcat = "c0popcat7",
+        wtype = "weights_static"
         )
 
     sel_cols <- c(
@@ -134,7 +138,7 @@ report2022_workforce_fig5.6 <- function() {
         wtype = c("weights_static", "weights_static")
         )
     
-    all_lhds <- pmap_dfr(args, return_survey_weighted_statistics) %>%
+    pmap_dfr(args, return_survey_weighted_statistics) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)])
    
@@ -168,6 +172,8 @@ report2022_workforce_fig5.10 <- function() {
 #' @importFrom purrr map_dfr
 #' @noRd
 report2022_workforce_fig5.12 <- function() {
+
+    # very small differences in the percentages
 
     args <- list(
         c("c5q63a", "c5q62a", "c5q52a", "c5q64a", 
@@ -220,7 +226,7 @@ report2022_workforce_fig5.13 <- function() {
         wtype = "weights_static"
         )
 
-    all_lhds <- pmap_dfr(args, return_survey_weighted_statistics) %>%
+    pmap_dfr(args, return_survey_weighted_statistics) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         mutate(
@@ -346,9 +352,9 @@ report2022_program_fig7.3 <- function() {
         popcat = "c0popcat3"
         )
 
-    all_lhds <- purrr::map_dfr(args1[[1]], return_survey_weighted_counts)
-    split_lhds <- purrr::pmap_dfr(args1, return_survey_weighted_counts)
-    split_urb <- purrr::pmap_dfr(args2, return_survey_weighted_counts)
+    all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
+    split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
+    split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
     
     sel_cols <- c(
         "GroupLabel", 
@@ -390,9 +396,9 @@ report2022_program_fig7.4 <- function() {
         popcat = "c0popcat3"
         )
 
-    all_lhds <- purrr::map_dfr(args1[[1]], return_survey_weighted_counts)
-    split_lhds <- purrr::pmap_dfr(args1, return_survey_weighted_counts)
-    split_urb <- purrr::pmap_dfr(args2, return_survey_weighted_counts)
+    all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
+    split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
+    split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
     
     sel_cols <- c(
         "GroupLabel", 
