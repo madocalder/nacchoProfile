@@ -186,12 +186,18 @@ mod_landscape_server <- function(id){
     })
 
 
-    # filter data -------------------------------------------------------------
-    filter_data <- reactive({
+    # filter meta data --------------------------------------------------------
+    filter_meta <- reactive({
+      meta %>%
+        dplyr::filter(field == input$topic)
+    })
+
+
+    # Function to generate data based on dataset and range
+    generate_data <- function() {
 
       if (input$topic == "totpop") {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
+        data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
           dplyr::mutate(fig_value = get(input$topic)) %>%
@@ -202,10 +208,8 @@ mod_landscape_server <- function(id){
           dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
           dplyr::ungroup()
 
-
       } else if (input$topic == "tenure") {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
+        data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
           dplyr::mutate(fig_value = get(input$topic)) %>%
@@ -215,7 +219,7 @@ mod_landscape_server <- function(id){
           dplyr::ungroup()
 
       } else if (input$view == "Map") {
-        master_data %>%
+        data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
           dplyr::distinct(fips, .keep_all = TRUE) %>%
@@ -223,14 +227,14 @@ mod_landscape_server <- function(id){
 
 
       } else if (input$topic == "field" & input$filter == "No Filter") {
-        master_data %>%
+        data <- master_data %>%
           dplyr::select(tidyselect::starts_with("c4q5")) %>%
           reshape2::melt() %>%
           tidyr::drop_na(value) %>%
           dplyr::mutate(fig_filter = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
-                                                 variable == "c4q502b" ~ "Nursing",
-                                                 variable == "c4q502c" ~ "Public Health",
-                                                 variable == "c4q502d" ~ "Other")) %>%
+                                                      variable == "c4q502b" ~ "Nursing",
+                                                      variable == "c4q502c" ~ "Public Health",
+                                                      variable == "c4q502d" ~ "Other")) %>%
           dplyr::group_by(fig_filter) %>%
           dplyr::summarise(fig_value = sum(value)) %>%
           dplyr::mutate(n = round(fig_value/935*100,1)) %>%
@@ -238,11 +242,11 @@ mod_landscape_server <- function(id){
 
 
       } else if (input$topic == "field" & input$filter != "No Filter") {
-        spec_data %>%
+        data <- spec_data %>%
           dplyr::filter(filter == input$filter)
 
       } else if (input$filter == "No Filter") {
-        master_data %>%
+        data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
           tidyr::drop_na(fig_filter) %>%
@@ -252,10 +256,8 @@ mod_landscape_server <- function(id){
           dplyr::mutate(subtitle = "Across All LHDs") %>%
           dplyr::ungroup()
 
-        # nested if/else: if any other filter is selected...
       } else {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
+        data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
           dplyr::mutate(fig_cat = stringr::str_to_title(get(input$topic))) %>%
@@ -264,100 +266,119 @@ mod_landscape_server <- function(id){
           dplyr::summarise(fig_value = dplyr::n()) %>%
           dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
           dplyr::ungroup()
-
       }  # close topic class if/else
-    })
+      return(data)
+    }
 
+    make_data <- function(...){
 
-    # filter meta data --------------------------------------------------------
-    filter_meta <- reactive({
-      meta %>%
-        dplyr::filter(field == input$topic)
-    })
-
+    }
 
     # figure output -----------------------------------------------------------
     output$figure <- highcharter::renderHighchart({
 
-      req(filter_data()) # prevents error message from popping
-      # print(filter_data()) # prints the dataset that is used in the viz
+      data <-  data.frame(
+        x = c(0, 1),
+        y = c(1, 3)
+      )
+      print(class(data$x))
 
-      if (input$view == "Bar Graph" & (input$topic %in% c("totpop", "tenure") | input$filter == "No Filter")) {
-        naccho.viz::create_single_bar(
-          data = filter_data(),
-          x_variable = "fig_filter",
-          y_variable = "n",
-          title_text = filter_meta()$title,
-          subtitle_text = filter_data()$subtitle[[1]],
-          caption_text = filter_meta()$caption,
-          y_label = filter_meta()$y_label,
-          y_max = filter_meta()$y_max,
-          y_format = filter_meta()$y_format,
-          my_colors = naccho.viz::naccho_orange,
-          legend_enable = FALSE,
-          legend_title = "",
-          tooltip = filter_meta()$tooltip,
-          allow_export = TRUE,
-          select_theme = naccho.viz::naccho_minimal_theme
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Bar Graph" & input$filter != "No Filter") {
-        naccho.viz::create_grouped_bar(
-          data = filter_data(),
-          x_variable = "fig_cat",
-          y_variable = "n",
-          x_group = "fig_filter",
-          title_text = filter_meta()$title,
-          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = filter_meta()$caption,
-          y_label = filter_meta()$y_label,
-          y_max = filter_meta()$y_max,
-          y_format = filter_meta()$y_format,
-          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-          legend_enable = TRUE,
-          legend_title = "",
-          tooltip = filter_meta()$tooltip,
-          allow_export = TRUE,
-          select_theme = naccho.viz::naccho_minimal_theme
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Pie Chart") {
-        naccho.viz::create_pie(
-          data = filter_data(),
-          variable = "fig_filter",
-          value = "n",
-          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-          legend_enable = TRUE,
-          title_text = filter_meta()$title,
-          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = filter_meta()$caption
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Map") {
-
-        naccho.viz::create_cat_map(
-          data = filter_data(),
-          fips_column = "fips",
-          selected_value = "fig_filter",
-          title_text = filter_meta()$title,
-          subtitle_text = "",
-          caption_text = filter_meta()$caption,
-          accessible_desc = ""
+      highcharter::hchart(data,
+                          "column",
+                          highcharter::hcaes(x = x, y = y)) %>%
+        highcharter::hc_xAxis(
+          categories = c("Urban", "Rural")
         )
+      })
+
+    proxy <- highcharter::highchartProxy(ns("figure"))
+
+    observe({
+      if (input$topic == "tenure") {
+        data <-  data.frame(
+          x = c(1, 3),
+          y = c(4, 5)
+        )
+
+        print(class(data$x))
+
+        proxy |>
+          highcharter::hcpxy_set_data(
+            "column",
+            data = data
+          ) |>
+          highcharter::hcpxy_redraw()
+
+      } else {
+        data <-  data.frame(
+          x = c(1, 2, 3),
+          y = c(7, 8, 9)
+        )
+        proxy |>
+          highcharter::hcpxy_set_data(
+            "column",
+            data = data
+          ) |>
+          highcharter::hcpxy_redraw()
       }
     })
+
+
+
+    #   } else if (input$view == "Bar Graph" & input$filter != "No Filter") {
+    #     naccho.viz::create_grouped_bar(
+    #       data = filter_data(),
+    #       x_variable = "fig_cat",
+    #       y_variable = "n",
+    #       x_group = "fig_filter",
+    #       title_text = filter_meta()$title,
+    #       subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+    #       caption_text = filter_meta()$caption,
+    #       y_label = filter_meta()$y_label,
+    #       y_max = filter_meta()$y_max,
+    #       y_format = filter_meta()$y_format,
+    #       my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
+    #       legend_enable = TRUE,
+    #       legend_title = "",
+    #       tooltip = filter_meta()$tooltip,
+    #       allow_export = TRUE,
+    #       select_theme = naccho.viz::naccho_minimal_theme
+    #     ) %>%
+    #       naccho.viz::add_logo(
+    #         "https://toolbox.naccho.org/pages/img/logo-header.png",
+    #         width = 150L,
+    #         height = 40L
+    #       )
+    #
+    #   } else if (input$view == "Pie Chart") {
+    #     naccho.viz::create_pie(
+    #       data = filter_data(),
+    #       variable = "fig_filter",
+    #       value = "n",
+    #       my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
+    #       legend_enable = TRUE,
+    #       title_text = filter_meta()$title,
+    #       subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+    #       caption_text = filter_meta()$caption
+    #     ) %>%
+    #       naccho.viz::add_logo(
+    #         "https://toolbox.naccho.org/pages/img/logo-header.png",
+    #         width = 150L,
+    #         height = 40L
+    #       )
+    #
+    #   } else if (input$view == "Map") {
+    #     naccho.viz::create_cat_map(
+    #       data = filter_data(),
+    #       fips_column = "fips",
+    #       selected_value = "fig_filter",
+    #       title_text = filter_meta()$title,
+    #       subtitle_text = "",
+    #       caption_text = filter_meta()$caption,
+    #       accessible_desc = ""
+    #     )
+    #   }
+    # })
 
 
 
