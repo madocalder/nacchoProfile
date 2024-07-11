@@ -1,5 +1,13 @@
 /* MY STYLES */
 
+
+/* Plot flickering */
+#mod_landscape_1-figure.recalculating {
+  opacity: 1.0;
+  animation-delay: 1;
+}
+
+
 /* Dropdowns */
 
 .min-height-400 .selectize-dropdown-content {

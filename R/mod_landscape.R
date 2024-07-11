@@ -162,37 +162,29 @@ mod_landscape_server <- function(id){
 
 
     # update inputs based on selections ---------------------------------------
-    observe({
+    observeEvent(c(input$topic, input$view, input$filter), {
       if (input$topic %in% c("totpop", "tenure")) {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[-1]
-        )
+        new_filter = landscape_filters[-1]
+        new_view = c("Bar Graph", "Line Graph", "Table")
+
+      } else if (input$topic == "c0govcatn" & input$filter != "No Filter") {
+        new_filter = landscape_filters[-3]
+        new_view = c("Bar Graph", "Line Graph", "Table")
+
+      } else if (input$topic == "c0govcatn" & input$filter == "No Filter") {
+        new_filter = landscape_filters[-3]
+        new_view = c("Map", "Bar Graph", "Line Graph", "Table")
+
       } else {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters
-        )
+        new_filter = landscape_filters
+        new_view = c("Bar Graph", "Line Graph", "Table")
+
       }
+
+      updateSelectInput(session, "filter", choices = new_filter)
+      updateSelectInput(session, "view", choices = new_view)
     })
 
-    observe({
-      if (input$topic == "c0govcatn") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[-3])
-      }
-
-      if (input$filter != "No Filter") {
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Table"))
-      }
-    })
-
-    observe({
-      if (input$topic == "c0govcatn") {
-        updateSelectInput(session, "view",
-                          choices = c("Map", "Bar Graph", "Line Graph", "Table"))
-      }
-
-    })
 
     # filter data -------------------------------------------------------------
     filter_data <- reactive({
@@ -354,6 +346,7 @@ mod_landscape_server <- function(id){
             height = 40L
           )
       } else if (input$view == "Map") {
+
         naccho.viz::create_cat_map(
           data = filter_data(),
           fips_column = "fips",
