@@ -196,29 +196,7 @@ mod_landscape_server <- function(id){
     # Function to generate data based on dataset and range
     generate_data <- function() {
 
-      if (input$topic == "totpop") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_value = get(input$topic)) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(fig_value = sum(fig_value)) %>%
-          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
-          dplyr::arrange(desc(fig_filter)) %>% # for axis order
-          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
-
-      } else if (input$topic == "tenure") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_value = get(input$topic)) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(n = mean(fig_value, na.rm = TRUE)) %>%
-          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
-
-      } else if (input$view == "Map") {
+      if (input$view == "Map") {
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
@@ -270,18 +248,14 @@ mod_landscape_server <- function(id){
       return(data)
     }
 
-    make_data <- function(...){
-
-    }
 
     # figure output -----------------------------------------------------------
     output$figure <- highcharter::renderHighchart({
 
-      data <-  data.frame(
+      data <- data.frame(
         x = c(0, 1),
-        y = c(1, 3)
+        y = c(10.1, 89.9)
       )
-      print(class(data$x))
 
       highcharter::hchart(data,
                           "column",
@@ -289,18 +263,21 @@ mod_landscape_server <- function(id){
         highcharter::hc_xAxis(
           categories = c("Urban", "Rural")
         )
-      })
+    })
 
     proxy <- highcharter::highchartProxy(ns("figure"))
 
     observe({
-      if (input$topic == "tenure") {
-        data <-  data.frame(
-          x = c(1, 3),
-          y = c(4, 5)
-        )
-
-        print(class(data$x))
+      if (input$topic == "totpop") {
+        data <- master_data %>%
+          dplyr::mutate(x = stringr::str_to_title(get(input$filter)),
+                        fig_value = get(input$topic)) %>%
+          dplyr::group_by(x) %>%
+          dplyr::summarise(fig_value = sum(fig_value)) %>%
+          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+                        x = as.numeric(x),
+                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup()
 
         proxy |>
           highcharter::hcpxy_set_data(
@@ -309,11 +286,17 @@ mod_landscape_server <- function(id){
           ) |>
           highcharter::hcpxy_redraw()
 
-      } else {
-        data <-  data.frame(
-          x = c(1, 2, 3),
-          y = c(7, 8, 9)
-        )
+      } else
+        if (input$topic == "tenure") {
+        data <- master_data %>%
+          dplyr::mutate(x = stringr::str_to_title(get(input$filter))) %>%
+          dplyr::mutate(fig_value = get(input$topic)) %>%
+          dplyr::group_by(x) %>%
+          dplyr::summarise(y = mean(fig_value, na.rm = TRUE)) %>%
+          dplyr::mutate(x = as.numeric(x)) %>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup()
+
         proxy |>
           highcharter::hcpxy_set_data(
             "column",

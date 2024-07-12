@@ -19,3 +19,25 @@ card_thumbnail <- function(
   )
 }
 
+
+
+#' #' Proxy Redraw
+#' #'
+#' #' @param type String; options include c("column", "line", "point").
+#' #'
+#' #' @description Function to redraw a highcharter figure using a proxy.
+#' #'
+#' #' @return Generates a new figure that is redrawn from the prior.
+#' #'
+#' #' @noRd
+#' #'
+#' proxy_redraw <- function(
+#'     type = "column",
+#'     my_data = data) {
+#'
+#'     highcharter::hcpxy_set_data(
+#'       type,
+#'       data = my_data
+#'     ) %>%
+#'     highcharter::hcpxy_redraw()
+#' }
