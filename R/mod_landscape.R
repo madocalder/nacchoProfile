@@ -45,8 +45,7 @@ mod_landscape_ui <- function(id){
                   "Pie Chart",
                   "Map",
                   "Table"
-                ),
-                selected = "Bar Graph"
+                )
               )
             ),
             div(
@@ -55,8 +54,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters[-1],
-                selected = "LHD Size"
+                choices = landscape_filters[-1]
               )
             )
           ),
@@ -174,17 +172,15 @@ mod_landscape_server <- function(id){
       }
     })
     observe({
-      if (input$topic == "c0govcatn") {
+      if (input$topic == "c0govcatn" & input$filter != "No Filter") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[-3])
-      }
-      if (input$filter != "No Filter") {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Table"))
       }
     })
     observe({
-      if (input$topic == "c0govcatn") {
+      if (input$topic == "c0govcatn" & input$filter == "No Filter") {
         updateSelectInput(session, "view",
                           choices = c("Map", "Bar Graph", "Line Graph", "Table"))
       }
@@ -200,31 +196,13 @@ mod_landscape_server <- function(id){
     # Function to generate data based on dataset and range
     generate_data <- function() {
 
-      if (input$view == "Map") {
+      # if (input$view == "Map")
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
           dplyr::distinct(fips, .keep_all = TRUE) %>%
           dplyr::select(fips, state_name, fig_filter)
 
-
-      } else if (input$topic == "field" & input$filter != "No Filter") {
-        data <- spec_data %>%
-          dplyr::filter(filter == input$filter)
-
-
-
-      } else {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_cat = stringr::str_to_title(get(input$topic))) %>%
-          tidyr::drop_na(fig_cat) %>%
-          dplyr::group_by(fig_filter, fig_cat) %>%
-          dplyr::summarise(fig_value = dplyr::n()) %>%
-          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
-          dplyr::ungroup()
-      }  # close topic class if/else
       return(data)
     }
 
@@ -236,12 +214,14 @@ mod_landscape_server <- function(id){
         x = c(0, 1),
         y = c(10.1, 89.9),
         category = c("Rural", "Urban"),
-        group = NA
+        group = "All LHDs"
       )
 
       highcharter::hchart(
         data,
         "column",
+        id = "All",
+        name = "All LHDs",
         highcharter::hcaes(
           x = x,
           y = y,
@@ -296,12 +276,14 @@ mod_landscape_server <- function(id){
     })
 
     proxy <- highcharter::highchartProxy(ns("figure"))
+    series_id <- reactiveVal(NULL)
+
 
     # this observe is needed to redraw the figure based on the input selected
     # by the user. Requirements are determined by how the data need to be
     # wrangled and filtered for a specific selection.
-    observe({
-      if (input$topic == "totpop") {
+    observeEvent(input$topic, {
+      if (input$topic == "totpop" & input$filter != "No Filter") {
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
@@ -313,7 +295,13 @@ mod_landscape_server <- function(id){
                         subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
           dplyr::ungroup()
 
+        print(series_id)
+
+
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = series_id()
+          ) %>%
           highcharter::hcpxy_set_data(
             "column",
             data = data
@@ -330,7 +318,7 @@ mod_landscape_server <- function(id){
           ) %>%
           highcharter::hcpxy_redraw()
 
-      } else if (input$topic == "tenure") {
+      } else if (input$topic == "tenure" & input$filter != "No Filter") {
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(category = stringr::str_to_title(get(input$filter))) %>%
@@ -341,7 +329,12 @@ mod_landscape_server <- function(id){
           dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
           dplyr::ungroup()
 
+        print(series_id)
+
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = series_id()
+          ) %>%
           highcharter::hcpxy_set_data(
             "column",
             data = data
@@ -359,9 +352,11 @@ mod_landscape_server <- function(id){
           highcharter::hcpxy_redraw()
 
       } else if (input$topic == "field" & input$filter == "No Filter") {
+        req(input$topic %not_in% c("totpop", "tenure"))
         data <- master_data %>%
           dplyr::select(tidyselect::starts_with("c4q5")) %>%
-          reshape2::melt() %>%
+          dplyr::mutate_if(is.double, as.numeric) %>% # this helps prevent a warning
+          reshape2::melt(id.vars = NULL) %>%
           tidyr::drop_na(value) %>%
           dplyr::mutate(category = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
                                                       variable == "c4q502b" ~ "Nursing",
@@ -373,7 +368,12 @@ mod_landscape_server <- function(id){
                         subtitle = "Across All LHDs",
                         x = as.numeric(as.factor(category)) -1)
 
+        print(series_id)
+
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = series_id()
+          ) %>%
           highcharter::hcpxy_set_data(
             "column",
             data = data
@@ -392,21 +392,24 @@ mod_landscape_server <- function(id){
 
 
       } else if (input$topic == "field" & input$filter != "No Filter") {
+
         data <- spec_data %>%
           dplyr::filter(filter == input$filter) %>%
           dplyr::ungroup() %>%
-          dplyr::mutate(x = as.numeric(as.factor(category)) -1)
+          dplyr::mutate(x = as.numeric(as.factor(category)) -1,
+                        group = stringr::str_to_title(group))
 
-        print(data)
-        print(data$x)
-        print(data$y)
-        print(data$group)
+        series_id(unique(data$group))
 
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = series_id()
+          ) %>%
           highcharter::hcpxy_add_series(
             data = data,
             "column",
-            hcaes(x =  x, y = y, group = group)
+            highcharter::hcaes(x, y, group = group),
+            id = series_id()
           ) %>%
           highcharter::hcpxy_update(
             yAxis = list(
@@ -417,8 +420,8 @@ mod_landscape_server <- function(id){
           ) %>%
           highcharter::hcpxy_redraw()
 
-
       } else if (input$filter == "No Filter") {
+        req(input$topic %not_in% c("totpop", "tenure"))
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(category = stringr::str_to_title(get(input$topic))) %>%
@@ -431,6 +434,9 @@ mod_landscape_server <- function(id){
           dplyr::ungroup()
 
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = series_id()
+          ) %>%
           highcharter::hcpxy_set_data(
             "column",
             data = data
@@ -443,6 +449,36 @@ mod_landscape_server <- function(id){
             ),
             xAxis = list(
               categories = data$category
+            )
+          ) %>%
+          highcharter::hcpxy_redraw()
+
+
+      } else {
+
+        data <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(group = stringr::str_to_title(get(input$filter))) %>%
+          dplyr::mutate(category = stringr::str_to_title(get(input$topic))) %>%
+          tidyr::drop_na(category) %>%
+          dplyr::group_by(group, category) %>%
+          dplyr::summarise(fig_value = dplyr::n()) %>%
+          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+                        x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::ungroup()
+
+        proxy %>%
+          highcharter::hcpxy_add_series(
+            data = data,
+            "column",
+            highcharter::hcaes(x, y, group = group),
+            id = c("urban", "rural")
+          ) %>%
+          highcharter::hcpxy_update(
+            yAxis = list(
+              title = list(
+                text = "% of LHD Directors*"
+              )
             )
           ) %>%
           highcharter::hcpxy_redraw()
