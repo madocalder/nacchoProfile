@@ -194,17 +194,18 @@ mod_landscape_server <- function(id){
 
 
     # Function to generate data based on dataset and range
-    generate_data <- function() {
-
-      # if (input$view == "Map")
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
-          dplyr::distinct(fips, .keep_all = TRUE) %>%
-          dplyr::select(fips, state_name, fig_filter)
-
-      return(data)
-    }
+    # generate_data <- function() {
+    #
+    #   # if (input$view == "Map")
+    #     data <- master_data %>%
+    #       haven::as_factor() %>%
+    #       dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
+    #       dplyr::distinct(fips, .keep_all = TRUE) %>%
+    #       dplyr::select(fips, state_name, fig_filter)
+    #
+    #   return(data)
+    # }
+    #
 
 
     # figure output -----------------------------------------------------------
@@ -275,14 +276,28 @@ mod_landscape_server <- function(id){
         )
     })
 
+    # save the figure as a proxy to redraw below
     proxy <- highcharter::highchartProxy(ns("figure"))
-    series_id <- reactiveVal(NULL)
 
+    colors <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange,
+          naccho.viz::naccho_pink)
+      }
+    })
 
-    # this observe is needed to redraw the figure based on the input selected
-    # by the user. Requirements are determined by how the data need to be
-    # wrangled and filtered for a specific selection.
-    observeEvent(input$topic, {
+    # filter and store tables based on the combined inputs
+    observe({
+
       if (input$topic == "totpop" & input$filter != "No Filter") {
         data <- master_data %>%
           haven::as_factor() %>%
@@ -293,14 +308,21 @@ mod_landscape_server <- function(id){
           dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
                         x = as.numeric(as.factor(category)) -1, # -1 is required so the numbers start at 0 for the proxy to correctly draw
                         subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
 
-        print(series_id)
+        # this is needed to remove the series for the proxy redraw
+        series_id_filter <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(id_filter = get(input$filter)) %>%
+          dplyr::select(id_filter)
 
+        # stores the series id to remove it when going from grouped to single bar charts
+        series_id <- print(stringr::str_to_title(unique(as.character(series_id_filter$id_filter))))
 
         proxy %>%
           highcharter::hcpxy_remove_series(
-            id = series_id()
+            id = series_id
           ) %>%
           highcharter::hcpxy_set_data(
             "column",
@@ -309,31 +331,49 @@ mod_landscape_server <- function(id){
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of Population"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
             ),
             xAxis = list(
               categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
+
 
       } else if (input$topic == "tenure" & input$filter != "No Filter") {
         data <- master_data %>%
           haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_value = get(input$topic)) %>%
+          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
+                        fig_value = get(input$topic)) %>%
           dplyr::group_by(category) %>%
           dplyr::summarise(y = mean(fig_value, na.rm = TRUE)) %>%
           dplyr::mutate(x = as.numeric(as.factor(category)) -1) %>%
           dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
 
-        print(series_id)
+        # this is needed to remove the series for the proxy redraw
+        series_id_filter <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(id_filter = get(input$filter)) %>%
+          dplyr::select(id_filter)
+
+        # stores the series id to remove it when going from grouped to single bar charts
+        series_id <- print(stringr::str_to_title(unique(as.character(series_id_filter$id_filter))))
 
         proxy %>%
           highcharter::hcpxy_remove_series(
-            id = series_id()
+            id = series_id
           ) %>%
           highcharter::hcpxy_set_data(
             "column",
@@ -342,14 +382,24 @@ mod_landscape_server <- function(id){
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of Population"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
             ),
             xAxis = list(
               categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
+
 
       } else if (input$topic == "field" & input$filter == "No Filter") {
         req(input$topic %not_in% c("totpop", "tenure"))
@@ -359,20 +409,28 @@ mod_landscape_server <- function(id){
           reshape2::melt(id.vars = NULL) %>%
           tidyr::drop_na(value) %>%
           dplyr::mutate(category = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
-                                                      variable == "c4q502b" ~ "Nursing",
-                                                      variable == "c4q502c" ~ "Public Health",
-                                                      variable == "c4q502d" ~ "Other")) %>%
+                                                    variable == "c4q502b" ~ "Nursing",
+                                                    variable == "c4q502c" ~ "Public Health",
+                                                    variable == "c4q502d" ~ "Other")) %>%
           dplyr::group_by(category) %>%
           dplyr::summarise(fig_value = sum(value)) %>%
           dplyr::mutate(y = round(fig_value/935*100,1),
                         subtitle = "Across All LHDs",
-                        x = as.numeric(as.factor(category)) -1)
-
-        print(series_id)
+                        x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::mutate(group = "All LHDs")
 
         proxy %>%
           highcharter::hcpxy_remove_series(
-            id = series_id()
+            id = c("Urban", "Rural")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("State", "Local", "Shared")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Midwest", "South", "West", "Northeast")
           ) %>%
           highcharter::hcpxy_set_data(
             "column",
@@ -381,61 +439,102 @@ mod_landscape_server <- function(id){
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of Population"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
             ),
             xAxis = list(
               categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
 
 
       } else if (input$topic == "field" & input$filter != "No Filter") {
-
         data <- spec_data %>%
           dplyr::filter(filter == input$filter) %>%
           dplyr::ungroup() %>%
           dplyr::mutate(x = as.numeric(as.factor(category)) -1,
                         group = stringr::str_to_title(group))
 
-        series_id(unique(data$group))
+        series_id <- unique(data$group)
 
         proxy %>%
           highcharter::hcpxy_remove_series(
-            id = series_id()
+            id = c("Urban", "Rural")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("State", "Local", "Shared")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Midwest", "South", "West", "Northeast")
           ) %>%
           highcharter::hcpxy_add_series(
             data = data,
             "column",
             highcharter::hcaes(x, y, group = group),
-            id = series_id()
+            id = series_id,
+            color = colors() # comes from earlier reactive and needs to match length of field input
           ) %>%
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of LHD Directors*"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
+            ),
+            xAxis = list(
+              categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
+
 
       } else if (input$filter == "No Filter") {
         req(input$topic %not_in% c("totpop", "tenure"))
         data <- master_data %>%
           haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$topic))) %>%
+          dplyr::mutate(category = get(input$topic)) %>%
           tidyr::drop_na(category) %>%
           dplyr::group_by(category) %>%
           dplyr::summarise(value = dplyr::n()) %>%
           dplyr::mutate(y = round(value/sum(value)*100,1),
                         subtitle = "Across All LHDs",
                         x = as.numeric(as.factor(category)) -1) %>%
-          dplyr::ungroup()
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
 
         proxy %>%
           highcharter::hcpxy_remove_series(
-            id = series_id()
+            id = c("Urban", "Rural")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("State", "Local", "Shared")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Midwest", "South", "West", "Northeast")
           ) %>%
           highcharter::hcpxy_set_data(
             "column",
@@ -444,22 +543,30 @@ mod_landscape_server <- function(id){
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of Population"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
             ),
             xAxis = list(
               categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
 
 
       } else {
-
         data <- master_data %>%
           haven::as_factor() %>%
-          dplyr::mutate(group = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$topic))) %>%
+          dplyr::mutate(group = stringr::str_to_title(get(input$filter)),
+                        category = get(input$topic)) %>%
           tidyr::drop_na(category) %>%
           dplyr::group_by(group, category) %>%
           dplyr::summarise(fig_value = dplyr::n()) %>%
@@ -467,24 +574,54 @@ mod_landscape_server <- function(id){
                         x = as.numeric(as.factor(category)) -1) %>%
           dplyr::ungroup()
 
+        series_id <- unique(data$group)
+
         proxy %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Urban", "Rural")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("State", "Local", "Shared")
+          ) %>%
+          highcharter::hcpxy_remove_series(
+            id = c("Midwest", "South", "West", "Northeast")
+          ) %>%
           highcharter::hcpxy_add_series(
             data = data,
             "column",
             highcharter::hcaes(x, y, group = group),
-            id = c("urban", "rural")
+            id = series_id,
+            color = colors() # comes from earlier reactive and needs to match length of field input
           ) %>%
           highcharter::hcpxy_update(
             yAxis = list(
               title = list(
-                text = "% of LHD Directors*"
+                text = filter_meta()$y_label
+              ),
+              max = filter_meta()$y_max,
+              labels = list(
+                format = filter_meta()$y_format
               )
+            ),
+            title = list(
+              text = filter_meta()$title
+            ),
+            caption = list(
+              text = filter_meta()$caption
+            ),
+            xAxis = list(
+              categories = data$category
             )
-          ) %>%
-          highcharter::hcpxy_redraw()
+          )
       }
-
     })
+
+    # this observe is needed to redraw the figure based on the input selected
+    # by the user. Requirements are determined by how the data need to be
+    # wrangled and filtered for a specific selection.
 
 
 
