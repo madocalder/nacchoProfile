@@ -24,6 +24,11 @@ Imports:
     naccho.viz,
     stringr,
     haven,
+    tibble,
+    survey,
+    srvyr,
+    tidyr,
+    purrr,
     tidyr,
     tidyselect,
     reshape2
