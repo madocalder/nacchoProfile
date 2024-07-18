@@ -653,13 +653,19 @@ a:hover, a:focus {
 }
 
 
-hr {
+hr:not(.tt) {
   border-top: 2px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
   padding-top: 10px !important;
   margin-left: 50px;
   margin-right: 50px;
+}
+
+hr .tt {
+  border-top: 1px solid !important;
+  color: #008A96 !important;
+  opacity: 1 !important;
 }
 
 p {
@@ -715,6 +721,7 @@ b, strong {
 .viz_content {
   padding-left: 4em !important;
   padding-right: 4em !important;
+  padding-top: 1em !important;
 }
 
 .context-content {
@@ -724,4 +731,13 @@ b, strong {
 
 .clicked-link {
     color: #AB6143 !important;
+}
+
+.highcharts-tooltip span {
+    height: auto;
+    width: 200px !important;
+    line-height: 1.2em;
+    text-align: center,
+    overflow: auto;
+    white-space: normal !important;
 }

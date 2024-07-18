@@ -43,10 +43,8 @@ mod_landscape_ui <- function(id){
                   "Bar Graph",
                   "Line Graph",
                   "Pie Chart",
-                  "Map",
                   "Table"
-                ),
-                selected = "Bar Graph"
+                )
               )
             ),
             div(
@@ -55,8 +53,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters[-1],
-                selected = "LHD Size"
+                choices = landscape_filters[-1]
               )
             )
           ),
@@ -69,7 +66,18 @@ mod_landscape_ui <- function(id){
 
           div(
             class = "viz_content",
-            highcharter::highchartOutput(ns("figure"), height = 575)
+
+            # display when map is selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
+            highcharter::highchartOutput(ns("map"), height = 575)
+            ),
+
+            # display when map is not selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] != \'Map\'"),
+              highcharter::highchartOutput(ns("figure"), height = 575)
+            )
           )
 
           # end of main content -----------------------------------------------------
@@ -162,202 +170,348 @@ mod_landscape_server <- function(id){
 
 
     # update inputs based on selections ---------------------------------------
-    observeEvent(c(input$topic, input$view, input$filter), {
+    # for example, if someone selects "geography," then the view will update to
+    # include a map options.
+    # this can create delays and glitches that I need to DEAL WITH // COME BACK
+    observe({
       if (input$topic %in% c("totpop", "tenure")) {
-        new_filter = landscape_filters[-1]
-        new_view = c("Bar Graph", "Line Graph", "Table")
-
-      } else if (input$topic == "c0govcatn" & input$filter != "No Filter") {
-        new_filter = landscape_filters[-3]
-        new_view = c("Bar Graph", "Line Graph", "Table")
-
-      } else if (input$topic == "c0govcatn" & input$filter == "No Filter") {
-        new_filter = landscape_filters[-3]
-        new_view = c("Map", "Bar Graph", "Line Graph", "Table")
-
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[-1]
+        )
       } else {
-        new_filter = landscape_filters
-        new_view = c("Bar Graph", "Line Graph", "Table")
-
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters
+        )
       }
-
-      updateSelectInput(session, "filter", choices = new_filter)
-      updateSelectInput(session, "view", choices = new_view)
     })
 
-
-    # filter data -------------------------------------------------------------
-    filter_data <- reactive({
-
-      if (input$topic == "totpop") {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_value = get(input$topic)) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(fig_value = sum(fig_value)) %>%
-          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
-          dplyr::arrange(desc(fig_filter)) %>% # for axis order
-          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
-
-
-      } else if (input$topic == "tenure") {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_value = get(input$topic)) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(n = mean(fig_value, na.rm = TRUE)) %>%
-          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup()
-
-      } else if (input$view == "Map") {
-        master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
-          dplyr::distinct(fips, .keep_all = TRUE) %>%
-          dplyr::select(fips, state_name, fig_filter)
-
-
-      } else if (input$topic == "field" & input$filter == "No Filter") {
-        master_data %>%
-          dplyr::select(tidyselect::starts_with("c4q5")) %>%
-          reshape2::melt() %>%
-          tidyr::drop_na(value) %>%
-          dplyr::mutate(fig_filter = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
-                                                 variable == "c4q502b" ~ "Nursing",
-                                                 variable == "c4q502c" ~ "Public Health",
-                                                 variable == "c4q502d" ~ "Other")) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(fig_value = sum(value)) %>%
-          dplyr::mutate(n = round(fig_value/935*100,1)) %>%
-          dplyr::mutate(subtitle = "Across All LHDs")
-
-
-      } else if (input$topic == "field" & input$filter != "No Filter") {
-        spec_data %>%
-          dplyr::filter(filter == input$filter)
-
-      } else if (input$filter == "No Filter") {
-        master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
-          tidyr::drop_na(fig_filter) %>%
-          dplyr::group_by(fig_filter) %>%
-          dplyr::summarise(value = dplyr::n()) %>%
-          dplyr::mutate(n = round(value/sum(value)*100,1)) %>%
-          dplyr::mutate(subtitle = "Across All LHDs") %>%
-          dplyr::ungroup()
-
-        # nested if/else: if any other filter is selected...
+    observe({
+      if (input$topic == "c0govcatn") {
+        updateSelectInput(session, "view",
+                          choices = c("Map", "Bar Graph", "Line Graph", "Table"))
+      } else if (input$topic == "totpop") {
+        updateSelectInput(session, "view",
+                          choices = c("Bar Graph", "Line Graph", "Pie Chart", "Table"))
       } else {
-        req(input$filter != "No Filter") # prevent error message from popping
-        master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(fig_filter = stringr::str_to_title(get(input$filter))) %>%
-          dplyr::mutate(fig_cat = stringr::str_to_title(get(input$topic))) %>%
-          tidyr::drop_na(fig_cat) %>%
-          dplyr::group_by(fig_filter, fig_cat) %>%
-          dplyr::summarise(fig_value = dplyr::n()) %>%
-          dplyr::mutate(n = round(fig_value/sum(fig_value)*100,1)) %>%
-          dplyr::ungroup()
+        updateSelectInput(session, "view",
+                          choices = c("Bar Graph", "Line Graph", "Table"))
+      }
+    })
 
-      }  # close topic class if/else
+    observe({
+      if (input$topic == "c0govcatn" & input$view == "Map") {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[1])
+      }
+      if (input$topic == "c0govcatn" & input$view != "Map") {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[-3])
+      }
     })
 
 
     # filter meta data --------------------------------------------------------
+    # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
       meta %>%
         dplyr::filter(field == input$topic)
     })
 
 
+
+    # map output --------------------------------------------------------------
+    # used for the map only, displayed in the UI using a conditional panel
+    output$map <- highcharter::renderHighchart({
+
+      req(input$filter == "No Filter") # needed to prevent glitch
+
+      # filters the data for a map, specifically
+      data <- master_data %>%
+        haven::as_factor() %>%
+        dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
+        dplyr::distinct(fips, .keep_all = TRUE) %>%
+        dplyr::select(fips, state_name, fig_filter)
+
+      # uses a function from the naccho.viz package
+      naccho.viz::create_cat_map(
+        data = data,
+        fips_column = "fips",
+        selected_value = "fig_filter",
+        title_text = filter_meta()$title,
+        subtitle_text = "",
+        caption_text = filter_meta()$caption,
+        accessible_desc = ""
+      )
+    })
+
+
     # figure output -----------------------------------------------------------
+    # used for bar and line graphs
     output$figure <- highcharter::renderHighchart({
 
-      req(filter_data()) # prevents error message from popping
-      # print(filter_data()) # prints the dataset that is used in the viz
+      data <- data.frame(
+        x = c(0, 1),
+        y = c(10.1, 89.9),
+        category = c("Rural", "Urban"),
+        group = "Among All LHDs"
+      )
 
-      if (input$view == "Bar Graph" & (input$topic %in% c("totpop", "tenure") | input$filter == "No Filter")) {
-        naccho.viz::create_single_bar(
-          data = filter_data(),
-          x_variable = "fig_filter",
-          y_variable = "n",
-          title_text = filter_meta()$title,
-          subtitle_text = filter_data()$subtitle[[1]],
-          caption_text = filter_meta()$caption,
-          y_label = filter_meta()$y_label,
-          y_max = filter_meta()$y_max,
-          y_format = filter_meta()$y_format,
-          my_colors = naccho.viz::naccho_orange,
-          legend_enable = FALSE,
-          legend_title = "",
-          tooltip = filter_meta()$tooltip,
-          allow_export = TRUE,
-          select_theme = naccho.viz::naccho_minimal_theme
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Bar Graph" & input$filter != "No Filter") {
-        naccho.viz::create_grouped_bar(
-          data = filter_data(),
-          x_variable = "fig_cat",
-          y_variable = "n",
-          x_group = "fig_filter",
-          title_text = filter_meta()$title,
-          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = filter_meta()$caption,
-          y_label = filter_meta()$y_label,
-          y_max = filter_meta()$y_max,
-          y_format = filter_meta()$y_format,
-          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-          legend_enable = TRUE,
-          legend_title = "",
-          tooltip = filter_meta()$tooltip,
-          allow_export = TRUE,
-          select_theme = naccho.viz::naccho_minimal_theme
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Pie Chart") {
-        naccho.viz::create_pie(
-          data = filter_data(),
-          variable = "fig_filter",
-          value = "n",
-          my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-          legend_enable = TRUE,
-          title_text = filter_meta()$title,
-          subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-          caption_text = filter_meta()$caption
-        ) %>%
-          naccho.viz::add_logo(
-            "https://toolbox.naccho.org/pages/img/logo-header.png",
-            width = 150L,
-            height = 40L
-          )
-      } else if (input$view == "Map") {
-
-        naccho.viz::create_cat_map(
-          data = filter_data(),
-          fips_column = "fips",
-          selected_value = "fig_filter",
-          title_text = filter_meta()$title,
-          subtitle_text = "",
-          caption_text = filter_meta()$caption,
-          accessible_desc = ""
+      highcharter::hchart(
+        data,
+        "column",
+        id = "All",
+        name = "Among All LHDs",
+        highcharter::hcaes(
+          x = x,
+          y = y,
+          group = group
+        ),
+        dataLabels = list(
+          enabled = TRUE,
+          format = "{point.y}%",
+          overflow = TRUE,
+          distance = 5,
+          padding = 2,
+          style = list(
+            color = naccho.viz::naccho_grey,
+            fontFamily = "Jost",
+            fontWeight = "500",
+            fontSize = "14px")
         )
+      ) %>%
+        highcharter::hc_xAxis(
+          title = list(text = ""), # x-axis label
+          categories = data$category
+        ) %>%
+        highcharter::hc_yAxis(
+          title = list(
+            text = "% of Population"
+            ), # y-axis label
+          min = 0,
+          labels = list(
+            format = "{value}%"
+          )
+        ) %>%
+        viz_options(
+          viz_title = "Percent of U.S. Population Served by LHDs",
+          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",
+          tooltip = "{point.y}% of the U.S. population is served by {point.category} LHDs"
+        ) %>%
+        viz_export()
+    })
+
+
+    # save the figure as a proxy to redraw below
+    proxy <- highcharter::highchartProxy(ns("figure"))
+
+
+    # reactively define the colors based on the filter
+    colors <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange,
+          naccho.viz::naccho_pink)
       }
     })
+
+
+
+
+    # this observe is needed to redraw the figure based on the input selected
+    # by the user. It also filters and stores tables based on the inputs
+    # combinations selected by the user.
+    observe({
+
+      # Topic: Population
+      # Filters: Rurality, Governance, LHD Size, Region
+      if (input$topic == "totpop" & input$filter != "No Filter") {
+        data <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
+                        fig_value = get(input$topic)) %>%
+          dplyr::group_by(category) %>%
+          dplyr::summarise(fig_value = sum(fig_value)) %>%
+          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+                        x = as.numeric(as.factor(category)) -1, # -1 is required so the numbers start at 0 for the proxy to correctly draw
+                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
+
+        # this is needed to remove the series for the proxy redraw
+        series_id_filter <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(id_filter = get(input$filter)) %>%
+          dplyr::select(id_filter)
+
+        if (input$view == "Bar Graph") {
+          proxy %>%
+            proxy_to_single(data = data,
+                            meta = filter_meta())
+        } else {
+          proxy %>%
+            proxy_to_pie(data = data,
+                         meta = filter_meta())
+        }
+
+
+
+      # Topic: Tenure
+      # View: Bar Graph
+      # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "tenure" & input$filter != "No Filter") {
+        data <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
+                        fig_value = get(input$topic)) %>%
+          dplyr::group_by(category) %>%
+          dplyr::summarise(y = mean(fig_value, na.rm = TRUE)) %>%
+          dplyr::mutate(y = round(y,1)) %>%
+          dplyr::mutate(x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
+
+        # this is needed to remove the series for the proxy redraw
+        series_id_filter <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(id_filter = get(input$filter)) %>%
+          dplyr::select(id_filter)
+
+          proxy %>%
+            proxy_to_single(data = data,
+                            meta = filter_meta())
+
+
+
+      # Topic: Specialization
+      # View: Bar Graph
+      # Filters: No Filter
+      } else if (input$topic == "field" & input$filter == "No Filter") {
+        req(input$topic %not_in% c("totpop", "tenure"))
+        data <- master_data %>%
+          dplyr::select(tidyselect::starts_with("c4q5")) %>%
+          dplyr::mutate_if(is.double, as.numeric) %>% # this helps prevent a warning
+          reshape2::melt(id.vars = NULL) %>%
+          tidyr::drop_na(value) %>%
+          dplyr::mutate(category = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
+                                                    variable == "c4q502b" ~ "Nursing",
+                                                    variable == "c4q502c" ~ "Public Health",
+                                                    variable == "c4q502d" ~ "Other")) %>%
+          dplyr::group_by(category) %>%
+          dplyr::summarise(fig_value = sum(value)) %>%
+          dplyr::mutate(y = round(fig_value/935*100,1),
+                        subtitle = "Across All LHDs",
+                        x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::mutate(group = "All LHDs")
+
+          proxy %>%
+            proxy_to_single(data = data,
+                            meta = filter_meta())
+
+
+
+      # Topic: Specialization
+      # View: Bar Graph
+      # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "field" & input$filter != "No Filter") {
+        data <- spec_data %>%
+          dplyr::filter(filter == input$filter) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(x = as.numeric(as.factor(category)) -1,
+                        group = stringr::str_to_title(group))
+
+        series_id <- unique(data$group)
+
+        proxy %>%
+          proxy_to_group(
+            data = data,
+            meta = filter_meta(),
+            id = series_id,
+            colors = colors() # comes from earlier reactive and needs to match length of field input
+          )
+
+
+
+      # Topics: Geographies Served, Governance, Structure, Board of Health, Age, Race, Highest Degree, Gender
+      # View: Bar Graph
+      # Filters: No Filter
+      } else if (input$filter == "No Filter") {
+        req(input$topic %not_in% c("totpop", "tenure"))
+        data <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(category = get(input$topic)) %>%
+          tidyr::drop_na(category) %>%
+          dplyr::group_by(category) %>%
+          dplyr::summarise(value = dplyr::n()) %>%
+          dplyr::mutate(y = round(value/sum(value)*100,1),
+                        subtitle = "Across All LHDs",
+                        x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(group = "All LHDs")
+
+          proxy %>%
+            proxy_to_single(data = data,
+                            meta = filter_meta())
+
+
+
+      # Topics: Geographies Served, Governance, Structure, Board of Health, Age, Race, Highest Degree, Gender
+      # View: Bar Graph
+      # Filters: Rurality, Governance, LHD Size, Region
+      } else {
+        data <- master_data %>%
+          haven::as_factor() %>%
+          dplyr::mutate(group = stringr::str_to_title(get(input$filter)),
+                        category = get(input$topic)) %>%
+          tidyr::drop_na(category) %>%
+          dplyr::group_by(group, category) %>%
+          dplyr::summarise(fig_value = dplyr::n()) %>%
+          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+                        x = as.numeric(as.factor(category)) -1) %>%
+          dplyr::ungroup()
+
+        series_id <- unique(data$group)
+
+        proxy %>%
+          proxy_to_group(
+            data = data,
+            meta = filter_meta(),
+            id = series_id,
+            colors = colors() # comes from earlier reactive and needs to match length of field input
+          )
+      }
+    })
+
+
+    #   } else if (input$view == "Pie Chart") {
+    #     naccho.viz::create_pie(
+    #       data = filter_data(),
+    #       variable = "fig_filter",
+    #       value = "n",
+    #       my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
+    #       legend_enable = TRUE,
+    #       title_text = filter_meta()$title,
+    #       subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
+    #       caption_text = filter_meta()$caption
+    #     ) %>%
+    #       naccho.viz::add_logo(
+    #         "https://toolbox.naccho.org/pages/img/logo-header.png",
+    #         width = 150L,
+    #         height = 40L
+    #       )
+    #
+    #   }
+    # })
 
 
 
