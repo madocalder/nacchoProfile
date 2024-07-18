@@ -7,7 +7,7 @@
 \format{
 data.frame
 
-A data frame with 942 rows and 908 columns:
+A data frame with 942 rows and 910 columns:
 \describe{
   \item{nacchoid}{NACCHO ID}
   \item{c0popcat7}{7 level population categories}

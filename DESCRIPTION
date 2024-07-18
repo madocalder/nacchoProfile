@@ -28,7 +28,10 @@ Imports:
     survey,
     srvyr,
     tidyr,
-    purrr
+    purrr,
+    tidyr,
+    tidyselect,
+    reshape2
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

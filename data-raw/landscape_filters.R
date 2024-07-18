@@ -1,5 +1,6 @@
 ## code to prepare `landscape_filters` dataset goes here
 landscape_filters <- list(
+  "No Filter",
   "Rurality" = "urbanrural2022",
   "Governance" = "c0govcat",
   "LHD Size" = "c0popcat3",

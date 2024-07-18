@@ -3,6 +3,10 @@ $(() => {
 
   layout();
   window.addEventListener("resize", layout);
+
+  $("body").on("click", "[data-toggle='tab']", () => {
+    window.bootstrap.Offcanvas.getInstance("#offcanvas-menu").hide();
+  });
 });
 
 const layout = () => {
