@@ -19,16 +19,16 @@ race$c4q28 <- dplyr::na_if(race$c4q28, "Prefer not to answer")
 
 race <- race %>%
   dplyr::filter(c4q27g != "checked" & c4q28 != "Hispanic or Latino") %>%
-  dplyr::mutate(white = dplyr::case_when(c4q27a == "checked" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "white",
+  dplyr::mutate(white = dplyr::case_when(c4q27a == "checked" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "White",
                                          TRUE ~ "Other")) %>%
-  dplyr::mutate(race = dplyr::case_when(white == "white" ~ "white",
-                                        white == "Other" & c4q27c == "checked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Other",
-                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "checked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Other",
-                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "checked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Black or African American",
-                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "checked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Other",
-                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "checked" & c4q28 == "not Hispanic/Latino" ~ "Other",
-                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "Hispanic/Latino" ~ "Hispanic or Latino",
-                                        TRUE ~ "Other")) %>%
+  dplyr::mutate(race = dplyr::case_when(white == "White" ~ "White Alone",
+                                        white == "Other" & c4q27c == "checked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Mixed Identity/Other",
+                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "checked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Mixed Identity/Other",
+                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "checked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Black or African American Alone",
+                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "checked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Mixed Identity/Other",
+                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "checked" & c4q28 == "not Hispanic/Latino" ~ "Mixed Identity/Other",
+                                        white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "Hispanic/Latino" ~ "Hispanic or Latino Alone",
+                                        TRUE ~ "Mixed Identity/Other")) %>%
   dplyr::select(nacchoid, race, white)
 
 
@@ -48,7 +48,7 @@ master_data <- dplyr::left_join(master_data, fips, by = "c0state")
 
 # save data ---------------------------------------------------------------
 usethis::use_data(master_data, overwrite = TRUE)
-
+devtools::document()
 
 
 # race <- race %>%

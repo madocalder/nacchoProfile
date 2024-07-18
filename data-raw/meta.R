@@ -13,7 +13,6 @@ meta <- data.frame(
             "Highest Degree Obtained by LHD Top Executive",
             "Field of Educational Study of LHD Top Executive",
             "Gender of LHD Top Executive"),
-  tooltip = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA),
   alt = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA),
   caption = "<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
@@ -32,8 +31,21 @@ meta <- data.frame(
   y_max = c(100, 100, 100, 100, 100, 100, 100, 10, 100, 100, 100),
   y_format = c("{value}%", "{value}%", "{value}%", "{value}%", "{value}%",
                "{value}%", "{value}%", "{value}", "{value}%", "{value}%", "{value}%"),
-  tooltip = c("{point.n}% of the U.S. population is served by {point.fig_filter} LHDs")
+  data_label = c("{point.y:,.1f}%", "{point.y:,.1f}%", "{point.y:,.1f}%", "{point.y:,.1f}%", "{point.y:,.1f}%",
+                 "{point.y:,.1f}%", "{point.y:,.1f}%", "{point.y:,.1f} Years", "{point.y:,.1f}%", "{point.y:,.1f}%", "{point.y:,.1f}%"),
+  tooltip = c("<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of the U.S. population is served by {point.category} LHDs",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHDs are {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHDs are {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHDs are {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHDs have the following Local Board of Health: {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHD Top Executives are {point.category} ",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHD Top Executives identify as {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  LHD Top Executives at {point.category}  agencies have been in their position an average of {point.y} years",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHD Top Executives have the following highest degree: {point.category} ",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHD Top Executives have a degree in {point.category}",
+              "<span style=\"color:{point.color}\">\u25CF</span>  {point.y}% of LHD Top Executives identify as {point.category} ")
 
 )
 
 usethis::use_data(meta, overwrite = TRUE)
+devtools::document()

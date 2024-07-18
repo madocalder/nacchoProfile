@@ -1,7 +1,7 @@
 ## code to prepare `landscape_topics` dataset goes here
 landscape_topics <- list(
   "Jurisdiction & Governance" = list("Population Served" = "totpop",
-                                     "Geographies Served" = "geography",
+                                     # "Geographies Served" = "geography",
                                      "Governance" = "c0govcatn",
                                      "Structure" = "c2q501",
                                      "Board of Health" = "lboh"),
