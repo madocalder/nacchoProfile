@@ -2,11 +2,11 @@
 
 export("%>%")
 export(add_weights)
-export(return_survey_weighted_counts)
-export(return_survey_weighted_statistics)
 export(proxy_to_group)
 export(proxy_to_pie)
 export(proxy_to_single)
+export(return_survey_weighted_counts)
+export(return_survey_weighted_statistics)
 export(run_app)
 export(viz_export)
 export(viz_options)
