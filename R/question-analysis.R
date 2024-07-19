@@ -5,7 +5,7 @@
 report2022_leadership_fig4.1 <- function() {
 
     questions <- c("c4q26", "c4q28", "c4q29", "racenotwhite")
-    
+
     map_dfr(questions, return_survey_weighted_counts) %>%
         mutate(Answer = case_when(
             .data$Question == "racenotwhite" & .data$Answer == 1 ~ "racenotwhite",
@@ -42,7 +42,7 @@ report2022_leadership_fig4.4 <- function() {
 #' @importFrom dplyr bind_rows mutate
 #' @noRd
 report2022_leadership_fig4.5 <- function() {
-    
+
     all_lhds <- return_survey_weighted_counts("c4q34")
     split_lhds <- return_survey_weighted_counts("c4q34", grps = "c0popcat3", popcat = "c0popcat3")
     split_urb <- return_survey_weighted_counts("c4q34", grps = "urbanrural2022", popcat = "c0popcat3")
@@ -58,26 +58,26 @@ report2022_leadership_fig4.5 <- function() {
 report2022_leadership_fig4.6 <- function() {
 
     args1 <- list(
-        c("c4q502a", "c4q502b", "c4q502c"), 
-        grps = "c0popcat3", 
-        popcat = "c0popcat3"
+        c("c4q502a", "c4q502b", "c4q502c"),
+        grps = "c0popcat3",
+        popcat = "c0popcat7"
         )
 
     args2 <- list(
-        c("c4q502a", "c4q502b", "c4q502c"), 
-        grps = "urbanrural2022", 
-        popcat = "c0popcat3"
+        c("c4q502a", "c4q502b", "c4q502c"),
+        grps = "urbanrural2022",
+        popcat = "c0popcat7"
         )
-    
+
     all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
     split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
     split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
-    
+
     bind_rows(all_lhds, split_lhds, split_urb) %>%
         filter(.data$Answer == "checked") %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
-   
+
 }
 
 #' @importFrom dplyr mutate case_when
@@ -102,19 +102,19 @@ report2022_workforce_fig5.2 <- function() {
     # when grouping
 
     args <- list(
-        c("c5q36", "c5q37"), 
-        grps = "c0popcat7", 
+        c("c5q36", "c5q37"),
+        grps = "c0popcat7",
         popcat = "c0popcat7",
         wtype = "weights_static"
         )
 
     sel_cols <- c(
-        "GroupLabel", 
-        "AnswerLabel", 
-        "Mean", 
+        "GroupLabel",
+        "AnswerLabel",
+        "Mean",
         "Median"
         )
-    
+
     all_lhds <- purrr::map_dfr(args[[1]], return_survey_weighted_statistics)
     split_lhds <- purrr::pmap_dfr(args, return_survey_weighted_statistics)
 
@@ -134,14 +134,14 @@ report2022_workforce_fig5.2 <- function() {
 report2022_workforce_fig5.6 <- function() {
 
     args <- list(
-        c("c5q36", "c5q37"), 
+        c("c5q36", "c5q37"),
         wtype = c("weights_static", "weights_static")
         )
-    
+
     pmap_dfr(args, return_survey_weighted_statistics) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)])
-   
+
 }
 
 #' @importFrom dplyr bind_rows mutate
@@ -176,24 +176,24 @@ report2022_workforce_fig5.12 <- function() {
     # very small differences in the percentages
 
     args <- list(
-        c("c5q63a", "c5q62a", "c5q52a", "c5q64a", 
-        "c5q61a", "c5q55a", "c5q47a", "c5q48a", 
+        c("c5q63a", "c5q62a", "c5q52a", "c5q64a",
+        "c5q61a", "c5q55a", "c5q47a", "c5q48a",
         "c5q50a", "c5q60a", "c5q57a", "c5q58a",
         "c5q49a", "c5q65a", "c5q59a", "c5q56a",
-        "c5q44a", "c5q51a", "c5q43a"), 
-        grps = "c0popcat7", 
+        "c5q44a", "c5q51a", "c5q43a"),
+        grps = "c0popcat7",
         popcat = "c0popcat7"
         )
 
     all_lhds <- map_dfr(args[[1]], return_survey_weighted_counts)
     split_lhds <- pmap_dfr(args, return_survey_weighted_counts)
-    
+
     sel_cols <- c(
-        "GroupLabel", 
-        "AnswerLabel", 
+        "GroupLabel",
+        "AnswerLabel",
         "Percentage"
         )
-    
+
     bind_rows(all_lhds, split_lhds) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
@@ -210,32 +210,32 @@ compare_results_fig5.12 <- function() {
 
     report <- tibble::tibble(
         AnswerLabel = c(
-            "Agency leadership",  
-            "Animal control worker", 
-            "Behavioral health staff", 
-            "Business and financial operations staff", 
-            "Community health worker", 
-            "Environmental health worker", 
-            "Epidemiologist/statistician", 
-            "Health educator", 
-            "Information systems specialist", 
-            "Laboratory worker", 
-            "Licensed practical or vocational nurse", 
-            "Nursing aide and home health aide", 
-            "Nutritionist", 
-            "Office and administrative support staff", 
-            "Oral health care professional", 
-            "Preparedness staff", 
-            "Public health physician", 
-            "Public information professional", 
-            "Registered nurse"), 
-        All_LHDs = c("0.81", "0.06", "0.14", "0.51", "0.38", "0.69", "0.37", "0.6", "0.19", "0.15", "0.34", "0.19", "0.46", "0.91", "0.14", "0.63", "0.25", "0.32", "0.92"), 
-        Min25k = c("0.7", "0.05", "0.04", "0.31", "0.22", "0.52", "0.12", "0.38", "0.04", "0.04", "0.26", "0.14",  "0.24", "0.85", "0.05", "0.43", "0.09", "0.16", "0.85"), 
-        `25k_49k` = c("0.83", "0.06", "0.08", "0.48", "0.33", "0.74", "0.25", "0.64", "0.13", "0.1", "0.3", "0.2", "0.44", "0.93", "0.11", "0.63", "0.18", "0.22", "0.96"), 
-        `50k_99k` = c("0.88", "0.08", "0.23", "0.63", "0.45", "0.83", "0.53", "0.74", "0.16", "0.16", "0.4", "0.23", "0.62", "0.92", "0.17", "0.75", "0.32", "0.34", "0.97"), 
-        `100k_249k` = c("0.95", "0.05", "0.15", "0.72", "0.53", "0.85", "0.72", "0.8", "0.35", "0.24", "0.4", "0.15", "0.68", "0.96", "0.24", "0.84", "0.40", "0.55", "0.98"), 
-        `250k_499k` = c("0.98", "0.04", "0.42", "0.9", "0.72", "0.92", "0.84", "0.88", "0.62", "0.4", "0.5", "0.26", "0.76", "0.98", "0.24", "0.92", "0.6", "0.76", "0.96"), 
-        `500k_999k` = c("1", "0.16", "0.49", "0.98", "0.89", "0.89", "1", "0.89", "0.84", "0.56", "0.71", "0.27", "0.87", "1", "0.36", "0.98", "0.72", "0.93", "1"), 
+            "Agency leadership",
+            "Animal control worker",
+            "Behavioral health staff",
+            "Business and financial operations staff",
+            "Community health worker",
+            "Environmental health worker",
+            "Epidemiologist/statistician",
+            "Health educator",
+            "Information systems specialist",
+            "Laboratory worker",
+            "Licensed practical or vocational nurse",
+            "Nursing aide and home health aide",
+            "Nutritionist",
+            "Office and administrative support staff",
+            "Oral health care professional",
+            "Preparedness staff",
+            "Public health physician",
+            "Public information professional",
+            "Registered nurse"),
+        All_LHDs = c("0.81", "0.06", "0.14", "0.51", "0.38", "0.69", "0.37", "0.6", "0.19", "0.15", "0.34", "0.19", "0.46", "0.91", "0.14", "0.63", "0.25", "0.32", "0.92"),
+        Min25k = c("0.7", "0.05", "0.04", "0.31", "0.22", "0.52", "0.12", "0.38", "0.04", "0.04", "0.26", "0.14",  "0.24", "0.85", "0.05", "0.43", "0.09", "0.16", "0.85"),
+        `25k_49k` = c("0.83", "0.06", "0.08", "0.48", "0.33", "0.74", "0.25", "0.64", "0.13", "0.1", "0.3", "0.2", "0.44", "0.93", "0.11", "0.63", "0.18", "0.22", "0.96"),
+        `50k_99k` = c("0.88", "0.08", "0.23", "0.63", "0.45", "0.83", "0.53", "0.74", "0.16", "0.16", "0.4", "0.23", "0.62", "0.92", "0.17", "0.75", "0.32", "0.34", "0.97"),
+        `100k_249k` = c("0.95", "0.05", "0.15", "0.72", "0.53", "0.85", "0.72", "0.8", "0.35", "0.24", "0.4", "0.15", "0.68", "0.96", "0.24", "0.84", "0.40", "0.55", "0.98"),
+        `250k_499k` = c("0.98", "0.04", "0.42", "0.9", "0.72", "0.92", "0.84", "0.88", "0.62", "0.4", "0.5", "0.26", "0.76", "0.98", "0.24", "0.92", "0.6", "0.76", "0.96"),
+        `500k_999k` = c("1", "0.16", "0.49", "0.98", "0.89", "0.89", "1", "0.89", "0.84", "0.56", "0.71", "0.27", "0.87", "1", "0.36", "0.98", "0.72", "0.93", "1"),
         `Plus1000k` = c("0.97", "0.17", "0.5", "1", "0.8", "0.77", "1", "0.93", "0.77", "0.83", "0.8", "0.4", "0.97", "1", "0.67", "1", "0.97", "0.83", "1")
         ) |>
         mutate(across(.data$All_LHDs:.data$Plus1000k, \(x) as.numeric(x))) |>
@@ -271,15 +271,15 @@ report2022_workforce_fig5.13 <- function() {
 
     args <- list(
         c(
-            "newc5q63b", "newc5q62b", 
-            "newc5q52b", "newc5q64b", 
-            "newc5q61b", "newc5q55b", 
-            "newc5q47b", "newc5q48b", 
-            "newc5q50b", "newc5q60b", 
+            "newc5q63b", "newc5q62b",
+            "newc5q52b", "newc5q64b",
+            "newc5q61b", "newc5q55b",
+            "newc5q47b", "newc5q48b",
+            "newc5q50b", "newc5q60b",
             "newc5q57b", "newc5q58b",
-            "newc5q49b", "newc5q65b", 
+            "newc5q49b", "newc5q65b",
             "newc5q59b", "newc5q56b",
-            "newc5q44b", "newc5q51b", 
+            "newc5q44b", "newc5q51b",
             "newc5q43b"),
         wtype = "weights_static"
         )
@@ -309,8 +309,8 @@ report2022_finance_fig6.2 <- function() {
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         rename(
-            `25th percentile` = "Quantile_q25", 
-            `50th percentile (Median)` = "Quantile_q50", 
+            `25th percentile` = "Quantile_q25",
+            `50th percentile (Median)` = "Quantile_q50",
             `75th percentile` = "Quantile_q75"
             )
 
@@ -328,13 +328,13 @@ report2022_finance_fig6.6 <- function() {
 #' @importFrom dplyr mutate
 #' @noRd
 report2022_finance_fig6.7 <- function() {
-    
+
     args <- list(
         c(
-            "c3q17p", "c3q17c", 
-            "c3q17d", "c3q17e", 
-            "c3q17r", "c3q17i", 
-            "c3q17j", "c3q17v", 
+            "c3q17p", "c3q17c",
+            "c3q17d", "c3q17e",
+            "c3q17r", "c3q17i",
+            "c3q17j", "c3q17v",
             "c3q17h", "c3q17m"),
         wtype = "weights_static"
         )
@@ -343,7 +343,7 @@ report2022_finance_fig6.7 <- function() {
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         mutate(Percentage = .data$Total/sum(.data$Total)*100)
-    
+
 }
 
 #' @importFrom dplyr mutate
@@ -378,8 +378,8 @@ report2022_finance_fig6.10 <- function() {
         "greater than the previous year's budget")
 
     sel_cols <- c(
-        "GroupLabel", 
-        "AnswerLabel", 
+        "GroupLabel",
+        "AnswerLabel",
         "Percentage")
 
     return_survey_weighted_counts("c10q301", wtype = "weights_static") %>%
@@ -399,24 +399,24 @@ report2022_finance_fig6.10 <- function() {
 report2022_program_fig7.3 <- function() {
 
     args1 <- list(
-        c("c6q147a", "c6q56a", "c6q55a", "c6q148a"), 
-        grps = "c0popcat3", 
+        c("c6q147a", "c6q56a", "c6q55a", "c6q148a"),
+        grps = "c0popcat3",
         popcat = "c0popcat3"
         )
 
      args2 <- list(
-        c("c6q147a", "c6q56a", "c6q55a", "c6q148a"), 
-        grps = "urbanrural2022", 
+        c("c6q147a", "c6q56a", "c6q55a", "c6q148a"),
+        grps = "urbanrural2022",
         popcat = "c0popcat3"
         )
 
     all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
     split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
     split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
-    
+
     sel_cols <- c(
-        "GroupLabel", 
-        "AnswerLabel", 
+        "GroupLabel",
+        "AnswerLabel",
         "Percentage")
 
     bind_rows(all_lhds, split_lhds, split_urb) %>%
@@ -425,7 +425,7 @@ report2022_program_fig7.3 <- function() {
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         select(all_of(sel_cols)) %>%
         pivot_wider(names_from = .data$GroupLabel, values_from = .data$Percentage)
-    
+
 }
 
 #' @importFrom dplyr bind_rows mutate select all_of
@@ -436,31 +436,31 @@ report2022_program_fig7.4 <- function() {
 
     args1 <- list(
         c(
-            "c6q59a", "c6q58a", "c6q57a", 
-            "c6q63a", "c6q142a", "c6q62a", 
+            "c6q59a", "c6q58a", "c6q57a",
+            "c6q63a", "c6q142a", "c6q62a",
             "c6q60a", "c6q61a", "c6q67a",
-            "c6q66a", "c6q65a"), 
-        grps = "c0popcat3", 
+            "c6q66a", "c6q65a"),
+        grps = "c0popcat3",
         popcat = "c0popcat3"
         )
 
     args2 <- list(
         c(
-            "c6q59a", "c6q58a", "c6q57a", 
-            "c6q63a", "c6q142a", "c6q62a", 
+            "c6q59a", "c6q58a", "c6q57a",
+            "c6q63a", "c6q142a", "c6q62a",
             "c6q60a", "c6q61a", "c6q67a",
-            "c6q66a", "c6q65a"), 
-        grps = "urbanrural2022", 
+            "c6q66a", "c6q65a"),
+        grps = "urbanrural2022",
         popcat = "c0popcat3"
         )
 
     all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
     split_lhds <- pmap_dfr(args1, return_survey_weighted_counts)
     split_urb <- pmap_dfr(args2, return_survey_weighted_counts)
-    
+
     sel_cols <- c(
-        "GroupLabel", 
-        "AnswerLabel", 
+        "GroupLabel",
+        "AnswerLabel",
         "Percentage")
 
     bind_rows(all_lhds, split_lhds, split_urb) %>%
@@ -469,5 +469,5 @@ report2022_program_fig7.4 <- function() {
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         select(all_of(sel_cols)) %>%
         pivot_wider(names_from = .data$GroupLabel, values_from = .data$Percentage)
-    
+
 }
