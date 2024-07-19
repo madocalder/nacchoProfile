@@ -253,14 +253,14 @@ mod_landscape_server <- function(id){
         x = c(0, 1),
         y = c(10.1, 89.9),
         category = c("Rural", "Urban"),
-        group = "Among All LHDs"
+        group = "Across All LHDs"
       )
 
       highcharter::hchart(
         data,
         "column",
         id = "All",
-        name = "Among All LHDs",
+        name = "Across All LHDs",
         highcharter::hcaes(
           x = x,
           y = y,
@@ -334,6 +334,7 @@ mod_landscape_server <- function(id){
 
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
+      # Weighting Performed:
       if (input$topic == "totpop" & input$filter != "No Filter") {
         data <- master_data %>%
           haven::as_factor() %>%
@@ -347,11 +348,6 @@ mod_landscape_server <- function(id){
           dplyr::ungroup() %>%
           dplyr::mutate(group = "All LHDs")
 
-        # this is needed to remove the series for the proxy redraw
-        series_id_filter <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(id_filter = get(input$filter)) %>%
-          dplyr::select(id_filter)
 
         if (input$view == "Bar Graph") {
           proxy %>%
@@ -369,28 +365,11 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "tenure" & input$filter != "No Filter") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
-                        fig_value = get(input$topic)) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(y = mean(fig_value, na.rm = TRUE)) %>%
-          dplyr::mutate(y = round(y,1)) %>%
-          dplyr::mutate(x = as.numeric(as.factor(category)) -1) %>%
-          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(group = "All LHDs")
-
-        # this is needed to remove the series for the proxy redraw
-        series_id_filter <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(id_filter = get(input$filter)) %>%
-          dplyr::select(id_filter)
+        data <- return_survey_weighted_statistics("tenure", input$filter)
 
           proxy %>%
             proxy_to_single(data = data,
                             meta = filter_meta())
-
 
 
       # Topic: Specialization
@@ -398,38 +377,18 @@ mod_landscape_server <- function(id){
       # Filters: No Filter
       } else if (input$topic == "field" & input$filter == "No Filter") {
         req(input$topic %not_in% c("totpop", "tenure"))
-        data <- master_data %>%
-          dplyr::select(tidyselect::starts_with("c4q5")) %>%
-          dplyr::mutate_if(is.double, as.numeric) %>% # this helps prevent a warning
-          reshape2::melt(id.vars = NULL) %>%
-          tidyr::drop_na(value) %>%
-          dplyr::mutate(category = dplyr::case_when(variable == "c4q502a" ~ "Medical Degree",
-                                                    variable == "c4q502b" ~ "Nursing",
-                                                    variable == "c4q502c" ~ "Public Health",
-                                                    variable == "c4q502d" ~ "Other")) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(fig_value = sum(value)) %>%
-          dplyr::mutate(y = round(fig_value/935*100,1),
-                        subtitle = "Across All LHDs",
-                        x = as.numeric(as.factor(category)) -1) %>%
-          dplyr::mutate(group = "All LHDs")
+        data <- spec_data_all
 
           proxy %>%
             proxy_to_single(data = data,
                             meta = filter_meta())
 
 
-
       # Topic: Specialization
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "field" & input$filter != "No Filter") {
-        data <- spec_data %>%
-          dplyr::filter(filter == input$filter) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(x = as.numeric(as.factor(category)) -1,
-                        group = stringr::str_to_title(group))
-
+        data <- spec_data %>% dplyr::filter(filter == input$filter)
         series_id <- unique(data$group)
 
         proxy %>%
@@ -441,45 +400,23 @@ mod_landscape_server <- function(id){
           )
 
 
-
       # Topics: Geographies Served, Governance, Structure, Board of Health, Age, Race, Highest Degree, Gender
       # View: Bar Graph
       # Filters: No Filter
       } else if (input$filter == "No Filter") {
         req(input$topic %not_in% c("totpop", "tenure"))
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(category = get(input$topic)) %>%
-          tidyr::drop_na(category) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(value = dplyr::n()) %>%
-          dplyr::mutate(y = round(value/sum(value)*100,1),
-                        subtitle = "Across All LHDs",
-                        x = as.numeric(as.factor(category)) -1) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(group = "All LHDs")
+        data <- return_survey_weighted_counts(input$topic)
 
           proxy %>%
             proxy_to_single(data = data,
                             meta = filter_meta())
 
 
-
       # Topics: Geographies Served, Governance, Structure, Board of Health, Age, Race, Highest Degree, Gender
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(group = stringr::str_to_title(get(input$filter)),
-                        category = get(input$topic)) %>%
-          tidyr::drop_na(category) %>%
-          dplyr::group_by(group, category) %>%
-          dplyr::summarise(fig_value = dplyr::n()) %>%
-          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
-                        x = as.numeric(as.factor(category)) -1) %>%
-          dplyr::ungroup()
-
+        data <- return_survey_weighted_counts(input$topic, input$filter)
         series_id <- unique(data$group)
 
         proxy %>%
@@ -487,7 +424,7 @@ mod_landscape_server <- function(id){
             data = data,
             meta = filter_meta(),
             id = series_id,
-            colors = colors() # comes from earlier reactive and needs to match length of field input
+            colors = colors() # rendered reactively to match filter length
           )
       }
     })
