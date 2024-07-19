@@ -190,6 +190,9 @@ proxy_to_single <- function(hc, data, meta, ...) {
       title = list(
         text = meta$title
       ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
       caption = list(
         text = meta$caption
       ),
@@ -263,11 +266,14 @@ proxy_to_group <- function(
       title = list(
         text = meta$title
       ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
       caption = list(
         text = meta$caption
       ),
       xAxis = list(
-        categories = data$category,
+        categories = unique(data$category),
         offset = 0
       ),
       tooltip = list(
