@@ -98,8 +98,8 @@ report2022_workforce_fig5.1 <- function() {
 #' @noRd
 report2022_workforce_fig5.2 <- function() {
 
-    # does not match on the actual non weighted data
-    # when grouping
+    # values when presenting by the c0popcat7 strata
+    # don'tm match perfectly (for 5 values)
 
     args <- list(
         c("c5q36", "c5q37"),
@@ -132,6 +132,10 @@ report2022_workforce_fig5.2 <- function() {
 #' @importFrom purrr pmap_dfr
 #' @noRd
 report2022_workforce_fig5.6 <- function() {
+
+    # rounded values match but we don't have any reference 
+    # values for the confidence bands
+    # so we can't really compare.
 
     args <- list(
         c("c5q36", "c5q37"),
