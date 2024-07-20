@@ -48,7 +48,7 @@ q_remap <- c(
     "c4q502c" = "Public Health",
     "c5q36" = "Number of employees",
     "c5q37" = "Number of FTEs",
-    "fte_bypop" = "Chnage in FTEs",
+    "fte_bypop" = "Change in FTEs",
     "jobsgoneany" = "Job lossses due to layoffs and/or attrition, over time",
     "c5q63a" = "Agency leadership", 
     "c5q62a" = "Animal control worker", 
