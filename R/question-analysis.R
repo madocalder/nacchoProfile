@@ -250,7 +250,7 @@ compare_results_fig5.12 <- function() {
 
     colnames(results) <- colnames(report)
 
-    report <- report |>
+    report |>
         left_join(results, by = "AnswerLabel") |>
         mutate(
             All_LHDs = paste0(.data$All_LHDs.x - .data$All_LHDs.y, "(", .data$All_LHDs.x, ", ", .data$All_LHDs.y, ")"),
