@@ -8,7 +8,7 @@
 \format{
 data.frame
 
-A data frame with 48 observations of 6 variables
+A data frame with 36 observations of 12 variables
 }
 \source{
 National Association of City and County Health Officials (NACCHO)
