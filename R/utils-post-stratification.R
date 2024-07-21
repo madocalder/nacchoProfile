@@ -57,7 +57,7 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
 #'
 #' @examples
 #' return_survey_weighted_counts("c3q15")
-#' return_survey_weighted_counts("c3q15", grps = NULL, popcat = "c0popcat7")
+#' return_survey_weighted_counts("c3q15", popcat = "c0popcat7")
 #'
 #' @return tibble
 return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popcat7", wtype = "weights") {
@@ -142,7 +142,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 #'
 #' @examples
 #' return_survey_weighted_statistics("tenure")
-#' return_survey_weighted_counts("c5q36", grps = "c0popcat7", popcat = "c0popcat7", wtype = "weights_static")
+#' return_survey_weighted_counts("c5q36", grps = "c0popcat7", wtype = "weights_static")
 #'
 #' @return tibble
 return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0popcat7", wtype = "weights") {

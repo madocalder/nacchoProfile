@@ -26,6 +26,6 @@ Calculate weighted results for categorical questions.
 }
 \examples{
 return_survey_weighted_counts("c3q15")
-return_survey_weighted_counts("c3q15", grps = NULL, popcat = "c0popcat7")
+return_survey_weighted_counts("c3q15", popcat = "c0popcat7")
 
 }
