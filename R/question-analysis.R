@@ -178,6 +178,7 @@ report2022_workforce_fig5.10 <- function() {
 report2022_workforce_fig5.12 <- function() {
 
     # very small differences in the percentages
+    # see compare_results_fig5.12()
 
     args <- list(
         c("c5q63a", "c5q62a", "c5q52a", "c5q64a",
@@ -405,13 +406,13 @@ report2022_program_fig7.3 <- function() {
     args1 <- list(
         c("c6q147a", "c6q56a", "c6q55a", "c6q148a"),
         grps = "c0popcat3",
-        popcat = "c0popcat3"
+        popcat = "c0popcat7"
         )
 
      args2 <- list(
         c("c6q147a", "c6q56a", "c6q55a", "c6q148a"),
         grps = "urbanrural2022",
-        popcat = "c0popcat3"
+        popcat = "c0popcat7"
         )
 
     all_lhds <- map_dfr(args1[[1]], return_survey_weighted_counts)
