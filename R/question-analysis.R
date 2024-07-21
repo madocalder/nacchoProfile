@@ -99,7 +99,7 @@ report2022_workforce_fig5.1 <- function() {
 report2022_workforce_fig5.2 <- function() {
 
     # values when presenting by the c0popcat7 strata
-    # don'tm match perfectly (for 5 values)
+    # don't match perfectly (for 5 values)
 
     args <- list(
         c("c5q36", "c5q37"),

@@ -25,7 +25,7 @@ tibble
 Calculate weighted results for categorical questions.
 }
 \examples{
-add_weights("c3q15")
-add_weights("totexp_percap")
+return_survey_weighted_counts("c3q15")
+return_survey_weighted_counts("c3q15", grps = NULL, popcat = "c0popcat7")
 
 }
