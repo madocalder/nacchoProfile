@@ -405,7 +405,12 @@ mod_landscape_server <- function(id){
       # Filters: No Filter
       } else if (input$filter == "No Filter") {
         req(input$topic %not_in% c("totpop", "tenure"))
+
         data <- return_survey_weighted_counts(input$topic)
+
+        if(input$topic == "c4q29") {
+          data$x[3] <- 2 # this may need to be hand-edited in 2025
+        }
 
           proxy %>%
             proxy_to_single(data = data,
@@ -416,7 +421,16 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else {
+        req(input$topic %not_in% c("totpop", "tenure"))
+
         data <- return_survey_weighted_counts(input$topic, input$filter)
+
+        if(input$topic == "c4q29") {
+          data <- data %>%
+            dplyr::mutate(x = dplyr::case_when(x == 3 ~ 2,
+                                               TRUE ~ x))
+        }
+
         series_id <- unique(data$group)
 
         proxy %>%
