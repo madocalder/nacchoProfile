@@ -27,12 +27,8 @@ mod_workforce_ui <- function(id){
               selectInput(
                 inputId = ns("topic"),
                 strong("Select Topic"),
-                choices = c(
-                  "Expenditures",
-                  "Funding",
-                  "Other lightg"
-                ),
-                selected = "Expenditures"
+                choices = workforce_topics,
+                selectize = TRUE
               )
             ),
             div(
@@ -43,10 +39,10 @@ mod_workforce_ui <- function(id){
                 strong("Select View"),
                 choices = c(
                   "Bar Graph",
-                  "Map",
+                  "Line Graph",
+                  "Pie Chart",
                   "Table"
-                ),
-                selected = "Bar Graph"
+                )
               )
             ),
             div(
@@ -55,12 +51,7 @@ mod_workforce_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = c(
-                  "Rurality",
-                  "Governance",
-                  "LHD Size"
-                ),
-                selected = "Rurality"
+                choices = landscape_filters
               )
             )
           ),
@@ -71,7 +62,42 @@ mod_workforce_ui <- function(id){
 
           # add main page content here ----------------------------------------------
 
-          p("This is the workforce Page"),
+
+            # display occupational classifications is selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
+              div(
+                class = "viz_content row",
+                div(
+                  class = "col-sm-3",
+                  # selectInput(
+                  #   "classifications",
+                  #   strong("Select Classification"),
+                  #   workforce_classifications,
+                  #   selectize = FALSE,
+                  #   multiple = TRUE,
+                  #   size = 7L
+                  # )
+                  # shinyWidgets::multiInput(
+                  #   inputId = "classifications",
+                  #   label = strong("Select Classification"),
+                  #   choices = workforce_classifications
+                  # )
+                  strong("Select Classification"),
+                  div(
+                    class = "checkboxes",
+                  checkboxGroupInput(
+                      "classifications",
+                      "",
+                      workforce_classifications,
+                  )
+                  )
+                ),
+                div(
+                  class = "col-sm-9"
+                )
+            )
+          )
 
           # end of main content -----------------------------------------------------
 
