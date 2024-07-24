@@ -1,14 +1,14 @@
-#' Landscape topics
+#' Landscape Topics
 #'
 #' @format list
 #'
-#' A list of 5
+#' A list of 2 lists
 #'
 #' @source columns from master_data
 "landscape_topics"
 
 
-#' Landscape filters
+#' Landscape Filters
 #'
 #' @format list
 #'
@@ -16,3 +16,25 @@
 #'
 #' @source columns from master_data
 "landscape_filters"
+
+
+#' Workforce Topics
+#'
+#' @format list
+#'
+#' A list of 5
+#'
+#' @source columns from master_data
+"workforce_topics"
+
+
+
+#' Workforce Classifications
+#'
+#' @format list
+#'
+#' A list of 19
+#'
+#' @source columns from master_data
+"workforce_classifications"
+
