@@ -63,47 +63,6 @@ label:not(.material-switch label) {
   padding-bottom: 3px;
 }
 
-/*
-
-
-.form-control {
-  background-color: #F9F8F7 !important;
-  color: #465177;
-  border: 1.5px solid #008A96;
-  letter-spacing: 1px;
-  padding: 0 !important;
-}
-
-select[multiple] option {
-  white-space: normal;
-  padding-bottom: 5px;
-  padding-top: 5px;
-  font-weight: 300 !important;
-  padding-left: 35px !important;
-  padding-right: 15px !important;
-  background-color: #F9F8F7 !important;
-  color: #465177;
-  line-height: .7em !important;
-}
-
-
-select[multiple] option:checked::before {
-  content: "\f00c";
-  font-family: "FontAwesome";
-  position: relative;
-  color: #008A96;
-  left: -10px;
-  display: inline;
-  margin-left: -15px !important;
-}
-
-.multi-wrapper .non-selected-wrapper, .multi-wrapper .selected-wrapper {
-  border: 1.5px solid #008A96;
-  box-shadow: none !important;
-  height: 400px !important;
-}
-*/
-
 
 /* Dropdowns */
 

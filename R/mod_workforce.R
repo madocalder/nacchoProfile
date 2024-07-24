@@ -70,19 +70,6 @@ mod_workforce_ui <- function(id){
                 class = "viz_content row",
                 div(
                   class = "col-sm-3",
-                  # selectInput(
-                  #   "classifications",
-                  #   strong("Select Classification"),
-                  #   workforce_classifications,
-                  #   selectize = FALSE,
-                  #   multiple = TRUE,
-                  #   size = 7L
-                  # )
-                  # shinyWidgets::multiInput(
-                  #   inputId = "classifications",
-                  #   label = strong("Select Classification"),
-                  #   choices = workforce_classifications
-                  # )
                   strong("Select Classification"),
                   div(
                     class = "checkboxes",
