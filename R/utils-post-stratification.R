@@ -155,13 +155,14 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
       as_survey_design(ids = popcat, weights = wtype) %>%
       summarise(
         N = n(),
+        Responses = length(which(!is.na(.data[[q_label]]))),
         Total = survey_total(.data[[q_label]], na.rm = TRUE),
         Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
-        Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE)
+        Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - 1)
       ) %>%
       mutate(Question = q_label) %>%
       mutate(Group = "All LHDs") %>%
-      select(.data$Question, .data$Group, .data$N, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+      select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
       mutate(
         y = round(Mean, 1),
         x = as.numeric(as.factor(Group)) - 1,
@@ -179,14 +180,15 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         group_by_at(grps) %>%
         summarise(
           N = n(),
+          Responses = length(which(!is.na(.data[[q_label]]))),
           Total = survey_total(.data[[q_label]], na.rm = TRUE),
           Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
-          Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE),
+          Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - sum(dplyr::n_distinct(.data[[popcat]]))),
           .groups = "drop"
         ) %>%
         mutate(Question = q_label) %>%
         rename(Group = grps) %>%
-        select(.data$Question, .data$Group, .data$N, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+        select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
         mutate(
           y = round(Mean, 1),
           x = as.numeric(as.factor(Group)) - 1,
