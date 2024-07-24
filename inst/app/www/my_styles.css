@@ -8,16 +8,130 @@
 }
 
 
+/* Occupation List */
+
+::selection {
+  background: #80A14E;
+  color: white;
+}
+
+
+label:not(.material-switch label) {
+  font-weight: 300px !important;
+}
+
+.checkboxes {
+  background-color: #F9F8F7;
+  color: #465177;
+  border: 1.5px solid #008A96;
+  letter-spacing: 1px;
+  height: 400px;
+  overflow: scroll;
+  padding-left: 30px !important;
+  padding-right: 15px !important;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 80%;
+  resize: vertical;
+  overflow: allow;
+}
+
+.shiny-input-container .checkbox input {
+  border: none;
+  margin-left: -20px;
+  border-radius: 50px;
+  background-color: #F9F8F7;
+  color: #465177;
+}
+
+.shiny-input-container .checkbox input:checked {
+  border-radius: 50px;
+  box-shadow: none;
+  border-color: #AB6143;
+  background-color: #AB6143;
+}
+
+.shiny-input-container .checkbox input:hover {
+  background-color: #D3D5DE;
+  border-radius: 50px;
+  box-shadow: none;
+  --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+
+.shiny-input-container .checkbox label {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/*
+
+
+.form-control {
+  background-color: #F9F8F7 !important;
+  color: #465177;
+  border: 1.5px solid #008A96;
+  letter-spacing: 1px;
+  padding: 0 !important;
+}
+
+select[multiple] option {
+  white-space: normal;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  font-weight: 300 !important;
+  padding-left: 35px !important;
+  padding-right: 15px !important;
+  background-color: #F9F8F7 !important;
+  color: #465177;
+  line-height: .7em !important;
+}
+
+
+select[multiple] option:checked::before {
+  content: "\f00c";
+  font-family: "FontAwesome";
+  position: relative;
+  color: #008A96;
+  left: -10px;
+  display: inline;
+  margin-left: -15px !important;
+}
+
+.multi-wrapper .non-selected-wrapper, .multi-wrapper .selected-wrapper {
+  border: 1.5px solid #008A96;
+  box-shadow: none !important;
+  height: 400px !important;
+}
+*/
+
+
 /* Dropdowns */
 
 .min-height-400 .selectize-dropdown-content {
   min-height: 400px;
 }
 
+.selectize-dropdown-content {
+  border: 1px solid #ccc;
+  min-width: 150px; /* Set a minimum width */
+  min-height: 50px; /* Set a minimum height */
+}
+
 .optgroup-header {
   font-weight: 700;
     color: #212F5B !important;
 }
+
+.selectize-dropdown-content {
+    text-align: left !important;
+}
+
+.selectize-input {
+  text-align: left !important;
+  display: block;
+}
+
+
 
 /* -------------------------------------------------- SIDEBAR AND NAVIGATION */
 .sidebar {
@@ -500,10 +614,13 @@ a:hover, a:focus {
 
 
 /* ------------------------------------------------------- THESE NEED LABELS */
+
+/*
 .form-control {
   background-color: transparent !important;
   border-radius: 50px !important;
 }
+*/
 
 .search-input {
   position: relative;
@@ -549,14 +666,7 @@ a:hover, a:focus {
 }
 
 
-.selectize-input {
-  text-align: left !important;
-  display: block;
-}
 
-.selectize-dropdown-content {
-    text-align: left !important;
-}
 
 
 .my-button {
@@ -675,7 +785,6 @@ p {
 
 label:not(.material-switch label) {
   color: #212F5B !important;
-  font-weight: 500 !important;
   display: block !important;
   text-align: left !important;
 }
@@ -693,6 +802,7 @@ h1 {
 
 b, strong {
   font-weight: 800;
+  color: #212F5B;
 }
 
 .selectize-input.full {
