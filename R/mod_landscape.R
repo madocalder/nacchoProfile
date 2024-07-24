@@ -256,42 +256,7 @@ mod_landscape_server <- function(id){
         group = "Across All LHDs"
       )
 
-      highcharter::hchart(
-        data,
-        "column",
-        id = "All",
-        name = "Across All LHDs",
-        highcharter::hcaes(
-          x = x,
-          y = y,
-          group = group
-        ),
-        dataLabels = list(
-          enabled = TRUE,
-          format = "{point.y}%",
-          overflow = TRUE,
-          distance = 5,
-          padding = 2,
-          style = list(
-            color = naccho.viz::naccho_grey,
-            fontFamily = "Jost",
-            fontWeight = "500",
-            fontSize = "14px")
-        )
-      ) %>%
-        highcharter::hc_xAxis(
-          title = list(text = ""), # x-axis label
-          categories = data$category
-        ) %>%
-        highcharter::hc_yAxis(
-          title = list(
-            text = "% of Population"
-            ), # y-axis label
-          min = 0,
-          labels = list(
-            format = "{value}%"
-          )
-        ) %>%
+     set_viz(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
