@@ -92,6 +92,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             group = Group,
             subtitle = paste0("Across All LHDs")
           )
+
     } else {
 
         new_names <- c(
@@ -200,3 +201,39 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
     }
 
 }
+
+
+#' Create Histogram Data
+#'
+#' @description Calculate weighted statistics results: total, mean, and quantiles.
+#'
+#' @param input The input to use for filtering the dataframe
+#'
+#' @export
+#'
+#' @examples
+#' create_hist("c5q37")
+#'
+#' @return dataframe
+create_hist <- function(input) {
+  data <- master_data %>%
+    haven::as_factor() %>%
+    dplyr::left_join(add_weights(input, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
+    dplyr::mutate(x = get(input) * weights,
+                  category = "All LHDs") %>%
+    dplyr:: select(x)
+
+  data <- hist(data$x, plot = FALSE, breaks = 200)
+
+  bins <- data$breaks
+  counts <- data$counts
+  midpoints <- data$mids
+
+  data.frame(
+    low_bin = head(bins, -1),
+    high_bin = tail(bins, -1),
+    y = counts,
+    midpoint = midpoints
+  )
+}
+
