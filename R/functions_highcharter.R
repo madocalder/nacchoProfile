@@ -326,25 +326,24 @@ proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
       tooltip = list(
         tooltip = meta$tooltip
       )
-    ) %>%
-    highcharter::hcpxy_redraw()
+    )
 }
 
 
 
-
-#' Set First Highcharter Visualization
+#' Set First Highcharter Column Graph
 #'
 #' @description Create the first highcharter visualizations from which proxies will redraw.
 #'
 #' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param y_label character string; Label for the Y Axis.
 #'
 #' @export
 #'
-#' @examples
 #'
-#' @return figure
-set_viz <- function(data) {
+#' @return column graph
+set_column <- function(data,
+                    y_label = "% of Population") {
 
   highcharter::hchart(
     data,
@@ -375,11 +374,100 @@ set_viz <- function(data) {
     ) %>%
     highcharter::hc_yAxis(
       title = list(
-        text = "% of Population"
+        text = y_label
       ), # y-axis label
       min = 0,
       labels = list(
         format = "{value}%"
+      )
+    )
+}
+
+
+
+#' Set First Highcharter Histogram
+#'
+#' @description Create the first highcharter visualizations from which proxies will redraw.
+#'
+#' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param y_label character string; Label for the Y Axis.
+#' @param x_label character string; Label for the X Axis.
+#'
+#' @export
+#'
+#' @examples
+#' data <- data.frame(x = runif(100, min = 1, max = 100))
+#' data <- hist(data$x, plot = FALSE, breaks = 200)
+#' set_hist(data = data)
+#'
+#' @return histogram (column graph)
+set_hist <- function(data,
+                     y_label = "# of LHDs",
+                     x_label = "FTEs") {
+
+
+    highcharter::hchart(
+      data,
+      "column",
+      id = "All",
+      name = "Across All LHDs",
+      highcharter::hcaes(
+        x = midpoint,
+        y = y
+      )
+    ) %>%
+    highcharter::hc_chart(
+      zoomType = "x"
+    ) %>%
+    highcharter::hc_xAxis(
+      title = list(text = x_label) # x-axis label
+    ) %>%
+    highcharter::hc_yAxis(
+      title = list(
+        text = y_label
+      ), # y-axis label
+      min = 0,
+      labels = list(
+        format = "{value}"
+      )
+    )
+}
+
+
+
+#' Histogram Bar Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#'
+#'
+#' @export
+proxy_to_hist <- function(hc, data, meta, ...) {
+
+  hc %>%
+    # highcharter::hcpxy_remove_series(
+    #   id = c("Urban", "Rural")
+    # ) %>%
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data
+    ) %>%
+    highcharter::hcpxy_update(
+      title = list(
+        text = meta$title
+      ),
+      # subtitle = list(
+      #   text = unique(data$subtitle)
+      # ),
+      caption = list(
+        text = meta$caption
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
       )
     )
 }
