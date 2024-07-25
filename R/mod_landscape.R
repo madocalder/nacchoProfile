@@ -28,7 +28,7 @@ mod_landscape_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("topic"),
-                strong("Select Topic"),
+                strong("Topic"),
                 choices = landscape_topics,
                 selectize = TRUE
               )
@@ -38,7 +38,7 @@ mod_landscape_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("view"),
-                strong("Select View"),
+                strong("Visualization Type"),
                 choices = c(
                   "Bar Graph",
                   "Line Graph",
@@ -65,12 +65,12 @@ mod_landscape_ui <- function(id){
           # add main page content here ----------------------------------------------
 
           div(
-            class = "viz_content",
+            class = "viz-content",
 
             # display when map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-            highcharter::highchartOutput(ns("map"), height = 575)
+              highcharter::highchartOutput(ns("map"), height = 575)
             ),
 
             # display when map is not selected
@@ -256,7 +256,7 @@ mod_landscape_server <- function(id){
         group = "Across All LHDs"
       )
 
-     set_viz(data) %>%
+     set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "<b> Source: </b> 2022 National Profile of Local Health

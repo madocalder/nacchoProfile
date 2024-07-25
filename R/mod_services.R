@@ -25,7 +25,7 @@ mod_services_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("topic"),
-                strong("Select Topic"),
+                strong("Topic"),
                 choices = c(
                   "Expenditures",
                   "Funding",
@@ -39,7 +39,7 @@ mod_services_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("view"),
-                strong("Select View"),
+                strong("Visualization Type"),
                 choices = c(
                   "Bar Graph",
                   "Map",

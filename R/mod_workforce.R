@@ -26,7 +26,7 @@ mod_workforce_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("topic"),
-                strong("Select Topic"),
+                strong("Topic"),
                 choices = workforce_topics,
                 selectize = TRUE
               )
@@ -36,7 +36,7 @@ mod_workforce_ui <- function(id){
               br(),
               selectInput(
                 inputId = ns("view"),
-                strong("Select View"),
+                strong("Visualization Type"),
                 choices = c(
                   "Bar Graph",
                   "Line Graph",
@@ -57,32 +57,61 @@ mod_workforce_ui <- function(id){
           ),
 
           hr(),
-          br(),
-          br(),
 
           # add main page content here ----------------------------------------------
 
 
-            # display occupational classifications is selected
-            conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
+          # display occupational classifications is selected
+          conditionalPanel(
+            condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
+            div(
+              class = "viz-content row",
               div(
-                class = "viz_content row",
+                class = "col-sm-3",
+                br(),
+                strong("Select Classification"),
                 div(
-                  class = "col-sm-3",
-                  strong("Select Classification"),
-                  div(
-                    class = "checkboxes",
+                  class = "checkboxes",
                   checkboxGroupInput(
-                      "classifications",
-                      "",
-                      workforce_classifications,
+                    ns("classifications"),
+                    "",
+                    workforce_classifications,
                   )
-                  )
-                ),
-                div(
-                  class = "col-sm-9"
                 )
+              ),
+              div(
+                class = "col-sm-9"
+              )
+            )
+          ),
+
+          # display if occupational classifications is not selected
+          conditionalPanel(
+            condition = paste0('input[\'', ns('topic'), "\'] != \'occupation_class\'"),
+            div(
+              class = "viz-content-buttons",
+              div(
+                radioButtons(
+                  ns("type"),
+                  "",
+                  choices = list("FTE Grouping" = "FTE_numcat",
+                                 "Total FTEs" = "c5q37",
+                                 "Per Capita FTEs" = "fte_bypop"),
+                  inline = TRUE
+                ),
+                br()
+              ),
+              br(),
+
+              conditionalPanel(
+                condition = paste0('input[\'', ns('type'), "\'] == \'FTE_numcat\'"),
+                highcharter::highchartOutput(ns("figure"), height = 575)
+              ),
+
+              conditionalPanel(
+                condition = paste0('input[\'', ns('type'), "\'] != \'FTE_numcat\'"),
+                highcharter::highchartOutput(ns("histogram"), height = 575)
+              )
             )
           )
 
@@ -153,6 +182,79 @@ mod_workforce_ui <- function(id){
 mod_workforce_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+
+    # filter meta data --------------------------------------------------------
+    # used to display the correct title, caption, labels, etc...
+    filter_meta <- reactive({
+      meta %>%
+        dplyr::filter(field == input$type)
+    })
+
+
+
+    # figure output -----------------------------------------------------------
+    # used for bar and line graphs
+    output$figure <- highcharter::renderHighchart({
+
+      data <- return_survey_weighted_counts("FTE_numcat")
+
+      set_column(data, y_label = "% of LHDs") %>%
+        viz_options(
+          viz_title = "Percent of LHDs within FTE Categories",
+          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",
+          tooltip = "{point.y}% of LHDs employ {point.category} FTEs at their agency."
+        ) %>%
+        viz_export()
+    })
+
+    # save the figure as a proxy to redraw below
+    proxy <- highcharter::highchartProxy(ns("figure"))
+
+
+    # used for first histogram
+    output$histogram <- highcharter::renderHighchart({
+      data <- create_hist("c5q37")
+
+      set_hist(data) %>%
+        viz_options(
+          viz_title = paste("Histogram Showing the Number of LHDs by the Number of Total FTEs"),
+          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
+                          Departments. National Association of County and City Health Officials.
+                          Washington, DC. (2024).",
+          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
+        ) %>%
+        viz_export()
+
+    })
+
+
+    # save the figure as a proxy to redraw below
+    hist_proxy <- highcharter::highchartProxy(ns("histogram"))
+
+
+
+    # this observe is needed to redraw the figure based on the input selected
+    # by the user. It also filters and stores tables based on the inputs
+    # combinations selected by the user.
+    observe ({
+
+      if (input$type == "fte_bypop") {
+        data <- create_hist("fte_bypop")
+
+        hist_proxy %>%
+          proxy_to_hist(data, filter_meta())
+
+
+      } else if (input$type == "c5q37") {
+        data <- create_hist("c5q37")
+
+        hist_proxy %>%
+          proxy_to_hist(data, filter_meta())
+      }
+    })
 
   })
 }
