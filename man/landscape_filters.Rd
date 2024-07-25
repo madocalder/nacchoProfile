@@ -3,7 +3,7 @@
 \docType{data}
 \name{landscape_filters}
 \alias{landscape_filters}
-\title{Landscape filters}
+\title{Landscape Filters}
 \format{
 list
 
@@ -16,6 +16,6 @@ columns from master_data
 landscape_filters
 }
 \description{
-Landscape filters
+Landscape Filters
 }
 \keyword{datasets}

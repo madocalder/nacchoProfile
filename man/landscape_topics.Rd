@@ -3,11 +3,11 @@
 \docType{data}
 \name{landscape_topics}
 \alias{landscape_topics}
-\title{Landscape topics}
+\title{Landscape Topics}
 \format{
 list
 
-A list of 5
+A list of 2 lists
 }
 \source{
 columns from master_data
@@ -16,6 +16,6 @@ columns from master_data
 landscape_topics
 }
 \description{
-Landscape topics
+Landscape Topics
 }
 \keyword{datasets}
