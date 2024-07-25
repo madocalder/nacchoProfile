@@ -52,18 +52,8 @@ app_ui <- function(request) {
             ),
 
           tabPanel(
-            "Landscape",
+            "LHD Landscape",
             value = "landscape_tab"
-          ),
-
-          tabPanel(
-            "Key Findings",
-            value = "key_findings_tab"
-          ),
-
-          tabPanel(
-            "Data Stories",
-            value = "data_stories_tab"
           ),
 
           tabPanel(
@@ -85,6 +75,17 @@ app_ui <- function(request) {
             "Topics",
             value = "topics_tab"
           ),
+
+          tabPanel(
+            "Key Findings",
+            value = "key_findings_tab"
+          ),
+
+          tabPanel(
+            "Data Stories",
+            value = "data_stories_tab"
+          ),
+
 
           tabPanel(
             actionButton("playground_button", "Data Playground", class = "pill-button"),

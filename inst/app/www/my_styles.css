@@ -51,6 +51,12 @@ label:not(.material-switch label) {
   background-color: #AB6143;
 }
 
+.shiny-input-container .radio-inline input:checked {
+  border: 1.5px solid #008A96 !important;
+  background-color: #80A14E !important;
+}
+
+
 .shiny-input-container .checkbox input:hover {
   background-color: #D3D5DE;
   border-radius: 50px;
@@ -63,6 +69,15 @@ label:not(.material-switch label) {
   padding-bottom: 3px;
 }
 
+
+/* Radio Buttons for Workfroce */
+
+.shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group, .shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
+    margin-top: -1px;
+    justify-content: space-evenly;
+    width: 100%;
+    display: flex;
+}
 
 /* Dropdowns */
 
@@ -742,9 +757,11 @@ p {
   font-weight: 500 !important;
 }
 
-label:not(.material-switch label) {
+label:select-input {
   color: #212F5B !important;
-  display: block !important;
+}
+
+.shiny-input-container:not(.shiny-input-container-inline) {
   text-align: left !important;
 }
 
@@ -787,10 +804,16 @@ b, strong {
   padding-right: 6em !important;
 }
 
-.viz_content {
+.viz-content {
   padding-left: 4em !important;
   padding-right: 4em !important;
   padding-top: 1em !important;
+}
+
+.viz-content-buttons {
+  padding-left: 4em !important;
+  padding-right: 4em !important;
+  padding-top: 0em !important;
 }
 
 .context-content {
