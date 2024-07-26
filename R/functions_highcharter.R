@@ -417,7 +417,30 @@ set_hist <- function(data,
       )
     ) %>%
     highcharter::hc_chart(
-      zoomType = "x"
+      zoomType = "x",
+      resetZoomButton = list(
+        theme = list(
+          fill = "white",
+          stroke = "#80A14E",
+          style = list(
+            color = "#80A14E",
+            fontWeight = "bold",
+            fontFamily = "Jost",
+            lineHeight = "25px" # positions text correctly inside button
+          ),
+          r = 20,  # border radius
+          padding = 10,
+          states = list(
+            hover = list(
+              fill = "#80A14E",
+              stroke = "white",
+              style = list(
+                color = "white"  # hover text color
+              )
+            )
+          )
+        )
+      )
     ) %>%
     highcharter::hc_xAxis(
       title = list(text = x_label), # x-axis label
