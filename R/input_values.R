@@ -38,3 +38,13 @@
 #' @source columns from master_data
 "workforce_classifications"
 
+
+#' Workforce Types
+#'
+#' @format list
+#'
+#' A list of 3
+#'
+#' @source columns from master_data
+"workforce_fte_types"
+

@@ -4,7 +4,7 @@
 \alias{set_hist}
 \title{Set First Highcharter Histogram}
 \usage{
-set_hist(data, y_label = "# of LHDs", x_label = "FTEs")
+set_hist(data, y_label = "# of LHDs", x_label = "Total FTEs")
 }
 \arguments{
 \item{data}{dataframe; A dataframe with x, y, group, and category columns.}

@@ -4,10 +4,12 @@
 \alias{create_hist}
 \title{Create Histogram Data}
 \usage{
-create_hist(input)
+create_hist(input, x_label)
 }
 \arguments{
-\item{input}{The input to use for filtering the dataframe}
+\item{input}{The input to use for filtering the dataframe.}
+
+\item{x_label}{character string; The text to appear on the x-axis.}
 }
 \value{
 dataframe

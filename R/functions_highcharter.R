@@ -403,7 +403,7 @@ set_column <- function(data,
 #' @return histogram (column graph)
 set_hist <- function(data,
                      y_label = "# of LHDs",
-                     x_label = "FTEs") {
+                     x_label = "Total FTEs") {
 
 
     highcharter::hchart(
@@ -488,14 +488,17 @@ proxy_to_hist <- function(hc, data, meta, ...) {
       title = list(
         text = meta$title
       ),
-      # subtitle = list(
-      #   text = unique(data$subtitle)
-      # ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
       caption = list(
         text = meta$caption
       ),
       xAxis = list(
-        categories = data$midpoint
+        categories = data$midpoint,
+        title = list(
+          text = unique(data$x_label)
+        )
       ),
       tooltip = list(
         pointFormat = meta$tooltip

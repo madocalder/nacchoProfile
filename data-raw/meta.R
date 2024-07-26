@@ -14,8 +14,8 @@ meta <- data.frame(
             "Field of Educational Study of LHD Top Executive",
             "Gender of LHD Top Executive",
             "Percent of LHDs within FTE Categories",
-            "Histogram of the Number of LHDs by the Number of Total FTEs",
-            "Histogram of the Number of LHDs by the Number of Per Capita FTEs"),
+            "The Number of LHDs by the Number of Total FTEs",
+            "The Number of LHDs by the Number of Per Capita FTEs"),
   alt = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA),
   caption = "<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.

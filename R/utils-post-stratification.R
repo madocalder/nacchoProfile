@@ -207,7 +207,8 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 #'
 #' @description Calculate weighted statistics results: total, mean, and quantiles.
 #'
-#' @param input The input to use for filtering the dataframe
+#' @param input The input to use for filtering the dataframe.
+#' @param x_label character string; The text to appear on the x-axis.
 #'
 #' @export
 #'
@@ -215,7 +216,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 #' create_hist("c5q37")
 #'
 #' @return dataframe
-create_hist <- function(input) {
+create_hist <- function(input, x_label) {
   data <- master_data %>%
     haven::as_factor() %>%
     dplyr::left_join(add_weights(input, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
@@ -234,7 +235,9 @@ create_hist <- function(input) {
     high_bin = tail(bins, -1),
     y = counts,
     midpoint = midpoints,
-    x = 1:length(midpoints) -1
+    x = 1:length(midpoints) -1,
+    subtitle = "Click and span a range on the figure to zoom.",
+    x_label = x_label
   )
 }
 

@@ -94,9 +94,7 @@ mod_workforce_ui <- function(id){
                 radioButtons(
                   ns("type"),
                   "",
-                  choices = list("FTE Grouping" = "FTE_numcat",
-                                 "Total FTEs" = "c5q37",
-                                 "Per Capita FTEs" = "fte_bypop"),
+                  choices = workforce_fte_types,
                   inline = TRUE
                 ),
                 br()
@@ -208,18 +206,20 @@ mod_workforce_server <- function(id){
         viz_export()
     })
 
-    # save the figure as a proxy to redraw below
+    # save the figure as a proxy to redraw
     proxy <- highcharter::highchartProxy(ns("figure"))
 
 
     # used for first histogram
     output$histogram <- highcharter::renderHighchart({
-      data <- create_hist("c5q37")
+      data <- create_hist(input = "c5q37",
+                          x_label = "Total FTEs")
 
       set_hist(data) %>%
         viz_options(
-          viz_title = paste("Histogram Showing the Number of LHDs by the Number of Total FTEs"),
+          viz_title = paste("The Number of LHDs by the Number of Total FTEs"),
           viz_caption = source_line,
+          viz_subtitle = unique(data$subtitle),
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs",
           theme = naccho.viz::hist_theme
         ) %>%
@@ -228,9 +228,8 @@ mod_workforce_server <- function(id){
     })
 
 
-    # save the figure as a proxy to redraw below
+    # save the figure as a proxy to redraw
     hist_proxy <- highcharter::highchartProxy(ns("histogram"))
-
 
 
     # this observe is needed to redraw the figure based on the input selected
@@ -239,14 +238,16 @@ mod_workforce_server <- function(id){
     observe ({
 
       if (input$type == "fte_bypop") {
-        data <- create_hist("fte_bypop")
+        data <- create_hist(input = "fte_bypop",
+                            x_label = "Per Capita FTEs")
 
         hist_proxy %>%
           proxy_to_hist(data, filter_meta())
 
 
       } else if (input$type == "c5q37") {
-        data <- create_hist("c5q37")
+        data <- create_hist(input = "c5q37",
+                            x_label = "Total FTEs")
 
         hist_proxy %>%
           proxy_to_hist(data, filter_meta())
