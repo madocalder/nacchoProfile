@@ -202,9 +202,7 @@ mod_workforce_server <- function(id){
       set_column(data, y_label = "% of LHDs") %>%
         viz_options(
           viz_title = "Percent of LHDs within FTE Categories",
-          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
-          Departments. National Association of County and City Health Officials.
-          Washington, DC. (2024).",
+          viz_caption = source_line,
           tooltip = "{point.y}% of LHDs employ {point.category} FTEs at their agency."
         ) %>%
         viz_export()
@@ -221,10 +219,9 @@ mod_workforce_server <- function(id){
       set_hist(data) %>%
         viz_options(
           viz_title = paste("Histogram Showing the Number of LHDs by the Number of Total FTEs"),
-          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
-                          Departments. National Association of County and City Health Officials.
-                          Washington, DC. (2024).",
-          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
+          viz_caption = source_line,
+          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs",
+          theme = naccho.viz::hist_theme
         ) %>%
         viz_export()
 

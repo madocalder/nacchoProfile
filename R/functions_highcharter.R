@@ -412,7 +412,7 @@ set_hist <- function(data,
       id = "All",
       name = "Across All LHDs",
       highcharter::hcaes(
-        x = midpoint,
+        x = x,
         y = y
       )
     ) %>%
@@ -420,7 +420,12 @@ set_hist <- function(data,
       zoomType = "x"
     ) %>%
     highcharter::hc_xAxis(
-      title = list(text = x_label) # x-axis label
+      title = list(text = x_label), # x-axis label
+      categories = data$midpoint,
+      labels = list(
+        step = 20,
+        format = "{value:,.0f}"
+      )
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -465,6 +470,9 @@ proxy_to_hist <- function(hc, data, meta, ...) {
       # ),
       caption = list(
         text = meta$caption
+      ),
+      xAxis = list(
+        categories = data$midpoint
       ),
       tooltip = list(
         pointFormat = meta$tooltip
