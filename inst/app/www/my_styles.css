@@ -825,6 +825,9 @@ b, strong {
     color: #AB6143 !important;
 }
 
+
+/* HIGHCHARTS */
+
 .highcharts-tooltip span {
     height: auto;
     width: 200px !important;
