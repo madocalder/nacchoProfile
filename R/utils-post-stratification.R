@@ -233,7 +233,8 @@ create_hist <- function(input) {
     low_bin = head(bins, -1),
     high_bin = tail(bins, -1),
     y = counts,
-    midpoint = midpoints
+    midpoint = midpoints,
+    x = 1:length(midpoints) -1
   )
 }
 
