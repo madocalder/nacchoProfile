@@ -81,3 +81,18 @@
 #'
 #' @source National Association of City and County Health Officials (NACCHO)
 "context"
+
+
+#' Source Line for NACCHO's 2022 National Profile
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format character
+#'
+#' A character: <b> Source: </b> 2022 National Profile of Local Health
+#' Departments. National Association of County and City Health Officials. Washington, DC. (2024).
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"source_line"

@@ -259,9 +259,7 @@ mod_landscape_server <- function(id){
      set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
-          viz_caption = "<b> Source: </b> 2022 National Profile of Local Health
-          Departments. National Association of County and City Health Officials.
-          Washington, DC. (2024).",
+          viz_caption = source_line,
           tooltip = "{point.y}% of the U.S. population is served by {point.category} LHDs"
         ) %>%
         viz_export()
