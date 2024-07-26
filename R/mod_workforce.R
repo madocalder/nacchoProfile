@@ -96,20 +96,10 @@ mod_workforce_ui <- function(id){
                   "",
                   choices = workforce_fte_types,
                   inline = TRUE
-                ),
-                br()
+                )
               ),
               br(),
-
-              conditionalPanel(
-                condition = paste0('input[\'', ns('type'), "\'] == \'FTE_numcat\'"),
-                highcharter::highchartOutput(ns("figure"), height = 575)
-              ),
-
-              conditionalPanel(
-                condition = paste0('input[\'', ns('type'), "\'] != \'FTE_numcat\'"),
-                highcharter::highchartOutput(ns("histogram"), height = 575)
-              )
+              highcharter::highchartOutput(ns("figure"), height = 575)
             )
           )
 
@@ -192,26 +182,8 @@ mod_workforce_server <- function(id){
 
 
     # figure output -----------------------------------------------------------
-    # used for bar and line graphs
-    output$figure <- highcharter::renderHighchart({
-
-      data <- return_survey_weighted_counts("FTE_numcat")
-
-      set_column(data, y_label = "% of LHDs") %>%
-        viz_options(
-          viz_title = "Percent of LHDs within FTE Categories",
-          viz_caption = source_line,
-          tooltip = "{point.y}% of LHDs employ {point.category} FTEs at their agency."
-        ) %>%
-        viz_export()
-    })
-
-    # save the figure as a proxy to redraw
-    proxy <- highcharter::highchartProxy(ns("figure"))
-
-
     # used for first histogram
-    output$histogram <- highcharter::renderHighchart({
+    output$figure <- highcharter::renderHighchart({
       data <- create_hist(input = "c5q37",
                           x_label = "Total FTEs")
 
@@ -229,7 +201,7 @@ mod_workforce_server <- function(id){
 
 
     # save the figure as a proxy to redraw
-    hist_proxy <- highcharter::highchartProxy(ns("histogram"))
+    proxy <- highcharter::highchartProxy(ns("figure"))
 
 
     # this observe is needed to redraw the figure based on the input selected
@@ -237,11 +209,20 @@ mod_workforce_server <- function(id){
     # combinations selected by the user.
     observe ({
 
-      if (input$type == "fte_bypop") {
+      if (input$type == "FTE_numcat") {
+        data <- return_survey_weighted_counts("FTE_numcat") %>%
+          dplyr::mutate(x_label = NA)
+
+        proxy %>%
+          proxy_hist_to_single(data,
+                               filter_meta(),
+                               theme = naccho.viz::basic_theme)
+
+      } else if (input$type == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
 
-        hist_proxy %>%
+        proxy %>%
           proxy_to_hist(data, filter_meta())
 
 
@@ -249,7 +230,7 @@ mod_workforce_server <- function(id){
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
 
-        hist_proxy %>%
+        proxy %>%
           proxy_to_hist(data, filter_meta())
       }
     })

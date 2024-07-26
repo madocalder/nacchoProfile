@@ -343,7 +343,7 @@ proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
 #'
 #' @return column graph
 set_column <- function(data,
-                    y_label = "% of Population") {
+                       y_label = "% of Population") {
 
   highcharter::hchart(
     data,
@@ -365,9 +365,10 @@ set_column <- function(data,
         color = naccho.viz::naccho_grey,
         fontFamily = "Jost",
         fontWeight = "500",
-        fontSize = "14px")
-    )
-  ) %>%
+        fontSize = "14px"
+        )
+      )
+    ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
       categories = data$category
@@ -402,7 +403,7 @@ set_column <- function(data,
 #'
 #' @return histogram (column graph)
 set_hist <- function(data,
-                     y_label = "# of LHDs",
+                     y_label = "LHDs",
                      x_label = "Total FTEs") {
 
 
@@ -444,7 +445,7 @@ set_hist <- function(data,
     ) %>%
     highcharter::hc_xAxis(
       title = list(text = x_label), # x-axis label
-      categories = data$midpoint,
+      categories = data$category,
       labels = list(
         step = 20,
         format = "{value:,.0f}"
@@ -474,17 +475,21 @@ set_hist <- function(data,
 #'
 #'
 #' @export
-proxy_to_hist <- function(hc, data, meta, ...) {
+proxy_to_hist <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
 
   hc %>%
-    # highcharter::hcpxy_remove_series(
-    #   id = c("Urban", "Rural")
-    # ) %>%
     highcharter::hcpxy_set_data(
       "column",
       data = data
     ) %>%
     highcharter::hcpxy_update(
+      series = list(
+        groupPadding = 0,
+        list(type = "column"),
+        dataLabels = list(
+          enabled = FALSE
+        )
+      ),
       title = list(
         text = meta$title
       ),
@@ -495,9 +500,75 @@ proxy_to_hist <- function(hc, data, meta, ...) {
         text = meta$caption
       ),
       xAxis = list(
-        categories = data$midpoint,
+        categories = data$category,
         title = list(
           text = unique(data$x_label)
+        ),
+        labels = list(
+          step = 20
+        )
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
+
+
+
+
+#' From Histogram to Single Column Graph
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#'
+#'
+#' @export
+proxy_hist_to_single <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+
+  hc %>%
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data
+    ) %>%
+    highcharter::hcpxy_update(
+      series = list(
+        groupPadding = .2,
+        type = "column",
+        dataLabels = list(
+          enabled = TRUE,
+          format = meta$data_label,
+          overflow = TRUE,
+          distance = 5,
+          padding = 2,
+          style = list(
+            color = naccho.viz::naccho_grey,
+            fontFamily = "Jost",
+            fontWeight = "500",
+            fontSize = "14px"
+          )
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = meta$caption
+      ),
+      xAxis = list(
+        categories = data$category,
+        title = list(
+          text = unique(data$x_label)
+        ),
+        labels = list(
+          step = 1
         )
       ),
       tooltip = list(

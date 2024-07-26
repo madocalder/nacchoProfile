@@ -234,7 +234,7 @@ create_hist <- function(input, x_label) {
     low_bin = head(bins, -1),
     high_bin = tail(bins, -1),
     y = counts,
-    midpoint = midpoints,
+    category = midpoints,
     x = 1:length(midpoints) -1,
     subtitle = "Click and span a range on the figure to zoom.",
     x_label = x_label
