@@ -27,6 +27,18 @@
   font-family: "FontAwesome";
 }
 
+.collapse {
+  color: #212F5B;
+  padding-left: 20px;
+  padding-top: 5px;
+}
+
+.collapsing {
+  color: #212F5B;
+  padding-left: 20px;
+  padding-top: 5px;
+}
+
 
 /* Occupation List */
 
@@ -697,12 +709,34 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 .color-block {
   background-color: #EEEAE5;
-  height: 80vh; /* 70% of the page height */
+  height: 80vh;
   border-radius: 0 50px 50px 50px; /* Top left: 0, Other sides: 50px */
   width: 100%;
   z-index: -1; /* Place behind other content */
   align-content: baseline;
+  overflow: hidden;
+  overflow-y: auto;
  }
+
+ .color-block-header {
+  background-color: #EEEAE5; /* Match the parent background color */
+  border-radius: 0 50px 0 0; /* Only top corners rounded */
+  padding: 10px; /* Adjust padding as needed */
+  z-index: 1; /* Ensure it stays above the scrollable content */
+  width: 100%;
+}
+
+.color-block-content {
+  background-color: #EEEAE5;
+  height: 70vh;
+  padding: 10px;
+  border-radius: 0 0px 50px 50px;
+  width: 100%;
+  z-index: -1; /* Place behind other content */
+  align-content: baseline;
+  overflow: hidden;
+  overflow-y: auto;
+}
 
 .fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
   display: block !important;
@@ -761,7 +795,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 }
 
 
-hr:not(.tt) {
+hr:not(.tt, .right-hr) {
   border-top: 2px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
@@ -776,9 +810,19 @@ hr .tt {
   opacity: 1 !important;
 }
 
+.right-hr {
+  border-top: 1px solid !important;
+  color: #212F5B !important;
+  opacity: 1 !important;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 85%;
+}
+
 p {
   color: #212F5B !important;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
 }
 
 body {

@@ -85,7 +85,7 @@ mod_landscape_ui <- function(id){
         ),
         right = div(
           div(
-            class = "row color-block",
+            class = "row color-block-header",
             div(
               class = "col-sm-4 hover-text-side",
               align = "center",
@@ -122,30 +122,27 @@ mod_landscape_ui <- function(id){
                 class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Relevant Definitions")
             ),
-            br(),
+            hr(class = "right-hr"),
+          ),
+          div(
+            class = "row color-block-content",
 
             # toggle side content -----------------------------------------------------
             shinyjs::hidden(
               div(id = ns("toggle_takeaway"),
                   class = "context-content",
-                  br(),
-                  br(),
                   uiOutput(ns("show_takeaway"))
               )
             ),
             shinyjs::hidden(
               div(id = ns("toggle_context"),
                   class = "context-content",
-                  br(),
-                  br(),
                   uiOutput(ns("show_context"))
               )
             ),
             shinyjs::hidden(
               div(id = ns("toggle_definitions"),
                   class = "context-content",
-                  br(),
-                  br(),
                   uiOutput(ns("show_definitions"))
               )
             ),
