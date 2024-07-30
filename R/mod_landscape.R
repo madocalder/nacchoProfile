@@ -502,20 +502,26 @@ mod_landscape_server <- function(id){
       output$show_definitions <- renderUI({
 
         definitions <- definitions %>%
-          dplyr::filter(item == "Rurality")
+          dplyr::filter(field %in% c(input$topic, input$filter))
 
-        div(
-          tags$a(
-            class = "def-link",
-            `data-bs-toggle` = "collapse",
-            href = "#collapseExample",
-            paste(definitions$item)
-          ),
+        links <- lapply(seq_along(definitions$item), function(i) {
           div(
-            class="collapse",
-            id="collapseExample",
-            paste(definitions$definition)
+            tags$a(
+              class = "def-link",
+              `data-bs-toggle` = "collapse",
+              href = paste0("#collapseExample", i),
+              paste(definitions$item[[i]])
+            ),
+            div(
+              class= "collapse",
+              id= paste0("collapseExample", i),
+              HTML(definitions$definition[[i]], "<br> <br>")
+            )
           )
+        })
+        div(
+          p(htmltools::HTML("<b>Definitions</b>: <br>")),
+          links
         )
       })
     })
