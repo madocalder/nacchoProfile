@@ -53,7 +53,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters[-1]
+                choices = landscape_filters[4]
               )
             )
           ),
@@ -91,7 +91,7 @@ mod_landscape_ui <- function(id){
               align = "center",
               br(),
               actionLink(
-                inputId = ns("more"),
+                inputId = ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
                               style = "font-size: 30px; text-align: center;"),
@@ -103,24 +103,24 @@ mod_landscape_ui <- function(id){
               align = "center",
               br(),
               actionLink(
-                inputId = ns("about"),
+                inputId = ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "About")
+              span(class = "hover-text-content-side", "Survey Context and Notes")
             ),
             div(
               class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("context"),
+                inputId = ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Definitions and Notes")
+              span(class = "hover-text-content-side", "Relevant Definitions")
             ),
             br(),
 
@@ -130,15 +130,23 @@ mod_landscape_ui <- function(id){
                   class = "context-content",
                   br(),
                   br(),
-                  uiOutput(ns("takeaway"))
+                  uiOutput(ns("show_takeaway"))
               )
             ),
             shinyjs::hidden(
-              div(id = ns("toggle_about"),
+              div(id = ns("toggle_context"),
                   class = "context-content",
                   br(),
                   br(),
-                  uiOutput(ns("context_about"))
+                  uiOutput(ns("show_context"))
+              )
+            ),
+            shinyjs::hidden(
+              div(id = ns("toggle_definitions"),
+                  class = "context-content",
+                  br(),
+                  br(),
+                  uiOutput(ns("show_definitions"))
               )
             ),
 
@@ -192,6 +200,8 @@ mod_landscape_server <- function(id){
       } else if (input$topic == "totpop") {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Pie Chart", "Table"))
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[4])
       } else {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Table"))
@@ -429,35 +439,84 @@ mod_landscape_server <- function(id){
 
 
 
-    # context and definitions -------------------------------------------------
-    output$about <- renderText({
-    })
+# right sidebar -----------------------------------------------------------
 
-    output$definitions <- renderText({
-    })
+    # takeaway
+    observeEvent(input$takeaway, {
 
-    observeEvent(input$about, {
-      shinyjs::show("toggle_about")
+      shinyjs::show("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_takeaway <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        view == input$view,
+                        filter == input$filter)
+
+        p(htmltools::HTML(notes$takeaway))
+      })
+    }, ignoreNULL = FALSE)
+
+
+    # survey questions, responses, and notes
+    observeEvent(input$context, {
+
       shinyjs::hide("toggle_takeaway")
-      output$context_about <- renderUI({
-        context <- context %>%
-          dplyr::filter(field == input$topic)
-        p(strong("Survey Question:"))
-        p(htmltools::HTML(
-          "<b>Survey Question</b>: <br>",
-          context$survey_question,
-          "<br> <br> <b> Survey Response Options: </b>",
-          context$response_options))
+      shinyjs::show("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_context <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        view == input$view,
+                        filter == input$filter)
+
+        if (is.na(notes$notes)) {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response))
+
+        } else {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            notes$notes))
+        }
       })
     })
 
-    observeEvent(input$more, {
-      shinyjs::show("toggle_takeaway")
-      shinyjs::hide("toggle_about")
-      output$takeaway <- renderUI({
-        context <- context %>%
-          dplyr::filter(field == input$topic)
-        p(htmltools::HTML(context$takeaway))
+
+    # definitions
+    observeEvent(input$definitions, {
+
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::show("toggle_definitions")
+
+      output$show_definitions <- renderUI({
+
+        definitions <- definitions %>%
+          dplyr::filter(item == "Rurality")
+
+        div(
+          tags$a(
+            class = "def-link",
+            `data-bs-toggle` = "collapse",
+            href = "#collapseExample",
+            paste(definitions$item)
+          ),
+          div(
+            class="collapse",
+            id="collapseExample",
+            paste(definitions$definition)
+          )
+        )
       })
     })
 

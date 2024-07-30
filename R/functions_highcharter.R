@@ -441,6 +441,29 @@ set_hist <- function(data,
             )
           )
         )
+      ),
+      events = list(
+        selection = highcharter::JS(
+          "function(event) {
+         if (event.resetSelection) {
+           this.update({
+             xAxis: {
+               labels: {
+                 step: 20
+               }
+             }
+           });
+         } else if (event.xAxis) {
+           this.update({
+             xAxis: {
+               labels: {
+                 step: 5
+               }
+             }
+           });
+         }
+       }"
+        )
       )
     ) %>%
     highcharter::hc_xAxis(
@@ -464,7 +487,7 @@ set_hist <- function(data,
 
 
 
-#' Histogram Bar Proxy Redraw
+#' Histogram Bar Proxy Redraw Total FTEs
 #'
 #' @param hc A `highchart` `htmlwidget` object.
 #' @param data Dataframe; data object to feed the figure.
@@ -475,7 +498,7 @@ set_hist <- function(data,
 #'
 #'
 #' @export
-proxy_to_hist <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+proxy_to_hist_total <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
 
   hc %>%
     highcharter::hcpxy_set_data(
@@ -505,7 +528,8 @@ proxy_to_hist <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 20
+          step = 50,
+          format = "{value:,.0f}"
         )
       ),
       tooltip = list(
@@ -515,6 +539,56 @@ proxy_to_hist <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
 }
 
 
+#' Histogram Bar Proxy Redraw for Per Capita FTEs
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#'
+#'
+#' @export
+proxy_to_hist_pc <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+
+  hc %>%
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data
+    ) %>%
+    highcharter::hcpxy_update(
+      series = list(
+        groupPadding = 0,
+        list(type = "column"),
+        dataLabels = list(
+          enabled = FALSE
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = meta$caption
+      ),
+      xAxis = list(
+        categories = data$category,
+        title = list(
+          text = unique(data$x_label)
+        ),
+        labels = list(
+          step = 20,
+          format = "{value:,.1f}"
+        )
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
 
 
 #' From Histogram to Single Column Graph

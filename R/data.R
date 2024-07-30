@@ -77,10 +77,25 @@
 #'
 #' @format data.frame
 #'
-#' A data frame with 46 observations of 11 variables
+#' A data frame with 26 observations of 6 variables
 #'
 #' @source National Association of City and County Health Officials (NACCHO)
-"context"
+"definitions"
+
+
+#' Dataset for notes for The National Profile
+#'  of Local Health Departments, 2022 master data
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format data.frame
+#'
+#' A data frame with 39 observations of 7 variables
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"notes"
 
 
 #' Source Line for NACCHO's 2022 National Profile

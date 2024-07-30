@@ -8,6 +8,23 @@
 }
 
 
+/* Definitions */
+.def-link::before {
+  content: "\2b";
+  font-family: "FontAwesome";
+  display: inline-block;
+  margin-right: 5px;
+  transition: content 0.2s;
+}
+
+.def-link:active::before {
+  content: "\f068";
+  font-family: "FontAwesome";
+}
+
+
+
+
 /* Occupation List */
 
 ::selection {

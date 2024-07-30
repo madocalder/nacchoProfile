@@ -223,7 +223,7 @@ mod_workforce_server <- function(id){
                             x_label = "Per Capita FTEs")
 
         proxy %>%
-          proxy_to_hist(data, filter_meta())
+          proxy_to_hist_pc(data, filter_meta())
 
 
       } else if (input$type == "c5q37") {
@@ -231,7 +231,7 @@ mod_workforce_server <- function(id){
                             x_label = "Total FTEs")
 
         proxy %>%
-          proxy_to_hist(data, filter_meta())
+          proxy_to_hist_total(data, filter_meta())
       }
     })
 
