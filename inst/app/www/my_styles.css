@@ -728,7 +728,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 .color-block-content {
   background-color: #EEEAE5;
-  height: 70vh;
+  height: 77vh;
   padding: 10px;
   border-radius: 0 0px 50px 50px;
   width: 100%;
@@ -812,7 +812,7 @@ hr .tt {
 
 .right-hr {
   border-top: 1px solid !important;
-  color: #212F5B !important;
+  color: #DBD3C8 !important;
   opacity: 1 !important;
   margin-top: 20px;
   margin-left: auto;

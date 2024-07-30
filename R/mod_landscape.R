@@ -96,7 +96,7 @@ mod_landscape_ui <- function(id){
                 icon = tags$i(class = "fa-light fa-key",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Key Takeaways")
+              span(class = "hover-text-content-side", "Takeaways")
             ),
             div(
               class = "col-sm-4 hover-text-side",
@@ -108,7 +108,7 @@ mod_landscape_ui <- function(id){
                 icon = tags$i(class = "fa-light fa-circle-info",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Survey Context and Notes")
+              span(class = "hover-text-content-side", "Notes")
             ),
             div(
               class = "col-sm-4 hover-text-side",
@@ -120,7 +120,7 @@ mod_landscape_ui <- function(id){
                 icon = tags$i(class = "fa-light fa-list",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Relevant Definitions")
+              span(class = "hover-text-content-side", "Definitions")
             ),
             hr(class = "right-hr"),
           ),
@@ -145,21 +145,20 @@ mod_landscape_ui <- function(id){
                   class = "context-content",
                   uiOutput(ns("show_definitions"))
               )
-            ),
-
-          ),
-          br(),
-          div(
-            style = "padding-left: 12%;",
-            shinyWidgets::materialSwitch(
-              inputId = ns("color_palette"),
-              p(
-                HTML("<b>Enable Color Patterns?</b> <br>
-                   Distinguish bars with patterns."
-                ), style = "margin-bottom: -20px;"
-              )
             )
           )
+          # br(),
+          # div(
+          #   style = "padding-left: 12%;",
+          #   shinyWidgets::materialSwitch(
+          #     inputId = ns("color_palette"),
+          #     p(
+          #       HTML("<b>Enable Color Patterns?</b> <br>
+          #          Distinguish bars with patterns."
+          #       ), style = "margin-bottom: -20px;"
+          #     )
+          #   )
+          # )
         )
       )
     )
@@ -451,7 +450,9 @@ mod_landscape_server <- function(id){
                         view == input$view,
                         filter == input$filter)
 
-        p(htmltools::HTML(notes$takeaway))
+        p(htmltools::HTML(
+          "<b>Key Takeaway(s)</b>: <br><br>",
+          notes$takeaway))
       })
     }, ignoreNULL = FALSE)
 
