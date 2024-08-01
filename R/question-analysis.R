@@ -30,7 +30,7 @@ report2022_leadership_fig4.2 <- function() {
 report2022_leadership_fig4.4 <- function() {
 
     all_lhds <- return_survey_weighted_statistics("tenure")
-    split_lhds <- return_survey_weighted_statistics("tenure", grps = "c0popcat3", popcat = "c0popcat3")
+    split_lhds <- return_survey_weighted_statistics("tenure", grps = "c0popcat3", popcat = "c0popcat7")
 
     bind_rows(all_lhds, split_lhds) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
@@ -44,12 +44,14 @@ report2022_leadership_fig4.4 <- function() {
 report2022_leadership_fig4.5 <- function() {
 
     all_lhds <- return_survey_weighted_counts("c4q34")
-    split_lhds <- return_survey_weighted_counts("c4q34", grps = "c0popcat3", popcat = "c0popcat3")
-    split_urb <- return_survey_weighted_counts("c4q34", grps = "urbanrural2022", popcat = "c0popcat3")
+    split_lhds <- return_survey_weighted_counts("c4q34", grps = "c0popcat3", popcat = "c0popcat7")
+    split_urb <- return_survey_weighted_counts("c4q34", grps = "urbanrural2022", popcat = "c0popcat7")
 
     bind_rows(all_lhds, split_lhds, split_urb) %>%
         mutate(AnswerLabel = label_remap[as.character(.data$Answer)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
+
+    
 }
 
 #' @importFrom dplyr bind_rows filter mutate
@@ -98,9 +100,6 @@ report2022_workforce_fig5.1 <- function() {
 #' @noRd
 report2022_workforce_fig5.2 <- function() {
 
-    # values when presenting by the c0popcat7 strata
-    # don't match perfectly (for 5 values)
-
     args <- list(
         c("c5q36", "c5q37"),
         grps = "c0popcat7",
@@ -123,7 +122,8 @@ report2022_workforce_fig5.2 <- function() {
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         rename(Median = "Quantile_q50") %>%
         select(all_of(sel_cols)) %>%
-        pivot_wider(names_from = .data$AnswerLabel, values_from = c(.data$Mean, .data$Median))
+        pivot_wider(names_from = .data$AnswerLabel, values_from = c(.data$Mean, .data$Median)) %>%
+        select(GroupLabel, `Mean_Number of employees`, `Median_Number of employees`, `Mean_Number of FTEs`, `Median_Number of FTEs`)
 
 }
 
@@ -176,7 +176,7 @@ report2022_workforce_fig5.10 <- function() {
 #' @importFrom purrr map_dfr
 #' @noRd
 report2022_workforce_fig5.12 <- function() {
-
+ 
     # very small differences in the percentages
     # see compare_results_fig5.12()
 
@@ -304,20 +304,83 @@ report2022_workforce_fig5.13 <- function() {
 #' @noRd
 report2022_finance_fig6.2 <- function() {
 
-    # still some issues with the percentile calculations
-    # some rare cases don't match precesely the report
+    # some discrepancies (see compare_results_fig6.2)
 
     all_lhds <- return_survey_weighted_statistics("c3q15")
     split_lhds <- return_survey_weighted_statistics("c3q15", grps = "c0popcat7", popcat = "c0popcat7")
 
-    bind_rows(all_lhds, split_lhds) %>%
+    all_lhds <- all_lhds %>%
+        mutate(GroupLabel = "All LHDs") %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
         rename(
             `25th percentile` = "Quantile_q25",
             `50th percentile (Median)` = "Quantile_q50",
             `75th percentile` = "Quantile_q75"
-            )
+            ) %>%
+        select(GroupLabel, Mean, `25th percentile`, `50th percentile (Median)`, `75th percentile`)
+
+    split_lhds <- split_lhds %>%
+        mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
+        mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
+        rename(
+            `25th percentile` = "Quantile_q25",
+            `50th percentile (Median)` = "Quantile_q50",
+            `75th percentile` = "Quantile_q75"
+            ) %>%
+        select(GroupLabel, Mean, `25th percentile`, `50th percentile (Median)`, `75th percentile`)
+
+    bind_rows(all_lhds, split_lhds)
+
+}
+
+compare_results_fig6.2 <- function() {
+
+    report <- tibble::tibble(
+        AnswerLabel = c(
+            "All LHDs",
+            "<25,000",
+            "25,000—49,999",
+            "50,000—99,999",
+            "100,000—249,999",
+            "250,000—499,999",
+            "500,000—999,999",
+            "1,000,000+"),
+        Mean = c("12500000", "845000", "4480000", "4900000", "8840000", "21400000", "48300000", "302000000"),
+        `25th percentile` = c("598000", "313000", "872000", "1940000", "4640000", "11500000", "22800000", "79500000"),
+        `50th percentile (Median)` = c("1540000", "575000", "1510000", "3640000", "7100000", "14600000", "38700000", "127000000"),
+        `75th percentile` = c("5700000", "1100000", "2810000", "5830000", "10300000", "24600000", "64800000", "229000000")
+        ) |>
+        mutate(across(.data$Mean:.data$`75th percentile`, \(x) as.numeric(x))) %>%
+        mutate(across(where(is.numeric), \(x) {round(x, 0)})) %>%
+        mutate(AnswerLabel = label_remap[as.character(.data$AnswerLabel)])
+
+    results <- report2022_finance_fig6.2() %>%
+        mutate(GroupLabel = as.character(.data$GroupLabel)) %>%
+        mutate(across(.data$Mean:.data$`75th percentile`, \(x) as.numeric(x))) %>%
+        mutate(across(where(is.numeric), \(x) {signif(round(x, 0), digits = 3)}))
+
+    colnames(results) <- colnames(report)
+
+    report |>
+        left_join(results, by = "AnswerLabel") |>
+        mutate(
+            MeanDiff = .data$Mean.x - .data$Mean.y,
+            q25Diff = .data$`25th percentile.x` - .data$`25th percentile.y`,
+            q50Diff = .data$`50th percentile (Median).x` - .data$`50th percentile (Median).y`,
+            q75Diff = .data$`75th percentile.x` - .data$`75th percentile.y`
+        ) |>
+        select(
+            AnswerLabel, 
+            MeanDiff:q75Diff, 
+            Mean.x,
+            Mean.y,
+            "q25.x" = `25th percentile.x`,
+            "q25.y" = `25th percentile.y`,
+            "q50.x" = `50th percentile (Median).x`,
+            "q50.y" = `50th percentile (Median).y`,
+            "q75.x" = `75th percentile.x`,
+            "q75.y" = `75th percentile.y`)
 
 }
 
@@ -333,6 +396,8 @@ report2022_finance_fig6.6 <- function() {
 #' @importFrom dplyr mutate
 #' @noRd
 report2022_finance_fig6.7 <- function() {
+
+    # only one value different for the Other category (rounds to 4.5 instead of 4)
 
     args <- list(
         c(
@@ -356,6 +421,7 @@ report2022_finance_fig6.7 <- function() {
 #' @noRd
 report2022_finance_fig6.9 <- function() {
 
+
     args <- list(
         c(
         "local_percap",
@@ -365,7 +431,7 @@ report2022_finance_fig6.9 <- function() {
         wtype = "weights_static"
     )
 
-    all_lhds <- pmap_dfr(args, return_survey_weighted_statistics) %>%
+    pmap_dfr(args, return_survey_weighted_statistics) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
         mutate(GroupLabel = label_remap[as.character(.data$Group)])
 
@@ -377,6 +443,8 @@ report2022_finance_fig6.10 <- function() {
 
     # special case, we need to exclude an answer to get the right percentage
     # perhaps a new argument in the function?
+
+    # One percentage value doesn't match the report
 
     sel_answer <- c(
         "less than previous year's budget",

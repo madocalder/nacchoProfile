@@ -76,7 +76,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
         master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(ids = popcat, weights = wtype) %>%
+          as_survey_design(strata = popcat, weights = wtype) %>%
           filter(!is.na(.data[[q_label]])) %>%
           survey_count(.data[[q_label]], na.rm = TRUE) %>%
           mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
@@ -104,10 +104,33 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             "Percentage",
             "Question")
 
+        # master_data %>%
+        #   as_factor() %>%
+        #   filter(!is.na(.data[[q_label]])) %>%
+        #   group_by_at(c(grps, q_label)) %>%
+        #   summarise(N = n()) %>%
+        #   ungroup() %>%
+        #   group_by_at(c(grps)) %>%
+        #   mutate(Percentage = (N/sum(N, na.rm = TRUE)) * 100) %>%
+        #   ungroup() %>%
+        #   mutate("NA.RM" = TRUE) %>%
+        #   mutate(SE = NA) %>%
+        #   mutate(Question = q_label) %>%
+        #   select(grps, q_label, "NA.RM", "N", "SE", "Percentage", "Question") %>%
+        #   rename_all(~new_names) %>%
+        #   mutate(
+        #     Answer = .data$Answer,
+        #     x = as.numeric(as.factor(Answer)) -1,
+        #     y = round(Percentage,1),
+        #     category = stringr::str_to_title(Answer),
+        #     group = stringr::str_to_title(Group),
+        #     subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+        #   )
+        
         master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(ids = popcat, weights = wtype) %>%
+          as_survey_design(strata = popcat, weights = wtype) %>%
           filter(!is.na(.data[[q_label]])) %>%
           group_by_at(grps) %>%
           survey_count(.data[[q_label]], na.rm = TRUE) %>%
@@ -153,7 +176,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
     master_data %>%
       as_factor() %>%
       left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-      as_survey_design(ids = popcat, weights = wtype) %>%
+      as_survey_design(strata = popcat, weights = wtype) %>%
       summarise(
         N = n(),
         Responses = length(which(!is.na(.data[[q_label]]))),
@@ -174,29 +197,60 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 
     } else {
 
-      master_data %>%
-        as_factor() %>%
-        left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-        as_survey_design(ids = popcat, weights = wtype) %>%
-        group_by_at(grps) %>%
-        summarise(
-          N = n(),
-          Responses = length(which(!is.na(.data[[q_label]]))),
-          Total = survey_total(.data[[q_label]], na.rm = TRUE),
-          Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
-          Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - sum(dplyr::n_distinct(.data[[popcat]]))),
-          .groups = "drop"
-        ) %>%
-        mutate(Question = q_label) %>%
-        rename(Group = grps) %>%
-        select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
-        mutate(
-          y = round(Mean, 1),
-          x = as.numeric(as.factor(Group)) - 1,
-          category = stringr::str_to_title(Group),
-          group = "All LHDs",
-          subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
-        )
+      if (grps != "c0popcat7") {
+        master_data %>%
+          as_factor() %>%
+          left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
+          as_survey_design(strata = popcat, weights = wtype) %>%
+          group_by_at(grps) %>%
+          summarise(
+            N = n(),
+            Responses = length(which(!is.na(.data[[q_label]]))),
+            Total = survey_total(.data[[q_label]], na.rm = TRUE),
+            Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
+            Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - sum(dplyr::n_distinct(.data[[popcat]]))),
+            .groups = "drop"
+          ) %>%
+          mutate(Question = q_label) %>%
+          rename(Group = grps) %>%
+          select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+          mutate(
+            y = round(Mean, 1),
+            x = as.numeric(as.factor(Group)) - 1,
+            category = stringr::str_to_title(Group),
+            group = "All LHDs",
+            subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+          )
+      } else {
+
+        master_data %>%
+          as_factor() %>%
+          group_by_at(grps) %>%
+          summarise(
+            N = n(),
+            Responses = length(which(!is.na(.data[[q_label]]))),
+            Total = n(),
+            Total_se = NA,
+            Mean = mean(.data[[q_label]], na.rm = TRUE),
+            Quantile_q25 = quantile(.data[[q_label]], probs = 0.25, na.rm = TRUE),
+            Quantile_q50 = quantile(.data[[q_label]], probs = 0.50, na.rm = TRUE),
+            Quantile_q75 = quantile(.data[[q_label]], probs = 0.75, na.rm = TRUE),
+            Quantile_q25_se = NA,
+            Quantile_q50_se = NA,
+            Quantile_q75_se = NA,
+            .groups = "drop"
+          ) %>%
+          mutate(Question = q_label) %>%
+          rename(Group = grps) %>%
+          select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+          mutate(
+            y = round(Mean, 1),
+            x = as.numeric(as.factor(Group)) - 1,
+            category = stringr::str_to_title(Group),
+            group = "All LHDs",
+            subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+          )
+        }
 
     }
 
