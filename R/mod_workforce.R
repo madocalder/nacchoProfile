@@ -200,7 +200,7 @@ mod_workforce_server <- function(id){
                 ns("classifications"),
                 "",
                 workforce_classifications,
-                selected = "c5q63"
+                selected = c("c5q63", "c5q52")
               )
             )
           )
@@ -350,10 +350,12 @@ mod_workforce_server <- function(id){
     # combinations selected by the user.
     observe ({
 
-      req(input$type) # prevent error
+      req(
+        isTruthy(input$type) || isTruthy(input$classifications)
+      ) # prevent error
 
 
-      if (input$type == "FTE_numcat") {
+      if (input$type == "FTE_numcat" & input$topic == "c5q37") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
         proxy %>%
@@ -363,7 +365,7 @@ mod_workforce_server <- function(id){
 
 
 
-      } else if (input$type == "fte_bypop") {
+      } else if (input$type == "fte_bypop" & input$topic == "c5q37") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
         proxy %>%
@@ -371,7 +373,7 @@ mod_workforce_server <- function(id){
 
 
 
-      } else if (input$type == "c5q37") {
+      } else if (input$type == "c5q37" & input$topic == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
         proxy %>%
@@ -379,8 +381,35 @@ mod_workforce_server <- function(id){
 
 
 
-      } else if (input$topic == "occupation_class") {
+      } else {
 
+        req(length(input$classifications) >= 1) # prevents error
+
+        if (length(input$classifications) == 1) {
+          selected_vars <- paste0(input$classifications, "a")
+          data <- return_survey_weighted_counts(selected_vars)
+
+        } else {
+          selected_data <- data.frame(x = c(paste0(input$classifications, "a"))) # store selections
+          data_list <- list() # create an empty list
+
+          for (i in selected_data[[1]]) {
+            data_list[[i]] <- return_survey_weighted_counts(i)
+          }
+
+          data <- do.call(rbind, data_list) # bind the data generated in loop
+        }
+
+        data <- data %>%
+          dplyr::filter(category == "Yes") %>%
+          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                        x = as.numeric(as.factor(category)) -1,
+                        x_label = NA)
+
+        proxy %>%
+          proxy_hist_to_single(data,
+                               filter_meta(),
+                               theme = naccho.viz::basic_theme)
 
       }
     })
