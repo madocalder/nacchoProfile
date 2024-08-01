@@ -1,14 +1,44 @@
 /* MY STYLES */
 
 
-/* Plot flickering */
+/* ---------------------------------------------------------- Plot flickering */
 #mod_landscape_1-figure.recalculating {
   opacity: 1.0;
   animation-delay: 1;
 }
 
 
-/* Definitions */
+
+
+/* ------------------------------------------------------------ various links */
+.clicked-link {
+    color: #AB6143 !important;
+}
+
+.link-no-underline {
+  text-decoration: none !important;
+  color: #212F5B;
+  font-weight: 600 !important;
+}
+
+
+.link-no-underline:hover, .link-no-underline:focus {
+  color: #AB6143 !important;
+}
+
+a {
+  text-decoration: none !important;
+  color: #212F5B;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+a:hover:not(.def-link), a:focus:not(.def-link) {
+  text-decoration: underline !important;
+}
+
+
+/* -------------------------------------------------------------- Definitions */
 .def-link::before {
   content: "\2b";
   font-family: "FontAwesome";
@@ -40,47 +70,16 @@
 }
 
 
-/* Occupation List */
 
+
+/* ---------------------------------------------------------- Occupation List */
 ::selection {
   background: #80A14E;
   color: white;
 }
 
-
 label:not(.material-switch label) {
   font-weight: 300px !important;
-}
-
-.checkboxes {
-  background-color: #F9F8F7;
-  color: #465177;
-  border: 1.5px solid #008A96;
-  letter-spacing: 1px;
-  height: 400px;
-  overflow: scroll;
-  padding-left: 30px !important;
-  padding-right: 15px !important;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  width: 80%;
-  resize: vertical;
-  overflow: allow;
-}
-
-.shiny-input-container .checkbox input {
-  border: none;
-  margin-left: -20px;
-  border-radius: 50px;
-  background-color: #F9F8F7;
-  color: #465177;
-}
-
-.shiny-input-container .checkbox input:checked {
-  border-radius: 50px;
-  box-shadow: none;
-  border-color: #AB6143;
-  background-color: #AB6143;
 }
 
 .shiny-input-container .radio-inline input:checked {
@@ -88,22 +87,17 @@ label:not(.material-switch label) {
   background-color: #80A14E !important;
 }
 
-
-.shiny-input-container .checkbox input:hover {
-  background-color: #D3D5DE;
-  border-radius: 50px;
-  box-shadow: none;
-  --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
-}
-
-.shiny-input-container .checkbox label {
-  padding-top: 3px;
-  padding-bottom: 3px;
+.checkboxes {
+  text-indent: -31px;
+  margin-left: 60px;
 }
 
 
-/* Radio Buttons for Workfroce */
+.shiny-input-container .checkbox input {
+  margin-right: 10px;
+}
 
+/* ---------------------------------------------- Radio Buttons for Workfroce */
 .shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group, .shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
     margin-top: -1px;
     justify-content: space-evenly;
@@ -111,8 +105,9 @@ label:not(.material-switch label) {
     display: flex;
 }
 
-/* Dropdowns */
 
+
+/* ---------------------------------------------------------------- Dropdowns */
 .min-height-400 .selectize-dropdown-content {
   min-height: 400px;
 }
@@ -139,9 +134,13 @@ label:not(.material-switch label) {
 
 
 
-/* -------------------------------------------------- SIDEBAR AND NAVIGATION */
+/* --------------------------------------------------- Sidebar and Navigation */
 .sidebar {
   background-color: #212F5B !important;
+}
+
+.bslib-sidebar-layout>.main {
+  color: #212F5B !important;
 }
 
 .bslib-sidebar-layout>.collapse-toggle {
@@ -238,7 +237,7 @@ label:not(.material-switch label) {
 
 
 
-/* ----------------------------------------------------- HOME PAGE ACCORDION */
+/* ------------------------------------------------------ home page accordion */
 .accordion-body {
   font-weight: 500 !important;
 }
@@ -269,7 +268,7 @@ label:not(.material-switch label) {
 }
 
 
-/* -------------------------------------------------------- HOME PAGE QUOTES */
+/* --------------------------------------------------------- home page quotes */
 .carousel-dark .carousel-indicators [data-bs-target] {
   color: #AB6143 !important;
 }
@@ -286,7 +285,7 @@ label:not(.material-switch label) {
 
 
 
-/* ---------------------------------------------------- KEY FINDINGS CONTENT */
+/* ----------------------------------------------------- key findings content */
 .key-findings-cards .html-fill-container {
   background-color: #fff !important;
   margin-top: 0px;
@@ -405,7 +404,7 @@ label:not(.material-switch label) {
 
 
 
-/* ---------------------------------------------------- DATA STORIES CONTENT */
+/* ----------------------------------------------------- data stories content */
 .data-stories-head {
   padding-top: 2em;
   padding-left: 5em;
@@ -431,19 +430,8 @@ label:not(.material-switch label) {
   }
 }
 
-/*------------------------------------------- FOOTER AND LINKS IN THE FOOTER */
+/*-------------------------------------------- footer and links in the footer */
 /* this changes the color of the links in the footer */
-a {
-  text-decoration: none !important;
-  color: #212F5B;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-a:hover:not(.def-link), a:focus:not(.def-link) {
-  text-decoration: underline !important;
-}
-
 .linkedin-button {
   background-color: transparent !important;
   font-size: 13px !important;
@@ -469,7 +457,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 }
 
 
-/* -------------------------------------------- BUTTONS FOR THE DATA STORIES */
+/* --------------------------------------------- buttons for the data stories */
 .side_button {
   border-radius: 50px 0px 0px 50px;
   padding-right: 1em;
@@ -495,7 +483,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 
 
-/* ------------------------------------------------ KEY FINDINGS - SCROLLBAR */
+/* ------------------------------------------ scroll bar for the key findings */
 .scroll-desc::-webkit-scrollbar {
     display: none;
 }
@@ -516,7 +504,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 
 
-/* ------------------------------------------- HOVER BUTTONS FOR TOPICS PAGE */
+/* ---------------------------------------- hover buttons for the topics page */
 .hover-text {
   position: relative;
   display: inline-block;
@@ -577,7 +565,7 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 }
 
 
-/* ----------------------------------------------------- RIGHT SIDEBAR ICONS */
+/* ------------------------------------------------------- right sidebar text */
 .hover-text-side {
   position: relative;
   display: inline-block;
@@ -728,14 +716,23 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 .color-block-content {
   background-color: #EEEAE5;
-  height: 77vh;
+  height: 73vh;
   padding: 10px;
-  border-radius: 0 0px 50px 50px;
+  border-radius: 0 0 0 0;
   width: 100%;
   z-index: -1; /* Place behind other content */
   align-content: baseline;
   overflow: hidden;
   overflow-y: auto;
+}
+
+.color-block-footer {
+  background-color: #EEEAE5; /* Match the parent background color */
+  height: 5vh;
+  border-radius: 0 0 50px 50px; /* Only bottom rounded */
+  padding: 10px;
+  z-index: 2;
+  width: 100%;
 }
 
 .fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
@@ -746,15 +743,8 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
   color: #008A96;
 }
 
-.link-no-underline {
-  text-decoration: none !important;
-  color: #212F5B !important;
-  font-weight: 600 !important;
-}
 
-.link-no-underline:hover {
-  text-decoration: none !important;
-}
+
 
 .download-input {
   position: relative;
@@ -894,9 +884,8 @@ b, strong {
   padding-right: 2em !important;
 }
 
-.clicked-link {
-    color: #AB6143 !important;
-}
+
+
 
 
 /* HIGHCHARTS */
