@@ -343,7 +343,6 @@ mod_workforce_server <- function(id){
     proxy <- highcharter::highchartProxy(ns("figure"))
 
 
-
     # update proxy ------------------------------------------------------------
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
@@ -390,14 +389,10 @@ mod_workforce_server <- function(id){
           data <- return_survey_weighted_counts(selected_vars)
 
         } else {
-          selected_data <- data.frame(x = c(paste0(input$classifications, "a"))) # store selections
-          data_list <- list() # create an empty list
+          selected_vars <- c(paste0(input$classifications, "a"))
+          data <- classification_data %>%
+            dplyr::filter(Question %in% selected_vars)
 
-          for (i in selected_data[[1]]) {
-            data_list[[i]] <- return_survey_weighted_counts(i)
-          }
-
-          data <- do.call(rbind, data_list) # bind the data generated in loop
         }
 
         data <- data %>%
@@ -406,18 +401,34 @@ mod_workforce_server <- function(id){
                         x = as.numeric(as.factor(category)) -1,
                         x_label = NA)
 
+
+        if (length(data$x) >= 8) {
+          rotate = -45
+          size = "13px"
+          overflow = "ellipsis"
+        } else {
+          rotate = 0
+          size = "17px"
+          overflow = "none"
+        }
+
         proxy %>%
           proxy_hist_to_single(data,
                                filter_meta(),
-                               theme = naccho.viz::basic_theme)
-
+                               theme = naccho.viz::basic_theme) %>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+              labels = list(
+                rotate = rotate,
+                style = list(
+                  fontSize = size,
+                  textOverflow = overflow
+                )
+              )
+            )
+          )
       }
     })
-
-
-
-
-
 
   })
 }
