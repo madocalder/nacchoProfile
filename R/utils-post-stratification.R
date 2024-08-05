@@ -73,7 +73,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             "Question",
             "Group")
 
-        master_data %>%
+         data <- master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
           as_survey_design(ids = popcat, weights = wtype) %>%
@@ -93,6 +93,17 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             subtitle = paste0("Across All LHDs")
           )
 
+        add_responses <- master_data %>%
+          as_factor() %>%
+          as_tibble() %>%
+          group_by_at(q_label) %>%
+          summarise(
+            Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
+          mutate(Answer = get(q_label))
+
+
+       left_join(data, add_responses, by = "Answer")
+
     } else {
 
         new_names <- c(
@@ -104,7 +115,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             "Percentage",
             "Question")
 
-        master_data %>%
+        data <- master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
           as_survey_design(ids = popcat, weights = wtype) %>%
@@ -124,6 +135,16 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             group = stringr::str_to_title(Group),
             subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
           )
+
+        add_responses <- master_data %>%
+          as_factor() %>%
+          group_by_at(c(q_label, grps)) %>%
+          summarise(
+            Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
+          mutate(Answer = get(q_label),
+                 Group = get(grps))
+
+        left_join(data, add_responses, by = c("Answer", "Group"))
     }
 
 }
@@ -241,7 +262,11 @@ create_hist <- function(input, x_label) {
     subtitle = "Click and span a range on the figure to zoom.",
     x_label = x_label
   )
+  # %>%
+  #   dplyr::mutate(y = (y/sum(y))*100,
+  #                 y = round(y, 1)) # this would make the y a %
 }
+
 
 
 
