@@ -313,11 +313,13 @@ mod_workforce_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      meta %>%
-        dplyr::filter(field == input$type)
+      if (input$topic == "c5q37") {
+        req(input$type)
+        dplyr::filter(meta, grepl(input$type[[1]], field))
+      } else if (input$topic == "occupation_class") {
+        dplyr::filter(meta, grepl(input$classifications[[1]], field))
+      }
     })
-
-
 
     # figure output -----------------------------------------------------------
     # used for first histogram
@@ -327,7 +329,7 @@ mod_workforce_server <- function(id){
 
       set_hist(data) %>%
         viz_options(
-          viz_title = paste("The Number of LHDs by the Number of Total FTEs"),
+          viz_title = "The Distribution of Total FTEs Across LHDs",
           viz_caption = source_line,
           viz_subtitle = unique(data$subtitle),
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs",
@@ -359,7 +361,7 @@ mod_workforce_server <- function(id){
           dplyr::mutate(x_label = NA)
         proxy %>%
           proxy_hist_to_single(data,
-                               filter_meta(),
+                               meta = filter_meta(),
                                theme = naccho.viz::basic_theme)
 
 
@@ -368,7 +370,9 @@ mod_workforce_server <- function(id){
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
         proxy %>%
-          proxy_to_hist_pc(data, filter_meta())
+          proxy_to_hist_pc(data,
+                           meta = filter_meta(),
+                           responses = sum(data$y))
 
 
 
@@ -376,7 +380,9 @@ mod_workforce_server <- function(id){
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
         proxy %>%
-          proxy_to_hist_total(data, filter_meta())
+          proxy_to_hist_total(data,
+                              meta = filter_meta(),
+                              responses = sum(data$y))
 
 
 
@@ -414,7 +420,8 @@ mod_workforce_server <- function(id){
 
         proxy %>%
           proxy_hist_to_single(data,
-                               filter_meta(),
+                               meta = filter_meta(),
+                               responses = "Refer to tooltip.",
                                theme = naccho.viz::basic_theme) %>%
           highcharter::hcpxy_update(
             xAxis = list(
