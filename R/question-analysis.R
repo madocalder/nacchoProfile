@@ -133,7 +133,7 @@ report2022_workforce_fig5.2 <- function() {
 #' @noRd
 report2022_workforce_fig5.6 <- function() {
 
-    # rounded values match but we don't have any reference 
+    # rounded values match but we don't have any reference
     # values for the confidence bands
     # so we can't really compare.
 
@@ -221,7 +221,7 @@ compare_results_fig5.12 <- function() {
             "Business and financial operations staff",
             "Community health worker",
             "Environmental health worker",
-            "Epidemiologist/statistician",
+            "Epidemiologist or statistician",
             "Health educator",
             "Information systems specialist",
             "Laboratory worker",
