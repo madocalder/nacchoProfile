@@ -285,12 +285,16 @@ mod_landscape_server <- function(id){
     })
 
 
+    updatedInputs <- reactive({
+      input$topic
+      input$filter
+    }) |> debounce(250)
 
 
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
     # combinations selected by the user.
-    observe({
+    observeEvent(updatedInputs(), {
 
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
@@ -499,6 +503,7 @@ mod_landscape_server <- function(id){
               class = "def-link",
               `data-bs-toggle` = "collapse",
               href = paste0("#collapseExample", i),
+              tags$i(class = "fa fa-plus"),
               paste(definitions$item[[i]])
             ),
             div(
