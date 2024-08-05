@@ -2,6 +2,8 @@
 
 export("%>%")
 export(add_weights)
+export(card_thumbnail)
+export(class_data)
 export(create_hist)
 export(proxy_hist_to_single)
 export(proxy_to_group)
