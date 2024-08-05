@@ -498,7 +498,11 @@ set_hist <- function(data,
 #'
 #'
 #' @export
-proxy_to_hist_total <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+proxy_to_hist_total <- function(hc,
+                                data,
+                                meta,
+                                responses = sum(data$Responses),
+                                theme = naccho.viz::hist_theme, ...) {
 
   hc %>%
     highcharter::hcpxy_set_data(
@@ -520,7 +524,7 @@ proxy_to_hist_total <- function(hc, data, meta, theme = naccho.viz::hist_theme, 
         text = unique(data$subtitle)
       ),
       caption = list(
-        text = meta$caption
+        text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
         categories = data$category,
@@ -542,15 +546,20 @@ proxy_to_hist_total <- function(hc, data, meta, theme = naccho.viz::hist_theme, 
 #' Histogram Bar Proxy Redraw for Per Capita FTEs
 #'
 #' @param hc A `highchart` `htmlwidget` object.
-#' @param data Dataframe; data object to feed the figure.
-#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param data Data frame; data object to feed the figure.
+#' @param meta Data frame; data object to set options (e.g., title, subtitle, etc).
+#' @param responses Numeric value; often derived from a filtered dataframe.
 #' @param ... Other arguments
 #'
 #' @return A redrawn figure.
 #'
 #'
 #' @export
-proxy_to_hist_pc <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+proxy_to_hist_pc <- function(hc,
+                             data,
+                             meta,
+                             responses = sum(data$Responses),
+                             theme = naccho.viz::hist_theme, ...) {
 
   hc %>%
     highcharter::hcpxy_set_data(
@@ -572,7 +581,7 @@ proxy_to_hist_pc <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...
         text = unique(data$subtitle)
       ),
       caption = list(
-        text = meta$caption
+        text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
         categories = data$category,
@@ -602,7 +611,11 @@ proxy_to_hist_pc <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...
 #'
 #'
 #' @export
-proxy_hist_to_single <- function(hc, data, meta, theme = naccho.viz::hist_theme, ...) {
+proxy_hist_to_single <- function(hc,
+                                 data,
+                                 meta,
+                                 responses = sum(data$Responses),
+                                 theme = naccho.viz::hist_theme, ...) {
 
   hc %>%
     highcharter::hcpxy_set_data(
@@ -634,7 +647,7 @@ proxy_hist_to_single <- function(hc, data, meta, theme = naccho.viz::hist_theme,
         text = unique(data$subtitle)
       ),
       caption = list(
-        text = meta$caption
+        text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
         categories = data$category,
