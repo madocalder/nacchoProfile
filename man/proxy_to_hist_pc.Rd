@@ -4,14 +4,23 @@
 \alias{proxy_to_hist_pc}
 \title{Histogram Bar Proxy Redraw for Per Capita FTEs}
 \usage{
-proxy_to_hist_pc(hc, data, meta, theme = naccho.viz::hist_theme, ...)
+proxy_to_hist_pc(
+  hc,
+  data,
+  meta,
+  responses = sum(data$Responses),
+  theme = naccho.viz::hist_theme,
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}
 
-\item{data}{Dataframe; data object to feed the figure.}
+\item{data}{Data frame; data object to feed the figure.}
 
-\item{meta}{Dataframe; data object to set options (e.g., title, subtitle, etc).}
+\item{meta}{Data frame; data object to set options (e.g., title, subtitle, etc).}
+
+\item{responses}{Numeric value; often derived from a filtered dataframe.}
 
 \item{...}{Other arguments}
 }
