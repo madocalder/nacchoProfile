@@ -79,10 +79,10 @@ mod_landscape_ui <- function(id){
               highcharter::highchartOutput(ns("figure"), height = 575)
             )
           )
+        ),
 
           # end of main content -----------------------------------------------------
 
-        ),
         right = div(
           div(
             class = "row color-block-header",
@@ -146,19 +146,10 @@ mod_landscape_ui <- function(id){
                   uiOutput(ns("show_definitions"))
               )
             )
+          ),
+          div(
+            class = "row color-block-footer"
           )
-          # br(),
-          # div(
-          #   style = "padding-left: 12%;",
-          #   shinyWidgets::materialSwitch(
-          #     inputId = ns("color_palette"),
-          #     p(
-          #       HTML("<b>Enable Color Patterns?</b> <br>
-          #          Distinguish bars with patterns."
-          #       ), style = "margin-bottom: -20px;"
-          #     )
-          #   )
-          # )
         )
       )
     )

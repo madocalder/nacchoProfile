@@ -528,7 +528,7 @@ proxy_to_hist_total <- function(hc, data, meta, theme = naccho.viz::hist_theme, 
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 50,
+          step = 20,
           format = "{value:,.0f}"
         )
       ),
@@ -642,11 +642,11 @@ proxy_hist_to_single <- function(hc, data, meta, theme = naccho.viz::hist_theme,
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 1
-        )
+          step = 1)
       ),
       tooltip = list(
         pointFormat = meta$tooltip
       )
     )
+
 }

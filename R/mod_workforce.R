@@ -57,106 +57,113 @@ mod_workforce_ui <- function(id){
           ),
 
           hr(),
+          br(),
 
           # add main page content here ----------------------------------------------
 
-
-          # display occupational classifications is selected
-          conditionalPanel(
-            condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
-            div(
-              class = "viz-content row",
-              div(
-                class = "col-sm-3",
-                br(),
-                strong("Select Classification"),
-                div(
-                  class = "checkboxes",
-                  checkboxGroupInput(
-                    ns("classifications"),
-                    "",
-                    workforce_classifications,
-                  )
-                )
-              ),
-              div(
-                class = "col-sm-9"
-              )
-            )
-          ),
-
-          # display if occupational classifications is not selected
-          conditionalPanel(
-            condition = paste0('input[\'', ns('topic'), "\'] != \'occupation_class\'"),
-            div(
-              class = "viz-content-buttons",
-              div(
-                radioButtons(
-                  ns("type"),
-                  "",
-                  choices = workforce_fte_types,
-                  inline = TRUE
-                )
-              ),
-              br(),
-              highcharter::highchartOutput(ns("figure"), height = 575)
-            )
+          div(
+            class = "viz-content",
+            highcharter::highchartOutput(ns("figure"), height = 575)
           )
+        ),
 
           # end of main content -----------------------------------------------------
 
-        ),
         right = div(
           div(
-            class = "row color-block",
+            class = "row color-block-header",
             div(
-              class = "col-sm-4 hover-text-side",
+              class = "col-sm-3 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("about"),
+                inputId = ns("viz_filters"), # key takeaway
                 "",
-                icon = tags$i(class = "fa-light fa-circle-info",
+                icon = tags$i(class = "fa-light fa-filter",
                               style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline"),
-              span(class = "hover-text-content-side", "About")
+                class = "link-no-underline action-link-2"),
+              span(class = "hover-text-content-side", "Filters")
             ),
+
             div(
-              class = "col-sm-4 hover-text-side",
+              class = "col-sm-3 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("context"),
-                "",
-                icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline"),
-              span(class = "hover-text-content-side", "Definitions and Notes")
-            ),
-            div(
-              class = "col-sm-4 hover-text-side",
-              align = "center",
-              br(),
-              actionLink(
-                inputId = ns("more"),
+                inputId = ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
                               style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline"),
-              span(class = "hover-text-content-side", "Key Takeaways")
-            )
+                class = "link-no-underline action-link-2"),
+              span(class = "hover-text-content-side", "Takeaways")
+            ),
+
+            div(
+              class = "col-sm-3 hover-text-side",
+              align = "center",
+              br(),
+              actionLink(
+                inputId = ns("context"), # survey questions and responses
+                "",
+                icon = tags$i(class = "fa-light fa-circle-info",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"),
+              span(class = "hover-text-content-side", "Notes")
+            ),
+
+            div(
+              class = "col-sm-3 hover-text-side",
+              align = "center",
+              br(),
+              actionLink(
+                inputId = ns("definitions"), # related definitions
+                "",
+                icon = tags$i(class = "fa-light fa-list",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"),
+              span(class = "hover-text-content-side", "Definitions")
+            ),
+            hr(class = "right-hr"),
           ),
-          br(),
+
           div(
-            style = "padding-left: 12%;",
-            shinyWidgets::materialSwitch(
-              inputId = ns("color_palette"),
-              p(
-                HTML("<b>Enable Color Patterns?</b> <br>
-                   Distinguish bars with patterns."
-                ), style = "margin-bottom: -20px;"
+            class = "row color-block-content",
+
+            # toggle side content -----------------------------------------------------
+            shinyjs::hidden(
+              div(
+                id = ns("toggle_viz_filters"),
+                class = "context-content",
+                uiOutput(ns("show_viz_filters"))
+              )
+            ),
+
+            shinyjs::hidden(
+              div(
+                id = ns("toggle_takeaway"),
+                class = "context-content",
+                uiOutput(ns("show_takeaway"))
+              )
+            ),
+
+            shinyjs::hidden(
+              div(
+                id = ns("toggle_context"),
+                class = "context-content",
+                uiOutput(ns("show_context"))
+              )
+            ),
+
+            shinyjs::hidden(
+              div(
+                id = ns("toggle_definitions"),
+                class = "context-content"
+                # uiOutput(ns("show_definitions"))
               )
             )
+          ),
+          div(
+            class = "row color-block-footer"
           )
         )
       )
@@ -170,6 +177,137 @@ mod_workforce_ui <- function(id){
 mod_workforce_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+
+    # right sidebar -----------------------------------------------------------
+    # viz filters
+    observeEvent(input$viz_filters, {
+
+      shinyjs::show("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_viz_filters <- renderUI({
+
+        # display if occupational classifications is selected
+        if (input$topic == "occupation_class") {
+          div(
+            strong("Select Classification"),
+            div(
+              class = "checkboxes",
+              checkboxGroupInput(
+                ns("classifications"),
+                "",
+                workforce_classifications,
+                selected = c("c5q63", "c5q52")
+              )
+            )
+          )
+
+          # display occupational ftes is selected
+        } else if (input$topic == "c5q37") {
+          radioButtons(
+            ns("type"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between various FTE measurements or
+                 groupings. <br> <br>")),
+            choices = workforce_fte_types
+          )
+        }
+      })
+    })
+
+    # takeaway
+    observeEvent(input$takeaway, {
+
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::show("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_takeaway <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        view == input$view,
+                        filter == input$filter)
+
+        p(htmltools::HTML(
+          "<b>Key Takeaway(s)</b>: <br><br>",
+          notes$takeaway))
+      })
+    }, ignoreNULL = FALSE)
+
+
+    # survey questions, responses, and notes
+    observeEvent(input$context, {
+
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::show("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_context <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        view == input$view,
+                        filter == input$filter)
+
+        if (is.na(notes$notes)) {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response))
+
+        } else {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            notes$notes))
+        }
+      })
+    })
+
+
+    # definitions
+    observeEvent(input$definitions, {
+
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::show("toggle_definitions")
+
+      # output$show_definitions <- renderUI({
+      #
+      #   definitions <- definitions %>%
+      #     dplyr::filter(field %in% c(input$topic, input$filter))
+      #
+      #   links <- lapply(seq_along(definitions$item), function(i) {
+      #     div(
+      #       tags$a(
+      #         class = "def-link",
+      #         `data-bs-toggle` = "collapse",
+      #         href = paste0("#collapseExample", i),
+      #         paste(definitions$item[[i]])
+      #       ),
+      #       div(
+      #         class= "collapse",
+      #         id= paste0("collapseExample", i),
+      #         HTML(definitions$definition[[i]], "<br> <br>")
+      #       )
+      #     )
+      #   })
+      #   div(
+      #     p(htmltools::HTML("<b>Definitions</b>: <br>")),
+      #     links
+      #   )
+      # })
+    })
 
 
     # filter meta data --------------------------------------------------------
@@ -196,42 +334,99 @@ mod_workforce_server <- function(id){
           theme = naccho.viz::hist_theme
         ) %>%
         viz_export()
-
     })
 
 
+
+    # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
     proxy <- highcharter::highchartProxy(ns("figure"))
 
 
+    # update proxy ------------------------------------------------------------
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
     # combinations selected by the user.
     observe ({
 
-      if (input$type == "FTE_numcat") {
+      req(
+        isTruthy(input$type) || isTruthy(input$classifications)
+      ) # prevent error
+
+
+      if (input$type == "FTE_numcat" & input$topic == "c5q37") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
-
         proxy %>%
           proxy_hist_to_single(data,
                                filter_meta(),
                                theme = naccho.viz::basic_theme)
 
-      } else if (input$type == "fte_bypop") {
+
+
+      } else if (input$type == "fte_bypop" & input$topic == "c5q37") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
-
         proxy %>%
           proxy_to_hist_pc(data, filter_meta())
 
 
-      } else if (input$type == "c5q37") {
+
+      } else if (input$type == "c5q37" & input$topic == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
-
         proxy %>%
           proxy_to_hist_total(data, filter_meta())
+
+
+
+      } else {
+
+        req(length(input$classifications) >= 1) # prevents error
+
+        if (length(input$classifications) == 1) {
+          selected_vars <- paste0(input$classifications, "a")
+          data <- return_survey_weighted_counts(selected_vars)
+
+        } else {
+          selected_vars <- c(paste0(input$classifications, "a"))
+          data <- classification_data %>%
+            dplyr::filter(Question %in% selected_vars)
+
+        }
+
+        data <- data %>%
+          dplyr::filter(category == "Yes") %>%
+          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                        x = as.numeric(as.factor(category)) -1,
+                        x_label = NA)
+
+
+        if (length(data$x) >= 8) {
+          rotate = -45
+          size = "13px"
+          overflow = "ellipsis"
+        } else {
+          rotate = 0
+          size = "17px"
+          overflow = "none"
+        }
+
+        proxy %>%
+          proxy_hist_to_single(data,
+                               filter_meta(),
+                               theme = naccho.viz::basic_theme) %>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+              labels = list(
+                rotate = rotate,
+                style = list(
+                  fontSize = size,
+                  textOverflow = overflow
+                )
+              )
+            )
+          )
       }
     })
 
