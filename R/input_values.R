@@ -39,6 +39,7 @@
 "workforce_classifications"
 
 
+
 #' Workforce Types
 #'
 #' @format list
@@ -48,3 +49,26 @@
 #' @source columns from master_data
 "workforce_fte_types"
 
+
+
+#' Workforce Classifications Measure
+#'
+#' @format list
+#'
+#' A list of 2
+#'
+#' @source columns from master_data
+"workforce_classifications_measure"
+
+
+
+
+
+#' Workforce Employee Types
+#'
+#' @format list
+#'
+#' A list of 0
+#'
+#' @source columns from master_data
+"workforce_employee_types"
