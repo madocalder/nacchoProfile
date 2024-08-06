@@ -357,6 +357,17 @@ mod_workforce_server <- function(id){
     # combinations selected by the user.
     observe ({
 
+      # update the yAxis title while maintaining the line animation
+      shinyjs::runjs(paste0("
+        var chart = $('#workforce_1-figure').highcharts();
+        chart.yAxis[0].update({
+          title: {
+            text: '", filter_meta()$y_label, "',
+            style: { color: '#333333' }
+          }
+        }, true, { duration: 1000 });
+    "))
+
       req(
         isTruthy(input$type_fte) || isTruthy(input$classifications)
       ) # prevent error
@@ -441,18 +452,6 @@ mod_workforce_server <- function(id){
             )
           )
       }
-
-      # update the yAxis title while maintaining the line animation
-      shinyjs::runjs(paste0("
-        var chart = $('#workforce_1-figure').highcharts();
-        chart.yAxis[0].update({
-          title: {
-            text: '", filter_meta()$y_label, "',
-            style: { color: '#333333' }
-          }
-        }, true, { duration: 1000 });
-    "))
-
     })
 
   })
