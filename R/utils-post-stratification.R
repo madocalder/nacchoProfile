@@ -286,3 +286,18 @@ create_hist <- function(input, x_label) {
 class_data <- function(args) {
   map_dfr(args, return_survey_weighted_counts)
 }
+
+
+
+
+#' Dynamic Classification Dataframe
+#'
+#' @description Dynamically create a dataframe to use with a shiny widget..
+#'
+#' @param args A variable from master_data.
+#'
+#' @export
+#' @return dataframe
+class_data_b <- function(args) {
+  pmap_dfr(args, return_survey_weighted_statistics)
+}
