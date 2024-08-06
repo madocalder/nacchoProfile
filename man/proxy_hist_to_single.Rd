@@ -4,7 +4,14 @@
 \alias{proxy_hist_to_single}
 \title{From Histogram to Single Column Graph}
 \usage{
-proxy_hist_to_single(hc, data, meta, theme = naccho.viz::hist_theme, ...)
+proxy_hist_to_single(
+  hc,
+  data,
+  meta,
+  responses = sum(data$Responses),
+  theme = naccho.viz::hist_theme,
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}
