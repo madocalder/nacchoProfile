@@ -95,6 +95,16 @@ label:not(.material-switch label) {
   margin-right: 10px;
 }
 
+.radio {
+  text-indent: -31px;
+  margin-left: 60px;
+}
+
+
+.shiny-input-container .radio input {
+  margin-right: 10px;
+}
+
 /* ---------------------------------------------- Radio Buttons for Workfroce */
 .shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group, .shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
     margin-top: -1px;

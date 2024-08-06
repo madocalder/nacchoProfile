@@ -403,7 +403,6 @@ set_column <- function(data,
 #'
 #' @return histogram (column graph)
 set_hist <- function(data,
-                     y_label = "LHDs",
                      x_label = "Total FTEs") {
 
 
@@ -476,11 +475,11 @@ set_hist <- function(data,
     ) %>%
     highcharter::hc_yAxis(
       title = list(
-        text = y_label
+        text =  "# of LHDs"
       ), # y-axis label
       min = 0,
       labels = list(
-        format = "{value}"
+        format = "{value:,.0f}"
       )
     )
 }

@@ -193,12 +193,17 @@ mod_workforce_server <- function(id){
         # display if occupational classifications is selected
         if (input$topic == "occupation_class") {
           div(
-            strong("Select Classification"),
+            radioButtons(
+              ns("type_class"),
+              strong("Select a Measure"),
+              choices = workforce_classifications_measure
+            ),
+            br(),
             div(
               class = "checkboxes",
               checkboxGroupInput(
                 ns("classifications"),
-                "",
+                strong("Select Classification(s)"),
                 workforce_classifications,
                 selected = c("c5q63", "c5q52")
               )
@@ -208,7 +213,7 @@ mod_workforce_server <- function(id){
           # display occupational ftes is selected
         } else if (input$topic == "c5q37") {
           radioButtons(
-            ns("type"),
+            ns("type_fte"),
             p(strong(HTML("Select a Measure <br>")),
               HTML("Use the selections below to toggle the
                  figure between various FTE measurements or
@@ -314,12 +319,13 @@ mod_workforce_server <- function(id){
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
       if (input$topic == "c5q37") {
-        req(input$type)
-        dplyr::filter(meta, grepl(input$type[[1]], field))
+        req(input$type_fte)
+        meta %>% dplyr::filter(field == input$type_fte)
       } else if (input$topic == "occupation_class") {
-        dplyr::filter(meta, grepl(input$classifications[[1]], field))
+        meta %>% dplyr::filter(field %in% input$type_class)
       }
     })
+
 
     # figure output -----------------------------------------------------------
     # used for first histogram
@@ -330,7 +336,7 @@ mod_workforce_server <- function(id){
       set_hist(data) %>%
         viz_options(
           viz_title = "The Distribution of Total FTEs Across LHDs",
-          viz_caption = source_line,
+          viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
           viz_subtitle = unique(data$subtitle),
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs",
           theme = naccho.viz::hist_theme
@@ -352,13 +358,15 @@ mod_workforce_server <- function(id){
     observe ({
 
       req(
-        isTruthy(input$type) || isTruthy(input$classifications)
+        isTruthy(input$type_fte) || isTruthy(input$classifications)
       ) # prevent error
 
 
-      if (input$type == "FTE_numcat" & input$topic == "c5q37") {
+      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
+
+
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
@@ -366,7 +374,7 @@ mod_workforce_server <- function(id){
 
 
 
-      } else if (input$type == "fte_bypop" & input$topic == "c5q37") {
+      } else if (input$topic == "c5q37" & input$type_fte == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
         proxy %>%
@@ -376,7 +384,7 @@ mod_workforce_server <- function(id){
 
 
 
-      } else if (input$type == "c5q37" & input$topic == "c5q37") {
+      } else if (input$topic == "c5q37" & input$type_fte == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
         proxy %>%
@@ -386,27 +394,25 @@ mod_workforce_server <- function(id){
 
 
 
-      } else {
-
+      } else if (input$topic == "occupation_class") {
         req(length(input$classifications) >= 1) # prevents error
 
         if (length(input$classifications) == 1) {
-          selected_vars <- paste0(input$classifications, "a")
+          selected_vars <- paste0(input$classifications, input$type_class)
           data <- return_survey_weighted_counts(selected_vars)
 
         } else {
-          selected_vars <- c(paste0(input$classifications, "a"))
-          data <- classification_data %>%
+          selected_vars <- c(paste0(input$classifications, input$type_class))
+          data <- get(paste0("classification_data_", input$type_class))
+          data <- data %>%
             dplyr::filter(Question %in% selected_vars)
-
         }
 
         data <- data %>%
           dplyr::filter(category == "Yes") %>%
           dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
-                        x = as.numeric(as.factor(category)) -1,
+                        x = 1:length(category) -1,
                         x_label = NA)
-
 
         if (length(data$x) >= 8) {
           rotate = -45
@@ -435,6 +441,18 @@ mod_workforce_server <- function(id){
             )
           )
       }
+
+      # update the yAxis title while maintaining the line animation
+      shinyjs::runjs(paste0("
+        var chart = $('#workforce_1-figure').highcharts();
+        chart.yAxis[0].update({
+          title: {
+            text: '", filter_meta()$y_label, "',
+            style: { color: '#333333' }
+          }
+        }, true, { duration: 1000 });
+    "))
+
     })
 
   })

@@ -42,4 +42,3 @@ $(() => {
         $(e.currentTarget).find("i").removeClass("fa-minus");
     });
 })
-

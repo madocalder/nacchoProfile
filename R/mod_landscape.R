@@ -296,6 +296,22 @@ mod_landscape_server <- function(id){
     # combinations selected by the user.
     observeEvent(updatedInputs(), {
 
+    #   shinyjs::runjs(paste0("
+    #   setTimeout(function() {
+    #     var chart = $('#landscape_1-figure').highcharts();
+    #     chart.yAxis[0].update({
+    #       title: {
+    #         text: '", filter_meta()$y_label, "',
+    #         style: { color: '#333333' }
+    #       },
+    #       labels: {
+    #       format: '", filter_meta()$y_format, "',
+    #       }
+    #     }, true, { duration: 1000 });
+    #   }, 500); // 500ms delay
+    # "))
+
+
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
       # Weighting Performed:
