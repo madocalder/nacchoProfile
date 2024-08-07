@@ -25,13 +25,9 @@ Imports:
     stringr,
     haven,
     tibble,
-    survey,
     srvyr,
-    tidyr,
     purrr,
-    tidyr,
-    tidyselect,
-    reshape2
+    tidyr
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
