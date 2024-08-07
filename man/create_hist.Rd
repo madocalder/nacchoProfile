@@ -17,7 +17,3 @@ dataframe
 \description{
 Calculate weighted statistics results: total, mean, and quantiles.
 }
-\examples{
-create_hist("c5q37")
-
-}

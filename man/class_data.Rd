@@ -17,6 +17,5 @@ Dynamically create a dataframe to use with a shiny widget..
 }
 \examples{
 class_data("c5q63a")
-data <- class_data(c(paste0(input$classifications, "a"))) # use with input
 
 }

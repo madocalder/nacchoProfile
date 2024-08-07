@@ -4,24 +4,16 @@
 \alias{set_hist}
 \title{Set First Highcharter Histogram}
 \usage{
-set_hist(data, y_label, x_label = "Total FTEs")
+set_hist(data, x_label = "Total FTEs")
 }
 \arguments{
 \item{data}{dataframe; A dataframe with x, y, group, and category columns.}
 
-\item{y_label}{character string; Label for the Y Axis.}
-
 \item{x_label}{character string; Label for the X Axis.}
 }
 \value{
-histogram (column graph)
+histogram
 }
 \description{
 Create the first highcharter visualizations from which proxies will redraw.
-}
-\examples{
-data <- data.frame(x = runif(100, min = 1, max = 100))
-data <- hist(data$x, plot = FALSE, breaks = 200)
-set_hist(data = data)
-
 }
