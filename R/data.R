@@ -98,6 +98,7 @@
 "notes"
 
 
+
 #' Source Line for NACCHO's 2022 National Profile
 #'
 #' @author Lindsay Jorgenson
@@ -111,3 +112,39 @@
 #'
 #' @source National Association of City and County Health Officials (NACCHO)
 "source_line"
+
+
+
+
+#' Occupational Classifications Data "A" for NACCHO's 2022 National Profile
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format data.frame
+#'
+#' A dataframe with 38 observations and 32 variables. Created so dynamic
+#' rendering is more smooth and quick. Data "A" is associated with the
+#' percent of agencies with the classification.
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"classification_data_a"
+
+
+
+
+#' Occupational Classifications Data "B" for NACCHO's 2022 National Profile
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format data.frame
+#'
+#' A dataframe with 19 observations and 18 variables. Created so dynamic
+#' rendering is more smooth and quick. Data "B" is associated with the
+#' total FTEs in the classification.
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"classification_data_b"
