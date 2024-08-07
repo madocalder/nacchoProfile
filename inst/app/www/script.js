@@ -20,6 +20,7 @@ $(document).on('click', '.action-link-2', function() {
 });
 
 
+
 $(document).on("shiny:value", (e) => {
     if(!e.name.match("show_definitions$")){
         return;

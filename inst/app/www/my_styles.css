@@ -37,23 +37,6 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
 
 
 /* -------------------------------------------------------------- Definitions */
-.def-link::before {
-  content: "\2b";
-  font-family: "FontAwesome";
-  display: inline-block;
-  margin-right: 5px;
-  transition: content 0.2s;
-}
-
-.def-link:active::before {
-  content: "\f068";
-  font-family: "FontAwesome";
-}
-
-.def-link:active::before {
-  content: "\f068";
-  font-family: "FontAwesome";
-}
 
 .collapse {
   color: #212F5B;
@@ -743,9 +726,9 @@ label:not(.material-switch label) {
   width: 100%;
 }
 
-.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
+/*.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
   display: block !important;
-}
+}*/
 
 .fas {
   color: #008A96;
