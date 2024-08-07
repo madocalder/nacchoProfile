@@ -52,9 +52,9 @@ viz_export <- function(hc, enabled = TRUE) {
 #' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::naccho_colors.
 #' @param theme hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.
 #' @param tooltip character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.
-#' @param tooltip_header character string; text and values to appear in the tooltip header, use {point.xx} to call a value from the data frame, where xx is a specific column.
 #' @param legend_enable boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.
 #' @param legend_title character string; title of the legend, defaults to nothing unless defined.
+#' @param legend_title character string; options include "left", "center" or "right". Defaults to "right".
 
 #'
 #' @return Options for rendering a highcharter figure.
@@ -391,30 +391,21 @@ set_column <- function(data,
 #' @description Create the first highcharter visualizations from which proxies will redraw.
 #'
 #' @param data dataframe; A dataframe with x, y, group, and category columns.
-#' @param y_label character string; Label for the Y Axis.
 #' @param x_label character string; Label for the X Axis.
 #'
 #' @export
 #'
-#' @examples
-#' data <- data.frame(x = runif(100, min = 1, max = 100))
-#' data <- hist(data$x, plot = FALSE, breaks = 200)
-#' set_hist(data = data)
-#'
-#' @return histogram (column graph)
+#' @return histogram
 set_hist <- function(data,
                      x_label = "Total FTEs") {
 
 
     highcharter::hchart(
       data,
-      "column",
+      type = "column",
       id = "All",
       name = "Across All LHDs",
-      highcharter::hcaes(
-        x = x,
-        y = y
-      )
+      highcharter::hcaes(x = x, y = y)
     ) %>%
     highcharter::hc_chart(
       zoomType = "x",
