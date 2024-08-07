@@ -216,9 +216,29 @@ mod_workforce_server <- function(id){
             ns("type_fte"),
             p(strong(HTML("Select a Measure <br>")),
               HTML("Use the selections below to toggle the
-                 figure between various FTE measurements or
+                 figure between various measurements or
                  groupings. <br> <br>")),
             choices = workforce_fte_types
+          )
+        } else if (input$topic == "c5q36") {
+          radioButtons(
+            ns("type_fte"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between various measurements or
+                 groupings. <br> <br>")),
+            choices = c("Total Employees", "Per Capita Employees")
+          )
+
+        } else if (input$topic == "jobs") {
+          radioButtons(
+            ns("type_fte"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between measurements or
+                 groupings. <br> <br>")),
+            choices = c("Positions Lost and Gained",
+                        "Change in Losses and Gains")
           )
         }
       })
@@ -408,22 +428,22 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "occupation_class") {
         req(length(input$classifications) >= 1) # prevents error
 
-        if (length(input$classifications) == 1) {
-          selected_vars <- paste0(input$classifications, input$type_class)
-          data <- return_survey_weighted_counts(selected_vars)
-
-        } else {
-          selected_vars <- c(paste0(input$classifications, input$type_class))
-          data <- get(paste0("classification_data_", input$type_class))
-          data <- data %>%
-            dplyr::filter(Question %in% selected_vars)
-        }
+        selected_vars <- c(paste0(input$classifications, input$type_class))
+        get_data <- get(paste0("classification_data_", input$type_class))
+        data <- get_data %>%
+          dplyr::filter(Question %in% selected_vars)
 
         data <- data %>%
           dplyr::filter(category == "Yes") %>%
           dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
                         x = 1:length(category) -1,
                         x_label = NA)
+
+        # for responses
+        Responses <- get_data %>%
+          group_by(Question) %>%
+          summarise(Responses = sum(Responses))
+
 
         if (length(data$x) >= 8) {
           rotate = -45
@@ -438,7 +458,7 @@ mod_workforce_server <- function(id){
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
-                               responses = "Refer to tooltip.",
+                               responses = show_n(Responses$Responses),
                                theme = naccho.viz::basic_theme) %>%
           highcharter::hcpxy_update(
             xAxis = list(
