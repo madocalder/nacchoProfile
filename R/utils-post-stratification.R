@@ -48,6 +48,7 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
 #' @param q_label The question label in the data set
 #' @param popcat Based on which categories to calculate the weights (popcat3 or popcat7)
 #' @param wtype The type of weights to use: "weights" or "weights_static"
+#' @param grps A value from the master_data file to use for grouping statistics.
 #'
 #' @export
 #' @importFrom haven as_factor
@@ -155,6 +156,8 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 #'
 #' @param q_label The question label in the data set
 #' @param wtype The type of weights to use: "weights" or "weights_static"
+#' @param grps A value from the master_data file to use for grouping statistics.
+#' @param popcat The stata by which to weight, either c0popcat3 or c0popcat7.
 #'
 #' @export
 #' @importFrom haven as_factor
@@ -233,9 +236,6 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 #'
 #' @export
 #'
-#' @examples
-#' create_hist("c5q37")
-#'
 #' @return dataframe
 create_hist <- function(input, x_label) {
   data <- master_data %>%
@@ -280,7 +280,6 @@ create_hist <- function(input, x_label) {
 #'
 #' @examples
 #' class_data("c5q63a")
-#' data <- class_data(c(paste0(input$classifications, "a"))) # use with input
 #'
 #' @return dataframe
 class_data <- function(args) {
