@@ -51,7 +51,7 @@ mod_workforce_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = "No Filter"
               )
             )
           ),
@@ -177,6 +177,41 @@ mod_workforce_ui <- function(id){
 mod_workforce_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+
+    # update inputs based on selections ---------------------------------------
+
+    observe({
+      if (input$topic == "occupation_class") {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+      } else if (input$topic == "c5q37") {
+        updateSelectInput(session, "filter",
+                          choices = "No Filter")
+      }
+    })
+
+    observeEvent(input$type_fte, {
+      if (input$type_fte %in% c("c5q37", "fte_bypop")) {
+        updateSelectInput(session, "filter",
+                          choices = "No Filter"
+        )
+      } else {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+      }
+    })
+
+
+    # observeEvent(input$topic == "occupation_class", {
+    #     updateSelectInput(session, "filter",
+    #                       choices = landscape_filters)
+    # })
+    #
+    # observeEvent(input$topic == "c5q37", {
+    #   updateSelectInput(session, "filter",
+    #                     choices = "No Filter")
+    # })
 
 
     # right sidebar -----------------------------------------------------------
@@ -407,9 +442,7 @@ mod_workforce_server <- function(id){
         }, true, { duration: 1000 });
     "))
 
-      req(
-        isTruthy(input$type_fte) || isTruthy(input$classifications)
-      ) # prevent error
+      req(isTruthy(input$type_fte) || isTruthy(input$classifications)) # prevent error
 
 
       if (input$topic == "c5q37" & input$type_fte == "FTE_numcat") {
@@ -485,6 +518,8 @@ mod_workforce_server <- function(id){
 
           series_id <- unique(data[[input$filter]]$group)
 
+          print(data)
+          print(series_id)
           proxy %>%
             proxy_hist_to_group(data = data[[input$filter]],
                                 data_all = data[['No Filter']],
