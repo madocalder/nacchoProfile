@@ -370,6 +370,7 @@ mod_workforce_server <- function(id){
     })
 
 
+
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
@@ -380,6 +381,27 @@ mod_workforce_server <- function(id){
         meta %>% dplyr::filter(field %in% input$type_class)
       }
     })
+
+
+
+    # colors ------------------------------------------------------------------
+    # reactively define the colors based on the filter
+    colors <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange,
+          naccho.viz::naccho_pink)
+      }
+    })
+
 
 
     # figure output -----------------------------------------------------------
@@ -407,22 +429,6 @@ mod_workforce_server <- function(id){
     proxy <- highcharter::highchartProxy(ns("figure"))
 
 
-    # reactively define the colors based on the filter
-    colors <- reactive ({
-      if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
-      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
-      } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
-      }
-    })
 
 
     # update proxy ------------------------------------------------------------
@@ -445,15 +451,30 @@ mod_workforce_server <- function(id){
       req(isTruthy(input$type_fte) || isTruthy(input$classifications)) # prevent error
 
 
-      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat") {
+      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "No Filter") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
-
 
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
                                theme = naccho.viz::basic_theme)
+
+
+      } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "No Filter") {
+        data <- return_survey_weighted_counts("FTE_numcat", input$filter) %>%
+          dplyr::mutate(x_label = NA)
+
+        series_id <- unique(data$group)
+
+        proxy %>%
+          proxy_hist_to_group(data = data,
+                              data_all = NULL,
+                              meta = filter_meta(),
+                              colors = colors(),
+                              id = series_id,
+                              responses = sum(data$Responses),
+                              theme = naccho.viz::basic_theme)
 
 
 
