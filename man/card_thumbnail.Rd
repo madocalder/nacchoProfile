@@ -7,10 +7,10 @@
 card_thumbnail(image, date)
 }
 \arguments{
-\item{date}{Date class, for example, as.Date("2024/01/01")}
-
-\item{image_file}{String character representing the file name of the
+\item{image}{String character representing the file name of the
 image to display in the card. The file should be located here: /nacchoProfile/inst/app/www}
+
+\item{date}{Date class, for example, as.Date("2024/01/01")}
 }
 \value{
 returns an image and date

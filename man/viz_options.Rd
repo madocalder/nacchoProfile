@@ -37,9 +37,7 @@ viz_options(
 
 \item{legend_enable}{boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.}
 
-\item{legend_title}{character string; title of the legend, defaults to nothing unless defined.}
-
-\item{tooltip_header}{character string; text and values to appear in the tooltip header, use {point.xx} to call a value from the data frame, where xx is a specific column.}
+\item{legend_title}{character string; options include "left", "center" or "right". Defaults to "right".}
 }
 \value{
 Options for rendering a highcharter figure.

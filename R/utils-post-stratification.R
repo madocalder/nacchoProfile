@@ -260,7 +260,8 @@ create_hist <- function(input, x_label) {
     # category = paste(head(bins, -1), " - ", tail(bins, -1)),
     x = 1:length(midpoints) -1,
     subtitle = "Click and span a range on the figure to zoom.",
-    x_label = x_label
+    x_label = x_label,
+    group = "All LHDs"
   )
   # %>%
   #   dplyr::mutate(y = (y/sum(y))*100,

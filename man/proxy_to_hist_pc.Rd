@@ -4,14 +4,7 @@
 \alias{proxy_to_hist_pc}
 \title{Histogram Bar Proxy Redraw for Per Capita FTEs}
 \usage{
-proxy_to_hist_pc(
-  hc,
-  data,
-  meta,
-  responses = sum(data$Responses),
-  theme = naccho.viz::hist_theme,
-  ...
-)
+proxy_to_hist_pc(hc, data, meta, responses = sum(data$Responses), ...)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}

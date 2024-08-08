@@ -492,12 +492,24 @@ proxy_to_hist_total <- function(hc,
                                 data,
                                 meta,
                                 responses = sum(data$Responses),
-                                theme = naccho.viz::hist_theme, ...) {
+                                ...) {
 
   hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
     highcharter::hcpxy_set_data(
       "column",
-      data = data
+      data = data,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
@@ -528,6 +540,9 @@ proxy_to_hist_total <- function(hc,
       ),
       tooltip = list(
         pointFormat = meta$tooltip
+      ),
+      legend = list(
+        enabled = FALSE
       )
     )
 }
@@ -549,9 +564,21 @@ proxy_to_hist_pc <- function(hc,
                              data,
                              meta,
                              responses = sum(data$Responses),
-                             theme = naccho.viz::hist_theme, ...) {
+                             ...) {
 
   hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
     highcharter::hcpxy_set_data(
       "column",
       data = data
@@ -585,6 +612,9 @@ proxy_to_hist_pc <- function(hc,
       ),
       tooltip = list(
         pointFormat = meta$tooltip
+      ),
+      legend = list(
+        enabled = FALSE
       )
     )
 }
@@ -604,13 +634,29 @@ proxy_to_hist_pc <- function(hc,
 proxy_hist_to_single <- function(hc,
                                  data,
                                  meta,
+                                 rotate = 0,
+                                 size = "17px",
+                                 overflow = "none",
                                  responses = sum(data$Responses),
-                                 theme = naccho.viz::hist_theme, ...) {
+                                 ...) {
 
   hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
     highcharter::hcpxy_set_data(
       "column",
-      data = data
+      data = data,
+      highcharter::hcaes(x, y)
     ) %>%
     highcharter::hcpxy_update(
       series = list(
@@ -645,11 +691,128 @@ proxy_hist_to_single <- function(hc,
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 1)
+          step = 1,
+          rotate = rotate,
+          style = list(
+            fontSize = size,
+            textOverflow = overflow
+          )
+        )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
+      ),
+      legend = list(
+        enabled = FALSE
       )
     )
 
 }
+
+
+
+
+#' From Histogram to Grouped Column Graph
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#'
+#'
+#' @export
+proxy_hist_to_group <- function(hc,
+                                data,
+                                data_all,
+                                meta,
+                                id,
+                                colors,
+                                rotate = 0,
+                                size = "17px",
+                                overflow = "none",
+                                responses = sum(data$Responses),
+                                theme = naccho.viz::hist_theme, ...) {
+
+  hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = "All LHDs"
+    ) %>%
+    highcharter::hcpxy_add_series(
+      data = data,
+      "column",
+      highcharter::hcaes(x, y, group = group),
+      id = id,
+      color = colors
+    ) %>%
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data_all,
+      highcharter::hcaes(x, y, group = group)
+    ) %>%
+    highcharter::hcpxy_update(
+      series = list(
+        # pointPadding = 0,
+        # groupPadding = 0,
+        type = "column",
+        dataLabels = list(
+          enabled = TRUE,
+          format = meta$data_label,
+          overflow = TRUE,
+          distance = 5,
+          padding = 2,
+          style = list(
+            color = naccho.viz::naccho_grey,
+            fontFamily = "Jost",
+            fontWeight = "500",
+            fontSize = "14px"
+          )
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
+      ),
+      xAxis = list(
+        categories = unique(data$category),
+        title = list(
+          text = unique(data$x_label)
+        ),
+        labels = list(
+          step = 1,
+          rotate = rotate,
+          style = list(
+            fontSize = size,
+            textOverflow = overflow
+          )
+        )
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      ),
+      legend = list(
+        enabled = TRUE
+      )
+    )
+
+
+}
+

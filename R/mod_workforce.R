@@ -355,11 +355,12 @@ mod_workforce_server <- function(id){
 
       set_hist(data) %>%
         viz_options(
+          legend_enable = FALSE,
           viz_title = "The Distribution of Total FTEs Across LHDs",
           viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
           viz_subtitle = unique(data$subtitle),
-          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs",
-          theme = naccho.viz::hist_theme
+          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
+          # theme = naccho.viz::hist_theme
         ) %>%
         viz_export()
     })
@@ -369,6 +370,24 @@ mod_workforce_server <- function(id){
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
     proxy <- highcharter::highchartProxy(ns("figure"))
+
+
+    # reactively define the colors based on the filter
+    colors <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange,
+          naccho.viz::naccho_pink)
+      }
+    })
 
 
     # update proxy ------------------------------------------------------------
@@ -429,9 +448,10 @@ mod_workforce_server <- function(id){
         req(length(input$classifications) >= 1) # prevents error
 
         selected_vars <- c(paste0(input$classifications, input$type_class))
-        get_data <- get(paste0("classification_data_", input$type_class))
-        data <- get_data %>%
-          dplyr::filter(Question %in% selected_vars)
+        selected_data <- get(paste0("classification_data_", input$type_class))
+        data <- selected_data %>%
+          dplyr::filter(Question %in% selected_vars) %>%
+          dplyr::filter(filter %in% c(input$filter, "No Filter"))
 
         data <- data %>%
           dplyr::filter(category == "Yes") %>%
@@ -440,8 +460,8 @@ mod_workforce_server <- function(id){
                         x_label = NA)
 
         # for responses
-        Responses <- get_data %>%
-          group_by(Question) %>%
+        Responses <- selected_data %>%
+          group_by(Question, filter) %>%
           summarise(Responses = sum(Responses))
 
 
@@ -455,25 +475,40 @@ mod_workforce_server <- function(id){
           overflow = "none"
         }
 
+        if (input$filter != "No Filter") {
+          data <- data %>%
+            group_by(group) %>%
+            mutate(x = 1:length(x)-1)
+
+          splitter <- data$filter
+          data <- split(data, splitter)
+
+          series_id <- unique(data[[input$filter]]$group)
+
+          proxy %>%
+            proxy_hist_to_group(data = data[[input$filter]],
+                                data_all = data[['No Filter']],
+                                meta = filter_meta(),
+                                colors = colors(),
+                                id = series_id,
+                                rotate = rotate,
+                                size = size,
+                                overflow = overflow,
+                                responses = show_n(Responses$Responses),
+                                theme = naccho.viz::basic_theme)
+        } else {
+
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
                                responses = show_n(Responses$Responses),
-                               theme = naccho.viz::basic_theme) %>%
-          highcharter::hcpxy_update(
-            xAxis = list(
-              labels = list(
-                rotate = rotate,
-                style = list(
-                  fontSize = size,
-                  textOverflow = overflow
-                )
-              )
-            )
-          )
+                               theme = naccho.viz::basic_theme,
+                               rotate = rotate,
+                               size = size,
+                               overflow = overflow)
+        }
       }
     })
-
   })
 }
 

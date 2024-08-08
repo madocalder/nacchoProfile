@@ -14,6 +14,8 @@ return_survey_weighted_counts(
 \arguments{
 \item{q_label}{The question label in the data set}
 
+\item{grps}{A value from the master_data file to use for grouping statistics.}
+
 \item{popcat}{Based on which categories to calculate the weights (popcat3 or popcat7)}
 
 \item{wtype}{The type of weights to use: "weights" or "weights_static"}

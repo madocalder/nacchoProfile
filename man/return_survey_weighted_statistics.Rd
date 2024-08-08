@@ -14,6 +14,10 @@ return_survey_weighted_statistics(
 \arguments{
 \item{q_label}{The question label in the data set}
 
+\item{grps}{A value from the master_data file to use for grouping statistics.}
+
+\item{popcat}{The stata by which to weight, either c0popcat3 or c0popcat7.}
+
 \item{wtype}{The type of weights to use: "weights" or "weights_static"}
 }
 \value{

@@ -167,12 +167,15 @@ mod_landscape_server <- function(id){
     # update inputs based on selections ---------------------------------------
     # for example, if someone selects "geography," then the view will update to
     # include a map options.
-    # this can create delays and glitches that I need to DEAL WITH // COME BACK
     observe({
-      if (input$topic %in% c("totpop", "tenure")) {
+      if (input$topic =="tenure") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[-1]
         )
+      } else if (input$topic == "totpop") {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[4])
+
       } else {
         updateSelectInput(session, "filter",
                           choices = landscape_filters
@@ -187,8 +190,6 @@ mod_landscape_server <- function(id){
       } else if (input$topic == "totpop") {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Pie Chart", "Table"))
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[4])
       } else {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Table"))
@@ -370,6 +371,7 @@ mod_landscape_server <- function(id){
       } else if (input$topic == "field" & input$filter != "No Filter") {
         data <- spec_data %>% dplyr::filter(filter == input$filter)
         series_id <- unique(data$group)
+        print(data)
 
         proxy %>%
           proxy_to_group(
