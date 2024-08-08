@@ -289,7 +289,7 @@ mod_landscape_server <- function(id){
     updatedInputs <- reactive({
       input$topic
       input$filter
-    }) |> debounce(250)
+    }) %>% debounce(250)
 
 
     # this observe is needed to redraw the figure based on the input selected
