@@ -765,8 +765,6 @@ proxy_hist_to_group <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
-        # pointPadding = 0,
-        # groupPadding = 0,
         type = "column",
         dataLabels = list(
           enabled = TRUE,
