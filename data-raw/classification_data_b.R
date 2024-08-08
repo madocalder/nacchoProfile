@@ -67,7 +67,8 @@
 # classification_data_b <- classification_data_b %>%
 #   dplyr::mutate(Question = gsub("new", "", Question),
 #                 category = "Yes",
-#                 y = Total)
+#                 y = Total,
+#                 group = stringr::str_to_title(Group))
 #
 #
 # # print elapsed time
