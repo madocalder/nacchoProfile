@@ -72,14 +72,14 @@ app_ui <- function(request) {
           ),
 
           tabPanel(
-            "Topics",
+            "Other Topics",
             value = "topics_tab"
           ),
 
-          tabPanel(
-            "Key Findings",
-            value = "key_findings_tab"
-          ),
+          # tabPanel(
+          #   "Key Findings",
+          #   value = "key_findings_tab"
+          # ),
 
           tabPanel(
             "Data Stories",
@@ -88,8 +88,8 @@ app_ui <- function(request) {
 
 
           tabPanel(
-            actionButton("playground_button", "Data Playground", class = "pill-button"),
-            value = "playground_tab"
+            actionButton("playground_button", "Key Findings", class = "pill-button"),
+            value = "key_findings_tab"
           )
         )
       ),

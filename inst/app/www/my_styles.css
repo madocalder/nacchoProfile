@@ -177,11 +177,11 @@ label:not(.material-switch label) {
   font-size: 1.0em !important;
 }
 
-.nav-item:nth-child(9) {
+.nav-item:nth-child(8) {
   padding-top: 60% !important;
 }
 
-.nav-item:nth-child(9) .nav-link {
+.nav-item:nth-child(8) .nav-link {
   padding-right: 0px !important;
 }
 
@@ -199,7 +199,7 @@ label:not(.material-switch label) {
     border-bottom: none !important;
   }
 
-.nav-item:nth-child(1) .nav-link.active, .nav-item:nth-child(9) .nav-link.active {
+.nav-item:nth-child(1) .nav-link.active, .nav-item:nth-child(8) .nav-link.active {
     border-bottom: none !important;
   }
 
@@ -215,6 +215,7 @@ label:not(.material-switch label) {
   box-shadow: none !important;
   font-size: .8em !important;
   font-weight: 700 !important;
+  letter-spacing: 1px;
 }
 
 /* this is for the data playground button */
