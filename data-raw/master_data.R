@@ -4,7 +4,7 @@ master_data <- haven::read_dta("data-raw/Profile2022_dashboarddataset.dta")
 
 
 # rename factor labels ----------------------------------------------------
-master_data$c0popcat3 <- haven::labelled(master_data$c0popcat3, labels = c("Small (<50,000)" = 1, "Medium (50,000-499,999)" = 2, "Large (500.000+)" = 3), label = "3 level population category, renamed by LJ")
+master_data$c0popcat3 <- haven::labelled(master_data$c0popcat3, labels = c("Small (<50,000)" = 1, "Medium (50,000-499,999)" = 2, "Large (500,000+)" = 3), label = "3 level population category, renamed by LJ")
 master_data$c2q501 <- haven::labelled(master_data$c2q501, labels = c("Combined" = 1, "Independent" = 0, "Don't Know" = 2), label = "Agency structure, renamed by LJ")
 master_data$lboh <- haven::labelled(master_data$lboh, labels = c("None" = 0, "Advising" = 1, "Governing" = 2), label = "Board of Health, renamed by LJ")
 
@@ -44,6 +44,29 @@ fips <- usmap::fips_info() %>%
 # join race and fips to master file ------------------------------------------------
 master_data <- dplyr::left_join(master_data, race, by = "nacchoid")
 master_data <- dplyr::left_join(master_data, fips, by = "c0state")
+
+
+
+# add employee by pop -----------------------------------------------------
+master_data <- master_data %>%
+  dplyr::mutate(employee_bypop = c5q36/(totpop/10000))
+
+
+
+# add employee categories -------------------------------------------------
+master_data <- master_data %>%
+  dplyr::mutate(employee_numcat = dplyr::case_when(c5q36 <= 4 ~ 1,
+                                                   c5q36 >= 5 & c5q36 < 10 ~ 2,
+                                                   c5q36 >= 10 & c5q36 < 25 ~ 3,
+                                                   c5q36 >= 25 & c5q36 < 50 ~ 4,
+                                                   c5q36 >= 50 & c5q36 < 100 ~ 5,
+                                                   c5q36 >= 100 & c5q36 < 200 ~ 6,
+                                                   c5q36 >= 200 & c5q36 ~ 7))
+
+
+master_data$employee_numcat <- haven::labelled(master_data$employee_numcat, labels = c("<5" = 1, "5-9.9" = 2, "10-24.9" = 3, "25-49.9" = 4, "50-99.9" = 5, "100-199.9" = 6, "200+" = 7), label = "Employee per 10,000 Population, created by LJ")
+
+
 
 
 # save data ---------------------------------------------------------------

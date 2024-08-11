@@ -180,7 +180,6 @@ mod_workforce_server <- function(id){
 
 
     # update inputs based on selections ---------------------------------------
-
     observe({
       if (input$topic == "occupation_class") {
         updateSelectInput(session, "filter",
@@ -202,27 +201,28 @@ mod_workforce_server <- function(id){
       }
     })
 
-
-    # observeEvent(input$topic == "occupation_class", {
-    #     updateSelectInput(session, "filter",
-    #                       choices = landscape_filters)
-    # })
-    #
-    # observeEvent(input$topic == "c5q37", {
-    #   updateSelectInput(session, "filter",
-    #                     choices = "No Filter")
-    # })
+    observeEvent(input$type_emp, {
+      if (input$type_fte %in% c("c5q36", "employee_bypop")) {
+        updateSelectInput(session, "filter",
+                          choices = "No Filter"
+        )
+      } else {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+      }
+    })
 
 
     # right sidebar -----------------------------------------------------------
-    # viz filters
     observeEvent(input$viz_filters, {
-
       shinyjs::show("toggle_viz_filters")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
 
+
+
+      # additional filters for right sidebar ------------------------------------
       output$show_viz_filters <- renderUI({
 
         # display if occupational classifications is selected
@@ -245,7 +245,7 @@ mod_workforce_server <- function(id){
             )
           )
 
-          # display occupational ftes is selected
+          # display fte is selected
         } else if (input$topic == "c5q37") {
           radioButtons(
             ns("type_fte"),
@@ -255,19 +255,22 @@ mod_workforce_server <- function(id){
                  groupings. <br> <br>")),
             choices = workforce_fte_types
           )
+
+          # display employees is selected
         } else if (input$topic == "c5q36") {
           radioButtons(
-            ns("type_fte"),
+            ns("type_emp"),
             p(strong(HTML("Select a Measure <br>")),
               HTML("Use the selections below to toggle the
                  figure between various measurements or
                  groupings. <br> <br>")),
-            choices = c("Total Employees", "Per Capita Employees")
+            choices = workforce_employee_types
           )
 
+          # display job gains and losses is selected
         } else if (input$topic == "jobs") {
           radioButtons(
-            ns("type_fte"),
+            ns("type_jobs"),
             p(strong(HTML("Select a Measure <br>")),
               HTML("Use the selections below to toggle the
                  figure between measurements or
@@ -279,9 +282,10 @@ mod_workforce_server <- function(id){
       })
     })
 
-    # takeaway
-    observeEvent(input$takeaway, {
 
+
+    # takeaway ----------------------------------------------------------------
+    observeEvent(input$takeaway, {
       shinyjs::hide("toggle_viz_filters")
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
@@ -300,9 +304,9 @@ mod_workforce_server <- function(id){
     }, ignoreNULL = FALSE)
 
 
-    # survey questions, responses, and notes
-    observeEvent(input$context, {
 
+    # survey questions, responses, and notes ----------------------------------
+    observeEvent(input$context, {
       shinyjs::hide("toggle_viz_filters")
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
@@ -334,9 +338,9 @@ mod_workforce_server <- function(id){
     })
 
 
-    # definitions
-    observeEvent(input$definitions, {
 
+    # definitions -------------------------------------------------------------
+    observeEvent(input$definitions, {
       shinyjs::hide("toggle_viz_filters")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
@@ -371,6 +375,8 @@ mod_workforce_server <- function(id){
 
 
 
+    # main content ------------------------------------------------------------
+
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
@@ -379,6 +385,9 @@ mod_workforce_server <- function(id){
         meta %>% dplyr::filter(field == input$type_fte)
       } else if (input$topic == "occupation_class") {
         meta %>% dplyr::filter(field %in% input$type_class)
+      } else if (input$topic == "c5q36") {
+        req(input$type_emp)
+        meta %>% dplyr::filter(field == input$type_emp)
       }
     })
 
@@ -430,7 +439,6 @@ mod_workforce_server <- function(id){
 
 
 
-
     # update proxy ------------------------------------------------------------
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
@@ -448,9 +456,19 @@ mod_workforce_server <- function(id){
         }, true, { duration: 1000 });
     "))
 
-      req(isTruthy(input$type_fte) || isTruthy(input$classifications)) # prevent error
+
+      # prevent error when observe is launched
+      req(
+        isTruthy(input$type_fte)
+        || isTruthy(input$classifications)
+        || isTruthy(input$type_emp)
+      )
 
 
+      # Topic: FTE
+      # Subtopic: FTEs by Category
+      # View: Bar Graph
+      # Filters: No Filter
       if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "No Filter") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
@@ -461,6 +479,11 @@ mod_workforce_server <- function(id){
                                theme = naccho.viz::basic_theme)
 
 
+
+        # Topic: FTE
+        # Subtopic: FTEs by Category
+        # View: Bar Graph
+        # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "No Filter") {
         data <- return_survey_weighted_counts("FTE_numcat", input$filter) %>%
           dplyr::mutate(x_label = NA)
@@ -478,6 +501,10 @@ mod_workforce_server <- function(id){
 
 
 
+        # Topic: FTE
+        # Subtopic: Per Capita FTE (Histogram)
+        # View: Bar Graph
+        # Filters: No Filter
       } else if (input$topic == "c5q37" & input$type_fte == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
@@ -488,6 +515,10 @@ mod_workforce_server <- function(id){
 
 
 
+        # Topic: FTE
+        # Subtopic: Total FTE (Histogram)
+        # View: Bar Graph
+        # Filters: No Filter
       } else if (input$topic == "c5q37" & input$type_fte == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
@@ -498,6 +529,79 @@ mod_workforce_server <- function(id){
 
 
 
+        # Topic: Employee
+        # Subtopic: Total Employee (Histogram)
+        # View: Bar Graph
+        # Filters: No Filter
+      } else if (input$topic == "c5q36" & input$type_emp == "c5q36") {
+        req(input$type_emp) # prevents error
+        data <- create_hist(input = "c5q36",
+                            x_label = "Total Employees")
+        proxy %>%
+          proxy_to_hist_total(data,
+                              meta = filter_meta(),
+                              responses = sum(data$y))
+
+
+
+        # Topic: Employee
+        # Subtopic: Per Capita Employee (Histogram)
+        # View: Bar Graph
+        # Filters: No Filter
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_bypop") {
+        req(input$type_emp) # prevents error
+        data <- create_hist(input = "employee_bypop",
+                            x_label = "Per Capita FTEs")
+        proxy %>%
+          proxy_to_hist_pc(data,
+                           meta = filter_meta(),
+                           responses = sum(data$y))
+
+
+
+
+        # Topic: Employee
+        # Subtopic: Employee by Category
+        # View: Bar Graph
+        # Filters: No Filter
+        } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "No Filter") {
+          req(input$type_emp) # prevents error
+          data <- return_survey_weighted_counts("employee_numcat") %>%
+            dplyr::mutate(x_label = NA)
+
+          proxy %>%
+            proxy_hist_to_single(data,
+                                 meta = filter_meta(),
+                                 theme = naccho.viz::basic_theme)
+
+
+
+        # Topic: Employee
+        # Subtopic: Employee by Category
+        # View: Bar Graph
+        # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "No Filter") {
+        req(input$type_emp) # prevents error
+        data <- return_survey_weighted_counts("employee_numcat", input$filter) %>%
+          dplyr::mutate(x_label = NA)
+
+        series_id <- unique(data$group)
+
+        proxy %>%
+          proxy_hist_to_group(data = data,
+                              data_all = NULL,
+                              meta = filter_meta(),
+                              colors = colors(),
+                              id = series_id,
+                              responses = sum(data$Responses),
+                              theme = naccho.viz::basic_theme)
+
+
+
+        # Topic: Occupational Classifications
+        # Subtopic: All Subtopics
+        # View: Bar Graph
+        # Filters: No Filter, Rurality, Governance, LHD Size, Region
       } else if (input$topic == "occupation_class") {
         req(length(input$classifications) >= 1) # prevents error
 
@@ -539,8 +643,6 @@ mod_workforce_server <- function(id){
 
           series_id <- unique(data[[input$filter]]$group)
 
-          print(data)
-          print(series_id)
           proxy %>%
             proxy_hist_to_group(data = data[[input$filter]],
                                 data_all = data[['No Filter']],

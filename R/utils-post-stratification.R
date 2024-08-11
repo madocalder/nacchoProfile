@@ -238,6 +238,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 #'
 #' @return dataframe
 create_hist <- function(input, x_label) {
+
   data <- master_data %>%
     haven::as_factor() %>%
     dplyr::left_join(add_weights(input, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%

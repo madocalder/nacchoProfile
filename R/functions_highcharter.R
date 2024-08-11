@@ -136,7 +136,7 @@ proxy_to_single <- function(hc, data, meta, ...) {
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -209,7 +209,7 @@ proxy_to_group <- function(
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -278,7 +278,7 @@ proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -499,7 +499,7 @@ proxy_to_hist_total <- function(hc,
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -535,7 +535,11 @@ proxy_to_hist_total <- function(hc,
         ),
         labels = list(
           step = 20,
-          format = "{value:,.0f}"
+          format = "{value:,.0f}",
+          style = list(
+            fontSize = "17px",
+            textOverflow = "none"
+          )
         )
       ),
       tooltip = list(
@@ -571,7 +575,7 @@ proxy_to_hist_pc <- function(hc,
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -607,7 +611,11 @@ proxy_to_hist_pc <- function(hc,
         ),
         labels = list(
           step = 20,
-          format = "{value:,.1f}"
+          format = "{value:,.1f}",
+          style = list(
+            fontSize = "17px",
+            textOverflow = "none"
+          )
         )
       ),
       tooltip = list(
@@ -645,7 +653,7 @@ proxy_hist_to_single <- function(hc,
       id = c("Urban", "Rural")
     ) %>%
     highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
     ) %>%
     highcharter::hcpxy_remove_series(
       id = c("State", "Local", "Shared")
@@ -742,7 +750,7 @@ proxy_hist_to_group <- function(hc,
         id = c("Urban", "Rural")
       ) %>%
       highcharter::hcpxy_remove_series(
-        id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
       ) %>%
       highcharter::hcpxy_remove_series(
         id = c("State", "Local", "Shared")
@@ -815,7 +823,7 @@ proxy_hist_to_group <- function(hc,
         id = c("Urban", "Rural")
       ) %>%
       highcharter::hcpxy_remove_series(
-        id = c("Small (<50,000)", "Medium (50,000-100,000)", "Large (500.000+)")
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
       ) %>%
       highcharter::hcpxy_remove_series(
         id = c("State", "Local", "Shared")

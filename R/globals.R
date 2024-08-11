@@ -21,7 +21,7 @@ label_remap <- c(
     "500,000+" = "Large (500,000+)",
     "Small (<50,000)" = "Small (<50,000)",
     "Medium (50,000-499,000)" = "Medium (50,000-499,000)",
-    "Large (500.000+)" = "Large (500,000+)",
+    "Large (500,000+)" = "Large (500,000+)",
     "urban" = "Urban",
     "rural" = "Rural",
     "associates" = "Associate's",
