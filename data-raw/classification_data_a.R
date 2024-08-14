@@ -48,9 +48,9 @@
 #
 #
 # # print elapsed time
-# end_time <- Sys.time() - old # calculate difference
+# end_time <- Sys.time() - start_time # calculate difference
 # # This shows how much time the script took and thus how much saved in load
-# print(end_time)
+# print(end_time) # save 1.3 minutes
 #
 #
 # # write the data
