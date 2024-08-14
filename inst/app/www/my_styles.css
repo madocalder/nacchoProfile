@@ -1,6 +1,13 @@
 /* MY STYLES */
 
 
+
+/* -------------------------------------------------------- Top Row for Color */
+
+.top-row {
+  background-color: ##F9F8F7;
+}
+
 /* ---------------------------------------------------------- Plot flickering */
 #mod_landscape_1-figure.recalculating {
   opacity: 1.0;
@@ -135,6 +142,7 @@ label:not(.material-switch label) {
 
 .bslib-sidebar-layout>.main {
   color: #212F5B !important;
+  padding: 0 !important;
 }
 
 .bslib-sidebar-layout>.collapse-toggle {
@@ -182,6 +190,7 @@ label:not(.material-switch label) {
 
 .nav-item:nth-child(8) {
   padding-top: 60% !important;
+  margin-left: -8%;
 }
 
 .nav-item:nth-child(8) .nav-link {
@@ -699,6 +708,7 @@ label:not(.material-switch label) {
   align-content: baseline;
   overflow: hidden;
   overflow-y: auto;
+  margin-left: 10px;
  }
 
  .color-block-header {
@@ -707,6 +717,8 @@ label:not(.material-switch label) {
   padding: 10px; /* Adjust padding as needed */
   z-index: 1; /* Ensure it stays above the scrollable content */
   width: 100%;
+  margin-top: 20px;
+  margin-left: -20px;
 }
 
 .color-block-content {
@@ -719,6 +731,7 @@ label:not(.material-switch label) {
   align-content: baseline;
   overflow: hidden;
   overflow-y: auto;
+  margin-left: -20px;
 }
 
 .color-block-footer {
@@ -728,6 +741,7 @@ label:not(.material-switch label) {
   padding: 10px;
   z-index: 2;
   width: 100%;
+  margin-left: -20px;
 }
 
 /*.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
@@ -767,8 +781,9 @@ label:not(.material-switch label) {
 
 
 .col-pad {
-  padding-left: 40px !important;
+  padding-left: 45px !important;
   padding-right: 45px !important;
+  padding-top: 15px;
 }
 
 .col-pad-left {
@@ -865,7 +880,7 @@ b, strong {
 .viz-content {
   padding-left: 4em !important;
   padding-right: 4em !important;
-  padding-top: 1em !important;
+  padding-top: 2em !important;
 }
 
 .viz-content-buttons {
