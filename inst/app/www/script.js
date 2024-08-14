@@ -53,17 +53,17 @@ function adjustXAxisOffset() {
   var chart = $('#workforce_1-figure_jobs').highcharts();
   var contentWidth = $('#resize-content').width();
   if (chart && contentWidth > 0) {
-    var basePercentage = 0.53;  // Base percentage when the window is wide
+    var basePercentage = 0.53;  // Base percentage at shiny load
     var minWidth = 400;  // Minimum width for the content div before max adjustment
     var maxWidth = 1200; // Maximum width for the content div before minimum adjustment
     var offsetPercentage;
 
     if (contentWidth < minWidth) {
-      offsetPercentage = 0.60;  // Increase percentage as the window gets narrower
+      offsetPercentage = 0.40;  // Decrease percentage as the window gets narrower
     } else if (contentWidth > maxWidth) {
       offsetPercentage = basePercentage;  // Use base percentage for wider windows
     } else {
-      offsetPercentage = basePercentage + (0.67 - basePercentage) * ((maxWidth - contentWidth) / (maxWidth - minWidth));
+      offsetPercentage = basePercentage + (0.60 - basePercentage) * ((maxWidth - contentWidth) / (maxWidth - minWidth));
     }
 
     var offsetValue = contentWidth * offsetPercentage;
