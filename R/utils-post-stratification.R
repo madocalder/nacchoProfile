@@ -348,6 +348,4 @@ filtered_jobs <- function(selected_data = jobs_data) {
                   difference = jobsgain - jobsgone) %>%
     dplyr::mutate(group = sub(" .*", "", group)) %>%
     dplyr::mutate_if(is.numeric, round, 1)
-
-
 }

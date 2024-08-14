@@ -440,9 +440,9 @@ mod_landscape_server <- function(id){
 
 
 
-# right sidebar -----------------------------------------------------------
+    # right content ===========================================================
 
-    # takeaway
+    # takeaway ----------------------------------------------------------------
     observeEvent(input$takeaway, {
 
       shinyjs::show("toggle_takeaway")
@@ -462,7 +462,7 @@ mod_landscape_server <- function(id){
     }, ignoreNULL = FALSE)
 
 
-    # survey questions, responses, and notes
+    # survey questions, responses, and notes ----------------------------------
     observeEvent(input$context, {
 
       shinyjs::hide("toggle_takeaway")
@@ -495,7 +495,7 @@ mod_landscape_server <- function(id){
     })
 
 
-    # definitions
+    # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
 
       shinyjs::hide("toggle_takeaway")
@@ -529,9 +529,6 @@ mod_landscape_server <- function(id){
         )
       })
     })
-
-    # keep so the correct action links are selection upon shiny connection
-    session$sendCustomMessage(type = 'setNamespace', message = 'landscape_1')
   })
 }
 

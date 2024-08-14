@@ -402,7 +402,7 @@ set_bar <- function(data,
   highcharter::highchart() %>%
     highcharter::hc_chart(
       type = "bar",
-      margin = list(70, 0, 150, 0),
+      margin = list(90, 0, 180, 0),
       events = list(
         load = highcharter::JS("
           function() {

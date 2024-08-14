@@ -198,6 +198,9 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q37") {
         updateSelectInput(session, "filter",
                           choices = "No Filter")
+      } else if (input$topic == "jobs") {
+        updateSelectInput(session, "filter",
+                          choices = "All Filters")
       }
     })
 
@@ -223,193 +226,35 @@ mod_workforce_server <- function(id){
       }
     })
 
-    observeEvent(input$type_jobs, {
-        updateSelectInput(session, "filter",
-                          choices = "All Filters")
+
+    observeEvent(input$topic, {
+      shinyjs::runjs("$('#workforce_1-viz_filters').trigger('click');")
     })
 
-
-    # right sidebar -----------------------------------------------------------
-    observeEvent(input$viz_filters, {
-      shinyjs::show("toggle_viz_filters")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::hide("toggle_definitions")
-
-
-
-      # additional filters for right sidebar ------------------------------------
-      output$show_viz_filters <- renderUI({
-
-        # display if occupational classifications is selected
-        if (input$topic == "occupation_class") {
-          div(
-            radioButtons(
-              ns("type_class"),
-              strong("Select a Measure"),
-              choices = workforce_classifications_measure
-            ),
-            br(),
-            div(
-              class = "checkboxes",
-              checkboxGroupInput(
-                ns("classifications"),
-                strong("Select Classification(s)"),
-                workforce_classifications,
-                selected = c("c5q63", "c5q52")
-              )
-            )
-          )
-
-          # display fte is selected
-        } else if (input$topic == "c5q37") {
-          radioButtons(
-            ns("type_fte"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between various measurements or
-                 groupings. <br> <br>")),
-            choices = workforce_fte_types
-          )
-
-          # display employees is selected
-        } else if (input$topic == "c5q36") {
-          radioButtons(
-            ns("type_emp"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between various measurements or
-                 groupings. <br> <br>")),
-            choices = workforce_employee_types
-          )
-
-          # display job gains and losses is selected
-        } else if (input$topic == "jobs") {
-          radioButtons(
-            ns("type_jobs"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between measurements or
-                 groupings. <br> <br>")),
-            choices = list("Jobs Lost/Added (Total)" = "jobs_total",
-                        "Jobs Lost/Added (Standardized)" = "jobs_standard")
-          )
-        }
-      })
-    })
+    # Reactive to get the inputs that I need for filtering --------------------
+    get_workforce_input <- function() {
+      if (input$topic == "c5q37") { # FTEs
+        input$type_fte
+      } else if (input$topic == "c5q36") { # Employees
+        input$type_emp
+      } else if (input$topic == "jobs") { # Jobs
+        input$type_jobs
+      } else if (input$topic == "occupation_class") { # occupation classifications
+        input$type_class
+      } else {
+        NULL
+      }
+    }
 
 
-
-    # takeaway ----------------------------------------------------------------
-    observeEvent(input$takeaway, {
-      shinyjs::hide("toggle_viz_filters")
-      shinyjs::show("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::hide("toggle_definitions")
-
-      output$show_takeaway <- renderUI({
-        notes <- notes %>%
-          dplyr::filter(topic == input$topic,
-                        view == input$view,
-                        filter == input$filter)
-
-        p(htmltools::HTML(
-          "<b>Key Takeaway(s)</b>: <br><br>",
-          notes$takeaway))
-      })
-    }, ignoreNULL = FALSE)
-
-
-
-    # survey questions, responses, and notes ----------------------------------
-    observeEvent(input$context, {
-      shinyjs::hide("toggle_viz_filters")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::show("toggle_context")
-      shinyjs::hide("toggle_definitions")
-
-      output$show_context <- renderUI({
-        notes <- notes %>%
-          dplyr::filter(topic == input$topic,
-                        view == input$view,
-                        filter == input$filter)
-
-        if (is.na(notes$notes)) {
-          p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
-            notes$survey_question,
-            "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response))
-
-        } else {
-          p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
-            notes$survey_question,
-            "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response,
-            "<br> <br> <b> Notes: </b>",
-            notes$notes))
-        }
-      })
-    })
-
-
-
-    # definitions -------------------------------------------------------------
-    observeEvent(input$definitions, {
-      shinyjs::hide("toggle_viz_filters")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::show("toggle_definitions")
-
-      output$show_definitions <- renderUI({
-
-        definitions <- definitions %>%
-          dplyr::filter(field %in% c(input$topic, input$filter))
-
-        links <- lapply(seq_along(definitions$item), function(i) {
-          div(
-            tags$a(
-              class = "def-link",
-              `data-bs-toggle` = "collapse",
-              href = paste0("#collapseExample", i),
-              paste(definitions$item[[i]])
-            ),
-            div(
-              class= "collapse",
-              id= paste0("collapseExample", i),
-              HTML(definitions$definition[[i]], "<br> <br>")
-            )
-          )
-        })
-        div(
-          p(htmltools::HTML("<b>Definitions</b>: <br>")),
-          links
-        )
-      })
-    })
-
-
-
-    # main content ------------------------------------------------------------
+    # main content ============================================================
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      if (input$topic == "c5q37") {
-        req(input$type_fte)
-        meta %>% dplyr::filter(field == input$type_fte)
-      } else if (input$topic == "occupation_class") {
-        meta %>% dplyr::filter(field %in% input$type_class)
-      } else if (input$topic == "c5q36") {
-        req(input$type_emp)
-        meta %>% dplyr::filter(field == input$type_emp)
-      } else if (input$topic == "jobs") {
-        req(input$type_jobs)
-        meta %>% dplyr::filter(field %in% input$type_jobs)
-      }
+      req(!is.null(get_workforce_input()))
+      meta %>% dplyr::filter(field == get_workforce_input())
     })
-
 
 
     # colors ------------------------------------------------------------------
@@ -474,6 +319,7 @@ mod_workforce_server <- function(id){
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
+          backgroundColor = "#fff",
           headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
@@ -769,6 +615,170 @@ mod_workforce_server <- function(id){
                                overflow = overflow)
       }
     })
+
+
+
+    # right content ===========================================================
+
+    # viz filters -------------------------------------------------------------
+    observeEvent(input$viz_filters, {
+      shinyjs::show("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_viz_filters <- renderUI({
+        # display if occupational classifications is selected
+        if (input$topic == "occupation_class") {
+          div(
+            radioButtons(
+              ns("type_class"),
+              strong("Select a Measure"),
+              choices = workforce_classifications_measure
+            ),
+            br(),
+            div(
+              class = "checkboxes",
+              checkboxGroupInput(
+                ns("classifications"),
+                strong("Select Classification(s)"),
+                workforce_classifications,
+                selected = c("c5q63", "c5q52")
+              )
+            )
+          )
+
+          # display fte is selected
+        } else if (input$topic == "c5q37") {
+          radioButtons(
+            ns("type_fte"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between various measurements or
+                 groupings. <br> <br>")),
+            choices = workforce_fte_types
+          )
+
+          # display employees is selected
+        } else if (input$topic == "c5q36") {
+          radioButtons(
+            ns("type_emp"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between various measurements or
+                 groupings. <br> <br>")),
+            choices = workforce_employee_types
+          )
+
+          # display job gains and losses is selected
+        } else if (input$topic == "jobs") {
+          radioButtons(
+            ns("type_jobs"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
+                 figure between measurements or
+                 groupings. <br> <br>")),
+            choices = list("Jobs Lost/Added (Total)" = "jobs_total",
+                           "Jobs Lost/Added (Standardized)" = "jobs_standard")
+          )
+        }
+      })
+    })
+
+
+    # takeaway ----------------------------------------------------------------
+    observeEvent(input$takeaway, {
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::show("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_takeaway <- renderUI({
+        print(get_workforce_input())
+        req(!is.null(get_workforce_input()))
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        subtopic == get_workforce_input(),
+                        view == input$view,
+                        filter == input$filter)
+
+        p(htmltools::HTML(
+          "<b>Key Takeaway(s)</b>: <br><br>",
+          notes$takeaway))
+      })
+    }, ignoreNULL = FALSE)
+
+
+
+    # survey questions, responses, and notes ----------------------------------
+    observeEvent(input$context, {
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::show("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_context <- renderUI({
+        req(!is.null(get_workforce_input()))
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        subtopic == get_workforce_input(),
+                        view == input$view,
+                        filter == input$filter)
+
+        if (is.na(notes$notes)) {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response))
+
+        } else {
+          p(htmltools::HTML(
+            "<b>Survey Question</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            notes$notes))
+        }
+      })
+    })
+
+
+
+    # definitions -------------------------------------------------------------
+    observeEvent(input$definitions, {
+      shinyjs::hide("toggle_viz_filters")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::show("toggle_definitions")
+
+      output$show_definitions <- renderUI({
+        definitions <- definitions %>%
+          dplyr::filter(field %in% c(input$topic, input$filter))
+
+        links <- lapply(seq_along(definitions$item), function(i) {
+          div(
+            tags$a(
+              class = "def-link",
+              `data-bs-toggle` = "collapse",
+              href = paste0("#collapseExample", i),
+              paste(definitions$item[[i]])
+            ),
+            div(
+              class= "collapse",
+              id= paste0("collapseExample", i),
+              HTML(definitions$definition[[i]], "<br> <br>")
+            )
+          )
+        })
+        div(
+          p(htmltools::HTML("<b>Definitions</b>: <br>")),
+          links
+        )
+      })
+    })
+
   })
 }
 
