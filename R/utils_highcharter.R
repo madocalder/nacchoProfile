@@ -109,7 +109,6 @@ viz_options <- function(hc,
       verticalAlign = "bottom",
       itemMarginBottom = 3,
       itemMarginTop = 3,
-      margin = 22,
       title = list(
         text = legend_title
       )
@@ -119,7 +118,7 @@ viz_options <- function(hc,
 
 
 
-#' Single Bar Proxy Redraw
+#' Single Column Proxy Redraw
 #'
 #' @param hc A `highchart` `htmlwidget` object.
 #' @param data Dataframe; data object to feed the figure.
@@ -185,7 +184,7 @@ proxy_to_single <- function(hc, data, meta, ...) {
 
 
 
-#' Grouped Bar Proxy Redraw
+#' Grouped Column Proxy Redraw
 #'
 #' @param hc A `highchart` `htmlwidget` object.
 #' @param data Dataframe; data object to feed the figure.
@@ -366,9 +365,9 @@ set_column <- function(data,
         fontFamily = "Jost",
         fontWeight = "500",
         fontSize = "14px"
-        )
       )
-    ) %>%
+    )
+  ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
       categories = data$category
@@ -386,6 +385,85 @@ set_column <- function(data,
 
 
 
+#' Set First Highcharter Bar Graph
+#'
+#' @description Create the first highcharter visualizations from which proxies will redraw.
+#'
+#' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param y_label character string; Label for the Y Axis.
+#'
+#' @export
+#'
+#'
+#' @return column graph
+set_bar <- function(data,
+                    y_label = "% of Population") {
+
+  highcharter::highchart() %>%
+    highcharter::hc_chart(
+      type = "bar",
+      margin = list(70, 0, 150, 0),
+      events = list(
+        load = highcharter::JS("
+          function() {
+            adjustXAxisOffset();
+          }
+        ")
+      )
+    ) %>%
+    highcharter::hc_legend(
+      enabled = TRUE,
+      layout = "horizontal",
+      align = "center",
+      verticalAlign = "bottom"
+    ) %>%
+    highcharter::hc_tooltip(
+      shared = TRUE,
+      crosshairs = TRUE
+    ) %>%
+    highcharter::hc_xAxis(
+      categories = unique(data$group),
+      labels = list(
+        useHTML = TRUE,
+        align = "center"
+      ),
+      offset = 0,
+      tickWidth = 0
+    ) %>%
+    highcharter::hc_yAxis_multiples(
+      list(
+        max = 15000,
+        title = list(text = NULL),
+        width = "45%",
+        reversed = TRUE
+      ),
+      list(
+        max = 15000,
+        title = list(text = NULL),
+        offset = 0,
+        left = "55%",
+        width = "45%"
+      )
+    ) %>%
+    highcharter::hc_add_series(
+      id = "Jobs Lost",
+      name = "Jobs Lost",
+      data = data$jobsgone,
+      yAxis = 0
+    ) %>%
+    highcharter::hc_add_series(
+      id = "Jobs Added",
+      name = "Jobs Added",
+      data = data$jobsgain,
+      yAxis = 1
+    )
+}
+
+
+
+
+
+
 #' Set First Highcharter Histogram
 #'
 #' @description Create the first highcharter visualizations from which proxies will redraw.
@@ -400,13 +478,13 @@ set_hist <- function(data,
                      x_label = "Total FTEs") {
 
 
-    highcharter::hchart(
-      data,
-      type = "column",
-      id = "All",
-      name = "Across All LHDs",
-      highcharter::hcaes(x = x, y = y)
-    ) %>%
+  highcharter::hchart(
+    data,
+    type = "column",
+    id = "All",
+    name = "Across All LHDs",
+    highcharter::hcaes(x = x, y = y)
+  ) %>%
     highcharter::hc_chart(
       zoomType = "x",
       resetZoomButton = list(
@@ -733,7 +811,7 @@ proxy_hist_to_single <- function(hc,
 #' @export
 proxy_hist_to_group <- function(hc,
                                 data,
-                                data_all,
+                                data_all = NULL,
                                 meta,
                                 id,
                                 colors,
@@ -897,3 +975,72 @@ proxy_hist_to_group <- function(hc,
   }
 }
 
+
+
+
+
+#' Single Bar Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_bar <- function(hc, data, max, meta, ...) {
+
+  hc %>%
+    highcharter::hcpxy_update_series(
+      id = "Jobs Lost",
+      name = "Jobs Lost",
+      data = data$jobsgone,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update_series(
+      id = "Jobs Added",
+      name = "Jobs Added",
+      data = data$jobsgain,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update(
+      yAxis = list(
+        list(
+          max = max,
+          tickWidth = 0,
+          lineWidth = .5
+        ),
+        list(
+          max = max,
+          tickWidth = 0,
+          lineWidth = .5
+        )
+      )
+    )
+    #   yAxis = list(
+    #     title = list(
+    #       text = meta$y_label
+    #     ),
+    #     max = meta$y_max,
+    #     labels = list(
+    #       format = meta$y_format
+    #     )
+    #   ),
+    #   title = list(
+    #     text = meta$title
+    #   ),
+    #   subtitle = list(
+    #     text = unique(data$subtitle)
+    #   ),
+    #   caption = list(
+    #     text = meta$caption
+    #   ),
+    #   xAxis = list(
+    #     categories = unique(data$group)
+    #   ),
+    #   tooltip = list(
+    #     pointFormat = meta$tooltip
+    #   )
+    # )
+}

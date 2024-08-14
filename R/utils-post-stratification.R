@@ -302,3 +302,50 @@ class_data <- function(args) {
 class_data_b <- function(args) {
   pmap_dfr(args, return_survey_weighted_statistics)
 }
+
+
+
+
+#' Retrieve n for jobs data
+#'
+#' @description Filtering jobs_data to retrieve the n for visualizations.
+#'
+#' @param question A variable from jobs_data, either "jobsgone" or "jobsgain" - either works.
+#'
+#' @export
+#' @return dataframe
+responses <- function(question = "jobsgone") {
+  jobs_data %>%
+  dplyr::filter(Question == question) %>%
+  dplyr::group_by(filter) %>%
+  dplyr::summarise(responses = sum(Responses))
+}
+
+
+
+#' Retrieve filtered jobs dataset for visualization
+#'
+#' @description Filtering jobs_data.
+#'
+#' @param question A variable from jobs_data, either "jobsgone" or "jobsgain" - either works.
+#'
+#' @export
+#' @return dataframe
+filtered_jobs <- function(selected_data = jobs_data) {
+
+  data <- selected_data %>%
+    dplyr::select(1:7, 14:20) %>%
+    dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                  group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                           TRUE ~ group)) %>%
+    dplyr::select(group, Question, y, x, total_employees)
+
+
+  data %>%
+    tidyr::pivot_wider(names_from = Question, values_from = y) %>%
+    dplyr::mutate(jobsgone_standard = round((jobsgone/total_employees)*100,1),
+                  jobsgain_standard = round((jobsgain/total_employees)*100,1)) %>%
+    dplyr::mutate(group = sub(" .*", "", group)) %>%
+    dplyr::mutate_if(is.numeric, round, 1)
+
+}

@@ -889,4 +889,5 @@ b, strong {
     text-align: center,
     overflow: auto;
     white-space: normal !important;
+    z-index: 9999;
 }

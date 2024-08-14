@@ -148,3 +148,19 @@
 #'
 #' @source National Association of City and County Health Officials (NACCHO)
 "classification_data_b"
+
+
+
+#' Jobs Lost and Added for NACCHO's 2022 National Profile
+#'
+#' @author Lindsay Jorgenson
+#' @references \email{ljorgenson@@astho.org}
+#'
+#'
+#' @format data.frame
+#'
+#' A dataframe with 26 observations and 20 variables. Created so dynamic
+#' rendering is more smooth and quick.
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"jobs_data"

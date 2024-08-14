@@ -43,3 +43,37 @@ $(() => {
         $(e.currentTarget).find("i").removeClass("fa-minus");
     });
 })
+
+
+// for jobs chart
+function adjustXAxisOffset() {
+  var chart = $('#workforce_1-figure_jobs').highcharts();
+  var contentWidth = $('#resize-content').width();
+  if (chart && contentWidth > 0) {
+    var basePercentage = 0.53;  // Base percentage when the window is wide
+    var minWidth = 400;  // Minimum width for the content div before max adjustment
+    var maxWidth = 1200; // Maximum width for the content div before minimum adjustment
+    var offsetPercentage;
+
+    if (contentWidth < minWidth) {
+      offsetPercentage = 0.60;  // Increase percentage as the window gets narrower
+    } else if (contentWidth > maxWidth) {
+      offsetPercentage = basePercentage;  // Use base percentage for wider windows
+    } else {
+      offsetPercentage = basePercentage + (0.67 - basePercentage) * ((maxWidth - contentWidth) / (maxWidth - minWidth));
+    }
+
+    var offsetValue = contentWidth * offsetPercentage;
+    chart.xAxis[0].update({
+      offset: -offsetValue
+    });
+  }
+}
+
+$(document).on('shiny:connected', function() {
+  adjustXAxisOffset();
+});
+
+$(window).on('resize', function() {
+  adjustXAxisOffset();
+});

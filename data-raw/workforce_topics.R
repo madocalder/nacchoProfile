@@ -1,7 +1,7 @@
 ## code to prepare `workforce_topics` dataset goes here
 workforce_topics <- list("Full-Time Equivalents" = "c5q37",
                              "Employees" = "c5q36",
-                             "Jobs Lost and Gained" = "jobs",
+                             "Jobs Lost and Added" = "jobs",
                              "Occupation Classifications" = "occupation_class"
 )
 

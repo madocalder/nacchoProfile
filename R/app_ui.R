@@ -45,7 +45,7 @@ app_ui <- function(request) {
                   src = "www/logo.png",
                   alt = "NACCHO logo, Home page",
                   height = 120,
-                  style = "position: absolute; left: 19%; top: 0;")
+                  style = "position: absolute; left: 47px; top: 0;")
               ),
             value = "home_tab",
             class = "no-underline",

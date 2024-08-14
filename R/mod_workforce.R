@@ -63,7 +63,19 @@ mod_workforce_ui <- function(id){
 
           div(
             class = "viz-content",
-            highcharter::highchartOutput(ns("figure"), height = 575)
+            id = "resize-content",
+
+            # display when map is selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('topic'), "\'] != \'jobs\'"),
+              highcharter::highchartOutput(ns("figure"), height = 575)
+            ),
+
+            # display when map is not selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('topic'), "\'] == \'jobs\'"),
+              highcharter::highchartOutput(ns("figure_jobs"), height = 675)
+            )
           )
         ),
 
@@ -212,6 +224,11 @@ mod_workforce_server <- function(id){
       }
     })
 
+    observeEvent(input$type_jobs, {
+        updateSelectInput(session, "filter",
+                          choices = "All Filters")
+    })
+
 
     # right sidebar -----------------------------------------------------------
     observeEvent(input$viz_filters, {
@@ -269,14 +286,22 @@ mod_workforce_server <- function(id){
 
           # display job gains and losses is selected
         } else if (input$topic == "jobs") {
-          radioButtons(
-            ns("type_jobs"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
+          div(
+            radioButtons(
+              ns("type_jobs"),
+              p(strong(HTML("Select a Measure <br>")),
+                HTML("Use the selections below to toggle the
                  figure between measurements or
                  groupings. <br> <br>")),
-            choices = c("Positions Lost and Gained",
-                        "Change in Losses and Gains")
+              choices = c("Jobs Lost and Added",
+                          "Change in Losses and Gains")
+            ),
+            br(),
+            shinyWidgets::materialSwitch(
+              ns("standardize"),
+              p("Standardize Comparison"),
+              right = TRUE
+            )
           )
         }
       })
@@ -346,31 +371,31 @@ mod_workforce_server <- function(id){
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")
 
-      # output$show_definitions <- renderUI({
-      #
-      #   definitions <- definitions %>%
-      #     dplyr::filter(field %in% c(input$topic, input$filter))
-      #
-      #   links <- lapply(seq_along(definitions$item), function(i) {
-      #     div(
-      #       tags$a(
-      #         class = "def-link",
-      #         `data-bs-toggle` = "collapse",
-      #         href = paste0("#collapseExample", i),
-      #         paste(definitions$item[[i]])
-      #       ),
-      #       div(
-      #         class= "collapse",
-      #         id= paste0("collapseExample", i),
-      #         HTML(definitions$definition[[i]], "<br> <br>")
-      #       )
-      #     )
-      #   })
-      #   div(
-      #     p(htmltools::HTML("<b>Definitions</b>: <br>")),
-      #     links
-      #   )
-      # })
+      output$show_definitions <- renderUI({
+
+        definitions <- definitions %>%
+          dplyr::filter(field %in% c(input$topic, input$filter))
+
+        links <- lapply(seq_along(definitions$item), function(i) {
+          div(
+            tags$a(
+              class = "def-link",
+              `data-bs-toggle` = "collapse",
+              href = paste0("#collapseExample", i),
+              paste(definitions$item[[i]])
+            ),
+            div(
+              class= "collapse",
+              id= paste0("collapseExample", i),
+              HTML(definitions$definition[[i]], "<br> <br>")
+            )
+          )
+        })
+        div(
+          p(htmltools::HTML("<b>Definitions</b>: <br>")),
+          links
+        )
+      })
     })
 
 
@@ -426,26 +451,61 @@ mod_workforce_server <- function(id){
           viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
           viz_subtitle = unique(data$subtitle),
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
-          # theme = naccho.viz::hist_theme
         ) %>%
         viz_export()
+      # %>%
+      #   highcharter::hc_plotOptions(
+      #     series = list(
+      #       groupPadding = 0
+      #     )
+      #   )
     })
 
+
+    # used for jobs losses and gains
+    output$figure_jobs <- highcharter::renderHighchart({
+
+      data <- filtered_jobs()
+
+      set_bar(data) %>%
+        viz_options(
+          legend_enable = TRUE,
+          viz_title = "Jobs Lost and Gained By LHD Characteristics",
+          viz_caption = paste0("<b> N: </b>", unique(responses()$responses), "<br>", source_line),
+          viz_subtitle = "",
+          tooltip = "<b> {series.name}: </b>
+              {point.y} <br>",
+          theme = naccho.viz::bar_pos_neg_theme
+        ) %>%
+        viz_export() %>%
+        highcharter::hc_tooltip(
+          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          style = list(
+            textAlign = "left"
+          ),
+          hideDelay = 2000,
+          shadow = FALSE,
+          positioner = highcharter::JS("
+          function (labelWidth, labelHeight, point) {
+            return {
+              x: 10,
+              y: 10
+            };
+          }
+        ")
+        )
+    })
 
 
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
     proxy <- highcharter::highchartProxy(ns("figure"))
 
+    # save the figure_jobs as a proxy to redraw
+    proxy_jobs <- highcharter::highchartProxy(ns("figure_jobs"))
 
-
-    # update proxy ------------------------------------------------------------
-    # this observe is needed to redraw the figure based on the input selected
-    # by the user. It also filters and stores tables based on the inputs
-    # combinations selected by the user.
-    observe ({
-
-      # update the yAxis title while maintaining the line animation
+    # update the yAxis title while maintaining the line animation
+    use_js_proxy <- reactive({
       shinyjs::runjs(paste0("
         var chart = $('#workforce_1-figure').highcharts();
         chart.yAxis[0].update({
@@ -455,17 +515,49 @@ mod_workforce_server <- function(id){
           }
         }, true, { duration: 1000 });
     "))
+    })
 
 
-      # prevent error when observe is launched
-      req(
-        isTruthy(input$type_fte)
-        || isTruthy(input$classifications)
-        || isTruthy(input$type_emp)
-      )
+
+    # inputs for each topic ---------------------------------------------------
+    inputs_fte <- reactive({
+      input$topic
+      input$filter
+      input$type_fte
+    }) %>% debounce(250)
 
 
-      # Topic: FTE
+    inputs_emp <- reactive({
+      input$topic
+      input$filter
+      input$type_emp
+    }) %>% debounce(250)
+
+
+    inputs_jobs <- reactive({
+      input$topic
+      input$filter
+      input$type_jobs
+      input$standardize
+    }) %>% debounce(250)
+
+
+    # inputs for classifications
+    inputs_class <- reactive({
+      input$topic
+      input$filter
+      input$type_class
+      input$classifications
+    }) %>% debounce(250)
+
+
+
+
+    # update proxy ------------------------------------------------------------
+    # for Full-Time Equivalent ------------------------------------------------
+    observeEvent(inputs_fte(), {
+      use_js_proxy()
+
       # Subtopic: FTEs by Category
       # View: Bar Graph
       # Filters: No Filter
@@ -478,9 +570,6 @@ mod_workforce_server <- function(id){
                                meta = filter_meta(),
                                theme = naccho.viz::basic_theme)
 
-
-
-        # Topic: FTE
         # Subtopic: FTEs by Category
         # View: Bar Graph
         # Filters: Rurality, Governance, LHD Size, Region
@@ -488,7 +577,7 @@ mod_workforce_server <- function(id){
         data <- return_survey_weighted_counts("FTE_numcat", input$filter) %>%
           dplyr::mutate(x_label = NA)
 
-        series_id <- unique(data$group)
+        series_id <- unique(data$group) # provide ID for proxy
 
         proxy %>%
           proxy_hist_to_group(data = data,
@@ -499,9 +588,6 @@ mod_workforce_server <- function(id){
                               responses = sum(data$Responses),
                               theme = naccho.viz::basic_theme)
 
-
-
-        # Topic: FTE
         # Subtopic: Per Capita FTE (Histogram)
         # View: Bar Graph
         # Filters: No Filter
@@ -513,9 +599,6 @@ mod_workforce_server <- function(id){
                            meta = filter_meta(),
                            responses = sum(data$y))
 
-
-
-        # Topic: FTE
         # Subtopic: Total FTE (Histogram)
         # View: Bar Graph
         # Filters: No Filter
@@ -526,15 +609,20 @@ mod_workforce_server <- function(id){
           proxy_to_hist_total(data,
                               meta = filter_meta(),
                               responses = sum(data$y))
+      }
+    })
 
 
 
-        # Topic: Employee
-        # Subtopic: Total Employee (Histogram)
-        # View: Bar Graph
-        # Filters: No Filter
-      } else if (input$topic == "c5q36" & input$type_emp == "c5q36") {
-        req(input$type_emp) # prevents error
+
+    # For Employees -----------------------------------------------------------
+    observeEvent(inputs_emp(), {
+      use_js_proxy()
+
+      # Subtopic: Total Employee (Histogram)
+      # View: Bar Graph
+      # Filters: No Filter
+      if (input$topic == "c5q36" & input$type_emp == "c5q36") {
         data <- create_hist(input = "c5q36",
                             x_label = "Total Employees")
         proxy %>%
@@ -542,14 +630,10 @@ mod_workforce_server <- function(id){
                               meta = filter_meta(),
                               responses = sum(data$y))
 
-
-
-        # Topic: Employee
         # Subtopic: Per Capita Employee (Histogram)
         # View: Bar Graph
         # Filters: No Filter
       } else if (input$topic == "c5q36" & input$type_emp == "employee_bypop") {
-        req(input$type_emp) # prevents error
         data <- create_hist(input = "employee_bypop",
                             x_label = "Per Capita FTEs")
         proxy %>%
@@ -557,31 +641,22 @@ mod_workforce_server <- function(id){
                            meta = filter_meta(),
                            responses = sum(data$y))
 
-
-
-
-        # Topic: Employee
         # Subtopic: Employee by Category
         # View: Bar Graph
         # Filters: No Filter
-        } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "No Filter") {
-          req(input$type_emp) # prevents error
-          data <- return_survey_weighted_counts("employee_numcat") %>%
-            dplyr::mutate(x_label = NA)
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "No Filter") {
+        data <- return_survey_weighted_counts("employee_numcat") %>%
+          dplyr::mutate(x_label = NA)
 
-          proxy %>%
-            proxy_hist_to_single(data,
-                                 meta = filter_meta(),
-                                 theme = naccho.viz::basic_theme)
+        proxy %>%
+          proxy_hist_to_single(data,
+                               meta = filter_meta(),
+                               theme = naccho.viz::basic_theme)
 
-
-
-        # Topic: Employee
         # Subtopic: Employee by Category
         # View: Bar Graph
         # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "No Filter") {
-        req(input$type_emp) # prevents error
         data <- return_survey_weighted_counts("employee_numcat", input$filter) %>%
           dplyr::mutate(x_label = NA)
 
@@ -595,67 +670,97 @@ mod_workforce_server <- function(id){
                               id = series_id,
                               responses = sum(data$Responses),
                               theme = naccho.viz::basic_theme)
+      }
+    })
 
 
 
-        # Topic: Occupational Classifications
-        # Subtopic: All Subtopics
-        # View: Bar Graph
-        # Filters: No Filter, Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "occupation_class") {
-        req(length(input$classifications) >= 1) # prevents error
+    # For Jobs Lost and Added -------------------------------------------------
+    observeEvent(inputs_jobs(), {
+      use_js_proxy()
 
-        selected_vars <- c(paste0(input$classifications, input$type_class))
-        selected_data <- get(paste0("classification_data_", input$type_class))
-        data <- selected_data %>%
-          dplyr::filter(Question %in% selected_vars) %>%
-          dplyr::filter(filter %in% c(input$filter, "No Filter"))
+      # # Subtopic: Jobs Lost and Added
+      # # View: Bar Graph
+      # # Filters: All - With standardized selected
+      if (input$standardize == TRUE) {
 
+        data <- filtered_jobs() %>%
+          dplyr::mutate(jobsgone = jobsgone_standard,
+                        jobsgain = jobsgain_standard)
+
+        proxy_jobs %>%
+          proxy_to_bar(data,
+                       meta = filter_meta(),
+                       max = 10)
+      } else {
+
+        data <- filtered_jobs()
+
+        proxy_jobs %>%
+          proxy_to_bar(data,
+                       meta = filter_meta(),
+                       max = 15000)
+      }
+
+    })
+
+    # For Occupational Classifications ----------------------------------------
+    observeEvent(inputs_class(), {
+      use_js_proxy()
+
+      # prevent error
+      req(length(input$classifications) >= 1)
+
+      selected_vars <- c(paste0(input$classifications, input$type_class))
+      selected_data <- get(paste0("classification_data_", input$type_class))
+      data <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::filter(filter %in% c(input$filter, "No Filter"))
+
+      data <- data %>%
+        dplyr::filter(category == "Yes") %>%
+        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                      x = 1:length(category) -1,
+                      x_label = NA)
+
+      # for responses
+      Responses <- selected_data %>%
+        group_by(Question, filter) %>%
+        summarise(Responses = sum(Responses))
+
+
+      if (length(data$x) >= 8) {
+        rotate = -45
+        size = "13px"
+        overflow = "ellipsis"
+      } else {
+        rotate = 0
+        size = "17px"
+        overflow = "none"
+      }
+
+      if (input$filter != "No Filter") {
         data <- data %>%
-          dplyr::filter(category == "Yes") %>%
-          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
-                        x = 1:length(category) -1,
-                        x_label = NA)
+          group_by(group) %>%
+          mutate(x = 1:length(x)-1)
 
-        # for responses
-        Responses <- selected_data %>%
-          group_by(Question, filter) %>%
-          summarise(Responses = sum(Responses))
+        splitter <- data$filter
+        data <- split(data, splitter)
 
+        series_id <- unique(data[[input$filter]]$group)
 
-        if (length(data$x) >= 8) {
-          rotate = -45
-          size = "13px"
-          overflow = "ellipsis"
-        } else {
-          rotate = 0
-          size = "17px"
-          overflow = "none"
-        }
-
-        if (input$filter != "No Filter") {
-          data <- data %>%
-            group_by(group) %>%
-            mutate(x = 1:length(x)-1)
-
-          splitter <- data$filter
-          data <- split(data, splitter)
-
-          series_id <- unique(data[[input$filter]]$group)
-
-          proxy %>%
-            proxy_hist_to_group(data = data[[input$filter]],
-                                data_all = data[['No Filter']],
-                                meta = filter_meta(),
-                                colors = colors(),
-                                id = series_id,
-                                rotate = rotate,
-                                size = size,
-                                overflow = overflow,
-                                responses = show_n(Responses$Responses),
-                                theme = naccho.viz::basic_theme)
-        } else {
-
+        proxy %>%
+          proxy_hist_to_group(data = data[[input$filter]],
+                              data_all = data[['No Filter']],
+                              meta = filter_meta(),
+                              colors = colors(),
+                              id = series_id,
+                              rotate = rotate,
+                              size = size,
+                              overflow = overflow,
+                              responses = show_n(Responses$Responses),
+                              theme = naccho.viz::basic_theme)
+      } else {
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
@@ -664,7 +769,6 @@ mod_workforce_server <- function(id){
                                rotate = rotate,
                                size = size,
                                overflow = overflow)
-        }
       }
     })
   })
