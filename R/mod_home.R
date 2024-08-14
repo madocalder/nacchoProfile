@@ -71,7 +71,7 @@ mod_home_ui <- function(id){
               ),
 
               bslib::accordion_panel(
-                title = h2("Acknowledgments"),
+                title = h2("Funding and Development Acknowledgments"),
                 value = "cord_ack",
                 "The 2022 Profile Study was supported by grant
                 #6NU38OT000306-03-06 awarded to the National Association of
@@ -83,7 +83,17 @@ mod_home_ui <- function(id){
                 and do not necessarily represent the official views of the
                 Centers for Disease Control and Prevention, the U.S. Department
                 of Health and Human Services, or the Robert Wood Johnson
-                Foundation."
+                Foundation.",
+                br(),
+                br(),
+                "This dashboard was created using R Shiny. Lindsay Jorgenson
+                served as the lead developer, with contributions from John Coene
+                and Pierre Saoter from the Y Company, and Madoc Marshall and
+                Elizabeth Woods from the Association of State and Territorial
+                Health Officials. For questions or to report an issue, please
+                visit Lindsay's GitHub account at ",
+                tags$a(href="https://github.com/lindsayjorgenson",
+                       "https://github.com/lindsayjorgenson.")
               ),
 
               bslib::accordion_panel(

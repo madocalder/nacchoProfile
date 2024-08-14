@@ -40,7 +40,6 @@ mod_workforce_ui <- function(id){
                 choices = c(
                   "Bar Graph",
                   "Line Graph",
-                  "Pie Chart",
                   "Table"
                 )
               )
@@ -286,22 +285,14 @@ mod_workforce_server <- function(id){
 
           # display job gains and losses is selected
         } else if (input$topic == "jobs") {
-          div(
-            radioButtons(
-              ns("type_jobs"),
-              p(strong(HTML("Select a Measure <br>")),
-                HTML("Use the selections below to toggle the
+          radioButtons(
+            ns("type_jobs"),
+            p(strong(HTML("Select a Measure <br>")),
+              HTML("Use the selections below to toggle the
                  figure between measurements or
                  groupings. <br> <br>")),
-              choices = c("Jobs Lost and Added",
-                          "Change in Losses and Gains")
-            ),
-            br(),
-            shinyWidgets::materialSwitch(
-              ns("standardize"),
-              p("Standardize Comparison"),
-              right = TRUE
-            )
+            choices = list("Jobs Lost/Added (Total)" = "jobs_total",
+                        "Jobs Lost/Added (Standardized)" = "jobs_standard")
           )
         }
       })
@@ -413,6 +404,9 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q36") {
         req(input$type_emp)
         meta %>% dplyr::filter(field == input$type_emp)
+      } else if (input$topic == "jobs") {
+        req(input$type_jobs)
+        meta %>% dplyr::filter(field %in% input$type_jobs)
       }
     })
 
@@ -469,10 +463,11 @@ mod_workforce_server <- function(id){
 
       set_bar(data) %>%
         viz_options(
+          colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
           legend_enable = TRUE,
-          viz_title = "Jobs Lost and Gained By LHD Characteristics",
+          viz_title = "Jobs Lost and Added - Estimated Total",
           viz_caption = paste0("<b> N: </b>", unique(responses()$responses), "<br>", source_line),
-          viz_subtitle = "",
+          viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y} <br>",
           theme = naccho.viz::bar_pos_neg_theme
@@ -538,7 +533,6 @@ mod_workforce_server <- function(id){
       input$topic
       input$filter
       input$type_jobs
-      input$standardize
     }) %>% debounce(250)
 
 
@@ -675,14 +669,14 @@ mod_workforce_server <- function(id){
 
 
 
-    # For Jobs Lost and Added -------------------------------------------------
+    # For Jobs Lost/Added (Total) -------------------------------------------------
     observeEvent(inputs_jobs(), {
       use_js_proxy()
 
-      # # Subtopic: Jobs Lost and Added
-      # # View: Bar Graph
-      # # Filters: All - With standardized selected
-      if (input$standardize == TRUE) {
+      # Subtopic: Jobs Lost/Added (Standardized)
+      # View: Bar Graph
+      # Filters: All
+      if (input$type_jobs == "jobs_standard") {
 
         data <- filtered_jobs() %>%
           dplyr::mutate(jobsgone = jobsgone_standard,
@@ -692,6 +686,9 @@ mod_workforce_server <- function(id){
           proxy_to_bar(data,
                        meta = filter_meta(),
                        max = 10)
+
+      # Subtopic: Jobs Lost/Added (Total)
+      # View: Bar Graph
       } else {
 
         data <- filtered_jobs()
@@ -706,6 +703,7 @@ mod_workforce_server <- function(id){
 
     # For Occupational Classifications ----------------------------------------
     observeEvent(inputs_class(), {
+      req(input$topic == "occupation_class")
       use_js_proxy()
 
       # prevent error

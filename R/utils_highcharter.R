@@ -348,7 +348,7 @@ set_column <- function(data,
     data,
     "column",
     id = "All",
-    name = "Across All LHDs",
+    name = "Estimated Across All LHDs",
     highcharter::hcaes(
       x = x,
       y = y,
@@ -482,7 +482,7 @@ set_hist <- function(data,
     data,
     type = "column",
     id = "All",
-    name = "Across All LHDs",
+    name = "Estimated Across All LHDs",
     highcharter::hcaes(x = x, y = y)
   ) %>%
     highcharter::hc_chart(
@@ -1016,31 +1016,9 @@ proxy_to_bar <- function(hc, data, max, meta, ...) {
           tickWidth = 0,
           lineWidth = .5
         )
+      ),
+      title = list(
+        text = meta$title
       )
     )
-    #   yAxis = list(
-    #     title = list(
-    #       text = meta$y_label
-    #     ),
-    #     max = meta$y_max,
-    #     labels = list(
-    #       format = meta$y_format
-    #     )
-    #   ),
-    #   title = list(
-    #     text = meta$title
-    #   ),
-    #   subtitle = list(
-    #     text = unique(data$subtitle)
-    #   ),
-    #   caption = list(
-    #     text = meta$caption
-    #   ),
-    #   xAxis = list(
-    #     categories = unique(data$group)
-    #   ),
-    #   tooltip = list(
-    #     pointFormat = meta$tooltip
-    #   )
-    # )
 }

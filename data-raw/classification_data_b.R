@@ -55,7 +55,7 @@
 #     wtype = "weights_static"
 #   )
 # ) %>%
-#   dplyr::mutate(subtitle = "Across All LHDs") %>% # change subtitle
+#   dplyr::mutate(subtitle = "Estimated Across All LHDs") %>% # change subtitle
 #   mutate(filter = "No Filter")
 #
 #

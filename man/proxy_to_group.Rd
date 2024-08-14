@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_highcharter.R
 \name{proxy_to_group}
 \alias{proxy_to_group}
-\title{Grouped Bar Proxy Redraw}
+\title{Grouped Column Proxy Redraw}
 \usage{
 proxy_to_group(hc, data, meta, id, colors, ...)
 }
@@ -21,5 +21,5 @@ proxy_to_group(hc, data, meta, id, colors, ...)
 A redrawn figure.
 }
 \description{
-Grouped Bar Proxy Redraw
+Grouped Column Proxy Redraw
 }

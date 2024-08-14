@@ -33,7 +33,7 @@ spec_data_all <- map_dfr(args1[[1]], return_survey_weighted_counts) %>%
     GroupLabel = label_remap[as.character(.data$Group)],
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = stringr::str_to_title(AnswerLabel),
-    subtitle = paste0("Across All LHDs")
+    subtitle = paste0("Estimated Across All LHDs")
     )
 
 

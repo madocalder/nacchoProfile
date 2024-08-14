@@ -70,7 +70,7 @@ mod_landscape_ui <- function(id){
             # display when map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-              highcharter::highchartOutput(ns("map"), height = 575)
+              highcharter::highchartOutput(ns("map"), height = 675)
             ),
 
             # display when map is not selected
@@ -239,7 +239,15 @@ mod_landscape_server <- function(id){
         subtitle_text = "",
         caption_text = filter_meta()$caption,
         accessible_desc = ""
-      )
+      ) %>%
+        highcharter::hc_chart(
+          marginBottom = 120,
+          spacingTop = 10,
+          spacingBottom = 0
+        ) %>%
+        highcharter::hc_legend(
+          margin = 60
+        )
     })
 
 
@@ -251,7 +259,7 @@ mod_landscape_server <- function(id){
         x = c(0, 1),
         y = c(10.1, 89.9),
         category = c("Rural", "Urban"),
-        group = "Across All LHDs"
+        group = "Estimated Across All LHDs"
       )
 
      set_column(data) %>%

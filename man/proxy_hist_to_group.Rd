@@ -7,7 +7,7 @@
 proxy_hist_to_group(
   hc,
   data,
-  data_all,
+  data_all = NULL,
   meta,
   id,
   colors,

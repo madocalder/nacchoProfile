@@ -35,6 +35,9 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
   text-decoration: underline !important;
 }
 
+.def-link {
+  color: #945548 !important;
+}
 
 /* -------------------------------------------------------------- Definitions */
 

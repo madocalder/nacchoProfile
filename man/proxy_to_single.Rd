@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_highcharter.R
 \name{proxy_to_single}
 \alias{proxy_to_single}
-\title{Single Bar Proxy Redraw}
+\title{Single Column Proxy Redraw}
 \usage{
 proxy_to_single(hc, data, meta, ...)
 }
@@ -19,5 +19,5 @@ proxy_to_single(hc, data, meta, ...)
 A redrawn figure.
 }
 \description{
-Single Bar Proxy Redraw
+Single Column Proxy Redraw
 }

@@ -91,7 +91,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             y = round(Percentage,1),
             category = stringr::str_to_title(Answer),
             group = Group,
-            subtitle = paste0("Across All LHDs")
+            subtitle = paste0("Estimated Across All LHDs")
           )
 
         add_responses <- master_data %>%
@@ -344,8 +344,10 @@ filtered_jobs <- function(selected_data = jobs_data) {
   data %>%
     tidyr::pivot_wider(names_from = Question, values_from = y) %>%
     dplyr::mutate(jobsgone_standard = round((jobsgone/total_employees)*100,1),
-                  jobsgain_standard = round((jobsgain/total_employees)*100,1)) %>%
+                  jobsgain_standard = round((jobsgain/total_employees)*100,1),
+                  difference = jobsgain - jobsgone) %>%
     dplyr::mutate(group = sub(" .*", "", group)) %>%
     dplyr::mutate_if(is.numeric, round, 1)
+
 
 }
