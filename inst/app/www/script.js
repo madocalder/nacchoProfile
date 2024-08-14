@@ -21,6 +21,8 @@ $(document).on('click', '.action-link-2', function() {
 
 
 
+
+
 $(document).on("shiny:value", (e) => {
     if(!e.name.match("show_definitions$")){
         return;
@@ -57,6 +59,23 @@ function adjustXAxisOffset() {
     var minWidth = 400;  // Minimum width for the content div before max adjustment
     var maxWidth = 1200; // Maximum width for the content div before minimum adjustment
     var offsetPercentage;
+
+    if (contentWidth < minWidth) {
+      offsetPercentage = 0.0;
+      // Change alignment to "left" for narrow content widths
+      chart.xAxis[0].update({
+        labels: {
+          align: 'left'
+        }
+      });
+    } else {
+      // Reset alignment to "center" for wider content widths
+      chart.xAxis[0].update({
+        labels: {
+          align: 'center'
+        }
+      });
+    }
 
     if (contentWidth < minWidth) {
       offsetPercentage = 0.40;  // Decrease percentage as the window gets narrower

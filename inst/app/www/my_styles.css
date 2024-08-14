@@ -1,6 +1,35 @@
 /* MY STYLES */
 
 
+/* -------------------------------------------------- Some Phone Sizing Stuff */
+
+@media (max-width: 991px) {
+  .d-flex {
+    display: block !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .d-flex {
+    display: block !important;
+  }
+
+  .col-pad {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .viz-content {
+    padding-left: 1 !important;
+    padding-right: 1 !important;
+  }
+
+  .viz-content-buttons {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+}
 
 /* -------------------------------------------------------- Top Row for Color */
 
@@ -444,22 +473,30 @@ label:not(.material-switch label) {
   padding: 0px !important;
 }
 
-.footer {
-  background-color: #008489 !important;
-  height: 5vh;
-  position: absolute;
-  bottom: 0px;
-  width: 100vw;
-  padding-top: 1.05em;
-  color: #fff !important;
-  justify-content: center !important;
-}
 
 .footer a {
   color: white !important;
   font-size: 14px !important;
 }
 
+.footer {
+  background-color: #008489;
+  padding-top: 1.5em;
+  text-align: center;
+  width: 100vw;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 1em; /* Initial height of the footer line */
+  overflow: hidden; /* Hide the content initially */
+  transition: height 0.3s ease-in-out; /* Smooth transition for expanding */
+  cursor: pointer; /* Change cursor to indicate it's interactive */
+}
+
+.footer:hover {
+  padding-top: 1.5em;
+  height: 4em; /* Height when expanded on hover */
+}
 
 /* --------------------------------------------- buttons for the data stories */
 .side_button {
@@ -781,17 +818,17 @@ label:not(.material-switch label) {
 
 
 .col-pad {
-  padding-left: 45px !important;
-  padding-right: 45px !important;
+  padding-left: 45px;
+  padding-right: 45px;
   padding-top: 15px;
 }
 
 .col-pad-left {
-  padding-left: 5% !important;
+  padding-left: 5%;
 }
 
 .col-pad-right {
-  padding-right: 5% !important;
+  padding-right: 5%;
 }
 
 
@@ -872,20 +909,20 @@ b, strong {
 }
 
 .home-content {
-  padding-top: 7em !important;
-  padding-left: 6em !important;
-  padding-right: 6em !important;
+  padding-top: 7em;
+  padding-left: 6em;
+  padding-right: 6em;
 }
 
 .viz-content {
-  padding-left: 4em !important;
-  padding-right: 4em !important;
-  padding-top: 2em !important;
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 2em;
 }
 
 .viz-content-buttons {
-  padding-left: 4em !important;
-  padding-right: 4em !important;
+  padding-left: 4em;
+  padding-right: 4em;
   padding-top: 0em !important;
 }
 
