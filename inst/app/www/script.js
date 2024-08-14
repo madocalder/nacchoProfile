@@ -29,19 +29,22 @@ $(document).on("shiny:value", (e) => {
     console.log(e.name);
 });
 $(() => {
-    $('body').on('click', '.def-link', (e) => {
-        const tgt = $(e.currentTarget).attr("href");
-        const visible = $(tgt).hasClass("show");
+  let timeout;
+  $('body').on('click', '.def-link', (e) => {
+    timeout = setTimeout(() => {
+      const tgt = $(e.currentTarget).attr("href");
+      const visible = $(tgt).hasClass("show");
 
-        if (visible) {
-            $(e.currentTarget).find("i").removeClass("fa-plus");
-            $(e.currentTarget).find("i").addClass("fa-minus");
-            return;
-        }
+      if (visible) {
+          $(e.currentTarget).find("i").removeClass("fa-plus");
+          $(e.currentTarget).find("i").addClass("fa-minus");
+          return;
+      }
 
-        $(e.currentTarget).find("i").addClass("fa-plus");
-        $(e.currentTarget).find("i").removeClass("fa-minus");
-    });
+      $(e.currentTarget).find("i").addClass("fa-plus");
+      $(e.currentTarget).find("i").removeClass("fa-minus");
+    }, 500);
+  });
 })
 
 
