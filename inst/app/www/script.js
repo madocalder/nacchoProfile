@@ -112,4 +112,41 @@ document.addEventListener('DOMContentLoaded', function() {
       placement: 'right'
     });
   });
-})
+});
+
+
+
+window.addEventListener('load', function() {
+
+  function updatePosition() {
+    const sidebar = document.querySelector('.sidebar'); // Select the sidebar class
+    const fixedDiv = document.querySelector('.dropdown-button');
+
+    if (window.innerWidth > 991) {
+      const sidebarWidth = sidebar.offsetWidth;
+
+      // Calculate new left position
+      fixedDiv.style.left = `calc(100px + ${sidebarWidth}px)`;
+    } else {
+      // For screen widths 991px or smaller, set left to 0px
+      fixedDiv.style.left = '0px';
+    }
+  }
+
+  // Add smooth transition for the left property
+  const fixedDiv = document.querySelector('.dropdown-button');
+  fixedDiv.style.transition = 'left 0.3s ease-in-out';
+
+  // Update position on load
+  updatePosition();
+
+  // Respond if the sidebar is toggled to collapse
+  const toggleButton = document.querySelector('.collapse-toggle');
+  toggleButton.addEventListener('click', function() {
+    // Wait for the collapse/expand animation to complete (if any)
+    setTimeout(updatePosition, 300); // Adjust timeout duration to match animation time
+  });
+
+  // Update position on window resize
+  window.addEventListener('resize', updatePosition);
+});
