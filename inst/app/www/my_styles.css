@@ -11,13 +11,13 @@
     padding: 5px 0;
     text-align: center;
     width: 49px;
-    position: absolute;
-    left: 100px;
+    left: 350px;
     top: 154px;
     color: #AB6143 !important;
     background-color: white!important;
     border: 1.5px solid #008A96;
     border-top: none;
+    position: fixed;
 }
 
 .dropdown-toggle::after {
@@ -51,13 +51,35 @@
   left: -6px;
 }
 
-#filer_collapse {
-    position: relative;
-    z-index: 1;
+#workforce_1-slide_measures {
+  overflow-y: hidden;
 }
 
-.shiny-input-radiogroup .radio-inline {
-  padding: 30px;
+#workforce_1-slide {
+  background: gray;
+  z-index: 30;
+  position: relative;
+}
+
+#workforce_1-slideMenu {
+  transform: translateY(-100%);
+  overflow: hidden;
+  z-index: 20;
+  transition: .5s transform ease-in;
+  position: relative;
+}
+
+#workforce_1-slideMenu.open {
+  transform: translateY(0);
+}
+
+.measures-shown {
+  height: 3em;
+  padding-top: 0;
+}
+
+.with-slider {
+  margin-top: -30px;
 }
 
 /* -------------------------------------------------- Some Phone Sizing Stuff */
@@ -81,7 +103,6 @@
   .viz-content {
     padding-left: 1 !important;
     padding-right: 1 !important;
-    position: relative;
   }
 
   .viz-content-buttons {
@@ -902,6 +923,7 @@ hr:not(.tt, .right-hr) {
   color: #008A96 !important;
   opacity: 1 !important;
   padding-top: 10px !important;
+  margin-bottom: 0px;
   margin-left: 50px;
   margin-right: 50px;
 }

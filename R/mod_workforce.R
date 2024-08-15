@@ -55,87 +55,96 @@ mod_workforce_ui <- function(id){
             )
           ),
           hr(),
+
           div(
-            tags$a(
-              `data-bs-toggle` = "collapse",
-              href = "#filer_collapse",
+            id = ns("slide_measures"),
+            div(
+              id = ns("slide"),
               actionButton(
-                ns("switch_measures"),
+                ns("slide_button"),
                 "",
                 icon = icon("filter"),
                 class = "dropdown-button"
               )
             ),
             div(
-              class = "collapse",
-              id = "filer_collapse",
-              div(
-                # class = "card card-block",
-                # FTEs
-                conditionalPanel(
-                  condition = paste0('input[\'', ns('topic'), "\'] == \'c5q37\'"),
-                  radioButtons(
-                    ns("type_fte"),
-                    "",
-                    choices = workforce_fte_types,
-                    inline = TRUE
-                  )
-                ),
+              id = ns("slideMenu"),
+              class = "measures-shown",
+              # FTEs
+              conditionalPanel(
+                condition = paste0('input[\'', ns('topic'), "\'] == \'c5q37\'"),
+                radioButtons(
+                  ns("type_fte"),
+                  "",
+                  choices = workforce_fte_types,
+                  inline = TRUE
+                )
+              ),
 
-                # Employees
-                conditionalPanel(
-                  condition = paste0('input[\'', ns('topic'), "\'] == \'c5q36\'"),
-                  radioButtons(
-                    ns("type_emp"),
-                    "",
-                    choices = workforce_employee_types,
-                    inline = TRUE
-                  )
-                ),
+              # Employees
+              conditionalPanel(
+                condition = paste0('input[\'', ns('topic'), "\'] == \'c5q36\'"),
+                radioButtons(
+                  ns("type_emp"),
+                  "",
+                  choices = workforce_employee_types,
+                  inline = TRUE
+                )
+              ),
 
-                # Jobs
-                conditionalPanel(
-                  condition = paste0('input[\'', ns('topic'), "\'] == \'jobs\'"),
-                  radioButtons(
-                    ns("type_jobs"),
-                    "",
-                    choices = list("Jobs Lost/Added (Total)" = "jobs_total",
-                                   "Jobs Lost/Added (Standardized)" = "jobs_standard"),
-                    inline = TRUE
-                  )
-                ),
+              # Jobs
+              conditionalPanel(
+                condition = paste0('input[\'', ns('topic'), "\'] == \'jobs\'"),
+                radioButtons(
+                  ns("type_jobs"),
+                  "",
+                  choices = list("Jobs Lost/Added (Total)" = "jobs_total",
+                                 "Jobs Lost/Added (Standardized)" = "jobs_standard"),
+                  inline = TRUE
+                )
+              ),
 
-                # Occupation Classifications
-                conditionalPanel(
-                  condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
-                  radioButtons(
-                    ns("type_class"),
-                    "",
-                    choices = workforce_classifications_measure,
-                    inline = TRUE
-                  ),
-                  br(),
-                  div(
-                    class = "checkboxes",
-                    checkboxGroupInput(
-                      ns("classifications"),
-                      strong("Select Classification(s)"),
-                      workforce_classifications,
-                      selected = c("c5q63", "c5q52")
-                    )
+              # Occupation Classifications
+              conditionalPanel(
+                condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
+                radioButtons(
+                  ns("type_class"),
+                  "",
+                  choices = workforce_classifications_measure,
+                  inline = TRUE
+                ),
+                br(),
+                div(
+                  class = "checkboxes",
+                  checkboxGroupInput(
+                    ns("classifications"),
+                    strong("Select Classification(s)"),
+                    workforce_classifications,
+                    selected = c("c5q63", "c5q52")
                   )
                 )
               )
             )
           ),
 
+          tags$script(HTML("
+              document.getElementById('workforce_1-slide_button').addEventListener('click', function() {
+                var slideMenu = document.querySelector('#workforce_1-slideMenu');
+                if (slideMenu.classList.contains('open')) {
+                  slideMenu.classList.remove('open');
+                } else {
+                  slideMenu.classList.add('open');
+                }
+              });
+            ")
+          ),
 
           br(),
 
           # add main page content here ----------------------------------------------
 
           div(
-            class = "viz-content",
+            class = "viz-content with-slider",
             id = "resize-content", # needed for script.js
 
             # display when map is selected

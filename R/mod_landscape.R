@@ -60,6 +60,7 @@ mod_landscape_ui <- function(id){
 
           hr(),
           br(),
+          br(),
 
           # add main page content here ----------------------------------------------
 
