@@ -60,7 +60,6 @@ mod_landscape_ui <- function(id){
 
           hr(),
           br(),
-          br(),
 
           # add main page content here ----------------------------------------------
 
@@ -221,7 +220,7 @@ mod_landscape_server <- function(id){
     # used for the map only, displayed in the UI using a conditional panel
     output$map <- highcharter::renderHighchart({
 
-      req(input$filter == "No Filter") # needed to prevent glitch
+      req(input$filter == "All LHDs") # needed to prevent glitch
 
       # filters the data for a map, specifically
       data <- master_data %>%
@@ -308,7 +307,7 @@ mod_landscape_server <- function(id){
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
       # Weighting Performed:
-      if (input$topic == "totpop" & input$filter != "No Filter") {
+      if (input$topic == "totpop" & input$filter != "All LHDs") {
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
@@ -337,7 +336,7 @@ mod_landscape_server <- function(id){
       # Topic: Tenure
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "tenure" & input$filter != "No Filter") {
+      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics("tenure", input$filter)
 
           proxy %>%
@@ -347,8 +346,8 @@ mod_landscape_server <- function(id){
 
       # Topic: Specialization
       # View: Bar Graph
-      # Filters: No Filter
-      } else if (input$topic == "field" & input$filter == "No Filter") {
+      # Filters: All LHDs
+      } else if (input$topic == "field" & input$filter == "All LHDs") {
         req(input$topic %not_in% c("totpop", "tenure"))
         data <- spec_data_all
 
@@ -360,7 +359,7 @@ mod_landscape_server <- function(id){
       # Topic: Specialization
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "field" & input$filter != "No Filter") {
+      } else if (input$topic == "field" & input$filter != "All LHDs") {
         data <- spec_data %>% dplyr::filter(filter == input$filter)
         series_id <- unique(data$group)
         print(data)
@@ -376,8 +375,8 @@ mod_landscape_server <- function(id){
 
       # Topics: Geographies Served, Governance, Structure, Board of Health, Age, Race, Highest Degree, Gender
       # View: Bar Graph
-      # Filters: No Filter
-      } else if (input$filter == "No Filter") {
+      # Filters: All LHDs
+      } else if (input$filter == "All LHDs") {
         req(input$topic %not_in% c("totpop", "tenure"))
 
         data <- return_survey_weighted_counts(input$topic)

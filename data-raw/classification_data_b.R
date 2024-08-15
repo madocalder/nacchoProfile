@@ -56,7 +56,7 @@
 #   )
 # ) %>%
 #   dplyr::mutate(subtitle = "Estimated Across All LHDs") %>% # change subtitle
-#   mutate(filter = "No Filter")
+#   mutate(filter = "All LHDs")
 #
 #
 # # join the two datasets -- with filters and with no filter

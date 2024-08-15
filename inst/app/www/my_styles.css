@@ -1,6 +1,65 @@
 /* MY STYLES */
 
 
+
+/* --------------------------------------------- Dropdown button for measure */
+
+.dropdown-button {
+    border-radius: 0 0px 50px 50px !important;
+    font-size: 20px;
+    height: 49px;
+    padding: 5px 0;
+    text-align: center;
+    width: 49px;
+    position: absolute;
+    left: 100px;
+    top: 154px;
+    color: #AB6143 !important;
+    background-color: white!important;
+    border: 1.5px solid #008A96;
+    border-top: none;
+}
+
+.dropdown-toggle::after {
+  content: none !important;
+}
+
+.popover-body {
+  color: white !important;
+  background-color: #212F5B !important;
+  border: none;
+  border-radius: 50px;
+  box-shadow: none !important;
+  padding: 8px;
+  font-family: Heebo;
+  letter-spacing: 1px;
+}
+
+.popover {
+  border: none;
+  box-shadow: none;
+  background-color: transparent !important;
+}
+
+.popover .popover-arrow::before, .popover .popover-arrow::after {
+    border-color: #212F5B !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+}
+
+.bs-popover-end>.popover-arrow, .bs-popover-auto[data-popper-placement^="right"]>.popover-arrow {
+  left: -6px;
+}
+
+#filer_collapse {
+    position: relative;
+    z-index: 1;
+}
+
+.shiny-input-radiogroup .radio-inline {
+  padding: 30px;
+}
+
 /* -------------------------------------------------- Some Phone Sizing Stuff */
 
 @media (max-width: 991px) {
@@ -22,13 +81,13 @@
   .viz-content {
     padding-left: 1 !important;
     padding-right: 1 !important;
+    position: relative;
   }
 
   .viz-content-buttons {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
-
 }
 
 /* -------------------------------------------------------- Top Row for Color */
@@ -746,6 +805,7 @@ label:not(.material-switch label) {
   overflow: hidden;
   overflow-y: auto;
   margin-left: 10px;
+  position: relative;
  }
 
  .color-block-header {
@@ -756,6 +816,7 @@ label:not(.material-switch label) {
   width: 100%;
   margin-top: 20px;
   margin-left: -20px;
+  position: relative;
 }
 
 .color-block-content {
@@ -769,6 +830,8 @@ label:not(.material-switch label) {
   overflow: hidden;
   overflow-y: auto;
   margin-left: -20px;
+  font-size: 15px;
+  position: relative;
 }
 
 .color-block-footer {
@@ -785,11 +848,13 @@ label:not(.material-switch label) {
   display: block !important;
 }*/
 
-.fas {
+.fas:not(.fa-filter) {
   color: #008A96;
 }
 
-
+.fas .fa-filter {
+  color: #fff;
+}
 
 
 .download-input {
@@ -833,7 +898,7 @@ label:not(.material-switch label) {
 
 
 hr:not(.tt, .right-hr) {
-  border-top: 2px solid !important;
+  border-top: 1.5px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
   padding-top: 10px !important;
@@ -912,6 +977,7 @@ b, strong {
   padding-top: 7em;
   padding-left: 6em;
   padding-right: 6em;
+  padding-bottom: 4em;
 }
 
 .viz-content {

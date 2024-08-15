@@ -1,7 +1,7 @@
-# ## code to prepare `jobs_data` dataset goes here
-# ## This script needs to be run to create the datafile called
-# ## "jobs_data"
-#
+## code to prepare `jobs_data` dataset goes here
+## This script needs to be run to create the datafile called
+## "jobs_data"
+
 # devtools::load_all()
 #
 # start_time <- Sys.time() # get start time
@@ -40,7 +40,7 @@
 #
 #
 # job_changes_no_filters <- rbind(gone, gain, total) %>%
-#   dplyr::mutate(filter = "No Filter")
+#   dplyr::mutate(filter = "All LHDs")
 #
 #
 # # almost final dataset

@@ -13,24 +13,25 @@ mod_home_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'home_tab'",
-      flexlayout::flexlayout(
-        left = NULL,
-        center = div(
-          class = "home-content",
-          openMenu(),
-          p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
-          h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
-          br(),
-            bslib::accordion(
-              id = "cord",
-              open = FALSE,
-              multiple = TRUE,
-              style = "padding-top: 0px;",
+      div(
+        class = "home-content",
+        openMenu(),
+        p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
+        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
+        br(),
+        br(),
+        br(),
+        br(),
+        bslib::accordion(
+          id = "cord",
+          open = FALSE,
+          multiple = TRUE,
+          style = "padding-top: 0px;",
 
-              bslib::accordion_panel(
-                title = h2("About the Survey"),
-                value = "cord_about",
-                "NACCHO conducts the National Profile of Local Health
+          bslib::accordion_panel(
+            title = h2("About the Survey"),
+            value = "cord_about",
+            "NACCHO conducts the National Profile of Local Health
                 Departments (commonly referred to as the 'Profile Study') every
                 three years to describe local health department infrastructure
                 and services at the national level. This study is the largest
@@ -40,12 +41,12 @@ mod_home_ui <- function(id){
                 partnerships. The Profile Study data show both point-in-time
                 information, as well as longitudinal change since the 2008
                 Profile Study."
-              ),
+          ),
 
-              bslib::accordion_panel(
-                title = h2("Methods"),
-                value = "cord_methods",
-                "For the 2022 Profile Study, a total of 2,512 local health
+          bslib::accordion_panel(
+            title = h2("Methods"),
+            value = "cord_methods",
+            "For the 2022 Profile Study, a total of 2,512 local health
                 departments were included in the study population. Rhode Island
                 was excluded from the study because the state health agency
                 operates on behalf of local public health and has no sub-state
@@ -56,24 +57,24 @@ mod_home_ui <- function(id){
                 through September 2022. Overall, 942 local health departments
                 responded, for a response rate of 38%. For a full description
                 of the methods, read our comprehensive report at",
-                tags$a(href="naccho.org/profile", "naccho.org/profile.")
-              ),
+            tags$a(href="naccho.org/profile", "naccho.org/profile.")
+          ),
 
-              bslib::accordion_panel(
-                title = h2("Access the Data"),
-                value = "cord_access",
-                "Deidentified data from the 2022 Profile Study will be made
+          bslib::accordion_panel(
+            title = h2("Access the Data"),
+            value = "cord_access",
+            "Deidentified data from the 2022 Profile Study will be made
                 publicly available through ICSPR's data repository in summer
                 2024. For access to prior years' Profile data and data use
                 policies for Profile data, please visit",
-                tags$a(href="icpsr.umich.edu/web/pages/ICPSR/index.html",
-                       "ICPSR's website.")
-              ),
+            tags$a(href="icpsr.umich.edu/web/pages/ICPSR/index.html",
+                   "ICPSR's website.")
+          ),
 
-              bslib::accordion_panel(
-                title = h2("Funding and Development Acknowledgments"),
-                value = "cord_ack",
-                "The 2022 Profile Study was supported by grant
+          bslib::accordion_panel(
+            title = h2("Funding and Development Acknowledgments"),
+            value = "cord_ack",
+            "The 2022 Profile Study was supported by grant
                 #6NU38OT000306-03-06 awarded to the National Association of
                 County and City Health Officials and funded by the Centers for
                 Disease Control and Prevention, as well as grant #78802 awarded
@@ -84,62 +85,25 @@ mod_home_ui <- function(id){
                 Centers for Disease Control and Prevention, the U.S. Department
                 of Health and Human Services, or the Robert Wood Johnson
                 Foundation.",
-                br(),
-                br(),
-                "This dashboard was created using R Shiny. Lindsay Jorgenson
+            br(),
+            br(),
+            "This dashboard was created using R Shiny. Lindsay Jorgenson
                 served as the lead developer, with contributions from John Coene
                 and Pierre Saoter from the Y Company, and Madoc Marshall and
                 Elizabeth Woods from the Association of State and Territorial
                 Health Officials. For questions or to report an issue, please
                 visit Lindsay's GitHub account at ",
-                tags$a(href="https://github.com/lindsayjorgenson",
-                       "https://github.com/lindsayjorgenson.")
-              ),
+            tags$a(href="https://github.com/lindsayjorgenson",
+                   "https://github.com/lindsayjorgenson.")
+          ),
 
-              bslib::accordion_panel(
-                title = h2("Contact and Questions"),
-                value = "cord_contact",
-                "For more information about the 2022 Profile Study, please
+          bslib::accordion_panel(
+            title = h2("Contact and Questions"),
+            value = "cord_contact",
+            "For more information about the 2022 Profile Study, please
                 reach out to our Research team at",
-                tags$a(href="mailto: profile@naccho.org",
-                       "profile@naccho.org.")
-              )
-            )
-        ),
-        right = div(
-          class = "home-content-carousel",
-          bsutils::carousel(
-            class = "carousel-dark alt",
-            indicators = TRUE,
-            controls = FALSE,
-            bsutils::carouselItem(
-              p("The Profile Study continues to provide field-leading,
-                nationally representative snapshots of the local health
-                department landscape.",
-                style = "font-size: 1.6em;
-                        font-weight: 700;
-                        font-style: italic;
-                        color: #AB6143 !important;"),
-              p("Aaron Alford, Senior Director of Research & Evaluation, NACCHO",
-                style = "text-align: left;"),
-              interval = 60000L
-            ),
-            bsutils::carouselItem(
-              p("Profile Study data led to a historic investment of $7.6B
-                included in the American Rescue Plan for the public health
-                workforce.",
-                style = "font-size: 1.6em;
-                        font-weight: 700;
-                        font-style: italic;
-                        color: #AB6143 !important;"),
-              p("Adriane Casalotti, Chief of Government & Public Affairs, NACCHO",
-                style = "text-align: left;"),
-              interval = 60000L
-            ),
-            bsutils::carouselItem(
-              p("This is a third test"),
-              interval = 60000L
-            )
+            tags$a(href="mailto: profile@naccho.org",
+                   "profile@naccho.org.")
           )
         )
       )

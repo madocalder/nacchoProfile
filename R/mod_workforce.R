@@ -50,19 +50,93 @@ mod_workforce_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = "No Filter"
+                choices = "All LHDs"
+              )
+            )
+          ),
+          hr(),
+          div(
+            tags$a(
+              `data-bs-toggle` = "collapse",
+              href = "#filer_collapse",
+              actionButton(
+                ns("switch_measures"),
+                "",
+                icon = icon("filter"),
+                class = "dropdown-button"
+              )
+            ),
+            div(
+              class = "collapse",
+              id = "filer_collapse",
+              div(
+                # class = "card card-block",
+                # FTEs
+                conditionalPanel(
+                  condition = paste0('input[\'', ns('topic'), "\'] == \'c5q37\'"),
+                  radioButtons(
+                    ns("type_fte"),
+                    "",
+                    choices = workforce_fte_types,
+                    inline = TRUE
+                  )
+                ),
+
+                # Employees
+                conditionalPanel(
+                  condition = paste0('input[\'', ns('topic'), "\'] == \'c5q36\'"),
+                  radioButtons(
+                    ns("type_emp"),
+                    "",
+                    choices = workforce_employee_types,
+                    inline = TRUE
+                  )
+                ),
+
+                # Jobs
+                conditionalPanel(
+                  condition = paste0('input[\'', ns('topic'), "\'] == \'jobs\'"),
+                  radioButtons(
+                    ns("type_jobs"),
+                    "",
+                    choices = list("Jobs Lost/Added (Total)" = "jobs_total",
+                                   "Jobs Lost/Added (Standardized)" = "jobs_standard"),
+                    inline = TRUE
+                  )
+                ),
+
+                # Occupation Classifications
+                conditionalPanel(
+                  condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
+                  radioButtons(
+                    ns("type_class"),
+                    "",
+                    choices = workforce_classifications_measure,
+                    inline = TRUE
+                  ),
+                  br(),
+                  div(
+                    class = "checkboxes",
+                    checkboxGroupInput(
+                      ns("classifications"),
+                      strong("Select Classification(s)"),
+                      workforce_classifications,
+                      selected = c("c5q63", "c5q52")
+                    )
+                  )
+                )
               )
             )
           ),
 
-          hr(),
+
           br(),
 
           # add main page content here ----------------------------------------------
 
           div(
             class = "viz-content",
-            id = "resize-content",
+            id = "resize-content", # needed for script.js
 
             # display when map is selected
             conditionalPanel(
@@ -84,20 +158,7 @@ mod_workforce_ui <- function(id){
           div(
             class = "row color-block-header",
             div(
-              class = "col-sm-3 hover-text-side",
-              align = "center",
-              br(),
-              actionLink(
-                inputId = ns("viz_filters"), # key takeaway
-                "",
-                icon = tags$i(class = "fa-light fa-filter",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"),
-              span(class = "hover-text-content-side", "Filters")
-            ),
-
-            div(
-              class = "col-sm-3 hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
@@ -110,7 +171,7 @@ mod_workforce_ui <- function(id){
             ),
 
             div(
-              class = "col-sm-3 hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
@@ -123,7 +184,7 @@ mod_workforce_ui <- function(id){
             ),
 
             div(
-              class = "col-sm-3 hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
@@ -141,14 +202,6 @@ mod_workforce_ui <- function(id){
             class = "row color-block-content",
 
             # toggle side content -----------------------------------------------------
-            shinyjs::hidden(
-              div(
-                id = ns("toggle_viz_filters"),
-                class = "context-content",
-                uiOutput(ns("show_viz_filters"))
-              )
-            ),
-
             shinyjs::hidden(
               div(
                 id = ns("toggle_takeaway"),
@@ -197,7 +250,7 @@ mod_workforce_server <- function(id){
                           choices = landscape_filters)
       } else if (input$topic == "c5q37") {
         updateSelectInput(session, "filter",
-                          choices = "No Filter")
+                          choices = "All LHDs")
       } else if (input$topic == "jobs") {
         updateSelectInput(session, "filter",
                           choices = "All Filters")
@@ -207,7 +260,7 @@ mod_workforce_server <- function(id){
     observeEvent(input$type_fte, {
       if (input$type_fte %in% c("c5q37", "fte_bypop")) {
         updateSelectInput(session, "filter",
-                          choices = "No Filter"
+                          choices = "All LHDs"
         )
       } else {
         updateSelectInput(session, "filter",
@@ -218,17 +271,12 @@ mod_workforce_server <- function(id){
     observeEvent(input$type_emp, {
       if (input$type_fte %in% c("c5q36", "employee_bypop")) {
         updateSelectInput(session, "filter",
-                          choices = "No Filter"
+                          choices = "All LHDs"
         )
       } else {
         updateSelectInput(session, "filter",
                           choices = landscape_filters)
       }
-    })
-
-
-    observeEvent(input$topic, {
-      shinyjs::runjs("$('#workforce_1-viz_filters').trigger('click');")
     })
 
     # Reactive to get the inputs that I need for filtering --------------------
@@ -400,8 +448,8 @@ mod_workforce_server <- function(id){
 
       # Subtopic: FTEs by Category
       # View: Bar Graph
-      # Filters: No Filter
-      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "No Filter") {
+      # Filters: All LHDs
+      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "All LHDs") {
         data <- return_survey_weighted_counts("FTE_numcat") %>%
           dplyr::mutate(x_label = NA)
 
@@ -413,7 +461,7 @@ mod_workforce_server <- function(id){
         # Subtopic: FTEs by Category
         # View: Bar Graph
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "No Filter") {
+      } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "All LHDs") {
         data <- return_survey_weighted_counts("FTE_numcat", input$filter) %>%
           dplyr::mutate(x_label = NA)
 
@@ -430,7 +478,7 @@ mod_workforce_server <- function(id){
 
         # Subtopic: Per Capita FTE (Histogram)
         # View: Bar Graph
-        # Filters: No Filter
+        # Filters: All LHDs
       } else if (input$topic == "c5q37" & input$type_fte == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
@@ -441,7 +489,7 @@ mod_workforce_server <- function(id){
 
         # Subtopic: Total FTE (Histogram)
         # View: Bar Graph
-        # Filters: No Filter
+        # Filters: All LHDs
       } else if (input$topic == "c5q37" & input$type_fte == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
@@ -461,7 +509,7 @@ mod_workforce_server <- function(id){
 
       # Subtopic: Total Employee (Histogram)
       # View: Bar Graph
-      # Filters: No Filter
+      # Filters: All LHDs
       if (input$topic == "c5q36" & input$type_emp == "c5q36") {
         data <- create_hist(input = "c5q36",
                             x_label = "Total Employees")
@@ -472,7 +520,7 @@ mod_workforce_server <- function(id){
 
         # Subtopic: Per Capita Employee (Histogram)
         # View: Bar Graph
-        # Filters: No Filter
+        # Filters: All LHDs
       } else if (input$topic == "c5q36" & input$type_emp == "employee_bypop") {
         data <- create_hist(input = "employee_bypop",
                             x_label = "Per Capita FTEs")
@@ -483,8 +531,8 @@ mod_workforce_server <- function(id){
 
         # Subtopic: Employee by Category
         # View: Bar Graph
-        # Filters: No Filter
-      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "No Filter") {
+        # Filters: All LHDs
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "All LHDs") {
         data <- return_survey_weighted_counts("employee_numcat") %>%
           dplyr::mutate(x_label = NA)
 
@@ -496,7 +544,7 @@ mod_workforce_server <- function(id){
         # Subtopic: Employee by Category
         # View: Bar Graph
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "No Filter") {
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "All LHDs") {
         data <- return_survey_weighted_counts("employee_numcat", input$filter) %>%
           dplyr::mutate(x_label = NA)
 
@@ -559,7 +607,7 @@ mod_workforce_server <- function(id){
       selected_data <- get(paste0("classification_data_", input$type_class))
       data <- selected_data %>%
         dplyr::filter(Question %in% selected_vars) %>%
-        dplyr::filter(filter %in% c(input$filter, "No Filter"))
+        dplyr::filter(filter %in% c(input$filter, "All LHDs"))
 
       data <- data %>%
         dplyr::filter(category == "Yes") %>%
@@ -583,7 +631,7 @@ mod_workforce_server <- function(id){
         overflow = "none"
       }
 
-      if (input$filter != "No Filter") {
+      if (input$filter != "All LHDs") {
         data <- data %>%
           group_by(group) %>%
           mutate(x = 1:length(x)-1)
@@ -595,7 +643,7 @@ mod_workforce_server <- function(id){
 
         proxy %>%
           proxy_hist_to_group(data = data[[input$filter]],
-                              data_all = data[['No Filter']],
+                              data_all = data[['All LHDs']],
                               meta = filter_meta(),
                               colors = colors(),
                               id = series_id,
@@ -620,75 +668,8 @@ mod_workforce_server <- function(id){
 
     # right content ===========================================================
 
-    # viz filters -------------------------------------------------------------
-    observeEvent(input$viz_filters, {
-      shinyjs::show("toggle_viz_filters")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::hide("toggle_definitions")
-
-      output$show_viz_filters <- renderUI({
-        # display if occupational classifications is selected
-        if (input$topic == "occupation_class") {
-          div(
-            radioButtons(
-              ns("type_class"),
-              strong("Select a Measure"),
-              choices = workforce_classifications_measure
-            ),
-            br(),
-            div(
-              class = "checkboxes",
-              checkboxGroupInput(
-                ns("classifications"),
-                strong("Select Classification(s)"),
-                workforce_classifications,
-                selected = c("c5q63", "c5q52")
-              )
-            )
-          )
-
-          # display fte is selected
-        } else if (input$topic == "c5q37") {
-          radioButtons(
-            ns("type_fte"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between various measurements or
-                 groupings. <br> <br>")),
-            choices = workforce_fte_types
-          )
-
-          # display employees is selected
-        } else if (input$topic == "c5q36") {
-          radioButtons(
-            ns("type_emp"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between various measurements or
-                 groupings. <br> <br>")),
-            choices = workforce_employee_types
-          )
-
-          # display job gains and losses is selected
-        } else if (input$topic == "jobs") {
-          radioButtons(
-            ns("type_jobs"),
-            p(strong(HTML("Select a Measure <br>")),
-              HTML("Use the selections below to toggle the
-                 figure between measurements or
-                 groupings. <br> <br>")),
-            choices = list("Jobs Lost/Added (Total)" = "jobs_total",
-                           "Jobs Lost/Added (Standardized)" = "jobs_standard")
-          )
-        }
-      })
-    })
-
-
     # takeaway ----------------------------------------------------------------
     observeEvent(input$takeaway, {
-      shinyjs::hide("toggle_viz_filters")
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
@@ -712,7 +693,6 @@ mod_workforce_server <- function(id){
 
     # survey questions, responses, and notes ----------------------------------
     observeEvent(input$context, {
-      shinyjs::hide("toggle_viz_filters")
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
       shinyjs::hide("toggle_definitions")
@@ -748,7 +728,6 @@ mod_workforce_server <- function(id){
 
     # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
-      shinyjs::hide("toggle_viz_filters")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")

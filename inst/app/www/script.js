@@ -4,7 +4,7 @@ $(document).on('shiny:connected', function() {
 
 
 $(document).on('shiny:connected', function() {
-  $('#workforce_1-viz_filters').addClass('clicked-link').click();
+  $('#workforce_1-takeaway').addClass('clicked-link').click();
 })
 
 
@@ -99,3 +99,17 @@ $(document).on('shiny:connected', function() {
 $(window).on('resize', function() {
   adjustXAxisOffset();
 });
+
+
+
+// For the dropdown button popover
+document.addEventListener('DOMContentLoaded', function() {
+  var popoverTriggerList = [].slice.call(document.querySelectorAll('#workforce_1-dropdown-button'));
+  var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl, {
+      content: 'Click here to change measure.',
+      trigger: 'hover',
+      placement: 'right'
+    });
+  });
+})

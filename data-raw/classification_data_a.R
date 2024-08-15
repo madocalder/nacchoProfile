@@ -40,7 +40,7 @@
 #     "c5q49a", "c5q65a", "c5q59a", "c5q56a",
 #     "c5q44a", "c5q51a", "c5q43a")) %>%
 #   select(1:12, "Responses") %>%
-#   mutate(filter = "No Filter")
+#   mutate(filter = "All LHDs")
 #
 #
 # # join the two datasets -- with filters and with no filter
