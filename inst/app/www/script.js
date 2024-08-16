@@ -20,6 +20,11 @@ $(document).on('click', '.action-link-2', function() {
 });
 
 
+Shiny.addCustomMessageHandler('triggerClick', function(id) {
+  document.getElementById(id).click();
+});
+
+
 
 
 

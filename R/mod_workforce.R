@@ -696,8 +696,10 @@ mod_workforce_server <- function(id){
     observeEvent(input$topic, {
       if (input$topic == "occupation_class") {
         shinyjs::addClass(selector = "#workforce_1-dynamic_row", class = "show-icon")
+        session$sendCustomMessage(type = "triggerClick", message = "workforce_1-get_classifications")
       } else {
         shinyjs::removeClass(selector = "#workforce_1-dynamic_row", class = "show-icon")
+        session$sendCustomMessage(type = "triggerClick", message = "workforce_1-takeaway")
       }
     })
 
