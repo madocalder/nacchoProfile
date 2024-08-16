@@ -204,15 +204,6 @@ label:not(.material-switch label) {
   background-color: #80A14E !important;
 }
 
-/*.occupation-measures .shiny-input-radiogroup .radio-inline {
-  margin-left: 3vw;
-}*/
-
-/*.overlap-checkboxes {
-  z-index: 999;
-}*/
-
-
 .radio {
   text-indent: -31px;
   margin-left: 60px;
@@ -223,14 +214,6 @@ label:not(.material-switch label) {
   margin-right: 10px;
 }
 
-.occupation-measures {
-  display: flex;
-  justify-content: space-around;
-}
-
-div#workforce_1-type_class {
-  padding-left: 100px;
-}
 
 /* ---------------------------------------------- Radio Buttons for Workfroce */
 .shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group, .shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {

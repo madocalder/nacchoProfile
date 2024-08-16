@@ -245,8 +245,8 @@ mod_workforce_ui <- function(id){
             shinyjs::hidden(
               div(
                 id = ns("toggle_definitions"),
-                class = "context-content"
-                # uiOutput(ns("show_definitions"))
+                class = "context-content",
+                uiOutput(ns("show_definitions"))
               )
             )
           ),
@@ -790,7 +790,7 @@ mod_workforce_server <- function(id){
 
       output$show_definitions <- renderUI({
         definitions <- definitions %>%
-          dplyr::filter(field %in% c(input$topic, input$filter))
+          dplyr::filter(field %in% c(get_workforce_input(), input$filter))
 
         links <- lapply(seq_along(definitions$item), function(i) {
           div(
@@ -798,6 +798,7 @@ mod_workforce_server <- function(id){
               class = "def-link",
               `data-bs-toggle` = "collapse",
               href = paste0("#collapseExample", i),
+              tags$i(class = "fa fa-plus"),
               paste(definitions$item[[i]])
             ),
             div(
