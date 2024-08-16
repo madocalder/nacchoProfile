@@ -1,11 +1,11 @@
 $(document).on('shiny:connected', function() {
   $('#landscape_1-takeaway').addClass('clicked-link').click();
-})
+});
 
 
 $(document).on('shiny:connected', function() {
   $('#workforce_1-takeaway').addClass('clicked-link').click();
-})
+});
 
 
 $(document).on('click', '.action-link', function() {
@@ -47,7 +47,9 @@ $(() => {
       $(e.currentTarget).find("i").removeClass("fa-minus");
     }, 500);
   });
-})
+});
+
+
 
 
 // for jobs chart

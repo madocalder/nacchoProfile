@@ -84,46 +84,48 @@ mod_landscape_ui <- function(id){
           # end of main content -----------------------------------------------------
 
         right = div(
-          div(
-            class = "row color-block-header",
             div(
-              class = "col-sm-4 hover-text-side",
-              align = "center",
-              br(),
-              actionLink(
-                inputId = ns("takeaway"), # key takeaway
-                "",
-                icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Takeaways")
+              class = "row color-block-header",
+              div(
+                class = "col-sm-4 hover-text-side",
+                align = "center",
+                br(),
+                actionLink(
+                  inputId = ns("takeaway"), # key takeaway
+                  "",
+                  icon = tags$i(class = "fa-light fa-key",
+                                style = "font-size: 30px; text-align: center;"),
+                  class = "link-no-underline action-link"),
+                span(class = "hover-text-content-side", "Takeaways")
+              ),
+              div(
+                class = "col-sm-4 hover-text-side",
+                align = "center",
+                br(),
+                actionLink(
+                  inputId = ns("context"), # survey questions and responses
+                  "",
+                  icon = tags$i(class = "fa-light fa-circle-info",
+                                style = "font-size: 30px; text-align: center;"),
+                  class = "link-no-underline action-link"),
+                span(class = "hover-text-content-side", "Notes")
+              ),
+              div(
+                class = "col-sm-4 hover-text-side",
+                align = "center",
+                br(),
+                actionLink(
+                  inputId = ns("definitions"), # related definitions
+                  "",
+                  icon = tags$i(class = "fa-light fa-list",
+                                style = "font-size: 30px; text-align: center;"),
+                  class = "link-no-underline action-link"),
+                span(class = "hover-text-content-side", "Definitions")
+              ),
+              hr(class = "right-hr")
             ),
-            div(
-              class = "col-sm-4 hover-text-side",
-              align = "center",
-              br(),
-              actionLink(
-                inputId = ns("context"), # survey questions and responses
-                "",
-                icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Notes")
-            ),
-            div(
-              class = "col-sm-4 hover-text-side",
-              align = "center",
-              br(),
-              actionLink(
-                inputId = ns("definitions"), # related definitions
-                "",
-                icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link"),
-              span(class = "hover-text-content-side", "Definitions")
-            ),
-            hr(class = "right-hr"),
-          ),
+
+
           div(
             class = "row color-block-content",
 

@@ -20,6 +20,7 @@ mod_workforce_ui <- function(id){
           openMenu(),
           div(
             class = "row",
+            id = ns("slide_occ"),
             align = "center",
             div(
               class = "col-sm-4",
@@ -107,20 +108,13 @@ mod_workforce_ui <- function(id){
               # Occupation Classifications
               conditionalPanel(
                 condition = paste0('input[\'', ns('topic'), "\'] == \'occupation_class\'"),
-                radioButtons(
-                  ns("type_class"),
-                  "",
-                  choices = workforce_classifications_measure,
-                  inline = TRUE
-                ),
-                br(),
                 div(
-                  class = "checkboxes",
-                  checkboxGroupInput(
-                    ns("classifications"),
-                    strong("Select Classification(s)"),
-                    workforce_classifications,
-                    selected = c("c5q63", "c5q52")
+                  class = "occupation-measures",
+                  radioButtons(
+                    ns("type_class"),
+                    "",
+                    choices = workforce_classifications_measure,
+                    inline = TRUE
                   )
                 )
               )
@@ -166,12 +160,25 @@ mod_workforce_ui <- function(id){
         right = div(
           div(
             class = "row color-block-header",
+            id = ns("dynamic_row"),
             div(
-              class = "col-sm-4 hover-text-side",
+              class = "col hover-text-side hide-icon",  # Hidden by default
+              align = "center",
+              actionLink(
+                ns("get_classifications"), # add occupation class
+                "",
+                icon = tags$i(class = "fa-light fa-filter",
+                              style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"),
+              span(class = "hover-text-content-side", "Add Classification")
+            ),
+
+            div(
+              class = "col hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("takeaway"), # key takeaway
+                ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
                               style = "font-size: 30px; text-align: center;"),
@@ -180,11 +187,11 @@ mod_workforce_ui <- function(id){
             ),
 
             div(
-              class = "col-sm-4 hover-text-side",
+              class = "col hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("context"), # survey questions and responses
+                ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
                               style = "font-size: 30px; text-align: center;"),
@@ -193,24 +200,32 @@ mod_workforce_ui <- function(id){
             ),
 
             div(
-              class = "col-sm-4 hover-text-side",
+              class = "col hover-text-side",
               align = "center",
               br(),
               actionLink(
-                inputId = ns("definitions"), # related definitions
+                ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
                               style = "font-size: 30px; text-align: center;"),
                 class = "link-no-underline action-link-2"),
               span(class = "hover-text-content-side", "Definitions")
             ),
-            hr(class = "right-hr"),
+            hr(class = "right-hr")
           ),
 
           div(
             class = "row color-block-content",
 
             # toggle side content -----------------------------------------------------
+            shinyjs::hidden(
+              div(
+                id = ns("toggle_get_classifications"),
+                class = "context-content",
+                uiOutput(ns("show_get_classifications"))
+              )
+            ),
+
             shinyjs::hidden(
               div(
                 id = ns("toggle_takeaway"),
@@ -253,40 +268,41 @@ mod_workforce_server <- function(id){
 
 
     # update inputs based on selections ---------------------------------------
+
     observe({
-      if (input$topic == "occupation_class") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-      } else if (input$topic == "c5q37") {
+      if (input$topic == "c5q37") {
+
+        # nested if/else
+        if (input$type_fte == "FTE_numcat") {
+          updateSelectInput(session, "filter",
+                            choices = landscape_filters)
+        } else {
         updateSelectInput(session, "filter",
                           choices = "All LHDs")
+        }
+
+      } else if (input$topic == "c5q36") {
+
+        # nested if/else
+        if (input$type_emp == "employee_numcat") {
+          updateSelectInput(session, "filter",
+                            choices = landscape_filters)
+        } else {
+          updateSelectInput(session, "filter",
+                            choices = "All LHDs")
+        }
+
+      } else if (input$topic == "occupation_class") {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+
       } else if (input$topic == "jobs") {
         updateSelectInput(session, "filter",
                           choices = "All Filters")
       }
+
     })
 
-    observeEvent(input$type_fte, {
-      if (input$type_fte %in% c("c5q37", "fte_bypop")) {
-        updateSelectInput(session, "filter",
-                          choices = "All LHDs"
-        )
-      } else {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-      }
-    })
-
-    observeEvent(input$type_emp, {
-      if (input$type_fte %in% c("c5q36", "employee_bypop")) {
-        updateSelectInput(session, "filter",
-                          choices = "All LHDs"
-        )
-      } else {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-      }
-    })
 
     # Reactive to get the inputs that I need for filtering --------------------
     get_workforce_input <- function() {
@@ -677,8 +693,35 @@ mod_workforce_server <- function(id){
 
     # right content ===========================================================
 
+    observeEvent(input$topic, {
+      if (input$topic == "occupation_class") {
+        shinyjs::addClass(selector = "#workforce_1-dynamic_row", class = "show-icon")
+      } else {
+        shinyjs::removeClass(selector = "#workforce_1-dynamic_row", class = "show-icon")
+      }
+    })
+
+    # show occupational classifications ---------------------------------------
+    observeEvent(input$get_classifications, {
+      shinyjs::show("toggle_get_classifications")
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_get_classifications <- renderUI({
+        checkboxGroupInput(
+          ns("classifications"),
+          strong("Select Classification(s)"),
+          workforce_classifications,
+          selected = c("c5q63", "c5q52")
+        )
+      })
+    }, ignoreNULL = FALSE)
+
+
     # takeaway ----------------------------------------------------------------
     observeEvent(input$takeaway, {
+      shinyjs::hide("toggle_get_classifications")
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
@@ -702,6 +745,7 @@ mod_workforce_server <- function(id){
 
     # survey questions, responses, and notes ----------------------------------
     observeEvent(input$context, {
+      shinyjs::hide("toggle_get_classifications")
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
       shinyjs::hide("toggle_definitions")
@@ -737,6 +781,7 @@ mod_workforce_server <- function(id){
 
     # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
+      shinyjs::hide("toggle_get_classifications")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")
