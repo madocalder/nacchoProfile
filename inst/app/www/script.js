@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var popoverTriggerList = [].slice.call(document.querySelectorAll('#workforce_1-slide_button'));
   var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
     return new bootstrap.Popover(popoverTriggerEl, {
-      content: 'Click here to change measure.',
+      content: 'Change measure here',
       trigger: 'hover',
       placement: 'right'
     });
