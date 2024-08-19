@@ -438,21 +438,21 @@ mod_workforce_server <- function(id){
       input$topic
       input$filter
       input$type_fte
-    }) %>% debounce(250)
+    }) %>% debounce(100)
 
 
     inputs_emp <- reactive({
       input$topic
       input$filter
       input$type_emp
-    }) %>% debounce(250)
+    }) %>% debounce(100)
 
 
     inputs_jobs <- reactive({
       input$topic
       input$filter
       input$type_jobs
-    }) %>% debounce(250)
+    }) %>% debounce(100)
 
 
     # inputs for classifications
@@ -461,7 +461,7 @@ mod_workforce_server <- function(id){
       input$filter
       input$type_class
       input$classifications
-    }) %>% debounce(250)
+    }) %>% debounce(100)
 
 
 
@@ -762,14 +762,14 @@ mod_workforce_server <- function(id){
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
+            "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response))
 
         } else {
           p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
+            "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,

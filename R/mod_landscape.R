@@ -299,7 +299,7 @@ mod_landscape_server <- function(id){
     updatedInputs <- reactive({
       input$topic
       input$filter
-    }) %>% debounce(250)
+    }) %>% debounce(100)
 
 
     # this observe is needed to redraw the figure based on the input selected
@@ -479,14 +479,14 @@ mod_landscape_server <- function(id){
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
+            "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response))
 
         } else {
           p(htmltools::HTML(
-            "<b>Survey Question</b>: <br>",
+            "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,
