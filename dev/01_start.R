@@ -36,7 +36,10 @@ golem::set_golem_options()
 golem::install_dev_deps()
 
 ## Add license and readme
-usethis::use_proprietary_license("@National Association of City & County Health Officials (NACCHO), all rights reserved") # You can set another license here
+# usethis::use_proprietary_license("@National Association of City & County Health Officials (NACCHO), all rights reserved") # You can set another license here
+# We decided to make this application open-source under GPL-3
+usethis::use_gpl_license(version = 3, include_future = TRUE)
+
 usethis::use_readme_rmd(open = FALSE)
 devtools::build_readme()
 usethis::use_code_of_conduct(contact = "ljorgenson@astho.org")
