@@ -291,12 +291,7 @@ report2022_workforce_fig5.13 <- function() {
 
     pmap_dfr(args, return_survey_weighted_statistics) %>%
         mutate(AnswerLabel = q_remap[as.character(.data$Question)]) %>%
-        mutate(GroupLabel = label_remap[as.character(.data$Group)]) %>%
-        mutate(
-            CI_L = .data$Total - .data$Total_SE,
-            CI_R = .data$Total + .data$Total_SE
-            )
-
+        mutate(GroupLabel = label_remap[as.character(.data$Group)])
 }
 
 #' @importFrom dplyr mutate bind_rows

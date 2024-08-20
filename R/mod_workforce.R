@@ -365,12 +365,11 @@ mod_workforce_server <- function(id){
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
         ) %>%
         viz_export()
-      # %>%
-      #   highcharter::hc_plotOptions(
-      #     series = list(
-      #       groupPadding = 0
-      #     )
-      #   )
+        # highcharter::hc_plotOptions(
+        #   series = list(
+        #     groupPadding = 0
+        #   )
+        # )
     })
 
 

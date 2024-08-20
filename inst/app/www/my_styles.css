@@ -22,6 +22,13 @@
     display: inline-block;
 }
 
+
+.dropdown-button:hover {
+    color: white !important;
+    background-color: #008A96 !important;
+    border: 1.5px solid #008A96;
+}
+
 .dropdown-toggle::after {
   content: none !important;
 }
