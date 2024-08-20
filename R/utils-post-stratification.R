@@ -77,7 +77,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
          data <- master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(ids = popcat, weights = wtype) %>%
+          as_survey_design(strata = popcat, weights = wtype) %>%
           filter(!is.na(.data[[q_label]])) %>%
           survey_count(.data[[q_label]], na.rm = TRUE) %>%
           mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
@@ -119,7 +119,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
         data <- master_data %>%
           as_factor() %>%
           left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(ids = popcat, weights = wtype) %>%
+          as_survey_design(strata = popcat, weights = wtype) %>%
           filter(!is.na(.data[[q_label]])) %>%
           group_by_at(grps) %>%
           survey_count(.data[[q_label]], na.rm = TRUE) %>%
@@ -150,6 +150,68 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 
 }
 
+
+
+
+#' Weighted All LHD Counts Wide
+#'
+#' @description Calculate weighted results for categorical questions for use in tables.
+#'
+#' @param q_label The question label in the data set
+#' @param popcat Based on which categories to calculate the weights (popcat3 or popcat7)
+#' @param wtype The type of weights to use: "weights" or "weights_static"
+#'
+#' @export
+#' @importFrom haven as_factor
+#' @importFrom dplyr left_join filter mutate select all_of rename_all
+#' @importFrom dplyr group_by_at ungroup rename
+#' @importFrom srvyr as_survey_design survey_count
+#'
+#' @examples
+#' add_all_counts_long("c3q15")
+#'
+#' @return tibble
+add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights") {
+
+  new_names <- c(
+    "Answer",
+    "NA.RM",
+    "N",
+    "SE",
+    "Percentage",
+    "Group")
+
+  data <- master_data %>%
+    as_factor() %>%
+    left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
+    as_survey_design(strata = popcat, weights = wtype) %>%
+    filter(!is.na(.data[[q_label]])) %>%
+    survey_count(.data[[q_label]], na.rm = TRUE) %>%
+    mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
+    mutate(Group = "All LHDs") %>%
+    rename_all(~new_names) %>%
+    select(all_of(c("Group", "Percentage", "Answer"))) %>%
+    mutate(
+      y = round(Percentage,1),
+      category = stringr::str_to_title(Answer),
+      group = Group,
+      subtitle = paste0("Estimated Across All LHDs")
+    )
+
+  add_responses <- master_data %>%
+    as_factor() %>%
+    as_tibble() %>%
+    group_by_at(q_label) %>%
+    summarise(
+      Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
+    mutate(Answer = get(q_label))
+
+  data <- left_join(data, add_responses, by = "Answer")  %>%
+    dplyr::select(category, group, y, Responses)
+
+  tidyr::pivot_wider(data, names_from = group, values_from = c(y, Responses))
+}
+
 #' Weighted Statistics
 #'
 #' @description Calculate weighted statistics results: total, mean, and quantiles.
@@ -177,17 +239,17 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
     master_data %>%
       as_factor() %>%
       left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-      as_survey_design(ids = popcat, weights = wtype) %>%
+      as_survey_design(strata = popcat, weights = wtype, fpc = "core_denom") %>%
       summarise(
         N = n(),
         Responses = length(which(!is.na(.data[[q_label]]))),
-        Total = survey_total(.data[[q_label]], na.rm = TRUE),
+        Total = survey_total(.data[[q_label]], na.rm = TRUE, vartype = c("ci", "se")),
         Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
         Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - 1)
       ) %>%
       mutate(Question = q_label) %>%
       mutate(Group = "All LHDs") %>%
-      select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+      select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", ci_low = "Total_low", ci_upp = "Total_upp", .data$Mean, all_of(starts_with("Quantile_"))) %>%
       mutate(
         y = round(Mean, 1),
         x = as.numeric(as.factor(Group)) - 1,
@@ -201,19 +263,19 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
       master_data %>%
         as_factor() %>%
         left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-        as_survey_design(ids = popcat, weights = wtype) %>%
+        as_survey_design(strata = popcat, weights = wtype, fpc = "core_denom") %>%
         group_by_at(grps) %>%
         summarise(
           N = n(),
           Responses = length(which(!is.na(.data[[q_label]]))),
-          Total = survey_total(.data[[q_label]], na.rm = TRUE),
+          Total = survey_total(.data[[q_label]], na.rm = TRUE, vartype = c("ci", "se")),
           Mean = survey_mean(.data[[q_label]], na.rm = TRUE),
           Quantile = survey_quantile(.data[[q_label]], quantiles = c(0.25, 0.50, 0.75), na.rm = TRUE, df = sum(Responses) - sum(dplyr::n_distinct(.data[[popcat]]))),
           .groups = "drop"
         ) %>%
         mutate(Question = q_label) %>%
         rename(Group = grps) %>%
-        select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", .data$Mean, all_of(starts_with("Quantile_"))) %>%
+        select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", ci_low = "Total_low", ci_upp = "Total_upp", .data$Mean, all_of(starts_with("Quantile_"))) %>%
         mutate(
           y = round(Mean, 1),
           x = as.numeric(as.factor(Group)) - 1,
