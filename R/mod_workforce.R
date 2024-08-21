@@ -57,6 +57,9 @@ mod_workforce_ui <- function(id){
           ),
           hr(),
 
+
+
+          #  Sliders ----------------------------------------------------------------
           div(
             id = ns("slide_measures"),
             div(
@@ -71,6 +74,7 @@ mod_workforce_ui <- function(id){
             div(
               id = ns("slideMenu"),
               class = "measures-shown",
+
               # FTEs
               conditionalPanel(
                 condition = paste0('input[\'', ns('topic'), "\'] == \'c5q37\'"),
@@ -268,7 +272,6 @@ mod_workforce_server <- function(id){
 
 
     # update inputs based on selections ---------------------------------------
-
     observe({
       if (input$topic == "c5q37") {
 
@@ -300,7 +303,6 @@ mod_workforce_server <- function(id){
         updateSelectInput(session, "filter",
                           choices = "All Filters")
       }
-
     })
 
 

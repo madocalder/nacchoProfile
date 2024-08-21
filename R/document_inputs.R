@@ -72,3 +72,43 @@
 #'
 #' @source columns from master_data
 "workforce_employee_types"
+
+
+
+
+
+#' Finance Topics
+#'
+#' @format list
+#'
+#' A list of 3
+#'
+#' @source columns from master_data
+"finance_topics"
+
+
+
+
+
+#' Finance Measures - Expenditures
+#'
+#' @format list
+#'
+#' A list of 3
+#'
+#' @source columns from master_data
+"finance_expenditure_types"
+
+
+
+
+
+
+#' Finance Measures - Revenues
+#'
+#' @format list
+#'
+#' A list of 3
+#'
+#' @source columns from master_data
+"finance_revenue_types"

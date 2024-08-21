@@ -52,6 +52,7 @@ viz_export <- function(hc, enabled = TRUE) {
 #' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::naccho_colors.
 #' @param theme hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.
 #' @param tooltip character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.
+#' @param tooltip_align character string; options include "left", "right", or "center".
 #' @param legend_enable boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.
 #' @param legend_title character string; title of the legend, defaults to nothing unless defined.
 #' @param legend_title character string; options include "left", "center" or "right". Defaults to "right".
@@ -68,6 +69,7 @@ viz_options <- function(hc,
                         colors = naccho.viz::naccho_colors,
                         theme = naccho.viz::basic_theme,
                         tooltip,
+                        tooltip_align = "center",
                         legend_enable = TRUE,
                         legend_title = "",
                         legend_align = "right") {
@@ -98,7 +100,7 @@ viz_options <- function(hc,
       useHTML = TRUE,
       style = list(
         fontWeight = 400,
-        textAlign = "center"
+        textAlign = tooltip_align
       )
     ) %>%
     highcharter::hc_legend(
@@ -555,6 +557,55 @@ set_hist <- function(data,
 
 
 
+#' Set First Boxplot Histogram
+#'
+#' @description Create the first highcharter boxplot visualizations from which proxies will redraw.
+#'
+#' @param data list, for the boxplot, the data needs to be a list.
+#'
+#' @export
+#'
+#' @return boxplot
+set_box <- function(data) {
+  highchart() %>%
+    hc_add_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      fillColor = "#EEEAE4",
+      lineWidth = 2,
+      medianWidth = 3,
+      stemWidth = 2,
+      whiskerWidth = 3
+    ) %>%
+    hc_add_series(
+      id = "Mean",
+      data = list_parse(data[[1]]$mean),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::naccho_orange
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      )
+    ) %>%
+    hc_yAxis(
+      title = list(text = "USD")
+    ) %>%
+    hc_xAxis(
+      categories = as.list(data[[1]]$category)
+    ) %>%
+    hc_add_theme(
+      naccho.viz::basic_theme
+    )
+}
+
+
+
 #' Histogram Bar Proxy Redraw Total FTEs
 #'
 #' @param hc A `highchart` `htmlwidget` object.
@@ -772,7 +823,7 @@ proxy_hist_to_single <- function(hc,
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
-        categories = data$category,
+        categories = as.list(data$category),
         title = list(
           text = unique(data$x_label)
         ),
@@ -983,6 +1034,7 @@ proxy_hist_to_group <- function(hc,
 #'
 #' @param hc A `highchart` `htmlwidget` object.
 #' @param data Dataframe; data object to feed the figure.
+#' @param max value, max value for the y axis.
 #' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
 #' @param ... Other arguments
 #'
@@ -1022,3 +1074,129 @@ proxy_to_bar <- function(hc, data, max, meta, ...) {
       )
     )
 }
+
+
+
+
+
+#' Single Box Plot Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_box <- function(hc, data, meta, ...) {
+
+  hc %>%
+    highcharter::hcpxy_update_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update_series(
+      id = "Mean",
+      data = list_parse(data[[1]]$mean),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::naccho_orange
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      ),
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update(
+      title = list(
+        text = meta$title
+      ),
+      title = list(
+        text = meta$title
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
+                      "<b> Note: </b> There were ", data[[1]]$total_outliers,
+                      " observations above the upper limit ranging from ",
+                      scales::dollar(data[[1]]$min_outlier)," to ",
+                      scales::dollar(data[[1]]$max_outlier), ". <br>",
+                      meta$caption)
+      ),
+      xAxis = list(
+        categories = as.list(sapply(data, function(x) x$name))
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
+
+
+
+
+
+#' Box Plot Proxy Redraw - Two
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_group_box <- function(hc, data, meta, ...) {
+
+  get_means <- do.call(rbind, lapply(data, function(d) d$mean))
+
+  hc %>%
+    highcharter::hcpxy_update_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update_series(
+      id = "Mean",
+      data = list_parse(get_means),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::naccho_orange
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      ),
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update(
+      title = list(
+        text = meta$title
+      ),
+      title = list(
+        text = meta$title
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
+                      "<b> Note: </b> Refer to the tooltip for information on outliers in each group. <br>",
+                      meta$caption)
+      ),
+      xAxis = list(
+        categories = as.list(sapply(data, function(x) x$name))
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
+

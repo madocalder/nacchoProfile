@@ -35,5 +35,6 @@ app_server <- function(input, output, session) {
   mod_key_findings_server("key_findings_1")
   mod_landscape_server("landscape_1")
   mod_workforce_server("workforce_1")
+  mod_finance_server("finance_1")
 
 }

@@ -1,23 +1,21 @@
+// Have the correct action links click upon load of app
+// this is for the right sidebar
 $(document).on('shiny:connected', function() {
   $('#landscape_1-takeaway').addClass('clicked-link').click();
-});
-
-
-$(document).on('shiny:connected', function() {
   $('#workforce_1-takeaway').addClass('clicked-link').click();
+  $('#finance_1-takeaway').addClass('clicked-link').click();
 });
 
 
-$(document).on('click', '.action-link', function() {
-  $('.action-link').removeClass('clicked-link'); // Remove class from all links
-  $(this).addClass('clicked-link'); // Add class to the clicked link
+
+// add and remove class to the right sidebar links when toggling
+// between the three
+$(document).on('click', '.action-link, .action-link-2, .action-link-3', function() {
+  $(this).siblings().removeClass('clicked-link');
+  $(this).addClass('clicked-link');
 });
 
 
-$(document).on('click', '.action-link-2', function() {
-  $('.action-link-2').removeClass('clicked-link'); // Remove class from all links
-  $(this).addClass('clicked-link'); // Add class to the clicked link
-});
 
 
 Shiny.addCustomMessageHandler('triggerClick', function(id) {
@@ -99,9 +97,11 @@ function adjustXAxisOffset() {
   }
 }
 
+
 $(document).on('shiny:connected', function() {
   adjustXAxisOffset();
 });
+
 
 $(window).on('resize', function() {
   adjustXAxisOffset();

@@ -11,6 +11,8 @@ proxy_to_bar(hc, data, max, meta, ...)
 
 \item{data}{Dataframe; data object to feed the figure.}
 
+\item{max}{value, max value for the y axis.}
+
 \item{meta}{Dataframe; data object to set options (e.g., title, subtitle, etc).}
 
 \item{...}{Other arguments}

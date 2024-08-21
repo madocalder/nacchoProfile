@@ -7,7 +7,7 @@
 filtered_jobs(selected_data = jobs_data)
 }
 \arguments{
-\item{question}{A variable from jobs_data, either "jobsgone" or "jobsgain" - either works.}
+\item{selected_data}{jobs_data.}
 }
 \value{
 dataframe

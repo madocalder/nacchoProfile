@@ -13,6 +13,7 @@ viz_options(
   colors = naccho.viz::naccho_colors,
   theme = naccho.viz::basic_theme,
   tooltip,
+  tooltip_align = "center",
   legend_enable = TRUE,
   legend_title = "",
   legend_align = "right"
@@ -34,6 +35,8 @@ viz_options(
 \item{theme}{hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.}
 
 \item{tooltip}{character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.}
+
+\item{tooltip_align}{character string; options include "left", "right", or "center".}
 
 \item{legend_enable}{boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.}
 

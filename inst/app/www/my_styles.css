@@ -60,16 +60,19 @@
   left: -6px;
 }
 
-#workforce_1-slide_measures {
+#workforce_1-slide_measures,
+#finance_1-slide_measures {
   overflow-y: hidden;
 }
 
-#workforce_1-slide {
+#workforce_1-slide,
+#finance_1-slide {
   z-index: 30;
   position: relative;
 }
 
-#workforce_1-slideMenu {
+#workforce_1-slideMenu,
+#finance_1-slideMenu {
   transform: translateY(-100%);
   overflow: hidden;
   z-index: 20;
@@ -77,12 +80,13 @@
   position: relative;
 }
 
-#workforce_1-slideMenu.open {
+#workforce_1-slideMenu.open,
+#finance_1-slideMenu.open {
   transform: translateY(0);
 }
 
 .with-slider {
-  margin-top: -15px;
+  margin-top: -30px;
 }
 
 /* -------------------------------------------------- Some Phone Sizing Stuff */
@@ -1031,15 +1035,13 @@ b, strong {
 
 
 
-
-
 /* HIGHCHARTS */
 
 .highcharts-tooltip span {
     height: auto;
-    width: 200px !important;
-    line-height: 1.2em;
-    text-align: center,
+    min-width: 250px;
+    max-width: 300px;
+    line-height: 1.4em;
     overflow: auto;
     white-space: normal !important;
     z-index: 9999;

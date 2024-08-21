@@ -389,7 +389,7 @@ responses <- function(question = "jobsgone") {
 #'
 #' @description Filtering jobs_data.
 #'
-#' @param question A variable from jobs_data, either "jobsgone" or "jobsgain" - either works.
+#' @param selected_data jobs_data.
 #'
 #' @export
 #' @return dataframe
@@ -410,4 +410,108 @@ filtered_jobs <- function(selected_data = jobs_data) {
                   difference = jobsgain - jobsgone) %>%
     dplyr::mutate(group = sub(" .*", "", group)) %>%
     dplyr::mutate_if(is.numeric, round, 1)
+}
+
+
+
+#' Create list for boxplot
+#'
+#' @description Create a list with a length of one or more for use in boxplot visualizations.
+#'
+#' @param args A variable from master_data.
+#'
+#' @export
+#' @return A list of one or more.
+boxplot_data <- function(args, grps = NULL) {
+
+  if (is.null(grps)) {
+    data <- return_survey_weighted_statistics(args) %>%
+      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3)))
+
+    find_limits <- master_data %>%
+      haven::as_factor() %>%
+      dplyr::left_join(add_weights(args, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
+      dplyr::mutate(y = get(args) * weights) %>%
+      tidyr::drop_na(y) %>%
+      dplyr::select(y)
+
+    # set upper and lower bounds for the box plot
+    iqr <- data$Quantile_q75 - data$Quantile_q25
+    find_lower <- data$Quantile_q25 - (1.5 * iqr)
+    upper_bound <- data$Quantile_q75 + (1.5 * iqr)
+    lower_bound <- ifelse((find_lower <= 1), 0, find_lower)
+
+    # mean
+    mean <- data.frame(x = 0, y = data$Mean)
+
+    # identify outliers, min, max, number of
+    outliers <- find_limits %>% dplyr::filter(y >= upper_bound | y <= lower_bound)
+
+    list(
+      list(
+        name = data$group,
+        low = lower_bound,
+        q1 = data$Quantile_q25,
+        median = data$Quantile_q50,
+        q3 = data$Quantile_q75,
+        high = upper_bound,
+        category = "All LHDs",
+        mean = mean,
+        responses = data$Responses,
+        outliers = outliers,
+        min_outlier = min(as.numeric(outliers$y)),
+        max_outlier = max(as.numeric(outliers$y)),
+        total_outliers = length(as.numeric(outliers$y)),
+        subtitle = data$subtitle
+      )
+    )
+
+  } else {
+
+    data <- return_survey_weighted_statistics(args, grps) %>%
+      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3))) %>%
+      dplyr::select(category, Quantile_q25, Quantile_q50, Quantile_q75, Responses, Mean, subtitle) %>%
+      dplyr::rename(q1 = Quantile_q25,
+                    median = Quantile_q50,
+                    q3 = Quantile_q75,
+                    mean = Mean,
+                    responses = Responses,
+                    category = category,
+                    subtitle = subtitle) %>%
+      dplyr::mutate(name = category)
+
+
+    data <- split(data, data$category)
+
+    find_limits <- master_data %>%
+      haven::as_factor() %>%
+      dplyr::left_join(add_weights(args, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
+      dplyr::mutate(y = get(args) * weights) %>%
+      tidyr::drop_na(y) %>%
+      dplyr::select(y, grps)
+
+    for(i in seq_along(data)) {
+
+      iqr <- data[[i]]$q3 - data[[i]]$q1
+      find_lower <- data[[i]]$q1 - (1.5 * iqr)
+      upper_bound <- data[[i]]$q3 + (1.5 * iqr)
+      lower_bound <- ifelse((find_lower <= 1), 0, find_lower)
+
+      outliers <- find_limits %>%
+        dplyr::filter(urbanrural2022 == stringr::str_to_lower(data[[i]]$name)) %>% ## NEED TO FIX
+        dplyr::filter(y >= upper_bound | y <= lower_bound)
+
+      # add elements to the list
+      data[[i]][["mean"]] <- data.frame(x = i-1, y = data[[i]]$mean)
+      data[[i]][["high"]] <- upper_bound
+      data[[i]][["low"]] <- lower_bound
+      data[[i]][["outliers"]] <- list(outliers)
+      data[[i]][["min_outlier"]] <- min(as.numeric(outliers$y))
+      data[[i]][["max_outlier"]] <- max(as.numeric(outliers$y))
+      data[[i]][["total_outliers"]] <- length(as.numeric(outliers$y))
+    }
+
+    lapply(data, function(tbl) as.list(tbl[1, ]))
+
+  }
 }

@@ -42,7 +42,6 @@ mod_landscape_ui <- function(id){
                 choices = c(
                   "Bar Graph",
                   "Line Graph",
-                  "Pie Chart",
                   "Table"
                 )
               )
@@ -191,7 +190,7 @@ mod_landscape_server <- function(id){
                           choices = c("Map", "Bar Graph", "Line Graph", "Table"))
       } else if (input$topic == "totpop") {
         updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Pie Chart", "Table"))
+                          choices = c("Bar Graph", "Line Graph", "Table"))
       } else {
         updateSelectInput(session, "view",
                           choices = c("Bar Graph", "Line Graph", "Table"))
@@ -418,29 +417,6 @@ mod_landscape_server <- function(id){
           )
       }
     })
-
-
-    #   } else if (input$view == "Pie Chart") {
-    #     naccho.viz::create_pie(
-    #       data = filter_data(),
-    #       variable = "fig_filter",
-    #       value = "n",
-    #       my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-    #       legend_enable = TRUE,
-    #       title_text = filter_meta()$title,
-    #       subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-    #       caption_text = filter_meta()$caption
-    #     ) %>%
-    #       naccho.viz::add_logo(
-    #         "https://toolbox.naccho.org/pages/img/logo-header.png",
-    #         width = 150L,
-    #         height = 40L
-    #       )
-    #
-    #   }
-    # })
-
-
 
     # right content ===========================================================
 
