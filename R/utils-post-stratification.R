@@ -469,16 +469,18 @@ boxplot_data <- function(args, grps = NULL) {
   } else {
 
     data <- return_survey_weighted_statistics(args, grps) %>%
-      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3))) %>%
-      dplyr::select(category, Quantile_q25, Quantile_q50, Quantile_q75, Responses, Mean, subtitle) %>%
+      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3)),
+                    Group = as.character(Group)) %>%
+      dplyr::select(category, Group, Quantile_q25, Quantile_q50, Quantile_q75, Responses, Mean, subtitle) %>%
       dplyr::rename(q1 = Quantile_q25,
                     median = Quantile_q50,
                     q3 = Quantile_q75,
+                    name = Group,
                     mean = Mean,
-                    responses = Responses,
+                    group_responses = Responses,
                     category = category,
                     subtitle = subtitle) %>%
-      dplyr::mutate(name = category)
+      dplyr::mutate(responses = sum(group_responses))
 
 
     data <- split(data, data$category)
@@ -498,7 +500,7 @@ boxplot_data <- function(args, grps = NULL) {
       lower_bound <- ifelse((find_lower <= 1), 0, find_lower)
 
       outliers <- find_limits %>%
-        dplyr::filter(urbanrural2022 == stringr::str_to_lower(data[[i]]$name)) %>% ## NEED TO FIX
+        dplyr::filter(get(grps) == data[[i]]$name) %>%
         dplyr::filter(y >= upper_bound | y <= lower_bound)
 
       # add elements to the list

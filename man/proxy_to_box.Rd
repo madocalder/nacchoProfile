@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_highcharter.R
 \name{proxy_to_box}
 \alias{proxy_to_box}
-\title{Single Bar Proxy Redraw}
+\title{Single Box Plot Proxy Redraw}
 \usage{
 proxy_to_box(hc, data, meta, ...)
 }
@@ -19,5 +19,5 @@ proxy_to_box(hc, data, meta, ...)
 A redrawn figure.
 }
 \description{
-Single Bar Proxy Redraw
+Single Box Plot Proxy Redraw
 }

@@ -597,7 +597,7 @@ set_box <- function(data) {
       title = list(text = "USD")
     ) %>%
     hc_xAxis(
-      categories = as.list(data[[1]]$category)
+      categories = as.list(stringr::str_to_title(data[[1]]$category))
     ) %>%
     hc_add_theme(
       naccho.viz::basic_theme
@@ -1130,7 +1130,7 @@ proxy_to_box <- function(hc, data, meta, ...) {
                       meta$caption)
       ),
       xAxis = list(
-        categories = as.list(sapply(data, function(x) x$name))
+        categories = as.list(stringr::str_to_title(sapply(data, function(x) x$name)))
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -1192,10 +1192,19 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
                       meta$caption)
       ),
       xAxis = list(
-        categories = as.list(sapply(data, function(x) x$name))
+        categories = as.list(stringr::str_to_title(sapply(data, function(x) x$name)))
       ),
       tooltip = list(
-        pointFormat = meta$tooltip
+        pointFormat = "<b> Upper Limit: </b> ${point.high} <br>
+                      <b> 75th Percentile: </b> ${point.q3} <br>
+                      <b> Median: </b> ${point.median} <br>
+                      <b> 25th Percentile: </b> ${point.q1} <br>
+                      <b> Lower Limit: </b> ${point.low} <br>
+                      <hr class = 'tt'>
+                      <b> Responses in Group:</b> {point.group_responses} <br>
+                      <b> Number of Outliers:</b> {point.total_outliers} <br>
+                      <b> Range of Outliers: </b> ${point.min_outlier:,.0f} to ${point.max_outlier:,.0f}"
+
       )
     )
 }

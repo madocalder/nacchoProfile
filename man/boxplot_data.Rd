@@ -4,7 +4,7 @@
 \alias{boxplot_data}
 \title{Create list for boxplot}
 \usage{
-boxplot_data(args)
+boxplot_data(args, grps = NULL)
 }
 \arguments{
 \item{args}{A variable from master_data.}
