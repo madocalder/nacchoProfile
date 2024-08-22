@@ -244,6 +244,23 @@ mod_finance_server <- function(id){
           updateSelectInput(session, "filter",
                             choices = landscape_filters)
 
+        if (input$type_exp == "exp_numcat") {
+          updateSelectInput(session, "view",
+                            choices = c("Bar Graph",
+                                        "Table"))
+
+        } else if (input$type_exp == "c3q15") {
+          updateSelectInput(session, "view",
+                            choices = c("Box Plot",
+                                        "Map",
+                                        "Line Graph",
+                                        "Table"))
+        } else {
+          updateSelectInput(session, "view",
+                            choices = c("Box Plot",
+                                        "Table"))
+        }
+
       } else if (input$topic == "revenues") {
 
           updateSelectInput(session, "filter",
@@ -344,22 +361,28 @@ mod_finance_server <- function(id){
     # for Expenditures --------------------------------------------------------
     observeEvent(inputs_exp(), {
 
-      if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter == "All LHDs") {
+      if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
         data <- boxplot_data(input$type_exp)
 
         proxy_box %>%
           proxy_to_box(data,
                        meta = filter_meta())
 
-      } else if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter != "All LHDs") {
+      } else if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter != "All LHDs" & input$view == "Box Plot") {
 
         data <- boxplot_data(input$type_exp,
-                             grps = "urbanrural2022") ## FIX THIS
+                             grps = input$filter)
         names(data) <- NULL
 
         proxy_box %>%
           proxy_to_group_box(data,
                        meta = filter_meta())
+
+      } else if (input$type_exp == "exp_numcat" & input$filter != "All LHDs" & input$view == "Bar Graph") {
+
+
+
+
 
       }
     })
