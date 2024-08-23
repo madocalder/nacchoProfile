@@ -1,3 +1,4 @@
+library(tippy)
 #landscape tables function------
 
 #' Create a Custom Non-Time Table
@@ -32,10 +33,18 @@
 #' }
 #'
 #' @export
-
+#
+# categorical tables--------
 create_non_time_table <- function(data, category, colors) {
 
-  #Define theme
+
+  # Extract the relevant Responses columns
+  response_columns <- grep("^Responses_", colnames(data), value = TRUE)
+
+  # Calculate total N counts for each corresponding Responses column
+  total_counts <- sapply(response_columns, function(col) sum(data[[col]], na.rm = TRUE))
+
+  # Define theme
   options(
     reactable.theme = reactableTheme(
       color = "#3d4242",
@@ -89,7 +98,6 @@ create_non_time_table <- function(data, category, colors) {
     )
   )
 
-
   # Define the groups and their corresponding columns
   group_definitions <- list(
     Rurality = list(columns = c("y_Urban", "y_Rural")),
@@ -106,16 +114,19 @@ create_non_time_table <- function(data, category, colors) {
     lapply(seq_along(selected_columns), function(i) {
       col <- selected_columns[i]
       col_name <- sub("^y_", "", col)
-
+      response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
+      count <- total_counts[[response_col]]  # Get the count for the current column
 
       colDef(
         name = stringr::str_replace_all(col_name, "_", " "),
         align = "center",
+        header = with_tooltip(col_name, paste0("n = ", count)),
         cell = data_bars(data,
                          text_position = "outside-end",
                          max_value = 100,
                          fill_color = colors[i],
-                         background = 'none')
+                         background = 'none',
+                         number_fmt = scales::percent_format(scale = 1))
       )
     }),
     selected_columns
@@ -138,11 +149,13 @@ create_non_time_table <- function(data, category, colors) {
       `y_All LHDs` = colDef(
         name = "All LHDs",
         align = "center",
+        header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
         cell = data_bars(data,
                          text_position = "outside-end",
                          max_value = 100,
                          fill_color = "#008A96",
-                         background = 'none'),
+                         background = 'none',
+                         number_fmt = scales::percent_format(scale = 1)),
         style = list(
           borderRight = "3px solid #3d4242"
         ),
@@ -156,6 +169,17 @@ create_non_time_table <- function(data, category, colors) {
     ),
     column_definitions
   )
+
+  # Add hidden columns for Responses_*
+  response_col_definitions <- setNames(
+    lapply(response_columns, function(col) {
+      colDef(show = FALSE)
+    }),
+    response_columns
+  )
+
+  # Combine the main column definitions with the hidden Response columns
+  column_definitions <- c(column_definitions, response_col_definitions)
 
   # Create the reactable table
   reactable(
@@ -175,4 +199,9 @@ create_non_time_table <- function(data, category, colors) {
   )
 }
 
+# Helper function to add tooltips
+with_tooltip <- function(value, tooltip, ...) {
+  div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
+      tippy(value, tooltip, ...))
+}
 

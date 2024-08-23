@@ -297,13 +297,18 @@ mod_landscape_server <- function(id){
         c(naccho.viz::naccho_blue, naccho.viz::naccho_green, naccho.viz::naccho_orange, naccho.viz::naccho_pink)
       }
 
+
+
       # Fetch the data based on inputs
       data <- return_survey_weighted_counts(input$topic, input$filter) %>%
         dplyr::mutate(x_label = NA) %>%
         dplyr::select(category, group, y, subtitle, Responses) %>%
         tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
         dplyr::left_join(., add_all_counts_long(input$topic), by = "category") %>%
-        dplyr::select(category, subtitle, `y_All LHDs`, tidyr::starts_with("y_"))
+        dplyr::select(category, subtitle, `y_All LHDs`, starts_with("y_"),
+                      starts_with("Responses"))
+
+
 
       # Determine the category based on the input filter
       category <- case_when(
