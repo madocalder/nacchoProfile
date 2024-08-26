@@ -8,11 +8,25 @@ $(document).on('shiny:connected', function() {
 
 
 
-// Add and remove class to the right sidebar links when toggling between the three
-$(document).on('click', '.action-link, .action-link-2, .action-link-3', function() {
-  $('.action-link, .action-link-2, .action-link-3').removeClass('clicked-link');
-  $(this).addClass('clicked-link');
+// add and remove class to the right sidebar links when toggling
+// between the three
+$(document).on('click', '.action-link', function() {
+  $('.action-link').removeClass('clicked-link'); // Remove class from all links
+  $(this).addClass('clicked-link'); // Add class to the clicked link
 });
+
+
+$(document).on('click', '.action-link-2', function() {
+  $('.action-link-2').removeClass('clicked-link'); // Remove class from all links
+  $(this).addClass('clicked-link'); // Add class to the clicked link
+});
+
+
+$(document).on('click', '.action-link-3', function() {
+  $('.action-link-3').removeClass('clicked-link'); // Remove class from all links
+  $(this).addClass('clicked-link'); // Add class to the clicked link
+});
+
 
 
 // triggers the occupational classifications to click
@@ -47,7 +61,6 @@ $(() => {
     }, 500);
   });
 });
-
 
 
 
