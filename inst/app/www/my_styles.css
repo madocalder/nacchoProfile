@@ -63,6 +63,8 @@
 #workforce_1-slide_measures,
 #finance_1-slide_measures {
   overflow-y: hidden;
+  font-size: 15px !important;
+  letter-spacing: .6px !important;
 }
 
 #workforce_1-slide,
@@ -230,6 +232,8 @@ label:not(.material-switch label) {
 .shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group, .shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
     margin-top: -1px;
     justify-content: space-evenly;
+    padding-left: 10px;
+    padding-right: 10px;
     width: 100%;
     display: flex;
 }
