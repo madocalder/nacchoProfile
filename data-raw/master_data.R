@@ -122,6 +122,7 @@ master_data$non_weighted_revenue_total <- dplyr::na_if(master_data$non_weighted_
 master_data$non_weighted_revenue_percap <- dplyr::na_if(master_data$non_weighted_revenue_percap, 0)
 
 # Add exp and rev categories for bar --------------------------------------
+# categories loosely based on jenks natural breaks
 master_data <- master_data %>%
   dplyr::mutate(exp_total_numcat = dplyr::case_when(c3q15 < 250000 ~ "Less than $250,000",
                                                     c3q15 >= 250000 & c3q15 < 500000 ~ "$250,000 to $499,999",
@@ -130,15 +131,13 @@ master_data <- master_data %>%
                                                     c3q15 >= 2000000 & c3q15 < 5000000 ~ "$2,000,000 to $4,999,999",
                                                     c3q15 >= 5000000 & c3q15 < 10000000 ~ "$5,000,000 to $9,999,999",
                                                     c3q15 >= 10000000 ~ "$10,000,000 or more")) %>%
-  # categories based on weighted quartiles
-  dplyr::mutate(exp_percap_numcat = dplyr::case_when(totexp_percap < 5 ~ "Less than $5",
-                                                     totexp_percap >= 5 & totexp_percap < 10 ~ "$5 to $9",
+  dplyr::mutate(exp_percap_numcat = dplyr::case_when(totexp_percap < 10 ~ "Less than $10",
                                                      totexp_percap >= 10 & totexp_percap < 25 ~ "$10 to $24",
-                                                     totexp_percap >= 25 & totexp_percap < 50 ~ "$25 to $49",
-                                                     totexp_percap >= 50 & totexp_percap < 100 ~ "$50 to $99",
-                                                     totexp_percap >= 100 & totexp_percap < 200 ~ "$100 to $200",
-                                                     totexp_percap >= 200 ~ "$200 or more")) %>%
-  # categories loosely based on jenks natural breaks
+                                                     totexp_percap >= 25 & totexp_percap < 50 ~ "$24 to $50",
+                                                     totexp_percap >= 50 & totexp_percap < 75 ~ "$50 to $74",
+                                                     totexp_percap >= 75 & totexp_percap < 100 ~ "$75 to $100",
+                                                     totexp_percap >= 100 & totexp_percap < 150 ~ "$100 to $150",
+                                                     totexp_percap >= 150 ~ "$150 or more")) %>%
   dplyr::mutate(rev_total_numcat = dplyr::case_when(non_weighted_revenue_total < 250000 ~ "Less than $250,000",
                                                     non_weighted_revenue_total >= 250000 & non_weighted_revenue_total < 500000 ~ "$250,000 to $499,999",
                                                     non_weighted_revenue_total >= 500000 & non_weighted_revenue_total < 1000000 ~ "$500,000 to $999,999",
@@ -146,15 +145,74 @@ master_data <- master_data %>%
                                                     non_weighted_revenue_total >= 2000000 & non_weighted_revenue_total < 5000000 ~ "$2,000,000 to $4,999,999",
                                                     non_weighted_revenue_total >= 5000000 & non_weighted_revenue_total < 10000000 ~ "$5,000,000 to $9,999,999",
                                                     non_weighted_revenue_total >= 10000000 ~ "$10,000,000 or more")) %>%
-  # categories based on weighted quartiles
-  dplyr::mutate(rev_percap_numcat = dplyr::case_when(non_weighted_revenue_percap < 5 ~ "Less than $5",
-                                                     non_weighted_revenue_percap >= 5 & non_weighted_revenue_percap < 10 ~ "$5 to $9",
+  dplyr::mutate(rev_percap_numcat = dplyr::case_when(non_weighted_revenue_percap < 10 ~ "Less than $10",
                                                      non_weighted_revenue_percap >= 10 & non_weighted_revenue_percap < 25 ~ "$10 to $24",
-                                                     non_weighted_revenue_percap >= 25 & non_weighted_revenue_percap < 50 ~ "$25 to $49",
-                                                     non_weighted_revenue_percap >= 50 & non_weighted_revenue_percap < 100 ~ "$50 to $99",
-                                                     non_weighted_revenue_percap >= 100 & non_weighted_revenue_percap < 200 ~ "$100 to $200",
-                                                     non_weighted_revenue_percap >= 200 ~ "$200 or more"))
+                                                     non_weighted_revenue_percap >= 25 & non_weighted_revenue_percap < 50 ~ "$24 to $50",
+                                                     non_weighted_revenue_percap >= 50 & non_weighted_revenue_percap < 75 ~ "$50 to $74",
+                                                     non_weighted_revenue_percap >= 75 & non_weighted_revenue_percap < 100 ~ "$75 to $100",
+                                                     non_weighted_revenue_percap >= 100 & non_weighted_revenue_percap < 150 ~ "$100 to $150",
+                                                     non_weighted_revenue_percap >= 150 ~ "$150 or more")) %>%
+  dplyr::mutate(exp_total_numcat = haven::as_factor(exp_total_numcat),
+                exp_percap_numcat = haven::as_factor(exp_percap_numcat),
+                rev_total_numcat = haven::as_factor(rev_total_numcat),
+                rev_percap_numcat = haven::as_factor(rev_percap_numcat))
 
+
+
+master_data$exp_total_numcat <- haven::labelled(
+  master_data$exp_total_numcat,
+  labels = c("Less than $250,000" = 1,
+             "$250,000 to $499,999" = 2,
+             "$500,000 to $999,999" = 3,
+             "$1,000,000 to $1,999,999" = 4,
+             "$2,000,000 to $4,999,999" = 5,
+             "$5,000,000 to $9,999,999" = 6,
+             "$10,000,000 or more" = 7
+             ),
+  label = "Total expenditures, by group, created by LJ"
+)
+
+
+master_data$rev_total_numcat <- haven::labelled(
+  master_data$rev_total_numcat,
+  labels = c("Less than $250,000" = 1,
+             "$250,000 to $499,999" = 2,
+             "$500,000 to $999,999" = 3,
+             "$1,000,000 to $1,999,999" = 4,
+             "$2,000,000 to $4,999,999" = 5,
+             "$5,000,000 to $9,999,999" = 6,
+             "$10,000,000 or more" = 7
+  ),
+  label = "Total revenue, by group, created by LJ"
+)
+
+
+master_data$exp_percap_numcat <- haven::labelled(
+  master_data$exp_percap_numcat,
+  labels = c("Less than $10" = 1,
+             "$10 to $24" = 2,
+             "$24 to $50" = 3,
+             "$50 to $74" = 4,
+             "$75 to $100" = 5,
+             "$100 to $150" = 6,
+             "$150 or more" = 7
+  ),
+  label = "Per capita expenditures, by group, created by LJ"
+)
+
+
+master_data$rev_percap_numcat <- haven::labelled(
+  master_data$rev_percap_numcat,
+  labels = c("Less than $10" = 1,
+             "$10 to $24" = 2,
+             "$24 to $50" = 3,
+             "$50 to $74" = 4,
+             "$75 to $100" = 5,
+             "$100 to $150" = 6,
+             "$150 or more" = 7
+  ),
+  label = "Per capita revenue, by group, created by LJ"
+)
 
 
 # print elapsed time

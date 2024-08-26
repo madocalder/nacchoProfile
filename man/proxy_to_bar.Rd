@@ -4,7 +4,15 @@
 \alias{proxy_to_bar}
 \title{Single Bar Proxy Redraw}
 \usage{
-proxy_to_bar(hc, data, max, meta, ...)
+proxy_to_bar(
+  hc,
+  data,
+  max,
+  meta,
+  name_one = "Jobs Lost",
+  name_two = "Jobs Added",
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}
