@@ -399,19 +399,16 @@ set_column <- function(data,
 #'
 #' @return column graph
 set_bar <- function(data,
-                    y_label = "% of Population") {
+                    y_label = "% of Population",
+                    name_one = "Jobs Lost",
+                    name_two = "Jobs Added",
+                    set_max = 15000,
+                    set_format = NA) {
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
-      type = "bar",
-      margin = list(90, 0, 180, 0),
-      events = list(
-        load = highcharter::JS("
-          function() {
-            adjustXAxisOffset();
-          }
-        ")
-      )
+      type = "bar"
+      # margin = list(90, 0, 180, 0)
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
@@ -426,37 +423,216 @@ set_bar <- function(data,
     highcharter::hc_xAxis(
       categories = unique(data$group),
       labels = list(
-        useHTML = TRUE,
-        align = "center"
+        enabled = FALSE
       ),
-      offset = 0,
-      tickWidth = 0
+      plotBands = list(
+        list(
+          from = -0.5,
+          to = 0.5,
+          color = "transparent",
+          label = list(
+            text = "Rural",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 0.5,
+          to = 1.5,
+          color = "transparent",
+          label = list(
+            text = "Urban",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 1.5,
+          to = 2.5,
+          color = "transparent",
+          label = list(
+            text = "Local",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 2.5,
+          to = 3.5,
+          color = "transparent",
+          label = list(
+            text = "Shared",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 3.5,
+          to = 4.5,
+          color = "transparent",
+          label = list(
+            text = "State",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 4.5,
+          to = 5.5,
+          color = "transparent",
+          label = list(
+            text = "Small",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 5.5,
+          to = 6.5,
+          color = "transparent",
+          label = list(
+            text = "Medium",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 6.5,
+          to = 7.5,
+          color = "transparent",
+          label = list(
+            text = "Large",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 7.5,
+          to = 8.5,
+          color = "transparent",
+          label = list(
+            text = "Midwest",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 8.5,
+          to = 9.5,
+          color = "transparent",
+          label = list(
+            text = "Northeast",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 9.5,
+          to = 10.5,
+          color = "transparent",
+          label = list(
+            text = "South",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 10.5,
+          to = 11.5,
+          color = "transparent",
+          label = list(
+            text = "West",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 11.5,
+          to = 12.5,
+          color = "#EEEAE4",
+          label = list(
+            text = "All LHDs",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo",
+              fontWeight = 700
+            )
+          )
+        )
+      )
     ) %>%
     highcharter::hc_yAxis_multiples(
       list(
-        max = 15000,
+        max = set_max,
         title = list(text = NULL),
         width = "45%",
-        reversed = TRUE
+        reversed = TRUE,
+        offset = 0,
+        alignTicks = FALSE,
+        labels = list(
+          format = set_format
+        )
       ),
       list(
-        max = 15000,
+        max = set_max,
         title = list(text = NULL),
         offset = 0,
         left = "55%",
-        width = "45%"
+        width = "45%",
+        offset = 0,
+        alignTicks = FALSE ,
+        labels = list(
+          format = set_format
+        )
       )
     ) %>%
     highcharter::hc_add_series(
-      id = "Jobs Lost",
-      name = "Jobs Lost",
-      data = data$jobsgone,
+      id = "Left",
+      name = name_one,
+      data = data$left,
       yAxis = 0
     ) %>%
     highcharter::hc_add_series(
-      id = "Jobs Added",
-      name = "Jobs Added",
-      data = data$jobsgain,
+      id = "Right",
+      name = name_two,
+      data = data$right,
       yAxis = 1
     )
 }
@@ -567,8 +743,8 @@ set_hist <- function(data,
 #'
 #' @return boxplot
 set_box <- function(data) {
-  highchart() %>%
-    hc_add_series(
+  highcharter::highchart() %>%
+    highcharter::hc_add_series(
       id = "All Box",
       type = "boxplot",
       data = data,
@@ -579,9 +755,9 @@ set_box <- function(data) {
       stemWidth = 2,
       whiskerWidth = 3
     ) %>%
-    hc_add_series(
+    highcharter::hc_add_series(
       id = "Mean",
-      data = list_parse(data[[1]]$mean),
+      data = highcharter::list_parse(data[[1]]$mean),
       type = "scatter",
       name = "Mean",
       marker = list(
@@ -593,13 +769,13 @@ set_box <- function(data) {
         pointFormat = "<b>Mean:</b> ${point.y}"
       )
     ) %>%
-    hc_yAxis(
+    highcharter::hc_yAxis(
       title = list(text = "USD")
     ) %>%
-    hc_xAxis(
+    highcharter::hc_xAxis(
       categories = as.list(stringr::str_to_title(data[[1]]$category))
     ) %>%
-    hc_add_theme(
+    highcharter::hc_add_theme(
       naccho.viz::basic_theme
     )
 }
@@ -1041,19 +1217,25 @@ proxy_hist_to_group <- function(hc,
 #' @return A redrawn figure.
 #' @export
 #'
-proxy_to_bar <- function(hc, data, max, meta, ...) {
+proxy_to_bar <- function(hc,
+                         data,
+                         max,
+                         meta,
+                         name_one = "Jobs Lost",
+                         name_two = "Jobs Added",
+                         ...) {
 
   hc %>%
     highcharter::hcpxy_update_series(
-      id = "Jobs Lost",
-      name = "Jobs Lost",
-      data = data$jobsgone,
+      id = "Left",
+      name = name_one,
+      data = data$left,
       redraw = TRUE
     ) %>%
     highcharter::hcpxy_update_series(
-      id = "Jobs Added",
-      name = "Jobs Added",
-      data = data$jobsgain,
+      id = "Right",
+      name = name_two,
+      data = data$right,
       redraw = TRUE
     ) %>%
     highcharter::hcpxy_update(
@@ -1101,7 +1283,7 @@ proxy_to_box <- function(hc, data, meta, ...) {
     ) %>%
     highcharter::hcpxy_update_series(
       id = "Mean",
-      data = list_parse(data[[1]]$mean),
+      data = highcharter::list_parse(data[[1]]$mean),
       type = "scatter",
       name = "Mean",
       marker = list(
@@ -1166,7 +1348,7 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
     ) %>%
     highcharter::hcpxy_update_series(
       id = "Mean",
-      data = list_parse(get_means),
+      data = highcharter::list_parse(get_means),
       type = "scatter",
       name = "Mean",
       marker = list(

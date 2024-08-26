@@ -376,7 +376,7 @@ class_data_b <- function(args) {
 #'
 #' @export
 #' @return dataframe
-responses <- function(question = "jobsgone") {
+jobs_responses <- function(question = "jobsgone") {
   jobs_data %>%
   dplyr::filter(Question == question) %>%
   dplyr::group_by(filter) %>%
@@ -387,29 +387,45 @@ responses <- function(question = "jobsgone") {
 
 #' Retrieve filtered jobs dataset for visualization
 #'
-#' @description Filtering jobs_data.
+#' @description Filtering jobs_data or budget_data.
 #'
-#' @param selected_data jobs_data.
+#' @param selected_data jobs_data or budget_jobs.
 #'
 #' @export
 #' @return dataframe
-filtered_jobs <- function(selected_data = jobs_data) {
+filtered_butterfly <- function(selected_data = "jobs_data") {
 
-  data <- selected_data %>%
-    dplyr::select(1:7, 14:20) %>%
-    dplyr::mutate(x = as.numeric(as.factor(group))-1,
-                  group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
-                                           TRUE ~ group)) %>%
-    dplyr::select(group, Question, y, x, total_employees)
+  if (selected_data == "jobs_data") {
+    data <- jobs_data %>%
+      dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                    group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                             TRUE ~ group)) %>%
+      dplyr::select(group, Question, y, x, total_employees)
 
 
-  data %>%
-    tidyr::pivot_wider(names_from = Question, values_from = y) %>%
-    dplyr::mutate(jobsgone_standard = round((jobsgone/total_employees)*100,1),
-                  jobsgain_standard = round((jobsgain/total_employees)*100,1),
-                  difference = jobsgain - jobsgone) %>%
-    dplyr::mutate(group = sub(" .*", "", group)) %>%
-    dplyr::mutate_if(is.numeric, round, 1)
+    data %>%
+      tidyr::pivot_wider(names_from = Question, values_from = y) %>%
+      dplyr::rename(left = jobsgone,
+                    right = jobsgain) %>%
+      dplyr::mutate(left_standard = round((left/total_employees)*100,1),
+                    right_standard = round((right/total_employees)*100,1),
+                    difference = right - left) %>%
+      dplyr::mutate(group = sub(" .*", "", group)) %>% # shorten labels
+      dplyr::mutate_if(is.numeric, round, 1)
+
+  } else {
+    data <- budget_data %>%
+      dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                    group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                             TRUE ~ group)) %>%
+      dplyr::select(group, x, y, category, Responses) %>%
+      tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+      dplyr::rename(left = 3,
+                    right = 4,
+                    left_n = 5,
+                    right_n = 6) %>%
+      dplyr::mutate(group = sub(" .*", "", group)) # shorten labels
+  }
 }
 
 

@@ -125,6 +125,7 @@ mod_workforce_ui <- function(id){
             )
           ),
 
+          # supports the sliding out menu
           tags$script(HTML("
               document.getElementById('workforce_1-slide_button').addEventListener('click', function() {
                 var slideMenu = document.querySelector('#workforce_1-slideMenu');
@@ -367,25 +368,20 @@ mod_workforce_server <- function(id){
           tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
         ) %>%
         viz_export()
-        # highcharter::hc_plotOptions(
-        #   series = list(
-        #     groupPadding = 0
-        #   )
-        # )
     })
 
 
     # used for jobs losses and gains
     output$figure_jobs <- highcharter::renderHighchart({
 
-      data <- filtered_jobs()
+      data <- filtered_butterfly()
 
       set_bar(data) %>%
         viz_options(
           colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
           legend_enable = TRUE,
           viz_title = "Jobs Lost and Added - Estimated Total",
-          viz_caption = paste0("<b> N: </b>", unique(responses()$responses), "<br>", source_line),
+          viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y} <br>",
@@ -393,7 +389,7 @@ mod_workforce_server <- function(id){
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
-          backgroundColor = "#fff",
+          backgroundColor = "transparent",
           headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
@@ -403,7 +399,7 @@ mod_workforce_server <- function(id){
           positioner = highcharter::JS("
           function (labelWidth, labelHeight, point) {
             return {
-              x: 10,
+              x: 0,
               y: 10
             };
           }
@@ -439,21 +435,21 @@ mod_workforce_server <- function(id){
       input$topic
       input$filter
       input$type_fte
-    }) %>% debounce(100)
+    })
 
 
     inputs_emp <- reactive({
       input$topic
       input$filter
       input$type_emp
-    }) %>% debounce(100)
+    })
 
 
     inputs_jobs <- reactive({
       input$topic
       input$filter
       input$type_jobs
-    }) %>% debounce(100)
+    })
 
 
     # inputs for classifications
@@ -462,7 +458,7 @@ mod_workforce_server <- function(id){
       input$filter
       input$type_class
       input$classifications
-    }) %>% debounce(100)
+    })
 
 
 
@@ -598,9 +594,9 @@ mod_workforce_server <- function(id){
       # Filters: All
       if (input$type_jobs == "jobs_standard") {
 
-        data <- filtered_jobs() %>%
-          dplyr::mutate(jobsgone = jobsgone_standard,
-                        jobsgain = jobsgain_standard)
+        data <- filtered_butterfly() %>%
+          dplyr::mutate(left = left_standard,
+                        right = right_standard)
 
         proxy_jobs %>%
           proxy_to_bar(data,
@@ -611,7 +607,7 @@ mod_workforce_server <- function(id){
       # View: Bar Graph
       } else {
 
-        data <- filtered_jobs()
+        data <- filtered_butterfly()
 
         proxy_jobs %>%
           proxy_to_bar(data,
@@ -730,7 +726,6 @@ mod_workforce_server <- function(id){
       shinyjs::hide("toggle_definitions")
 
       output$show_takeaway <- renderUI({
-        print(get_workforce_input())
         req(!is.null(get_workforce_input()))
         notes <- notes %>%
           dplyr::filter(topic == input$topic,

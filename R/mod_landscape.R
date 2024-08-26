@@ -364,7 +364,6 @@ mod_landscape_server <- function(id){
       } else if (input$topic == "field" & input$filter != "All LHDs") {
         data <- spec_data %>% dplyr::filter(filter == input$filter)
         series_id <- unique(data$group)
-        print(data)
 
         proxy %>%
           proxy_to_group(
