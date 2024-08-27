@@ -1,12 +1,11 @@
 // Have the correct action links click upon load of app
+// =============================================================================
 // this is for the right sidebar
 $(document).on('shiny:connected', function() {
   $('#landscape_1-takeaway').addClass('clicked-link').click();
   $('#workforce_1-takeaway').addClass('clicked-link').click();
   $('#finance_1-takeaway').addClass('clicked-link').click();
 });
-
-
 
 // add and remove class to the right sidebar links when toggling
 // between the three
@@ -29,14 +28,20 @@ $(document).on('click', '.action-link-3', function() {
 
 
 
+
+
 // triggers the occupational classifications to click
+// =============================================================================
 Shiny.addCustomMessageHandler('triggerClick', function(id) {
   document.getElementById(id).click();
 });
 
 
 
+
+
 // change the definitions link from plus to minus
+// =============================================================================
 $(document).on("shiny:value", (e) => {
     if(!e.name.match("show_definitions$")){
         return;
@@ -64,7 +69,9 @@ $(() => {
 
 
 
+
 // For the dropdown button popover
+// =============================================================================
 document.addEventListener('DOMContentLoaded', function() {
   var popoverTriggerList = [].slice.call(document.querySelectorAll('#workforce_1-slide_button'));
   var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
@@ -80,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // changes the position of the extra filter button based on window size
+// =============================================================================
 window.addEventListener('load', function() {
 
   function updatePosition() {

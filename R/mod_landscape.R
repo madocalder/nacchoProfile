@@ -24,7 +24,7 @@ mod_landscape_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-4 min-height-400",
+              class = "col-sm-6 min-height-400",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -34,20 +34,7 @@ mod_landscape_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-4",
-              br(),
-              selectInput(
-                inputId = ns("view"),
-                strong("Visualization Type"),
-                choices = c(
-                  "Bar Graph",
-                  "Line Graph",
-                  "Table"
-                )
-              )
-            ),
-            div(
-              class = "col-sm-4",
+              class = "col-sm-6",
               br(),
               selectInput(
                 inputId = ns("filter"),
@@ -58,11 +45,24 @@ mod_landscape_ui <- function(id){
           ),
 
           hr(),
-          br(),
-          br(),
 
-          # add main page content here ----------------------------------------------
+          # viz toggles here --------------------------------------------------
+          div(
+            class = "viz-view",
+            shinyWidgets::radioGroupButtons(
+              ns("view"),
+              "",
+              choiceNames = list(
+                HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
+                HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
+                HTML('<i class="fas fa-earth-americas"></i>')         # Map icon
+              ),
+              choiceValues = c('Bar Graph', 'Line Graph', 'Map')
+            )
+          ),
 
+
+          # add main page content here ----------------------------------------
           div(
             class = "viz-content",
 
@@ -186,14 +186,24 @@ mod_landscape_server <- function(id){
 
     observe({
       if (input$topic == "c0govcatn") {
-        updateSelectInput(session, "view",
-                          choices = c("Map", "Bar Graph", "Line Graph", "Table"))
-      } else if (input$topic == "totpop") {
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Table"))
+        updateRadioGroupButtons(session, "view",
+                                choiceNames = list(
+                                  HTML('<i class="fas fa-earth-americas"></i>'),
+                                  HTML('<i class="fas fa-chart-simple"></i>'),
+                                  HTML('<i class="fas fa-chart-line"></i>'),
+                                  HTML('<i class="fas fa-table"></i>')
+                                ),
+                                choiceValues = c("Map", "Bar Graph", "Line Graph", "Table")
+        )
       } else {
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Table"))
+        updateRadioGroupButtons(session, "view",
+                                choiceNames = list(
+                                  HTML('<i class="fas fa-chart-simple"></i>'),
+                                  HTML('<i class="fas fa-chart-line"></i>'),
+                                  HTML('<i class="fas fa-table"></i>')
+                                ),
+                                choiceValues = c("Bar Graph", "Line Graph", "Table")
+        )
       }
     })
 
@@ -429,7 +439,7 @@ mod_landscape_server <- function(id){
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        view == input$view,
+                        # view == input$view, # fix
                         filter == input$filter)
 
         p(htmltools::HTML(
@@ -449,7 +459,7 @@ mod_landscape_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        view == input$view,
+                        # view == input$view, # fix
                         filter == input$filter)
 
         if (is.na(notes$notes)) {

@@ -2,6 +2,53 @@
 
 
 
+/* ---------------------------------------------------------- Data viz views */
+.viz-view {
+    display: flex;
+    padding-left: 42%;
+    margin-top: -67px;
+    padding-bottom: 25px;
+}
+
+.btn-group {
+  display: inline-block !important;
+}
+
+
+.btn-group>.btn {
+    background-color: white;
+    border-radius: 200px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 12px;
+    border: 1.5px solid #008A96;
+    font-size: 14px;
+    padding-top: 13px;
+    width: 50px;
+    margin-right: 5px;
+    color: #212F5B !important;
+}
+
+/* Hover state for buttons in a .btn-group */
+.btn-group > .btn:hover {
+    background-color: white;
+    color: #AB6143 !important;
+    border: 1.5px solid #AB6143;
+}
+
+/* Focus state for buttons in a .btn-group */
+.btn-group > .btn:focus {
+    background-color: white;
+    color: #AB6143 !important;
+    border: 1.5px solid #AB6143;
+}
+
+/* Active state for buttons in a .btn-group */
+.btn-check:checked+.btn {
+    color: #AB6143 !important;
+    background-color: white;
+    border: 1.5px solid #AB6143;
+}
 /* --------------------------------------------- Dropdown button for measure */
 
 .dropdown-button {
@@ -887,7 +934,7 @@ label:not(.material-switch label) {
   display: block !important;
 }*/
 
-.fas:not(.fa-filter) {
+.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table) {
   color: #008A96;
 }
 
@@ -940,10 +987,10 @@ hr:not(.tt, .right-hr) {
   border-top: 1.5px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
-  padding-top: 10px !important;
-  margin-bottom: -10px;
+/*  margin-bottom: -10px;*/
   margin-left: 50px;
   margin-right: 50px;
+  margin-top: 45px;
 }
 
 hr .tt {
