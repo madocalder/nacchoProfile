@@ -934,7 +934,7 @@ label:not(.material-switch label) {
   display: block !important;
 }*/
 
-.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table) {
+.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick) {
   color: #008A96;
 }
 

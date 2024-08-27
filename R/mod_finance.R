@@ -19,10 +19,9 @@ mod_finance_ui <- function(id){
           openMenu(),
           div(
             class = "row",
-            id = ns("slide_occ"),
             align = "center",
             div(
-              class = "col-sm-4",
+              class = "col-sm-6 min-height-400",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -32,21 +31,7 @@ mod_finance_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-4",
-              br(),
-              selectInput(
-                inputId = ns("view"),
-                strong("Visualization Type"),
-                choices = c(
-                  "Box Plot",
-                  "Bar Graph",
-                  "Line Graph",
-                  "Table"
-                )
-              )
-            ),
-            div(
-              class = "col-sm-4",
+              class = "col-sm-6",
               br(),
               selectInput(
                 inputId = ns("filter"),
@@ -58,77 +43,26 @@ mod_finance_ui <- function(id){
           hr(),
 
 
-          #  Sliders ----------------------------------------------------------------
+          # viz toggles here --------------------------------------------------
           div(
-            id = ns("slide_measures"),
-            div(
-              id = ns("slide"),
-              actionButton(
-                ns("slide_button"),
-                "",
-                icon = icon("filter"),
-                class = "dropdown-button"
-              )
-            ),
-            div(
-              id = ns("slideMenu"),
-              class = "measures-shown",
-
-              # Expenditures
-              conditionalPanel(
-                condition = paste0('input[\'', ns('topic'), "\'] == \'expenditures\'"),
-                radioButtons(
-                  ns("type_exp"),
-                  "",
-                  choices = finance_expenditure_types,
-                  inline = TRUE
-                )
+            class = "viz-view",
+            shinyWidgets::radioGroupButtons(
+              ns("view"),
+              "",
+              choiceNames = list(
+                HTML('<i class="fas fa-chart-candlestick"></i>'), # Chart icon
+                HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
+                HTML('<i class="fas fa-table"></i>') # Map icon
               ),
-
-              # Revenues
-              conditionalPanel(
-                condition = paste0('input[\'', ns('topic'), "\'] == \'revenues\'"),
-                radioButtons(
-                  ns("type_rev"),
-                  "",
-                  choices = finance_revenue_types,
-                  inline = TRUE
-                )
-              ),
-
-              # Jobs
-              conditionalPanel(
-                condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\'"),
-                radioButtons(
-                  ns("type_budget"),
-                  "",
-                  choices = list("Changes in Budgets" = "budget_changes",
-                                 "Expected Budget Cuts" = ""),
-                  inline = TRUE
-                )
-              )
+              choiceValues = c("Box Plot", "Line Graph", "Table")
             )
           ),
 
-          # supports the sliding out menu
-          tags$script(HTML("
-              document.getElementById('finance_1-slide_button').addEventListener('click', function() {
-                var slideMenu = document.querySelector('#finance_1-slideMenu');
-                if (slideMenu.classList.contains('open')) {
-                  slideMenu.classList.remove('open');
-                } else {
-                  slideMenu.classList.add('open');
-                }
-              });
-            ")
-          ),
-
-          br(),
 
           # add main page content here ----------------------------------------------
 
           div(
-            class = "viz-content with-slider",
+            class = "viz-content",
 
             # display when Box Plot is selected
             conditionalPanel(
@@ -245,83 +179,53 @@ mod_finance_server <- function(id){
 
 
     # inputs for each topic ---------------------------------------------------
-    inputs_exp <- reactive({
+    updated_inputs <- reactive({
       input$topic
       input$filter
-      input$type_exp
-    })
+    }) %>% debounce(100)
 
-    inputs_rev <- reactive({
-      input$topic
-      input$filter
-      input$type_rev
-    })
-
-    inputs_budget <- reactive({
-      input$topic
-      input$filter
-      input$type_budget
-    })
 
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic == "expenditures") {
-        if (input$type_exp %in% c("c3q15", "totexp_percap")) {
-          updateSelectInput(session, "view",
-                            choices = c("Box Plot",
-                                        "Line Graph",
-                                        "Table"))
-        } else {
-          updateSelectInput(session, "view",
-                            choices = c("Bar Graph",
-                                        "Table"))
+      if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-candlestick"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Box Plot", "Line Graph", "Table"))
+
+
+        } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat")) {
+          shinyWidgets::updateRadioGroupButtons(session, "view",
+                                                choiceNames = list(
+                                                  HTML('<i class="fas fa-chart-simple"></i>'),
+                                                  HTML('<i class="fas fa-table"></i>')
+                                                ),
+                                                choiceValues = c("Bar Graph", "Table"))
         }
+    })
 
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-
-      } else if (input$topic == "revenues") {
-        if (input$type_rev %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap")) {
-          updateSelectInput(session, "view",
-                            choices = c("Box Plot",
-                                        "Line Graph",
-                                        "Table"))
-        } else {
-          updateSelectInput(session, "view",
-                            choices = c("Bar Graph",
-                                        "Table"))
-        }
-
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-
-
-
-      } else if (input$topic == "budget_changes") {
+    observe({
+      if (input$topic == "budget_changes") {
         updateSelectInput(session, "filter",
                           choices = "All Filters")
 
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph",
-                                      "Table"))
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
+
+      } else {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
       }
     })
 
-
-
-    # Reactive to get the inputs that I need for filtering --------------------
-    get_finance_input <- function() {
-      if (input$topic == "expenditures") {
-        input$type_exp
-      } else if (input$topic == "revenues") {
-        input$type_rev
-      } else if (input$topic == "budget_changes") {
-        input$type_budget
-      } else {
-        NULL
-      }
-    }
 
 
     # colors ------------------------------------------------------------------
@@ -348,8 +252,8 @@ mod_finance_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      req(!is.null(get_finance_input()))
-      meta %>% dplyr::filter(field == get_finance_input())
+      req(!is.null(input$topic))
+      meta %>% dplyr::filter(field == input$topic)
     })
 
 
@@ -442,6 +346,8 @@ mod_finance_server <- function(id){
         )
     })
 
+
+
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
     proxy_box <- highcharter::highchartProxy(ns("figure_box"))
@@ -465,14 +371,11 @@ mod_finance_server <- function(id){
 
 
     # update proxy ------------------------------------------------------------
-    # for Expenditures --------------------------------------------------------
-    observeEvent(inputs_exp(), {
-      req(input$topic == "expenditures")
+    observeEvent(updated_inputs(), {
       use_js_proxy()
 
-
-      if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$type_exp, "_all")
+      if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
+        get_boxplot_list <- paste0("boxplot_data_", input$topic, "_all")
         data <- boxplot_list[get_boxplot_list]
 
         names(data) <- NULL
@@ -483,8 +386,8 @@ mod_finance_server <- function(id){
                        meta = filter_meta())
 
 
-      } else if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter != "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$type_exp, "_", input$filter)
+      } else if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter != "All LHDs" & input$view == "Box Plot") {
+        get_boxplot_list <- paste0("boxplot_data_", input$topic, "_", input$filter)
         data <- boxplot_list[get_boxplot_list]
 
         names(data) <- NULL
@@ -496,9 +399,10 @@ mod_finance_server <- function(id){
 
 
 
-      } else if (input$type_exp %in% c("exp_total_numcat", "exp_percap_numcat") & input$filter == "All LHDs") {
-        data <- return_survey_weighted_counts(input$type_exp) %>%
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
+        data <- return_survey_weighted_counts(input$topic) %>%
           dplyr::mutate(x_label = NA)
+
         proxy_bar %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
@@ -506,11 +410,11 @@ mod_finance_server <- function(id){
 
 
 
-      } else if (input$type_exp %in% c("exp_total_numcat", "exp_percap_numcat") & input$filter != "All LHDs") {
-        data <- return_survey_weighted_counts(input$type_exp, input$filter) %>%
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
+        data <- return_survey_weighted_counts(input$topic, input$filter) %>%
           dplyr::mutate(x_label = NA)
 
-        data_all <- return_survey_weighted_counts(input$type_exp) %>%
+        data_all <- return_survey_weighted_counts(input$topic) %>%
           dplyr::mutate(x_label = NA)
 
         series_id <- unique(data$group) # provide ID for proxy
@@ -525,84 +429,6 @@ mod_finance_server <- function(id){
                               theme = naccho.viz::basic_theme)
       }
     })
-
-
-    # for Revenues --------------------------------------------------------
-    observeEvent(inputs_rev(), {
-      req(input$topic == "revenues")
-      use_js_proxy()
-
-
-      if (input$type_rev %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$type_rev, "_all")
-        data <- boxplot_list[get_boxplot_list]
-
-        names(data) <- NULL
-        data[[1]] <- data[[1]][[1]]
-
-        proxy_box %>%
-          proxy_to_box(data,
-                       meta = filter_meta())
-
-
-      } else if (input$type_rev %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter != "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$type_rev, "_", input$filter)
-        data <- boxplot_list[get_boxplot_list]
-
-        names(data) <- NULL
-        data <- data[[1]]
-
-        proxy_box %>%
-          proxy_to_group_box(data,
-                             meta = filter_meta())
-
-
-
-      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
-        data <- return_survey_weighted_counts(input$type_rev) %>%
-          dplyr::mutate(x_label = NA)
-
-        proxy_bar %>%
-          proxy_hist_to_single(data,
-                               meta = filter_meta(),
-                               theme = naccho.viz::basic_theme)
-
-
-
-      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
-        data <- return_survey_weighted_counts(input$type_rev, input$filter) %>%
-          dplyr::mutate(x_label = NA)
-
-        data_all <- return_survey_weighted_counts(input$type_rev) %>%
-          dplyr::mutate(x_label = NA)
-
-        series_id <- unique(data$group) # provide ID for proxy
-
-        proxy_bar %>%
-          proxy_hist_to_group(data = data,
-                              data_all = data_all,
-                              meta = filter_meta(),
-                              colors = colors(),
-                              id = series_id,
-                              responses = sum(data$Responses),
-                              theme = naccho.viz::basic_theme)
-      }
-    })
-
-
-    # for budget changes -----------------------------------------------------
-    observeEvent(inputs_budget(), {
-      req(input$topic == "budget_changes")
-      use_js_proxy()
-
-      # if (input$type_budget %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap")) {
-      #
-      # } else if {
-      #
-      # }
-
-    })
-
   })
 }
 

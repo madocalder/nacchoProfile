@@ -18,6 +18,7 @@
 "landscape_filters"
 
 
+
 #' Workforce Topics
 #'
 #' @format list
@@ -40,30 +41,6 @@
 
 
 
-#' Workforce Types
-#'
-#' @format list
-#'
-#' A list of 3
-#'
-#' @source columns from master_data
-"workforce_fte_types"
-
-
-
-#' Workforce Classifications Measure
-#'
-#' @format list
-#'
-#' A list of 2
-#'
-#' @source columns from master_data
-"workforce_classifications_measure"
-
-
-
-
-
 #' Workforce Employee Types
 #'
 #' @format list
@@ -72,8 +49,6 @@
 #'
 #' @source columns from master_data
 "workforce_employee_types"
-
-
 
 
 
@@ -86,29 +61,3 @@
 #' @source columns from master_data
 "finance_topics"
 
-
-
-
-
-#' Finance Measures - Expenditures
-#'
-#' @format list
-#'
-#' A list of 3
-#'
-#' @source columns from master_data
-"finance_expenditure_types"
-
-
-
-
-
-
-#' Finance Measures - Revenues
-#'
-#' @format list
-#'
-#' A list of 3
-#'
-#' @source columns from master_data
-"finance_revenue_types"

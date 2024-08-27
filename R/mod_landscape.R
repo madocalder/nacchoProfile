@@ -169,53 +169,53 @@ mod_landscape_server <- function(id){
     # for example, if someone selects "geography," then the view will update to
     # include a map options.
     observe({
-      if (input$topic =="tenure") {
+      if (input$topic == "tenure") {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters[-1]
-        )
+                          choices = landscape_filters[-1])
+
+
       } else if (input$topic == "totpop") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[4])
 
+
       } else {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters
-        )
+                          choices = landscape_filters)
       }
     })
 
     observe({
-      if (input$topic == "c0govcatn") {
-        updateRadioGroupButtons(session, "view",
-                                choiceNames = list(
-                                  HTML('<i class="fas fa-earth-americas"></i>'),
-                                  HTML('<i class="fas fa-chart-simple"></i>'),
-                                  HTML('<i class="fas fa-chart-line"></i>'),
-                                  HTML('<i class="fas fa-table"></i>')
-                                ),
-                                choiceValues = c("Map", "Bar Graph", "Line Graph", "Table")
-        )
-      } else {
-        updateRadioGroupButtons(session, "view",
-                                choiceNames = list(
-                                  HTML('<i class="fas fa-chart-simple"></i>'),
-                                  HTML('<i class="fas fa-chart-line"></i>'),
-                                  HTML('<i class="fas fa-table"></i>')
-                                ),
-                                choiceValues = c("Bar Graph", "Line Graph", "Table")
-        )
-      }
-    })
+      req(input$topic == "c0govcatn")
 
-    observe({
-      if (input$topic == "c0govcatn" & input$view == "Map") {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-earth-americas"></i>'),
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Map", "Bar Graph", "Line Graph", "Table"))
+
+      if (input$view == "Map") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1])
-      }
-      if (input$topic == "c0govcatn" & input$view != "Map") {
+
+      } else if (input$view != "Map") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[-3])
       }
+    })
+
+    observe({
+      req(input$topic != "c0govcatn")
+      shinyWidgets::updateRadioGroupButtons(session, "view",
+                                            choiceNames = list(
+                                              HTML('<i class="fas fa-chart-simple"></i>'),
+                                              HTML('<i class="fas fa-chart-line"></i>'),
+                                              HTML('<i class="fas fa-table"></i>')
+                                            ),
+                                            choiceValues = c("Bar Graph", "Line Graph", "Table"))
     })
 
 
@@ -305,7 +305,7 @@ mod_landscape_server <- function(id){
     })
 
 
-    updatedInputs <- reactive({
+    updated_inputs <- reactive({
       input$topic
       input$filter
     }) %>% debounce(100)
@@ -314,7 +314,7 @@ mod_landscape_server <- function(id){
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
     # combinations selected by the user.
-    observeEvent(updatedInputs(), {
+    observeEvent(updated_inputs(), {
 
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
