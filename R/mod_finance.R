@@ -244,11 +244,30 @@ mod_finance_server <- function(id){
     ns <- session$ns
 
 
+    # inputs for each topic ---------------------------------------------------
+    inputs_exp <- reactive({
+      input$topic
+      input$filter
+      input$type_exp
+    })
+
+    inputs_rev <- reactive({
+      input$topic
+      input$filter
+      input$type_rev
+    })
+
+    inputs_budget <- reactive({
+      input$topic
+      input$filter
+      input$type_budget
+    })
+
+
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("expenditures", "revenues")) {
-
-        if (input$type_exp %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap")) {
+      if (input$topic == "expenditures") {
+        if (input$type_exp %in% c("c3q15", "totexp_percap")) {
           updateSelectInput(session, "view",
                             choices = c("Box Plot",
                                         "Line Graph",
@@ -258,6 +277,26 @@ mod_finance_server <- function(id){
                             choices = c("Bar Graph",
                                         "Table"))
         }
+
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+
+      } else if (input$topic == "revenues") {
+        if (input$type_rev %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap")) {
+          updateSelectInput(session, "view",
+                            choices = c("Box Plot",
+                                        "Line Graph",
+                                        "Table"))
+        } else {
+          updateSelectInput(session, "view",
+                            choices = c("Bar Graph",
+                                        "Table"))
+        }
+
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+
+
 
       } else if (input$topic == "budget_changes") {
         updateSelectInput(session, "filter",
@@ -351,7 +390,9 @@ mod_finance_server <- function(id){
           viz_title = "Percent of LHDs by Grouped Total Expenditures",
           viz_caption = source_line,
           viz_subtitle = "Estimated Across All LHDs",
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHDs had per capita expenditures between {point.category}."
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
+                    {point.y}% of LHDs had per capita expenditures between
+                    {point.category}."
         ) %>%
         viz_export()
     })
@@ -423,32 +464,12 @@ mod_finance_server <- function(id){
 
 
 
-    # inputs for each topic ---------------------------------------------------
-    inputs_exp <- reactive({
-      input$topic
-      input$filter
-      input$type_exp
-    })
-
-    inputs_rev <- reactive({
-      input$topic
-      input$filter
-      input$type_rev
-    })
-
-    inputs_budget <- reactive({
-      input$topic
-      input$filter
-      input$type_budget
-    })
-
-
-
     # update proxy ------------------------------------------------------------
     # for Expenditures --------------------------------------------------------
     observeEvent(inputs_exp(), {
       req(input$topic == "expenditures")
       use_js_proxy()
+
 
       if (input$type_exp %in% c("c3q15", "totexp_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
         get_boxplot_list <- paste0("boxplot_data_", input$type_exp, "_all")
@@ -473,14 +494,16 @@ mod_finance_server <- function(id){
           proxy_to_group_box(data,
                        meta = filter_meta())
 
-      } else if (input$type_exp %in% c("exp_total_numcat", "exp_percap_numcat") & input$filter == "All LHDs") {
 
+
+      } else if (input$type_exp %in% c("exp_total_numcat", "exp_percap_numcat") & input$filter == "All LHDs") {
         data <- return_survey_weighted_counts(input$type_exp) %>%
           dplyr::mutate(x_label = NA)
         proxy_bar %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
                                theme = naccho.viz::basic_theme)
+
 
 
       } else if (input$type_exp %in% c("exp_total_numcat", "exp_percap_numcat") & input$filter != "All LHDs") {
@@ -509,6 +532,7 @@ mod_finance_server <- function(id){
       req(input$topic == "revenues")
       use_js_proxy()
 
+
       if (input$type_rev %in% c("non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
         get_boxplot_list <- paste0("boxplot_data_", input$type_rev, "_all")
         data <- boxplot_list[get_boxplot_list]
@@ -532,8 +556,9 @@ mod_finance_server <- function(id){
           proxy_to_group_box(data,
                              meta = filter_meta())
 
-      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
 
+
+      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
         data <- return_survey_weighted_counts(input$type_rev) %>%
           dplyr::mutate(x_label = NA)
 
@@ -543,8 +568,8 @@ mod_finance_server <- function(id){
                                theme = naccho.viz::basic_theme)
 
 
-      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
 
+      } else if (input$type_rev %in% c("rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
         data <- return_survey_weighted_counts(input$type_rev, input$filter) %>%
           dplyr::mutate(x_label = NA)
 
