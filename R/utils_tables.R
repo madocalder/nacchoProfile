@@ -35,14 +35,8 @@ library(tippy)
 #' @export
 #
 # categorical tables--------
+
 create_non_time_table <- function(data, category, colors) {
-
-
-  # Extract the relevant Responses columns
-  response_columns <- grep("^Responses_", colnames(data), value = TRUE)
-
-  # Calculate total N counts for each corresponding Responses column
-  total_counts <- sapply(response_columns, function(col) sum(data[[col]], na.rm = TRUE))
 
   # Define theme
   options(
@@ -98,45 +92,36 @@ create_non_time_table <- function(data, category, colors) {
     )
   )
 
-  # Define the groups and their corresponding columns
-  group_definitions <- list(
-    Rurality = list(columns = c("y_Urban", "y_Rural")),
-    Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
-    `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
-    Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
-  )
-
-  # Get the columns for the selected category
-  selected_columns <- group_definitions[[category]]$columns
-
-  # Dynamically create column definitions
-  column_definitions <- setNames(
-    lapply(seq_along(selected_columns), function(i) {
-      col <- selected_columns[i]
-      col_name <- sub("^y_", "", col)
-      response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
-      count <- total_counts[[response_col]]  # Get the count for the current column
-
-      colDef(
-        name = stringr::str_replace_all(col_name, "_", " "),
-        align = "center",
-        header = with_tooltip(col_name, paste0("n = ", count)),
-        cell = data_bars(data,
-                         text_position = "outside-end",
-                         max_value = 100,
-                         fill_color = colors[i],
-                         background = 'none',
-                         number_fmt = scales::percent_format(scale = 1))
+  # Check if y_All_LHDs column exists in the data
+  if ("y_All LHDs" %in% colnames(data)) {
+    # Common column definition for y_All_LHDs
+    all_lhds_col <- colDef(
+      name = "All LHDs",
+      align = "center",
+      header = with_tooltip("All LHDs", paste0("n = ", data$'Responses_All LHDs'[1])),
+      cell = data_bars(data,
+                       text_position = "outside-end",
+                       max_value = 100,
+                       fill_color = "#008A96",
+                       background = 'none',
+                       number_fmt = scales::percent_format(scale = 1)),
+      style = list(
+        borderLeft = "3px solid #3d4242"
+      ),
+      headerStyle = list(
+        fontWeight = "bolder"
       )
-    }),
-    selected_columns
-  )
+    )
+  } else {
+    all_lhds_col <- NULL
+  }
 
-  # Add the All LHDs column definition
-  column_definitions <- c(
-    list(
+  # Check if the data is for "All LHDs"
+  if (category == "All LHDs") {
+    # Define column definitions for All LHDs
+    column_definitions <- list(
       category = colDef(
-        name = stringr::str_to_title(colnames(data)[1]),
+        name = "Category",
         align = "center",
         style = list(
           fontFamily = "Heebo",
@@ -145,58 +130,131 @@ create_non_time_table <- function(data, category, colors) {
         headerStyle = list(
           fontWeight = "bold"
         )
-      ),
-      `y_All LHDs` = colDef(
-        name = "All LHDs",
+      )
+    )
+
+    if (!is.null(all_lhds_col)) {
+      column_definitions$'y_All LHDs' <- all_lhds_col
+    }
+
+    # Hide the extra column "Responses_All_LHDs"
+    hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs"))
+    hidden_col_definitions <- setNames(
+      lapply(hidden_columns, function(col) {
+        colDef(show = FALSE)
+      }),
+      hidden_columns
+    )
+
+    # Merge with hidden columns
+    column_definitions <- c(column_definitions, hidden_col_definitions)
+    print(column_definitions)
+
+    # Create the reactable table
+    reactable(
+      data = data,
+      columns = column_definitions,
+      filterable = FALSE,
+      showPageSizeOptions = TRUE,
+      striped = FALSE,
+      highlight = TRUE,
+      searchable = FALSE,
+      bordered = FALSE,
+      resizable = TRUE
+    )
+  } else {
+    # Handle other cases with the existing logic
+    group_definitions <- list(
+      Rurality = list(columns = c("y_Urban", "y_Rural")),
+      Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
+      `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
+      Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
+    )
+
+    selected_columns <- group_definitions[[category]]$columns
+    selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
+
+    # Ensure y_All_LHDs is included if it exists
+    if ("y_All LHDs" %in% colnames(data)) {
+      selected_columns <- c("y_All LHDs", selected_columns)
+    }
+
+    column_definitions <- list(
+      category = colDef(
+        name = "Category",
         align = "center",
-        header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
-        cell = data_bars(data,
-                         text_position = "outside-end",
-                         max_value = 100,
-                         fill_color = "#008A96",
-                         background = 'none',
-                         number_fmt = scales::percent_format(scale = 1)),
         style = list(
+          fontFamily = "Heebo",
           borderRight = "3px solid #3d4242"
         ),
         headerStyle = list(
-          fontWeight = "bolder"
+          fontWeight = "bold"
+        )
+      )
+    )
+
+    if (!is.null(all_lhds_col)) {
+      column_definitions$'y_All LHDs' <- all_lhds_col
+    }
+
+    # Handle selected columns for non-All LHDs cases
+    column_definitions <- c(
+      column_definitions,
+      setNames(
+        lapply(seq_along(selected_columns), function(i) {
+          col <- selected_columns[i]
+          col_name <- sub("^y_", "", col)
+          colDef(
+            name = stringr::str_replace_all(col_name, "_", " "),
+            align = "center",
+            header = with_tooltip(col_name, paste0("n = ", data[[paste0("Responses_", col_name)]][1])),
+            cell = data_bars(data,
+                             text_position = "outside-end",
+                             max_value = 100,
+                             fill_color = colors[i],
+                             background = 'none',
+                             number_fmt = scales::percent_format(scale = 1))
+          )
+        }),
+        selected_columns
+      )
+    )
+
+
+
+    # Hide the extra columns that are not needed
+    hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs", selected_columns ))
+    hidden_col_definitions <- setNames(
+      lapply(hidden_columns, function(col) {
+        colDef(show = FALSE)
+      }),
+      hidden_columns
+    )
+
+    column_definitions <- c(column_definitions, hidden_col_definitions)
+
+    print(column_definitions)
+
+
+
+    reactable(
+      data = data,
+      columns = column_definitions,
+      columnGroups = list(
+        colGroup(
+          name = unique(data$subtitle),
+          columns = selected_columns[!selected_columns %in% "y_All LHDs"]  # Exclude "All LHDs" from the group
         )
       ),
-      subtitle = colDef(
-        show = FALSE  # Hide the "Subtitle" column
-      )
-    ),
-    column_definitions
-  )
-
-  # Add hidden columns for Responses_*
-  response_col_definitions <- setNames(
-    lapply(response_columns, function(col) {
-      colDef(show = FALSE)
-    }),
-    response_columns
-  )
-
-  # Combine the main column definitions with the hidden Response columns
-  column_definitions <- c(column_definitions, response_col_definitions)
-
-  # Create the reactable table
-  reactable(
-    data = data,
-    columns = column_definitions,
-    columnGroups = list(
-      colGroup(name = unique(data$subtitle),
-               columns = selected_columns)
-    ),
-    filterable = FALSE,
-    showPageSizeOptions = TRUE,
-    striped = FALSE,
-    highlight = TRUE,
-    searchable = FALSE,
-    bordered = FALSE,
-    resizable = TRUE
-  )
+      filterable = FALSE,
+      showPageSizeOptions = TRUE,
+      striped = FALSE,
+      highlight = TRUE,
+      searchable = FALSE,
+      bordered = FALSE,
+      resizable = TRUE
+    )
+  }
 }
 
 # Helper function to add tooltips
@@ -205,3 +263,275 @@ with_tooltip <- function(value, tooltip, ...) {
       tippy(value, tooltip, ...))
 }
 
+
+
+
+
+# create_non_time_table <- function(data, category, colors) {
+#
+#   # Extract the relevant Responses columns
+#   response_columns <- grep("^Responses_", colnames(data), value = TRUE)
+#
+#   # Calculate total N counts for each corresponding Responses column
+#   total_counts <- sapply(response_columns, function(col) sum(data[[col]], na.rm = TRUE))
+#
+#   # Define theme
+#   options(
+#     reactable.theme = reactableTheme(
+#       color = "#3d4242",
+#       backgroundColor = "#F9F8F7",
+#       borderColor = NULL,
+#       stripedColor = NULL,
+#       highlightColor = "#EEEAE4",
+#       inputStyle = list(
+#         backgroundColor = "white"
+#       ),
+#       selectStyle = list(
+#         backgroundColor = "white"
+#       ),
+#       pageButtonHoverStyle = list(
+#         backgroundColor = ""
+#       ),
+#       pageButtonActiveStyle = list(
+#         backgroundColor = ""
+#       ),
+#       headerStyle = list(
+#         borderWidth = "3px",
+#         paddingTop = "10px",
+#         verticalAlign = "bottom",
+#         textAlign = "center",
+#         background = "white",
+#         textTransform = "uppercase",
+#         borderColor = "#3d4242",
+#         color = "#3d4242",
+#         fontSize = "14px",
+#         fontWeight = "normal"
+#       ),
+#       groupHeaderStyle = list(
+#         "&:not(:empty)" = list(
+#           paddingBottom = "2px",
+#           verticalAlign = "bottom",
+#           borderWidth = "3px",
+#           borderColor = "#3d4242",
+#           textAlign = "center",
+#           backgroundColor = "#ffffff",
+#           textTransform = "uppercase",
+#           fontSize = "14px",
+#           fontWeight = "bold",
+#           color = "#3d4242"
+#         )
+#       ),
+#       cellPadding = "15px 25px",
+#       style = list(
+#         fontFamily = "Heebo",
+#         fontSize = "12px"  # Define general font size for table cells here
+#       )
+#     )
+#   )
+#
+#   # Define the groups and their corresponding columns
+#   group_definitions <- list(
+#     Rurality = list(columns = c("y_Urban", "y_Rural")),
+#     Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
+#     `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
+#     Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
+#   )
+#
+#   # Get the columns for the selected category
+#   selected_columns <- group_definitions[[category]]$columns
+#   selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
+#
+#   # Dynamically create column definitions
+#   column_definitions <- setNames(
+#     lapply(seq_along(selected_columns), function(i) {
+#       col <- selected_columns[i]
+#       col_name <- sub("^y_", "", col)
+#       response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
+#       count <- total_counts[[response_col]]  # Get the count for the current column
+#
+#       colDef(
+#         name = stringr::str_replace_all(col_name, "_", " "),
+#         align = "center",
+#         header = with_tooltip(col_name, paste0("n = ", count)),
+#         cell = data_bars(data,
+#                          text_position = "outside-end",
+#                          max_value = 100,
+#                          fill_color = colors[i],
+#                          background = 'none',
+#                          number_fmt = scales::percent_format(scale = 1))
+#       )
+#     }),
+#     selected_columns
+#   )
+#
+#   # Add the All LHDs column definition if it exists in the data
+#   if ("y_All LHDs" %in% colnames(data)) {
+#     column_definitions <- c(
+#       list(
+#         category = colDef(
+#           name = stringr::str_to_title(colnames(data)[1]),
+#           align = "center",
+#           style = list(
+#             fontFamily = "Heebo",
+#             borderRight = "3px solid #3d4242"
+#           ),
+#           headerStyle = list(
+#             fontWeight = "bold"
+#           )
+#         ),
+#         `y_All LHDs` = colDef(
+#           name = "All LHDs",
+#           align = "center",
+#           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
+#           cell = data_bars(data,
+#                            text_position = "outside-end",
+#                            max_value = 100,
+#                            fill_color = "#008A96",
+#                            background = 'none',
+#                            number_fmt = scales::percent_format(scale = 1)),
+#           style = list(
+#             borderRight = "3px solid #3d4242"
+#           ),
+#           headerStyle = list(
+#             fontWeight = "bolder"
+#           )
+#         )
+#       ),
+#       column_definitions
+#     )
+#   }
+#
+#   # Add the subtitle column definition to hide it
+#   column_definitions$subtitle <- colDef(show = FALSE)
+#
+#   # Add hidden columns for Responses_*
+#   response_col_definitions <- setNames(
+#     lapply(response_columns, function(col) {
+#       colDef(show = FALSE)
+#     }),
+#     response_columns
+#   )
+#
+#   # Combine the main column definitions with the hidden Response columns
+#   column_definitions <- c(column_definitions, response_col_definitions)
+#
+#   # Create the reactable table
+#   reactable(
+#     data = data,
+#     columns = column_definitions,
+#     columnGroups = list(
+#       colGroup(name = unique(data$subtitle),
+#                columns = selected_columns)
+#     ),
+#     filterable = FALSE,
+#     showPageSizeOptions = TRUE,
+#     striped = FALSE,
+#     highlight = TRUE,
+#     searchable = FALSE,
+#     bordered = FALSE,
+#     resizable = TRUE
+#   )
+# }
+#
+# # Helper function to add tooltips
+# with_tooltip <- function(value, tooltip, ...) {
+#   div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
+#       tippy(value, tooltip, ...))
+# }
+
+
+
+
+
+#   # Get the columns for the selected category
+#   selected_columns <- group_definitions[[category]]$columns
+#   selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
+#
+#   # Dynamically create column definitions
+#   column_definitions <- setNames(
+#     lapply(seq_along(selected_columns), function(i) {
+#       col <- selected_columns[i]
+#       col_name <- sub("^y_", "", col)
+#       response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
+#       count <- total_counts[[response_col]]  # Get the count for the current column
+#
+#       colDef(
+#         name = stringr::str_replace_all(col_name, "_", " "),
+#         align = "center",
+#         header = with_tooltip(col_name, paste0("n = ", count)),
+#         cell = data_bars(data,
+#                          text_position = "outside-end",
+#                          max_value = 100,
+#                          fill_color = colors[i],
+#                          background = 'none',
+#                          number_fmt = scales::percent_format(scale = 1))
+#       )
+#     }),
+#     selected_columns
+#   )
+#
+#   # Add the All LHDs column definition if not already included
+#   if ("y_All LHDs" %in% colnames(data)) {
+#     column_definitions <- c(
+#       list(
+#         category = colDef(
+#           name = stringr::str_to_title(colnames(data)[1]),
+#           align = "center",
+#           style = list(
+#             fontFamily = "Heebo",
+#             borderRight = "3px solid #3d4242"
+#           ),
+#           headerStyle = list(
+#             fontWeight = "bold"
+#           )
+#         ),
+#         `y_All LHDs` = colDef(
+#           name = "All LHDs",
+#           align = "center",
+#           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
+#           cell = data_bars(data,
+#                            text_position = "outside-end",
+#                            max_value = 100,
+#                            fill_color = "#008A96",
+#                            background = 'none',
+#                            number_fmt = scales::percent_format(scale = 1)),
+#           style = list(
+#             borderRight = "3px solid #3d4242"
+#           ),
+#           headerStyle = list(
+#             fontWeight = "bolder"
+#           )
+#         )
+#       ),
+#       column_definitions
+#     )
+#   }
+#
+#   # Add hidden columns for Responses_*
+#   response_col_definitions <- setNames(
+#     lapply(response_columns, function(col) {
+#       colDef(show = FALSE)
+#     }),
+#     response_columns
+#   )
+#
+#   # Combine the main column definitions with the hidden Response columns
+#   column_definitions <- c(column_definitions, response_col_definitions)
+#
+#   # Create the reactable table
+#   reactable(
+#     data = data,
+#     columns = column_definitions,
+#     columnGroups = list(
+#       colGroup(name = unique(data$subtitle),
+#                columns = selected_columns)
+#     ),
+#     filterable = FALSE,
+#     showPageSizeOptions = TRUE,
+#     striped = FALSE,
+#     highlight = TRUE,
+#     searchable = FALSE,
+#     bordered = FALSE,
+#     resizable = TRUE
+#   )
+# }

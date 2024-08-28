@@ -284,48 +284,6 @@ mod_landscape_server <- function(id){
 
 
 
-    # Create the reactable table when "Table" is selected
-    output$data_table <- reactable::renderReactable({
-      req(input$view == "Table")
-
-      # Define colors reactively based on the filter
-      colors <- if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue, naccho.viz::naccho_green)
-      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue, naccho.viz::naccho_green, naccho.viz::naccho_orange)
-      } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue, naccho.viz::naccho_green, naccho.viz::naccho_orange, naccho.viz::naccho_pink)
-      }
-
-
-
-      # Fetch the data based on inputs
-      data <- return_survey_weighted_counts(input$topic, input$filter) %>%
-        dplyr::mutate(x_label = NA) %>%
-        dplyr::select(category, group, y, subtitle, Responses) %>%
-        tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
-        dplyr::left_join(., add_all_counts_long(input$topic), by = "category") %>%
-        dplyr::select(category, subtitle, `y_All LHDs`, starts_with("y_"),
-                      starts_with("Responses"))
-
-
-
-      # Determine the category based on the input filter
-      category <- case_when(
-        input$filter == "urbanrural2022" ~ "Rurality",
-        input$filter == "c0govcat" ~ "Governance",
-        input$filter == "c0popcat3" ~ "LHD size",
-        input$filter == "censusregion" ~ "Region"
-      )
-
-      # Create and return the reactable table, passing the colors
-      create_non_time_table(data, category, colors)
-    })
-
-
-
-
-
     # save the figure as a proxy to redraw below
     proxy <- highcharter::highchartProxy(ns("figure"))
 
@@ -471,44 +429,7 @@ mod_landscape_server <- function(id){
       }
     })
 
-    #table data reactive
-    table_data <- reactive({
-      req(input$topic, input$filter)
 
-      if (input$topic == "totpop" & input$filter != "All LHDs") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
-                        fig_value = get(input$topic)) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(fig_value = sum(fig_value)) %>%
-          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
-                        x = as.numeric(as.factor(category)) -1, # -1 is required so the numbers start at 0 for the proxy to correctly draw
-                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(group = "All LHDs")
-
-      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
-        data <- return_survey_weighted_statistics("tenure", input$filter)
-
-      } else if (input$topic == "field" & input$filter == "All LHDs") {
-        req(input$topic %not_in% c("totpop", "tenure"))
-        data <- spec_data_all
-
-      } else if (input$topic == "field" & input$filter != "All LHDs") {
-        data <- spec_data %>% dplyr::filter(filter == input$filter)
-
-      } else if (input$filter == "All LHDs") {
-        req(input$topic %not_in% c("totpop", "tenure"))
-        data <- return_survey_weighted_counts(input$topic)
-
-      } else {
-        req(input$topic %not_in% c("totpop", "tenure"))
-        data <- return_survey_weighted_counts(input$topic, input$filter)
-      }
-
-      data
-    })
 
 
     #   } else if (input$view == "Pie Chart") {
@@ -530,6 +451,98 @@ mod_landscape_server <- function(id){
     #
     #   }
     # })
+
+   #tables output
+    output$data_table <- reactable::renderReactable({
+      req(input$view == "Table")
+
+      # Define colors reactively based on the filter
+      colors <- if (input$filter == "urbanrural2022") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::naccho_blue,
+          naccho.viz::naccho_green,
+          naccho.viz::naccho_orange,
+          naccho.viz::naccho_pink)
+      } else if (input$filter == "All LHDs") {
+        c(naccho.viz::naccho_blue) }
+
+      # Determine the category based on the input filter
+      category <- case_when(
+        input$filter == "urbanrural2022" ~ "Rurality",
+        input$filter == "c0govcat" ~ "Governance",
+        input$filter == "c0popcat3" ~ "LHD size",
+        input$filter == "censusregion" ~ "Region",
+        input$filter == "All LHDs" ~ "All LHDs"
+      )
+
+      if (input$topic == "field" & input$filter == "All LHDs") {
+
+        data <- spec_data_all %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, y, subtitle, Responses) %>%
+          dplyr::summarise(category = category, 'y_All LHDs' = y, 'Responses_All LHDs' = sum(Responses),  subtitle = subtitle )
+
+        # } else if (input$topic == "tenure" & input$filter == "All LHDs") {
+        # data <- return_survey_weighted_statistics("tenure", input$filter) %>%
+        #   dplyr::select(category, 'y_ALL LHDs' = y, subtitle, 'Responses_All LHDs' = Responses)
+
+        } else if (input$filter == "All LHDs") {
+          # Get the data for All LHDs
+          data <- return_survey_weighted_counts(input$topic)
+
+          # Calculate total responses and y_All_LHDs
+          total_responses <- sum(data$Responses, na.rm = TRUE)
+          data <- data %>%
+            dplyr::mutate(
+              y_All_LHDs = 100 * (Responses / total_responses),
+              Responses_All_LHDs = total_responses
+            ) %>%
+            dplyr::select(category, group, y_All_LHDs, Responses_All_LHDs) %>%
+            dplyr::left_join(., add_all_counts_long(input$topic), by = "category")
+
+      } else if (input$topic == "field" & input$filter != "All LHDs") {
+
+        data <- spec_data %>% dplyr::filter(filter == input$filter) %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          dplyr::group_by(category) %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+
+      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
+        data <- return_survey_weighted_statistics("tenure", input$filter) %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+
+      } else if (input$topic == "totpop" & input$filter != "All LHDs") {
+        data <- return_survey_weighted_statistics("totpop", input$filter) %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+
+      } else {
+        # Process data as usual for other filters
+        data <- return_survey_weighted_counts(input$topic, input$filter) %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+          dplyr::left_join(., add_all_counts_long(input$topic), by = "category")
+
+      }
+
+      # Debugging: Print the column names to check their contents
+      # print(colnames(data))
+      # view(data)
+
+      # Call the table creation function with the appropriate data and parameters
+      create_non_time_table(data, category, colors)
+    })
 
 
 
@@ -624,7 +637,6 @@ mod_landscape_server <- function(id){
     })
   })
 }
-
 ## To be copied in the UI
 # mod_landscape_ui("landscape_1")
 
