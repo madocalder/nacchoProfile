@@ -7,7 +7,7 @@
 #'
 #'
 #'
-library(waiter)
+
 
 theme <- bslib::bs_theme(
   version = 5L,

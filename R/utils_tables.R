@@ -1,4 +1,4 @@
-library(tippy)
+
 #landscape tables function------
 
 #' Create a Custom Non-Time Table

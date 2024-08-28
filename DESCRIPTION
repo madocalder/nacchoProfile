@@ -27,7 +27,12 @@ Imports:
     tibble,
     srvyr,
     purrr,
-    tidyr
+    tidyr,
+    waiter,
+    reactable,
+    reactablefmtr,
+    tippy,
+    sparkline
 Suggests: 
     spelling,
     testthat (>= 3.0.0),
