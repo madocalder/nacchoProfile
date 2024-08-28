@@ -36,7 +36,8 @@ library(tippy)
 #
 # categorical tables--------
 
-create_non_time_table <- function(data, category, colors) {
+create_non_time_table <- function(data, category, colors, topic) {
+
 
   # Define theme
   options(
@@ -101,10 +102,17 @@ create_non_time_table <- function(data, category, colors) {
       header = with_tooltip("All LHDs", paste0("n = ", data$'Responses_All LHDs'[1])),
       cell = data_bars(data,
                        text_position = "outside-end",
-                       max_value = 100,
+                       max_value = ifelse(topic == "tenure", 8, 100),
                        fill_color = "#008A96",
                        background = 'none',
-                       number_fmt = scales::percent_format(scale = 1)),
+                       number_fmt = function(x) {
+                         rounded_value <- round(x, 2)  # Round to 2 decimal places
+                         if (topic == "tenure") {
+                           paste0(rounded_value, " years")  # Add " years" after the rounded number
+                         } else {
+                           scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
+                         }
+                       }),
       style = list(
         borderLeft = "3px solid #3d4242"
       ),
@@ -112,6 +120,7 @@ create_non_time_table <- function(data, category, colors) {
         fontWeight = "bolder"
       )
     )
+
   } else {
     all_lhds_col <- NULL
   }
@@ -176,7 +185,7 @@ create_non_time_table <- function(data, category, colors) {
 
     # Ensure y_All_LHDs is included if it exists
     if ("y_All LHDs" %in% colnames(data)) {
-      selected_columns <- c("y_All LHDs", selected_columns)
+      selected_columns <- c(selected_columns, "y_All LHDs")
     }
 
     column_definitions <- list(
@@ -210,10 +219,18 @@ create_non_time_table <- function(data, category, colors) {
             header = with_tooltip(col_name, paste0("n = ", data[[paste0("Responses_", col_name)]][1])),
             cell = data_bars(data,
                              text_position = "outside-end",
-                             max_value = 100,
+                             max_value = ifelse(topic == "tenure", 8, 100),
                              fill_color = colors[i],
                              background = 'none',
-                             number_fmt = scales::percent_format(scale = 1))
+                             number_fmt = function(x) {
+                               rounded_value <- round(x, 2)  # Round to 2 decimal places
+                               if (topic == "tenure") {
+                                 paste0(rounded_value, " years")  # Add " years" after the rounded number
+                               } else {
+                                 scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
+                               }
+                             })
+
           )
         }),
         selected_columns
@@ -243,7 +260,7 @@ create_non_time_table <- function(data, category, colors) {
       columnGroups = list(
         colGroup(
           name = unique(data$subtitle),
-          columns = selected_columns[!selected_columns %in% "y_All LHDs"]  # Exclude "All LHDs" from the group
+          columns = selected_columns
         )
       ),
       filterable = FALSE,
