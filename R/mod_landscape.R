@@ -584,8 +584,8 @@ mod_landscape_server <- function(id){
       }
 
       # Debugging: Print the column names to check their contents
-      print(colnames(data))
-      view(data)
+      # print(colnames(data))
+      # view(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
