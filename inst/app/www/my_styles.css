@@ -5,7 +5,7 @@
 /* ---------------------------------------------------------- Data viz views */
 .viz-view {
     display: flex;
-    padding-left: 42%;
+    justify-content: center;
     margin-top: -67px;
     padding-bottom: 25px;
 }
@@ -934,7 +934,7 @@ label:not(.material-switch label) {
   display: block !important;
 }*/
 
-.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick) {
+.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick, .fa-chart-scatter) {
   color: #008A96;
 }
 

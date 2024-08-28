@@ -413,7 +413,8 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
       dplyr::mutate(group = sub(" .*", "", group)) %>% # shorten labels
       dplyr::mutate_if(is.numeric, round, 1)
 
-  } else {
+
+  } else if (selected_data == "budget_data") {
     data <- budget_data %>%
       dplyr::mutate(x = as.numeric(as.factor(group))-1,
                     group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",

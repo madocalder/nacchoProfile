@@ -41,17 +41,6 @@
 
 
 
-#' Workforce Employee Types
-#'
-#' @format list
-#'
-#' A list of 0
-#'
-#' @source columns from master_data
-"workforce_employee_types"
-
-
-
 #' Finance Topics
 #'
 #' @format list
@@ -61,3 +50,27 @@
 #' @source columns from master_data
 "finance_topics"
 
+
+
+
+#' Services Topics
+#'
+#' @format list
+#'
+#' A list of 2
+#'
+#' @source columns from master_data
+"service_topics"
+
+
+
+
+
+#' Services Provision To
+#'
+#' @format list
+#'
+#' A list of 10
+#'
+#' @source columns from master_data
+"service_classifications"

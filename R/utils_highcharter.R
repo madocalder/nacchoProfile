@@ -387,6 +387,60 @@ set_column <- function(data,
 
 
 
+
+#' Set First Highcharter Column Graph
+#'
+#' @description Create the first highcharter visualizations from which proxies will redraw.
+#'
+#' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param y_label character string; Label for the Y Axis.
+#'
+#' @export
+#'
+#'
+#' @return column graph
+set_simple_bar <- function(data,
+                           y_label = "% of LHDs") {
+
+  highcharter::hchart(
+    data,
+    "bar",
+    id = "All",
+    highcharter::hcaes(
+      x = x,
+      y = y,
+      group = group
+    ),
+    dataLabels = list(
+      enabled = TRUE,
+      format = "{point.y}%",
+      overflow = TRUE,
+      distance = 5,
+      padding = 2,
+      style = list(
+        color = naccho.viz::naccho_grey,
+        fontFamily = "Jost",
+        fontWeight = "500",
+        fontSize = "14px"
+      )
+    )
+  ) %>%
+    highcharter::hc_xAxis(
+      title = list(text = ""), # x-axis label
+      categories = unique(data$category)
+    ) %>%
+    highcharter::hc_yAxis(
+      title = list(
+        text = y_label
+      ), # y-axis label
+      min = 0,
+      labels = list(
+        format = "{value}%"
+      )
+    )
+}
+
+
 #' Set First Highcharter Bar Graph
 #'
 #' @description Create the first highcharter visualizations from which proxies will redraw.

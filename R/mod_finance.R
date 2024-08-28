@@ -60,7 +60,6 @@ mod_finance_ui <- function(id){
 
 
           # add main page content here ----------------------------------------------
-
           div(
             class = "viz-content",
 

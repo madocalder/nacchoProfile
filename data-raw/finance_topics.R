@@ -1,8 +1,8 @@
 ## code to prepare `finance_topics` dataset goes here
 finance_topics <- list(
-  "Expenditures" = list("Total Exp." = "c3q15",
-                        "Per Capita Exp." = "totexp_percap",
-                        "Grouped Total Exp." = "exp_total_numcat",
+  "Expenditures" = list("Total Expenditures" = "c3q15",
+                        "Per Capita Expenditures" = "totexp_percap",
+                        "Grouped Total Expenditures" = "exp_total_numcat",
                         "Grouped Per Capita Exp." = "exp_percap_numcat"),
 
   "Revenues" = list("Total Revenues" = "non_weighted_revenue_total",

@@ -37,6 +37,10 @@ Shiny.addCustomMessageHandler('triggerClick', function(id) {
 });
 
 
+Shiny.addCustomMessageHandler('triggerClickService', function(id) {
+  document.getElementById(id).click();
+});
+
 
 
 
