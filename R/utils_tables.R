@@ -41,7 +41,7 @@ create_non_time_table <- function(data, category, colors, topic) {
 
   # Define theme
   options(
-    reactable.theme = reactableTheme(
+    reactable.theme = reactable::reactableTheme(
       color = "#3d4242",
       backgroundColor = "#F9F8F7",
       borderColor = NULL,
@@ -99,7 +99,7 @@ create_non_time_table <- function(data, category, colors, topic) {
     all_lhds_col <- colDef(
       name = "All LHDs",
       align = "center",
-      header = with_tooltip("All LHDs", paste0("n = ", data$'Responses_All LHDs'[1])),
+      header = with_tooltip("All LHDs", paste0("n = ", sum(data['Responses_All LHDs']))),
       cell = data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8, 100),
@@ -216,7 +216,10 @@ create_non_time_table <- function(data, category, colors, topic) {
           colDef(
             name = stringr::str_replace_all(col_name, "_", " "),
             align = "center",
-            header = with_tooltip(col_name, paste0("n = ", data[[paste0("Responses_", col_name)]][1])),
+            header = with_tooltip(
+              col_name,
+              paste0("n = ", sum(data[[paste0("Responses_", col_name)]]))
+            ),
             cell = data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8, 100),
@@ -277,7 +280,7 @@ create_non_time_table <- function(data, category, colors, topic) {
 # Helper function to add tooltips
 with_tooltip <- function(value, tooltip, ...) {
   div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
-      tippy(value, tooltip, ...))
+      tippy::tippy(value, tooltip, ...))
 }
 
 

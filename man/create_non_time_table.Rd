@@ -4,7 +4,7 @@
 \alias{create_non_time_table}
 \title{Create a Custom Non-Time Table}
 \usage{
-create_non_time_table(data, category, colors)
+create_non_time_table(data, category, colors, topic)
 }
 \arguments{
 \item{data}{A data frame containing the data to be displayed in the table. The first column is expected to contain category names, and the remaining columns should contain numeric values.}

@@ -35,7 +35,7 @@ app_ui <- function(request) {
       stylesheet = "css/all.min.css"
     ),
 
-    useWaiter(),
+    waiter::useWaiter(),
 
     tags$style(
       ".waiter-overlay {
@@ -45,12 +45,12 @@ app_ui <- function(request) {
       background-color: #fff !important;}"
     ),
 
-    waiter_set_theme(
-      html = spin_pixel(),
+    waiter::waiter_set_theme(
+      html = waiter::spin_pixel(),
       color = "white"
     ),
 
-    waiterPreloader(
+    waiter::waiterPreloader(
       html = div(
         div(
           # style = "margin-left: -80%;",

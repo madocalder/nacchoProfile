@@ -302,8 +302,14 @@ mod_landscape_server <- function(id){
           naccho.viz::naccho_green,
           naccho.viz::naccho_orange,
           naccho.viz::naccho_pink)
+
+      } else if (input$filter %in% c("All LHDs")) {
+      c(naccho.viz::naccho_blue)
+
       }
-    })
+    }
+    )
+
 
 
     updatedInputs <- reactive({
@@ -460,20 +466,22 @@ mod_landscape_server <- function(id){
       topic = input$topic
 
       # Define colors reactively based on the filter
-      colors <- if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
-      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
-      } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
-      } else if (input$filter == "All LHDs") {
-        c(naccho.viz::naccho_blue) }
+      colors <- colors()
+
+      #   if (input$filter == "urbanrural2022") {
+      #   c(naccho.viz::naccho_blue,
+      #     naccho.viz::naccho_green)
+      # } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+      #   c(naccho.viz::naccho_blue,
+      #     naccho.viz::naccho_green,
+      #     naccho.viz::naccho_orange)
+      # } else if (input$filter == "censusregion") {
+      #   c(naccho.viz::naccho_blue,
+      #     naccho.viz::naccho_green,
+      #     naccho.viz::naccho_orange,
+      #     naccho.viz::naccho_pink)
+      # } else if (input$filter == "All LHDs") {
+      #   c(naccho.viz::naccho_blue) }
 
       # Determine the category based on the input filter
       category <- case_when(
@@ -579,7 +587,12 @@ mod_landscape_server <- function(id){
           dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, group, y, subtitle, Responses) %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
-          dplyr::left_join(., add_all_counts_long(input$topic), by = "category")
+          dplyr::left_join(., add_all_counts_long(input$topic), by = "category") %>%
+          dplyr::mutate(
+            dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+          )
+
+
 
       }
 
