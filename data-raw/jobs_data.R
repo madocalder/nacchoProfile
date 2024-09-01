@@ -62,7 +62,7 @@ jobs_data <- left_join(jobs_data_cats, jobs_data_all, by = "Group")
 
 # raw total
 jobs_data <- jobs_data %>%
-  dplyr::mutate(group = stringr::str_to_title(Group),
+  dplyr::mutate(group = sapply(Group, custom_str_to_title),
                 y = dplyr::case_when(Question == "jobsgone" ~ Total,
                                      Question == "jobsgain" ~ Total),
                 category = case_when(Question == "jobsgone" ~ "Jobs Lost",

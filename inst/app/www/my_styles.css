@@ -292,6 +292,12 @@ label:not(.material-switch label) {
   min-height: 400px;
 }
 
+
+.min-height-250 .selectize-dropdown-content {
+  min-height: 250px;
+}
+
+
 .selectize-dropdown-content {
   border: 1px solid #ccc;
   min-width: 150px; /* Set a minimum width */

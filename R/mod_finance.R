@@ -231,17 +231,17 @@ mod_finance_server <- function(id){
     # reactively define the colors based on the filter
     colors <- reactive ({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
+        c(naccho.viz::navy,
+          naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       }
     })
 
@@ -315,7 +315,7 @@ mod_finance_server <- function(id){
               name_two = "Same or Higher",
               set_format = "{value}%") %>%
         viz_options(
-          colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+          colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
           legend_title = "Budget...",
           viz_title = "Changes in Budget From Prior Year",
@@ -323,7 +323,7 @@ mod_finance_server <- function(id){
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y}% <br>",
-          theme = naccho.viz::bar_pos_neg_theme
+          theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
@@ -405,7 +405,7 @@ mod_finance_server <- function(id){
         proxy_bar %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
-                               theme = naccho.viz::basic_theme)
+                               theme = naccho.viz::basic)
 
 
 
@@ -425,7 +425,7 @@ mod_finance_server <- function(id){
                               colors = colors(),
                               id = series_id,
                               responses = sum(data$Responses),
-                              theme = naccho.viz::basic_theme)
+                              theme = naccho.viz::basic)
       }
     })
   })

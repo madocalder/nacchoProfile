@@ -3,7 +3,7 @@
 \docType{data}
 \name{service_classifications}
 \alias{service_classifications}
-\title{Services Provision To}
+\title{Services Provision Topics}
 \format{
 list
 
@@ -16,6 +16,6 @@ columns from master_data
 service_classifications
 }
 \description{
-Services Provision To
+Services Provision Topics
 }
 \keyword{datasets}

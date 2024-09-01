@@ -29,7 +29,6 @@ $(document).on('click', '.action-link-3', function() {
 
 
 
-
 // triggers the occupational classifications to click
 // =============================================================================
 Shiny.addCustomMessageHandler('triggerClick', function(id) {
@@ -126,3 +125,8 @@ window.addEventListener('load', function() {
   // Update position on window resize
   window.addEventListener('resize', updatePosition);
 });
+
+
+
+
+

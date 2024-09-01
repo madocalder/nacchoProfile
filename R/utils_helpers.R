@@ -67,25 +67,18 @@ take_inputs <- function(selected_inputs) {
 
 
 
-#' set colors
+
+#' Apply str_to_title to all but "All LHDs:
 #'
-#'@param input One or more inputs to feed an observeEvent
+#' @param text the string or strings to apply function to
 #'
-#' @return filtering for colors
+#' @return formatted strings
 #' @export
 #'
-set_colors <- function(input = input) {
-  if (input$filter == "urbanrural2022") {
-    c(naccho.viz::naccho_blue,
-      naccho.viz::naccho_green)
-  } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-    c(naccho.viz::naccho_blue,
-      naccho.viz::naccho_green,
-      naccho.viz::naccho_orange)
-  } else if (input$filter == "censusregion") {
-    c(naccho.viz::naccho_blue,
-      naccho.viz::naccho_green,
-      naccho.viz::naccho_orange,
-      naccho.viz::naccho_pink)
+custom_str_to_title <- function(text) {
+  if (text == "All LHDs") {
+    return(text)  # Return the text as is
+  } else {
+    return(stringr::str_to_title(text))  # Apply str_to_title to other text
   }
 }

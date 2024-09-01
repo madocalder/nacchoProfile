@@ -23,8 +23,8 @@ viz_export <- function(hc, enabled = TRUE) {
         contextButton = list(
           symbol = "menu",
           symbolStrokeWidth = 2,
-          symbolFill = naccho.viz::naccho_teal,
-          symbolStroke = naccho.viz::naccho_teal,
+          symbolFill = naccho.viz::teal,
+          symbolStroke = naccho.viz::teal,
           menuItems = c("printChart",
                         "separator",
                         "downloadPNG",
@@ -49,7 +49,7 @@ viz_export <- function(hc, enabled = TRUE) {
 #' @param viz_subtitle character string; subtitle to appear underneath the title. Defaults to nothing.
 #' @param viz_caption character string; source and data notes to appear underneath the figure. Defaults to nothing.
 #' @param caption_align character string; options include "left", "center", or "right" where the default is "center".
-#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::naccho_colors.
+#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::colors.
 #' @param theme hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.
 #' @param tooltip character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.
 #' @param tooltip_align character string; options include "left", "right", or "center".
@@ -66,8 +66,8 @@ viz_options <- function(hc,
                         viz_subtitle = "",
                         viz_caption = "",
                         caption_align = "center",
-                        colors = naccho.viz::naccho_colors,
-                        theme = naccho.viz::basic_theme,
+                        colors = naccho.viz::colors,
+                        theme = naccho.viz::basic,
                         tooltip,
                         tooltip_align = "center",
                         legend_enable = TRUE,
@@ -91,7 +91,7 @@ viz_options <- function(hc,
     highcharter::hc_caption(
       text = viz_caption, # source and data notes
       useHTML = TRUE,
-      margin = 20,
+      margin = 60,
       align = caption_align
     ) %>%
     highcharter::hc_tooltip(
@@ -363,7 +363,7 @@ set_column <- function(data,
       distance = 5,
       padding = 2,
       style = list(
-        color = naccho.viz::naccho_grey,
+        color = naccho.viz::grey,
         fontFamily = "Jost",
         fontWeight = "500",
         fontSize = "14px"
@@ -418,7 +418,7 @@ set_simple_bar <- function(data,
       distance = 5,
       padding = 2,
       style = list(
-        color = naccho.viz::naccho_grey,
+        color = naccho.viz::grey,
         fontFamily = "Jost",
         fontWeight = "500",
         fontSize = "14px"
@@ -817,7 +817,7 @@ set_box <- function(data) {
       marker = list(
         symbol = "circle",
         radius = 5,
-        fillColor = naccho.viz::naccho_orange
+        fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y}"
@@ -830,7 +830,7 @@ set_box <- function(data) {
       categories = as.list(stringr::str_to_title(data[[1]]$category))
     ) %>%
     highcharter::hc_add_theme(
-      naccho.viz::basic_theme
+      naccho.viz::basic
     )
 }
 
@@ -1036,7 +1036,7 @@ proxy_hist_to_single <- function(hc,
           distance = 5,
           padding = 2,
           style = list(
-            color = naccho.viz::naccho_grey,
+            color = naccho.viz::grey,
             fontFamily = "Jost",
             fontWeight = "500",
             fontSize = "14px"
@@ -1100,7 +1100,7 @@ proxy_hist_to_group <- function(hc,
                                 size = "17px",
                                 overflow = "none",
                                 responses = sum(data$Responses),
-                                theme = naccho.viz::hist_theme, ...) {
+                                theme = naccho.viz::histogram, ...) {
 
   if (is.null(data_all)) {
 
@@ -1137,7 +1137,7 @@ proxy_hist_to_group <- function(hc,
             distance = 5,
             padding = 2,
             style = list(
-              color = naccho.viz::naccho_grey,
+              color = naccho.viz::grey,
               fontFamily = "Jost",
               fontWeight = "500",
               fontSize = "14px"
@@ -1215,7 +1215,7 @@ proxy_hist_to_group <- function(hc,
             distance = 5,
             padding = 2,
             style = list(
-              color = naccho.viz::naccho_grey,
+              color = naccho.viz::grey,
               fontFamily = "Jost",
               fontWeight = "500",
               fontSize = "14px"
@@ -1343,7 +1343,7 @@ proxy_to_box <- function(hc, data, meta, ...) {
       marker = list(
         symbol = "circle",
         radius = 5,
-        fillColor = naccho.viz::naccho_orange
+        fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y}"
@@ -1408,7 +1408,7 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
       marker = list(
         symbol = "circle",
         radius = 5,
-        fillColor = naccho.viz::naccho_orange
+        fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y}"
@@ -1444,4 +1444,354 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
       )
     )
 }
+
+
+
+#' Scatter Plot
+#'
+#' @param data Dataframe for the viz
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+scatter_plot <- function(data, colors) {
+
+  data_for_n <- data
+
+  if (sum(stringr::str_detect(data_for_n$filter, "All LHDs")) > 0) {
+
+    n <- data_for_n$demoninator
+
+  } else {
+
+    data_for_n <- data_for_n %>%
+      dplyr::group_by(service_type, filter) %>%
+      dplyr::summarize(n = sum(demoninator))
+
+    n <- data_for_n$n
+  }
+
+  req(n)
+  highcharter::highchart() %>%
+    highcharter::hc_add_series(
+      id = "All",
+      data = data,
+      type = "scatter",
+      highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+    ) %>%
+    highcharter::hc_chart(
+      zoomType = "xy",
+      resetZoomButton = list(
+        theme = list(
+          fill = "white",
+          stroke = "#80A14E",
+          style = list(
+            color = "#80A14E",
+            fontWeight = "bold",
+            fontFamily = "Jost",
+            lineHeight = "25px" # positions text correctly inside button
+          ),
+          r = 20,  # border radius
+          padding = 10,
+          states = list(
+            hover = list(
+              fill = "#80A14E",
+              stroke = "white",
+              style = list(
+                color = "white"
+              )
+            )
+          )
+        )
+      )
+    ) %>%
+    highcharter::hc_plotOptions(
+      scatter = list(
+        events = list(
+          click = highcharter::JS("function() {
+                     this.selectionMarker.destroy();
+                     }")
+        ),
+        dataLabels = list(
+          enabled = TRUE,
+          allowOverlap = TRUE,
+          formatter = highcharter::JS("
+          function() {
+            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
+          }
+        "),
+          style = list(
+            textOutline = "none",
+            fontFamily = "Heebo",
+            fontSize = "10px",
+            fontWeight = "bold"
+          )
+        ),
+        marker = list(
+          radius = 7,
+          lineWidth = 1
+        )
+      )
+    ) %>%
+    highcharter::hc_xAxis(
+      min = 0,
+      max = 35,
+      title = list(
+        text = "Percent of LHDs reducing service",
+        align = "high"
+      ),
+      plotLines = list(
+        list(
+          value = 20,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent reduced (20%)",
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 20,
+          to = 35,
+          color = "rgba(171, 97, 67, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "bottom",
+            align = "right")
+        )
+      )
+    ) %>%
+    highcharter::hc_yAxis(
+      min = 0,
+      title = list(
+        text = "Percent of LHDs expanding service"
+      ),
+      plotLines = list(
+        list(
+          value = 27,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent expanded (27%)",
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 0,
+          to = 27,
+          color = "rgba(236, 229, 225, 0.3)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "right")
+        ),
+        list(
+          from = 27,
+          to = 100,
+          color = "rgba(0, 138, 150, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "left")
+        )
+      )
+    ) %>%
+    highcharter::hc_add_theme(
+      naccho.viz::scatter
+    ) %>%
+    highcharter::hc_colors(
+      colors = colors
+    ) %>%
+    highcharter::hc_annotations(
+      list(
+        draggable = FALSE,
+        labels = list(
+          list(
+            point = list(
+              x = 1,
+              y = 78,
+              xAxis = 0,
+              yAxis = 0
+            ),
+            text = HTML('Services Growing'),
+            style = list(
+              color = "black",
+              fontWeight = "bold",
+              fontSize = "14px",
+              fontFamily = "Heebo"
+            ),
+            backgroundColor = "transparent",
+            borderColor = "transparent"
+          ),
+          list(
+            point = list(
+              x = 1,
+              y = 0,
+              xAxis = 0,
+              yAxis = 0
+            ),
+            text = HTML('Services Stable'),
+            style = list(
+              color = "black",
+              fontWeight = "bold",
+              fontSize = "14px",
+              fontFamily = "Heebo"
+            ),
+            backgroundColor = "transparent",
+            borderColor = "transparent"
+          ),
+          list(
+            point = list(
+              x = 34,
+              y = 78,
+              xAxis = 0,
+              yAxis = 0
+            ),
+            text = HTML('Mixed Trend'),
+            style = list(
+              color = "black",
+              fontWeight = "bold",
+              fontSize = "14px",
+              fontFamily = "Heebo"
+            ),
+            backgroundColor = "transparent",
+            borderColor = "transparent"
+          ),
+          list(
+            point = list(
+              x = 33,
+              y = 0,
+              xAxis = 0,
+              yAxis = 0
+            ),
+            text = HTML('Services Shrinking'),
+            style = list(
+              color = "black",
+              fontWeight = "bold",
+              fontSize = "14px",
+              fontFamily = "Heebo"
+            ),
+            backgroundColor = "transparent",
+            borderColor = "transparent"
+          )
+        )
+      )
+    ) %>%
+    highcharter::hc_title(
+      text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
+      margin = 40,
+      widthAdjust = -60
+    ) %>%
+    highcharter::hc_subtitle(
+      text = "Click and span a range on the figure to zoom."
+    ) %>%
+    highcharter::hc_caption(
+      text = HTML("<b> N: </b>", min(n), " to ", max(n), "<br>", source_line),
+      useHTML = TRUE,
+      margin = 60,
+      align = "center"
+    )
+}
+
+
+
+
+#' Scatter Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_scatter_single <- function(hc, data,...) {
+
+    hc %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Urban", "Rural")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("State", "Local", "Shared")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Midwest", "South", "West", "Northeast")
+      ) %>%
+    highcharter::hcpxy_remove_series(
+      id = "All"
+    ) %>%
+      highcharter::hcpxy_add_series(
+        id = "All",
+        data = data,
+        type = "scatter",
+        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+      ) %>%
+      highcharter::hcpxy_update(
+        chart = list(
+          zoomType = "xy")
+      )
+}
+
+
+
+
+
+#' Scatter Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_scatter_group <- function(hc, data, id = NULL, input, colors = NULL,...) {
+
+    hc %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Urban", "Rural")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("State", "Local", "Shared")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Midwest", "South", "West", "Northeast")
+      ) %>%
+    highcharter::hcpxy_remove_series(
+      id = "All"
+    ) %>%
+      highcharter::hcpxy_add_series(
+        data = data,
+        type = "scatter",
+        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type),
+        id = id,
+        color = colors
+      ) %>%
+      highcharter::hcpxy_update(
+        chart = list(
+          zoomType = "xy")
+      )
+}
+
+
+
+
 

@@ -32,7 +32,7 @@ spec_data_all <- map_dfr(args1[[1]], return_survey_weighted_counts) %>%
     AnswerLabel = q_remap[.data$Question],
     GroupLabel = label_remap[as.character(.data$Group)],
     x = as.numeric(as.factor(AnswerLabel)) -1,
-    category = stringr::str_to_title(AnswerLabel),
+    category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("Estimated Across All LHDs")
     )
 
@@ -44,7 +44,7 @@ spec_data_population <- pmap_dfr(args1, return_survey_weighted_counts) %>%
     filter = "c0popcat3",
     AnswerLabel = q_remap[.data$Question],
     x = as.numeric(as.factor(AnswerLabel)) -1,
-    category = stringr::str_to_title(AnswerLabel),
+    category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By LHD Size")
     ) %>%
   select(-c0popcat3)
@@ -57,7 +57,7 @@ spec_data_rurality <- pmap_dfr(args2, return_survey_weighted_counts) %>%
     filter = "urbanrural2022",
     AnswerLabel = q_remap[.data$Question],
     x = as.numeric(as.factor(AnswerLabel)) -1,
-    category = stringr::str_to_title(AnswerLabel),
+    category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Rurality")
     ) %>%
   select(-urbanrural2022)
@@ -70,7 +70,7 @@ spec_data_governance <- pmap_dfr(args3, return_survey_weighted_counts) %>%
     filter = "c0govcat",
     AnswerLabel = q_remap[.data$Question],
     x = as.numeric(as.factor(AnswerLabel)) -1,
-    category = stringr::str_to_title(AnswerLabel),
+    category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Governance")
     ) %>%
   select(-c0govcat)
@@ -83,7 +83,7 @@ spec_data_region <- pmap_dfr(args4, return_survey_weighted_counts) %>%
     filter = "censusregion",
     AnswerLabel = q_remap[.data$Question],
     x = as.numeric(as.factor(AnswerLabel)) -1,
-    category = stringr::str_to_title(AnswerLabel),
+    category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Region")
     ) %>%
   select(-censusregion)

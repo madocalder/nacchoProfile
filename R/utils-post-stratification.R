@@ -89,7 +89,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
             y = round(Percentage,1),
-            category = stringr::str_to_title(Answer),
+            category = sapply(Answer, custom_str_to_title),
             group = Group,
             subtitle = paste0("Estimated Across All LHDs")
           )
@@ -132,8 +132,8 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
             y = round(Percentage,1),
-            category = stringr::str_to_title(Answer),
-            group = stringr::str_to_title(Group),
+            category = sapply(Answer, custom_str_to_title),
+            group = sapply(Group, custom_str_to_title),
             subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
           )
 
@@ -193,7 +193,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
     select(all_of(c("Group", "Percentage", "Answer"))) %>%
     mutate(
       y = round(Percentage,1),
-      category = stringr::str_to_title(Answer),
+      category = sapply(Answer, custom_str_to_title),
       group = Group,
       subtitle = paste0("Estimated Across All LHDs")
     )
@@ -253,7 +253,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
       mutate(
         y = round(Mean, 1),
         x = as.numeric(as.factor(Group)) - 1,
-        category = stringr::str_to_title(Group),
+        category = sapply(Group, custom_str_to_title),
         group = "All LHDs",
         subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
       )
@@ -279,7 +279,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         mutate(
           y = round(Mean, 1),
           x = as.numeric(as.factor(Group)) - 1,
-          category = stringr::str_to_title(Group),
+          category = sapply(Group, custom_str_to_title),
           group = "All LHDs",
           subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
         )
@@ -533,4 +533,81 @@ boxplot_data <- function(args, grps = NULL) {
     lapply(data, function(tbl) as.list(tbl[1, ]))
 
   }
+}
+
+
+
+#' Data cleaning for the scatter plots
+#'
+#' @description Clean and format data for the scatter plot visualization
+#'
+#' @param set_filter value from the data, one of the filters
+#' @param set_service value(s) from the data, one of the service_types
+#'
+#' @export
+#' @return A list of one or more.
+scatter_data <- function(set_filter = "All LHDs",
+                         set_service = "Blood Lead Screening") {
+
+  data <- services_change_data %>%
+    dplyr::select(Group, filter:y)
+
+
+  data_wide <- tidyr::pivot_wider(data, names_from = service_provision, values_from = c(y)) %>%
+    dplyr::mutate(size = 1,
+                  x = `Reduced Service`,
+                  y = `Expanded Service`) %>%
+    dplyr::filter(filter == set_filter,
+                  service_type %in% set_service)
+
+
+  data_clean <- data_wide %>%
+    dplyr::mutate(verticalAlign = dplyr::case_when(service_type == "Blood Lead Screening" ~ "top",
+                                                   service_type == "Chronic Disease" ~ "bottom",
+                                                   service_type == "Communicable Disease Screening or Treatment" ~ "bottom",
+                                                   service_type == "Diabetes Screening" ~ "top",
+                                                   service_type == "Emergency Preparedness" ~ "top",
+                                                   service_type == "Environmental Health Including Food Safety" ~ "top",
+                                                   service_type == "Epidemiology and Surveillance" ~ "bottom",
+                                                   service_type == "High Blood Pressure Screening" ~ "middle",
+                                                   service_type == "Immunization" ~ "bottom",
+                                                   service_type == "Maternal and Child Health Services" ~ "bottom",
+                                                   service_type == "Mental Health" ~ "middle",
+                                                   service_type == "Obesity Prevention" ~ "top",
+                                                   service_type == "Substance Use Prevention" ~ "bottom")) %>%
+    dplyr::mutate(align = dplyr::case_when(service_type == "Blood Lead Screening" ~ "left",
+                                           service_type == "Chronic Disease" ~ "left",
+                                           service_type == "Communicable Disease Screening or Treatment" ~ "center",
+                                           service_type == "Diabetes Screening" ~ "center",
+                                           service_type == "Emergency Preparedness" ~ "center",
+                                           service_type == "Environmental Health Including Food Safety" ~ "center",
+                                           service_type == "Epidemiology and Surveillance" ~ "center",
+                                           service_type == "High Blood Pressure Screening" ~ "left",
+                                           service_type == "Immunization" ~ "center",
+                                           service_type == "Maternal and Child Health Services" ~ "center",
+                                           service_type == "Mental Health" ~ "left",
+                                           service_type == "Obesity Prevention" ~ "center",
+                                           service_type == "Substance Use Prevention" ~ "center")) %>%
+    dplyr::mutate(service_type = dplyr::case_when(service_type == "Blood Lead Screening" ~ "Blood Lead",
+                                                  service_type == "Chronic Disease" ~ "Chronic Disease",
+                                                  service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
+                                                  service_type == "Diabetes Screening" ~ "Diabetes Sx",
+                                                  service_type == "Emergency Preparedness" ~ "Emrgy Preparedness",
+                                                  service_type == "Environmental Health Including Food Safety" ~ "Env Health",
+                                                  service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
+                                                  service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
+                                                  service_type == "Immunization" ~ "Immunization",
+                                                  service_type == "Maternal and Child Health Services" ~ "MCH",
+                                                  service_type == "Mental Health" ~ "Mental Health",
+                                                  service_type == "Obesity Prevention" ~ "Obesity Prev.",
+                                                  service_type == "Substance Use Prevention" ~ "Substance Use Prev."))
+
+  data_clean %>%
+    dplyr::mutate(
+      dataLabels = purrr::map2(
+        verticalAlign, align,
+        ~ list(enabled = TRUE, verticalAlign = .x, align = .y)
+      )
+    )
+
 }

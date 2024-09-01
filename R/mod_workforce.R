@@ -222,17 +222,17 @@ mod_workforce_server <- function(id){
     # reactively define the colors based on the filter
     colors <- reactive ({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
+        c(naccho.viz::navy,
+          naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       }
     })
 
@@ -263,14 +263,14 @@ mod_workforce_server <- function(id){
 
       set_bar(data) %>%
         viz_options(
-          colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+          colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
           viz_title = "Jobs Lost and Added - Estimated Total",
           viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y} <br>",
-          theme = naccho.viz::bar_pos_neg_theme
+          theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
@@ -343,7 +343,7 @@ mod_workforce_server <- function(id){
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
-                               theme = naccho.viz::basic_theme)
+                               theme = naccho.viz::basic)
 
 
         # Topic: FTEs by Category
@@ -362,7 +362,7 @@ mod_workforce_server <- function(id){
                               colors = colors(),
                               id = series_id,
                               responses = sum(data$Responses),
-                              theme = naccho.viz::basic_theme)
+                              theme = naccho.viz::basic)
 
 
 
@@ -428,7 +428,7 @@ mod_workforce_server <- function(id){
         proxy %>%
           proxy_hist_to_single(data,
                                meta = filter_meta(),
-                               theme = naccho.viz::basic_theme)
+                               theme = naccho.viz::basic)
 
 
         # Topic: Employee by Category
@@ -447,7 +447,7 @@ mod_workforce_server <- function(id){
                               colors = colors(),
                               id = series_id,
                               responses = sum(data$Responses),
-                              theme = naccho.viz::basic_theme)
+                              theme = naccho.viz::basic)
 
 
         # Topic: Jobs Standard
@@ -534,7 +534,7 @@ mod_workforce_server <- function(id){
                                 size = size,
                                 overflow = overflow,
                                 responses = show_n(Responses$Responses),
-                                theme = naccho.viz::basic_theme)
+                                theme = naccho.viz::basic)
 
 
         } else if (input$topic %in% c("a", "b") & input$filter == "All LHDs") {
@@ -542,7 +542,7 @@ mod_workforce_server <- function(id){
             proxy_hist_to_single(data,
                                  meta = filter_meta(),
                                  responses = show_n(Responses$Responses),
-                                 theme = naccho.viz::basic_theme,
+                                 theme = naccho.viz::basic,
                                  rotate = rotate,
                                  size = size,
                                  overflow = overflow)

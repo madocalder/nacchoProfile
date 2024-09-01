@@ -96,14 +96,14 @@ services_data <- services_data %>%
                                                 stringr::str_detect(Question, "c6q56") ~ "Routine Childhood Immunizations",
                                                 stringr::str_detect(Question, "c6q147") ~ "COVID-19 Adult Immunizations",
                                                 stringr::str_detect(Question, "c6q148") ~ "COVID-19 Child Immunizations",
-                                                stringr::str_detect(Question, "c6q142") ~ "BMI",
-                                                stringr::str_detect(Question, "c6q60") ~ "Cancer",
-                                                stringr::str_detect(Question, "c6q61") ~ "Cardiovascular Disease",
-                                                stringr::str_detect(Question, "c6q62") ~ "Diabetes",
-                                                stringr::str_detect(Question, "c6q63") ~ "High Blood Pressure",
-                                                stringr::str_detect(Question, "c6q57") ~ "HIV/AIDs",
-                                                stringr::str_detect(Question, "c6q58") ~ "Other STDs",
-                                                stringr::str_detect(Question, "c6q59") ~ "Tuberculosis",
+                                                stringr::str_detect(Question, "c6q142") ~ "BMI Screening",
+                                                stringr::str_detect(Question, "c6q60") ~ "Cancer Screening",
+                                                stringr::str_detect(Question, "c6q61") ~ "Cardiovascular Disease Screening",
+                                                stringr::str_detect(Question, "c6q62") ~ "Diabetes Screening",
+                                                stringr::str_detect(Question, "c6q63") ~ "High Blood Pressure Screening",
+                                                stringr::str_detect(Question, "c6q57") ~ "HIV/AIDs Screening",
+                                                stringr::str_detect(Question, "c6q58") ~ "Other STDs Screening",
+                                                stringr::str_detect(Question, "c6q59") ~ "Tuberculosis Screening",
                                                 stringr::str_detect(Question, "c6q65") ~ "HIV/AIDs",
                                                 stringr::str_detect(Question, "c6q66") ~ "Other STDs",
                                                 stringr::str_detect(Question, "c6q67") ~ "Tuberculosis",
@@ -174,7 +174,7 @@ services_data <- services_data %>%
 # create a dataframe just for the total n
 services_data_n <- services_data %>%
   group_by(Question, group) %>%
-  summarise(demoninator = sum(Responses))
+  summarise(denominator = sum(Responses))
 
 services_data <- services_data %>%
   dplyr::filter(Answer == "checked")

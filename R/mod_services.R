@@ -21,7 +21,7 @@ mod_services_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-6",
+              class = "col-sm-6 min-height-250",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -65,27 +65,28 @@ mod_services_ui <- function(id){
 
             # display when Service Provision and Bar Graph are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Service Provision' && input['", ns('view'), "\'] == 'Bar Graph'"),
-              highcharter::highchartOutput(ns("figure_bar"), height = 575)
+              condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
+              highcharter::highchartOutput(ns("figure_bar"), height = 675)
             ),
 
             # display when Service Provision and Line Graph are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Service Provision' && input['", ns('view'), "\'] == 'Line Graph'"),
+              condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Line Graph'"),
               # highcharter::highchartOutput(ns("figure_line"), height = 575)
             ),
 
             # display when Service Changes and Scatter Plot are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Service Changes' && input['", ns('view'), "\'] == 'Scatter Plot'"),
-              # highcharter::highchartOutput(ns("figure_scatter"), height = 675)
+              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
+              highcharter::highchartOutput(ns("figure_scatter"), height = 775)
             ),
 
             # display when Service Changes and Butterfly Graph are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Service Provision' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
+              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
               # highcharter::highchartOutput(ns("figure_butterfly"), height = 575)
-            )
+            ),
+            br(),
           )
         ),
 
@@ -205,7 +206,7 @@ mod_services_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic == "Service Provision") {
+      if (input$topic != "Reduced/Expanded Services") {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
@@ -231,20 +232,35 @@ mod_services_server <- function(id){
     # reactively define the colors based on the filter
     colors <- reactive ({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
+        c(naccho.viz::navy,
+          naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       }
     })
 
+    colors_scatter <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c("#1A2545",
+          "#2C6A77")
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c("#1A2545",
+          "#2C6A77",
+          "#7A3C23")
+      } else if (input$filter == "censusregion") {
+        c("#1A2545",
+          "#2C6A77",
+          "#7A3C23",
+          "#B090B1")
+      }
+    })
 
 
     # main content ============================================================
@@ -256,6 +272,12 @@ mod_services_server <- function(id){
       input$services
     }) %>% debounce(100)
 
+    service_change_inputs <- reactive({
+      input$topic
+      input$filter
+      input$service_changes
+      input$service_changes_single
+    }) %>% debounce(100)
 
 
     # filter meta data --------------------------------------------------------
@@ -269,12 +291,11 @@ mod_services_server <- function(id){
     # figure output -----------------------------------------------------------
     # used for bar graph
     output$figure_bar <- highcharter::renderHighchart({
-
       data <- services_data %>%
         dplyr::filter(service_category == "Immunization") %>%
         dplyr::filter(filter == "All LHDs") %>%
-        dplyr::filter(service_provision != "Status Unknown") %>%
-        dplyr::mutate(group = service_provision,
+        dplyr::filter(service_provision == "LHD (Directly)") %>%
+        dplyr::mutate(group = filter,
                       category = service_type) %>%
         dplyr::group_by(group) %>%
         dplyr::mutate(x = (1:length(group))-1) %>%
@@ -282,16 +303,15 @@ mod_services_server <- function(id){
 
       set_simple_bar(data) %>%
         viz_options(
-          viz_title = "",
-          viz_subtitle = "",
-          viz_caption = "",
+          viz_title = "Estimated Percent of LHDs that Provide Services Directly",
+          viz_subtitle = "Immunization Services", # unique(data$service_category)
+          viz_caption = paste0("<b> N: </b>",  min(data$demoninator), "-", max(data$demoninator), "<br>", source_line),
           tooltip = "",
-          theme = naccho.viz::bar_pos_neg_theme,
-          legend_title = "Service Provider",
-          legend_align = "right"
+          theme = naccho.viz::butterfly,
+          legend_enable = FALSE,
+          colors = naccho.viz::green
         ) %>%
         viz_export()
-
     })
 
 
@@ -305,8 +325,11 @@ mod_services_server <- function(id){
 
     # used for scatter plot
     output$figure_scatter <- highcharter::renderHighchart({
-      # data <- services_change_data %>%
-      #   dplyr::filter(service_provision %in% c("Reduced Service", "Expanded Service"))
+      data <- scatter_data(set_filter = "All LHDs",
+                           set_service = change_classifications) %>%
+        dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+
+      scatter_plot(data, colors = "#6D833A")
     })
 
 
@@ -329,27 +352,123 @@ mod_services_server <- function(id){
     # update proxy ------------------------------------------------------------
     observeEvent(updated_inputs(), {
 
-      if (input$topic == "Service Provision" & input$view == "Bar Graph" & input$filter == "All LHDs") {
+      if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter == "All LHDs") {
+        req(length(input$services) >= 1) # prevents error
+
         data <- services_data %>%
-          dplyr::filter(service_category %in% c(input$services)) %>%
-          dplyr::filter(filter == "All LHDs")
+          dplyr::filter(service_category %in% c(input$services),
+                        filter == "All LHDs",
+                        service_provision == input$topic) %>%
+          dplyr::mutate(group = Group,
+                        category = service_type) %>%
+          dplyr::group_by(group) %>%
+          dplyr::mutate(x = (1:length(group))-1,
+                        x_label = "") %>%
+          dplyr::ungroup()
 
 
-      } else if (input$topic == "Service Provision" & input$view == "Bar Graph" & input$filter == "All LHDs") {
+        # nested
+        if (length(data$x) >= 8) {
+          size = "13px"
+          overflow = "ellipsis"
+        } else {
+          size = "17px"
+          overflow = "none"
+        }
+
+        proxy_bar %>%
+          proxy_hist_to_single(data,
+                          meta = filter_meta(),
+                          size = size,
+                          overflow = overflow)
+
+
+
+      } else if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter != "All LHDs") {
+        req(length(input$services) >= 1) # prevents error
+
         data <- services_data %>%
-          dplyr::filter(service_category %in% c(input$services)) %>%
-          dplyr::filter(filter == input$filter)
+          dplyr::filter(service_category %in% c(input$services),
+                        filter == input$filter,
+                        service_provision == input$topic) %>%
+          dplyr::mutate(group = sapply(Group, custom_str_to_title),
+                        category = service_type) %>%
+          dplyr::group_by(group) %>%
+          dplyr::mutate(x = (1:length(group))-1,
+                        x_label = "") %>%
+          dplyr::ungroup()
+
+        data_all <- services_data %>%
+          dplyr::filter(service_category %in% c(input$services),
+                        filter == "All LHDs",
+                        service_provision == input$topic) %>%
+          dplyr::mutate(group = Group,
+                        category = service_type) %>%
+          dplyr::group_by(group) %>%
+          dplyr::mutate(x = (1:length(group))-1,
+                        x_label = "") %>%
+          dplyr::ungroup()
 
 
-      } else if (input$topic == "Service Provision" & input$view == "Line Graph") {
+
+        # nested
+        if (length(data$x) >= 8) {
+          size = "13px"
+          overflow = "ellipsis"
+        } else {
+          size = "17px"
+          overflow = "none"
+        }
+
+        series_id <- unique(data$group) # provide ID for proxy
+
+        proxy_bar %>%
+          proxy_hist_to_group(data = data,
+                              data_all = data_all,
+                              meta = filter_meta(),
+                              colors = colors(),
+                              id = series_id,
+                              responses = "",
+                              size = size,
+                              overflow = overflow)
+
+
+      } else if (input$topic != "Reduced/Expanded Services" & input$view == "Line Graph") {
         #ADD
 
+      }
+    })
 
-      } else if (input$topic == "Service Changes" & input$view == "Scatter Plot") {
+
+
+    observeEvent(service_change_inputs(), {
+      if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter != "All LHDs") {
+
+        data <- scatter_data(set_filter = input$filter,
+                             set_service = input$service_changes_single) %>%
+          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+
+        series_id <- unique(data$Group)
+
+        proxy_scatter %>%
+          proxy_to_scatter_group(data = data,
+                           input = input$filter,
+                           id = series_id,
+                           colors = colors_scatter())
 
 
 
-      } else if (input$topic == "Service Changes" & input$view == "Butterfly Graph") {
+      } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {
+
+        req(input$service_changes)
+        data <- scatter_data(set_filter = "All LHDs",
+                                 set_service = input$service_changes) %>%
+          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+
+        proxy_scatter %>%
+          proxy_to_scatter_single(data)
+
+        } else if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
 
       }
     })
@@ -359,13 +478,8 @@ mod_services_server <- function(id){
     # right content ===========================================================
 
     observeEvent(input$topic, {
-      if (input$topic == "Service Provision") {
         shinyjs::addClass(selector = "#services_1-dynamic_row", class = "show-icon")
         session$sendCustomMessage(type = "triggerClickService", message = "services_1-get_services")
-      } else {
-        shinyjs::removeClass(selector = "#services_1-dynamic_row", class = "show-icon")
-        session$sendCustomMessage(type = "triggerClickService", message = "services_1-takeaway")
-      }
     })
 
     # show services by cateogry  ---------------------------------------
@@ -376,12 +490,30 @@ mod_services_server <- function(id){
       shinyjs::hide("toggle_definitions")
 
       output$show_get_services <- renderUI({
-        checkboxGroupInput(
-          ns("services"),
-          strong("Select Service Topic"),
-          service_classifications,
-          selected = "Immunization"
-        )
+
+        if (input$topic != "Reduced/Expanded Services") {
+          shinyWidgets::prettyRadioButtons(
+            ns("services"),
+            strong("Select Service Topic"),
+            service_classifications,
+            selected = "Immunization"
+          )
+        } else if (input$topic == "Reduced/Expanded Services" & input$filter != "All LHDs") {
+          shinyWidgets::prettyRadioButtons(
+            ns("service_changes_single"),
+            strong("Select Service Topic"),
+            change_classifications,
+            selected = "Epidemiology and Surveillance"
+          )
+        } else {
+          checkboxGroupInput(
+            ns("service_changes"),
+            strong("Select Service Topic"),
+            change_classifications,
+            selected = change_classifications
+          )
+
+        }
       })
     }, ignoreNULL = FALSE)
 

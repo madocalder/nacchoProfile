@@ -290,17 +290,17 @@ mod_landscape_server <- function(id){
     # reactively define the colors based on the filter
     colors <- reactive ({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
+        c(naccho.viz::navy,
+          naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       }
     })
 
