@@ -276,7 +276,6 @@ mod_services_server <- function(id){
       input$topic
       input$filter
       input$service_changes
-      input$service_changes_single
     }) %>% debounce(100)
 
 
@@ -445,7 +444,7 @@ mod_services_server <- function(id){
       if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter != "All LHDs") {
 
         data <- scatter_data(set_filter = input$filter,
-                             set_service = input$service_changes_single) %>%
+                             set_service = input$service_changes) %>%
           dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
         series_id <- unique(data$Group)
@@ -498,13 +497,13 @@ mod_services_server <- function(id){
             service_classifications,
             selected = "Immunization"
           )
-        } else if (input$topic == "Reduced/Expanded Services" & input$filter != "All LHDs") {
-          shinyWidgets::prettyRadioButtons(
-            ns("service_changes_single"),
-            strong("Select Service Topic"),
-            change_classifications,
-            selected = "Epidemiology and Surveillance"
-          )
+        # } else if (input$topic == "Reduced/Expanded Services" & input$filter != "All LHDs") {
+        #   shinyWidgets::prettyRadioButtons(
+        #     ns("service_changes_single"),
+        #     strong("Select Service Topic"),
+        #     change_classifications,
+        #     selected = "Epidemiology and Surveillance"
+        #   )
         } else {
           checkboxGroupInput(
             ns("service_changes"),

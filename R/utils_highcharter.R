@@ -1522,7 +1522,7 @@ scatter_plot <- function(data, colors) {
         "),
           style = list(
             textOutline = "none",
-            fontFamily = "Heebo",
+            fontFamily = "Jost",
             fontSize = "10px",
             fontWeight = "bold"
           )
@@ -1612,81 +1612,81 @@ scatter_plot <- function(data, colors) {
     highcharter::hc_colors(
       colors = colors
     ) %>%
-    highcharter::hc_annotations(
-      list(
-        draggable = FALSE,
-        labels = list(
-          list(
-            point = list(
-              x = 1,
-              y = 78,
-              xAxis = 0,
-              yAxis = 0
-            ),
-            text = HTML('Services Growing'),
-            style = list(
-              color = "black",
-              fontWeight = "bold",
-              fontSize = "14px",
-              fontFamily = "Heebo"
-            ),
-            backgroundColor = "transparent",
-            borderColor = "transparent"
-          ),
-          list(
-            point = list(
-              x = 1,
-              y = 0,
-              xAxis = 0,
-              yAxis = 0
-            ),
-            text = HTML('Services Stable'),
-            style = list(
-              color = "black",
-              fontWeight = "bold",
-              fontSize = "14px",
-              fontFamily = "Heebo"
-            ),
-            backgroundColor = "transparent",
-            borderColor = "transparent"
-          ),
-          list(
-            point = list(
-              x = 34,
-              y = 78,
-              xAxis = 0,
-              yAxis = 0
-            ),
-            text = HTML('Mixed Trend'),
-            style = list(
-              color = "black",
-              fontWeight = "bold",
-              fontSize = "14px",
-              fontFamily = "Heebo"
-            ),
-            backgroundColor = "transparent",
-            borderColor = "transparent"
-          ),
-          list(
-            point = list(
-              x = 33,
-              y = 0,
-              xAxis = 0,
-              yAxis = 0
-            ),
-            text = HTML('Services Shrinking'),
-            style = list(
-              color = "black",
-              fontWeight = "bold",
-              fontSize = "14px",
-              fontFamily = "Heebo"
-            ),
-            backgroundColor = "transparent",
-            borderColor = "transparent"
-          )
-        )
-      )
-    ) %>%
+    # highcharter::hc_annotations(
+    #   list(
+    #     draggable = FALSE,
+    #     labels = list(
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Growing'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Stable'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 34,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Mixed Trend'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 33,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Shrinking'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       )
+    #     )
+    #   )
+    # ) %>%
     highcharter::hc_title(
       text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
       margin = 40,
@@ -1696,7 +1696,14 @@ scatter_plot <- function(data, colors) {
       text = "Click and span a range on the figure to zoom."
     ) %>%
     highcharter::hc_caption(
-      text = HTML("<b> N: </b>", min(n), " to ", max(n), "<br>", source_line),
+      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 14px; color: black;\'>
+                  In the top left quadrant, services are <span style=\'color: #008A96; font-weight: bold;\'>growing</span>.
+                  In the top right quadrant, services show a <span style=\'color: #666; font-weight: bold;\'>mixed trend</span>.
+                  In the bottom left quadrant, services are <span style=\'color: #B8B3AE; font-weight: bold;\'>stable</span>.
+                  In the bottom right quadrant, services are <span style=\'color: #AB6143; font-weight: bold;\'>shrinking</span>.
+                  </span> <br>
+                  <b> N: </b>", min(n), " to ", max(n), "<br>",
+                  source_line),
       useHTML = TRUE,
       margin = 60,
       align = "center"
