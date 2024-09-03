@@ -36,7 +36,26 @@
 #
 # categorical tables--------
 
-create_non_time_table <- function(data, category, colors, topic) {
+create_non_time_table <- function(data, category, colors, topic, subtopic) {
+
+print(topic)
+  print(subtopic)
+
+
+ num_format <- function(x) {
+    rounded_value <- round(x, 2)  # Round to 2 decimal places
+
+
+    if (topic == "tenure") {
+      paste0(rounded_value, " years")
+    } else if (subtopic == "fte_bypop") {
+      paste0(rounded_value, " per capita")
+    } else if (subtopic == "c5q37") {
+      paste0(rounded_value, " FTE")
+    } else {
+      scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
+    }
+  }
 
 
   # Define theme
@@ -68,7 +87,7 @@ create_non_time_table <- function(data, category, colors, topic) {
         textTransform = "uppercase",
         borderColor = "#3d4242",
         color = "#3d4242",
-        fontSize = "14px",
+        fontSize = "13px",
         fontWeight = "normal"
       ),
       groupHeaderStyle = list(
@@ -80,7 +99,7 @@ create_non_time_table <- function(data, category, colors, topic) {
           textAlign = "center",
           backgroundColor = "#ffffff",
           textTransform = "uppercase",
-          fontSize = "14px",
+          fontSize = "13px",
           fontWeight = "bold",
           color = "#3d4242"
         )
@@ -105,14 +124,8 @@ create_non_time_table <- function(data, category, colors, topic) {
                        max_value = ifelse(topic == "tenure", 8, 100),
                        fill_color = "#008A96",
                        background = 'none',
-                       number_fmt = function(x) {
-                         rounded_value <- round(x, 2)  # Round to 2 decimal places
-                         if (topic == "tenure") {
-                           paste0(rounded_value, " years")  # Add " years" after the rounded number
-                         } else {
-                           scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
-                         }
-                       }),
+                       number_fmt = num_format
+                    ),
       style = list(
         borderLeft = "3px solid #3d4242"
       ),
@@ -157,7 +170,7 @@ create_non_time_table <- function(data, category, colors, topic) {
 
     # Merge with hidden columns
     column_definitions <- c(column_definitions, hidden_col_definitions)
-    print(column_definitions)
+    # print(column_definitions)
 
     # Create the reactable table
     reactable(
@@ -225,14 +238,8 @@ create_non_time_table <- function(data, category, colors, topic) {
                              max_value = ifelse(topic == "tenure", 8, 100),
                              fill_color = colors[i],
                              background = 'none',
-                             number_fmt = function(x) {
-                               rounded_value <- round(x, 2)  # Round to 2 decimal places
-                               if (topic == "tenure") {
-                                 paste0(rounded_value, " years")  # Add " years" after the rounded number
-                               } else {
-                                 scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
-                               }
-                             })
+                             number_fmt = num_format
+                          )
 
           )
         }),
@@ -253,7 +260,7 @@ create_non_time_table <- function(data, category, colors, topic) {
 
     column_definitions <- c(column_definitions, hidden_col_definitions)
 
-    print(column_definitions)
+    # print(column_definitions)
 
 
 
@@ -261,9 +268,10 @@ create_non_time_table <- function(data, category, colors, topic) {
       data = data,
       columns = column_definitions,
       columnGroups = list(
+        # Ensure that the column group excludes the "All LHDs" column
         colGroup(
           name = unique(data$subtitle),
-          columns = selected_columns
+          columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
         )
       ),
       filterable = FALSE,

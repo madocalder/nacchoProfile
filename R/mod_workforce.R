@@ -141,19 +141,24 @@ mod_workforce_ui <- function(id){
             class = "viz-content with-slider",
             id = "resize-content", # needed for script.js
 
-            # display when map is selected
+            # display when map is selected and view is not Table
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] != \'jobs\'"),
+              condition = paste('input["', ns("topic"), '"] != "jobs" && input["', ns("view"), '"] != "Table"', sep = ""),
               highcharter::highchartOutput(ns("figure"), height = 575)
             ),
 
-            # display when map is not selected
+            # display when map is not selected and view is not Table
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == \'jobs\'"),
+              condition = paste('input["', ns("topic"), '"] == "jobs" && input["', ns("view"), '"] != "Table"', sep = ""),
               highcharter::highchartOutput(ns("figure_jobs"), height = 675)
+            ),
+
+            # Adding the new table view
+            conditionalPanel(
+              condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
+              reactable::reactableOutput(ns("data_table"), height = "auto")
             )
-          )
-        ),
+          ),
 
           # end of main content -----------------------------------------------------
 
@@ -257,6 +262,7 @@ mod_workforce_ui <- function(id){
       )
     )
   )
+  )
 }
 
 #' workforce Server Functions
@@ -345,8 +351,12 @@ mod_workforce_server <- function(id){
           naccho.viz::naccho_green,
           naccho.viz::naccho_orange,
           naccho.viz::naccho_pink)
-      }
-    })
+      } else if (input$filter %in% c("All LHDs")) {
+        c(naccho.viz::naccho_blue)
+
+             }
+           }
+         )
 
 
 
@@ -686,6 +696,107 @@ mod_workforce_server <- function(id){
                                size = size,
                                overflow = overflow)
       }
+    })
+
+
+
+    # For tables--------
+
+    output$data_table <- reactable::renderReactable({
+      req(input$view == "Table")
+
+      #add topic value for function
+      topic = input$topic
+
+        workforce_input <- get_workforce_input()  # Get the relevant input type based on the topic
+
+         # Debugging: Print workforce_input and all relevant inputs
+  cat("Debug: workforce_input = ", workforce_input, "\n")
+
+        subtopic <- workforce_input
+
+
+
+
+        # Debugging: print the final topic and subtopic values
+        cat("Debug: topic = ", input$topic, "\n")
+        cat("Debug: subtopic = ", subtopic, "\n")
+
+
+
+
+      # Define colors reactively based on the filter
+      colors <- colors()
+
+      # Determine the category based on the input filter
+      category <- case_when(
+        input$filter == "urbanrural2022" ~ "Rurality",
+        input$filter == "c0govcat" ~ "Governance",
+        input$filter == "c0popcat3" ~ "LHD size",
+        input$filter == "censusregion" ~ "Region",
+        input$filter == "All LHDs" ~ "All LHDs"
+      )
+
+      #FTE---------------------
+
+      # Subtopic: FTEs by Category -------
+      # Filters: All LHDs
+      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "All LHDs") {
+
+        data <- return_survey_weighted_counts("FTE_numcat") %>%
+          dplyr::mutate(x_label = NA)%>%
+          dplyr::select(category, group, y, subtitle, Responses)  %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
+
+
+
+      } else if (input$topic == "c5q37" & input$type_fte != "FTE_numcat" & input$filter == "All LHDs") {
+        data <- return_survey_weighted_statistics(input$type_fte) %>%
+          dplyr::mutate(x_label = NA,
+                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter])))%>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
+
+
+
+
+        # Subtopic: FTEs by Category -------
+        # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "All LHDs") {
+
+        data <- return_survey_weighted_counts("FTE_numcat", input$filter)  %>%
+          dplyr::mutate(x_label = NA)%>%
+          dplyr::select(category, group, y, subtitle, Responses)%>%
+          dplyr::group_by(category)%>%
+          dplyr::mutate('Responses_All LHDs' = sum(Responses), 'y_All LHDs' = mean(y, na.rm = TRUE))%>%
+          dplyr::ungroup() %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
+
+
+
+        # Subtopic: FTEs Total and Per Capita -------
+        # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "c5q37" & input$type_fte != "FTE_numcat" & input$filter != "All LHDs") {
+
+        data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
+          dplyr::mutate(x_label = NA)%>%
+          dplyr::select(category, group, y, subtitle, Responses)  %>%
+          dplyr::mutate('y_All LHDs' = mean(y, na.rm = TRUE), 'Responses_All LHDs' = sum(Responses)) %>%
+          tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
+
+      }
+
+
+      # Call the table creation function with the appropriate data and parameters
+      create_non_time_table(data, category, colors, topic, subtopic)
     })
 
 

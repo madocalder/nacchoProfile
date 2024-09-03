@@ -465,23 +465,11 @@ mod_landscape_server <- function(id){
       #add topic value for function
       topic = input$topic
 
+      subtopic = "no subtopic"
+
       # Define colors reactively based on the filter
       colors <- colors()
 
-      #   if (input$filter == "urbanrural2022") {
-      #   c(naccho.viz::naccho_blue,
-      #     naccho.viz::naccho_green)
-      # } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-      #   c(naccho.viz::naccho_blue,
-      #     naccho.viz::naccho_green,
-      #     naccho.viz::naccho_orange)
-      # } else if (input$filter == "censusregion") {
-      #   c(naccho.viz::naccho_blue,
-      #     naccho.viz::naccho_green,
-      #     naccho.viz::naccho_orange,
-      #     naccho.viz::naccho_pink)
-      # } else if (input$filter == "All LHDs") {
-      #   c(naccho.viz::naccho_blue) }
 
       # Determine the category based on the input filter
       category <- case_when(
@@ -601,7 +589,7 @@ mod_landscape_server <- function(id){
       # view(data)
 
       # Call the table creation function with the appropriate data and parameters
-      create_non_time_table(data, category, colors, topic)
+      create_non_time_table(data, category, colors, topic, subtopic)
     })
 
 
