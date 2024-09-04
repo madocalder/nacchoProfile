@@ -84,7 +84,7 @@ mod_services_ui <- function(id){
             # display when Service Changes and Butterfly Graph are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
-              # highcharter::highchartOutput(ns("figure_butterfly"), height = 575)
+              highcharter::highchartOutput(ns("figure_butterfly"), height = 675)
             ),
             br(),
           )
@@ -279,6 +279,12 @@ mod_services_server <- function(id){
     }) %>% debounce(100)
 
 
+    service_change_single_inputs <- reactive({
+      input$topic
+      input$filter
+      input$service_changes_single
+    }) %>% debounce(100)
+
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
@@ -302,7 +308,7 @@ mod_services_server <- function(id){
 
       set_simple_bar(data) %>%
         viz_options(
-          viz_title = "Estimated Percent of LHDs that Provide Services Directly",
+          viz_title = "Percent of LHDs that Directly Provide Selected Services",
           viz_subtitle = "Immunization Services", # unique(data$service_category)
           viz_caption = paste0("<b> N: </b>",  min(data$demoninator), "-", max(data$demoninator), "<br>", source_line),
           tooltip = "",
@@ -332,10 +338,52 @@ mod_services_server <- function(id){
     })
 
 
-    # used for scatter plot
+    # used for butterfly plot
     output$figure_butterfly <- highcharter::renderHighchart({
-      # data <- services_change_data %>%
-      #   dplyr::filter(service_provision %in% c("Reduced Service", "Expanded Service"))
+      data <- scatter_data(set_filter = c(landscape_filters),
+                            set_service = "Immunization") %>%
+        dplyr::mutate(group = sapply(Group, custom_str_to_title),
+                      left = `Reduced Service`,
+                      right = `Expanded Service`,
+                      x = (1:length(Group)-1)) %>%
+        dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
+
+      data_n <- data %>%
+        dplyr::filter(group == "All LHDs")
+
+      set_bar(data,
+              set_max = 100,
+              name_one = "Service Shrunk",
+              name_two = "Service Grew",
+              set_format = "{value}%") %>%
+        viz_options(
+          colors = c(naccho.viz::terracotta, naccho.viz::green),
+          legend_enable = TRUE,
+          viz_title = "The Percent of LHDs that Shrunk or Grew Selected Service",
+          viz_caption = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line),
+          viz_subtitle = paste(unique(data$service_type)),
+          tooltip = "<b> {series.name}: </b>
+              {point.y} <br>",
+          theme = naccho.viz::butterfly
+        ) %>%
+        viz_export() %>%
+        highcharter::hc_tooltip(
+          backgroundColor = "transparent",
+          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          style = list(
+            textAlign = "left"
+          ),
+          hideDelay = 2000,
+          shadow = FALSE,
+          positioner = highcharter::JS("
+          function (labelWidth, labelHeight, point) {
+            return {
+              x: 0,
+              y: 10
+            };
+          }
+        ")
+        )
     })
 
 
@@ -379,8 +427,8 @@ mod_services_server <- function(id){
           proxy_hist_to_single(data,
                           meta = filter_meta(),
                           size = size,
-                          overflow = overflow)
-
+                          overflow = overflow,
+                          responses = paste0(min(data$demoninator), "-", max(data$demoninator)))
 
 
       } else if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter != "All LHDs") {
@@ -427,17 +475,15 @@ mod_services_server <- function(id){
                               meta = filter_meta(),
                               colors = colors(),
                               id = series_id,
-                              responses = "",
                               size = size,
-                              overflow = overflow)
+                              overflow = overflow,
+                              responses = paste0(min(data_all$demoninator), "-", max(data_all$demoninator)))
 
 
       } else if (input$topic != "Reduced/Expanded Services" & input$view == "Line Graph") {
         #ADD
-
       }
     })
-
 
 
     observeEvent(service_change_inputs(), {
@@ -447,18 +493,22 @@ mod_services_server <- function(id){
                              set_service = input$service_changes) %>%
           dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
+        data_all <- scatter_data(set_filter = "All LHDs",
+                             set_service = input$service_changes) %>%
+          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+
+
         series_id <- unique(data$Group)
 
         proxy_scatter %>%
           proxy_to_scatter_group(data = data,
-                           input = input$filter,
-                           id = series_id,
-                           colors = colors_scatter())
-
+                                 data_all = data_all,
+                                 input = input$filter,
+                                 id = series_id,
+                                 colors = colors_scatter())
 
 
       } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {
-
         req(input$service_changes)
         data <- scatter_data(set_filter = "All LHDs",
                                  set_service = input$service_changes) %>%
@@ -466,9 +516,37 @@ mod_services_server <- function(id){
 
         proxy_scatter %>%
           proxy_to_scatter_single(data)
+        }
+    })
 
-        } else if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
 
+
+    observeEvent(service_change_single_inputs(), {
+      if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
+        data <- scatter_data(set_filter = c(landscape_filters),
+                             set_service = input$service_changes_single) %>%
+          dplyr::mutate(group = sapply(Group, custom_str_to_title),
+                        left = `Reduced Service`,
+                        right = `Expanded Service`,
+                        x = (1:length(Group)-1)) %>%
+          dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
+
+        data_n <- data %>%
+          dplyr::filter(group == "All LHDs")
+
+        proxy_butterfly %>%
+          highcharter::hcpxy_update(
+            series = list(
+              list(id = "Left", data = data$left),  # Update Left series data
+              list(id = "Right", data = data$right) # Update Right series data
+            ),
+            subtitle = list(
+              text = paste(unique(data$service_type))
+            ),
+            caption = list(
+              text = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line)
+            )
+          )
       }
     })
 
@@ -497,17 +575,17 @@ mod_services_server <- function(id){
             service_classifications,
             selected = "Immunization"
           )
-        # } else if (input$topic == "Reduced/Expanded Services" & input$filter != "All LHDs") {
-        #   shinyWidgets::prettyRadioButtons(
-        #     ns("service_changes_single"),
-        #     strong("Select Service Topic"),
-        #     change_classifications,
-        #     selected = "Epidemiology and Surveillance"
-        #   )
+        } else if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
+          shinyWidgets::prettyRadioButtons(
+            ns("service_changes_single"),
+            strong("Select Service Topic"),
+            change_classifications,
+            selected = "Immunization"
+          )
         } else {
           checkboxGroupInput(
             ns("service_changes"),
-            strong("Select Service Topic"),
+            strong("Select One or More Topic"),
             change_classifications,
             selected = change_classifications
           )

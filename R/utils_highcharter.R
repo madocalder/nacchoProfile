@@ -97,12 +97,20 @@ viz_options <- function(hc,
     highcharter::hc_tooltip(
       headerFormat = "",
       pointFormat = tooltip,
+      borderWidth = 2,
       useHTML = TRUE,
       style = list(
         fontWeight = 400,
-        textAlign = tooltip_align
-      )
-    ) %>%
+        textAlign = tooltip_align,
+        fontSize = "13px",
+        color = "black"
+      ),
+      backgroundColor = "#EEEAE5",
+      borderRadius = 2,
+      headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+      hideDelay = 1000,
+      shadow = FALSE
+      ) %>%
     highcharter::hc_legend(
       enabled = legend_enable, # enabled legend
       reversed = FALSE,
@@ -147,15 +155,10 @@ proxy_to_single <- function(hc, data, meta, ...) {
     ) %>%
     highcharter::hcpxy_set_data(
       "column",
-      data = data
+      data = data,
+      highcharter::hcaes(x, y)
     ) %>%
     highcharter::hcpxy_update(
-      series = list(
-        list(type = "column"),
-        dataLabels = list(
-          format = meta$data_label
-        )
-      ),
       yAxis = list(
         title = list(
           text = meta$y_label
@@ -175,7 +178,7 @@ proxy_to_single <- function(hc, data, meta, ...) {
         text = meta$caption
       ),
       xAxis = list(
-        categories = data$category,
+        categories = unique(data$category),
         offset = 0
       ),
       tooltip = list(
@@ -350,7 +353,6 @@ set_column <- function(data,
     data,
     "column",
     id = "All",
-    name = "Estimated Across All LHDs",
     highcharter::hcaes(
       x = x,
       y = y,
@@ -372,7 +374,7 @@ set_column <- function(data,
   ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
-      categories = data$category
+      categories = unique(data$category)
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -872,6 +874,7 @@ proxy_to_hist_total <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = 0,
         list(type = "column"),
         dataLabels = list(
@@ -948,6 +951,7 @@ proxy_to_hist_pc <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = 0,
         list(type = "column"),
         dataLabels = list(
@@ -1027,6 +1031,7 @@ proxy_hist_to_single <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = .2,
         type = "column",
         dataLabels = list(
@@ -1129,6 +1134,7 @@ proxy_hist_to_group <- function(hc,
       ) %>%
       highcharter::hcpxy_update(
         series = list(
+          visible = FALSE,
           type = "column",
           dataLabels = list(
             enabled = TRUE,
@@ -1208,6 +1214,7 @@ proxy_hist_to_group <- function(hc,
       highcharter::hcpxy_update(
         series = list(
           type = "column",
+          visible = FALSE,
           dataLabels = list(
             enabled = TRUE,
             format = meta$data_label,
@@ -1523,7 +1530,7 @@ scatter_plot <- function(data, colors) {
           style = list(
             textOutline = "none",
             fontFamily = "Jost",
-            fontSize = "10px",
+            fontSize = "11px",
             fontWeight = "bold"
           )
         ),
@@ -1738,18 +1745,21 @@ proxy_to_scatter_single <- function(hc, data,...) {
       highcharter::hcpxy_remove_series(
         id = c("Midwest", "South", "West", "Northeast")
       ) %>%
-    highcharter::hcpxy_remove_series(
-      id = "All"
-    ) %>%
-      highcharter::hcpxy_add_series(
-        id = "All",
+    # highcharter::hcpxy_remove_series(
+    #   id = "All"
+    # ) %>%
+      highcharter::hcpxy_set_data(
+        # id = "All",
         data = data,
         type = "scatter",
         mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
       ) %>%
       highcharter::hcpxy_update(
         chart = list(
-          zoomType = "xy")
+          zoomType = "xy"),
+        series = list(
+          visible = TRUE
+        )
       )
 }
 
@@ -1767,7 +1777,7 @@ proxy_to_scatter_single <- function(hc, data,...) {
 #' @return A redrawn figure.
 #' @export
 #'
-proxy_to_scatter_group <- function(hc, data, id = NULL, input, colors = NULL,...) {
+proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors = NULL,...) {
 
     hc %>%
       highcharter::hcpxy_remove_series(
@@ -1782,9 +1792,9 @@ proxy_to_scatter_group <- function(hc, data, id = NULL, input, colors = NULL,...
       highcharter::hcpxy_remove_series(
         id = c("Midwest", "South", "West", "Northeast")
       ) %>%
-    highcharter::hcpxy_remove_series(
-      id = "All"
-    ) %>%
+    # highcharter::hcpxy_remove_series(
+    #   id = "All"
+    # ) %>%
       highcharter::hcpxy_add_series(
         data = data,
         type = "scatter",
@@ -1792,13 +1802,17 @@ proxy_to_scatter_group <- function(hc, data, id = NULL, input, colors = NULL,...
         id = id,
         color = colors
       ) %>%
-      highcharter::hcpxy_update(
-        chart = list(
-          zoomType = "xy")
+    highcharter::hcpxy_set_data(
+      data = data_all,
+      type = "scatter",
+      mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+    ) %>%
+    highcharter::hcpxy_update(
+      chart = list(
+        zoomType = "xy"
+      ),
+      series = list(
+        visible = FALSE
       )
+    )
 }
-
-
-
-
-

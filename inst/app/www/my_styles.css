@@ -940,7 +940,7 @@ label:not(.material-switch label) {
   display: block !important;
 }*/
 
-.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick, .fa-chart-scatter) {
+.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick, .fa-chart-scatter, .fa-chart-tree-map) {
   color: #008A96;
 }
 
@@ -1096,8 +1096,8 @@ b, strong {
 
 .highcharts-tooltip span {
     height: auto;
-    min-width: 250px;
-    max-width: 300px;
+    min-width: 200px;
+    max-width: 200px;
     line-height: 1.4em;
     overflow: auto;
     white-space: normal !important;

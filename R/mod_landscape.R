@@ -332,16 +332,9 @@ mod_landscape_server <- function(id){
           dplyr::ungroup() %>%
           dplyr::mutate(group = "All LHDs")
 
-
-        if (input$view == "Bar Graph") {
           proxy %>%
             proxy_to_single(data = data,
                             meta = filter_meta())
-        } else {
-          proxy %>%
-            proxy_to_pie(data = data,
-                         meta = filter_meta())
-        }
 
 
 
@@ -350,6 +343,7 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "tenure" & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics("tenure", input$filter)
+        print(data)
 
           proxy %>%
             proxy_to_single(data = data,

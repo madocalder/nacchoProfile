@@ -557,7 +557,7 @@ scatter_data <- function(set_filter = "All LHDs",
     dplyr::mutate(size = 1,
                   x = `Reduced Service`,
                   y = `Expanded Service`) %>%
-    dplyr::filter(filter == set_filter,
+    dplyr::filter(filter %in% set_filter,
                   service_type %in% set_service)
 
 
@@ -588,7 +588,7 @@ scatter_data <- function(set_filter = "All LHDs",
                                            service_type == "Mental Health" ~ "left",
                                            service_type == "Obesity Prevention" ~ "center",
                                            service_type == "Substance Use Prevention" ~ "center")) %>%
-    dplyr::mutate(service_type = dplyr::case_when(service_type == "Blood Lead Screening" ~ "Blood Lead",
+    dplyr::mutate(service_type_short = dplyr::case_when(service_type == "Blood Lead Screening" ~ "Blood Lead",
                                                   service_type == "Chronic Disease" ~ "Chronic Disease",
                                                   service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
                                                   service_type == "Diabetes Screening" ~ "Diabetes Sx",

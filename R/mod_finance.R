@@ -79,6 +79,12 @@ mod_finance_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\'"),
               highcharter::highchartOutput(ns("figure_budget"), height = 675)
+            ),
+
+            # display when Budget Changes is selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\' && input[\'", ns('topic'), "\'] == \'non_weighted_revenue_total\'"),
+              highcharter::highchartOutput(ns("figure_tree"), height = 675)
             )
           )
         ),
@@ -187,7 +193,18 @@ mod_finance_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap")) {
+
+      if (input$topic == "non_weighted_revenue_total") {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-candlestick"></i>'),
+                                                HTML('<i class="fas fa-chart-tree-map"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Box Plot", "Tree Map", "Line Graph", "Table"))
+
+      } else if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-candlestick"></i>'),
@@ -197,14 +214,14 @@ mod_finance_server <- function(id){
                                               choiceValues = c("Box Plot", "Line Graph", "Table"))
 
 
-        } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat")) {
-          shinyWidgets::updateRadioGroupButtons(session, "view",
-                                                choiceNames = list(
-                                                  HTML('<i class="fas fa-chart-simple"></i>'),
-                                                  HTML('<i class="fas fa-table"></i>')
-                                                ),
-                                                choiceValues = c("Bar Graph", "Table"))
-        }
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
+      }
     })
 
     observe({
@@ -346,6 +363,113 @@ mod_finance_server <- function(id){
     })
 
 
+    # used for budget changes
+    output$figure_tree <- highcharter::renderHighchart({
+      req(input$topic == "non_weighted_revenue_total")
+      data <- revenue_percentages %>%
+        dplyr::mutate(percentage = round(percentage*100, 1))
+
+      # Creating the treemap using the dataframe
+      data %>%
+        highcharter::hchart(
+          "treemap",
+          highcharter::hcaes(x = revenue_type,
+                value = percentage,
+                color = percentage),
+          borderColor = "#FFFFFF", # Set the border color to white
+          borderWidth = 2          # Set the border width
+        ) %>%
+        hc_colorAxis(minColor = naccho.viz::pink,
+                     maxColor = naccho.viz::teal
+        ) %>%
+        highcharter::hc_add_theme(
+          naccho.viz::basic
+        ) %>%
+        highcharter::hc_plotOptions(
+          series = list(
+            dataLabels = list(
+              enabled = TRUE,
+              align = "center",
+              verticalAlign = "middle",
+              allowOverlap = TRUE,             # Allow labels to overlap other labels
+              overflow = "allow",
+              format = '<b>{point.name}</b> <br> {point.value}%',
+              style = list(
+                fontSize = "13px",
+                fontFamily = "Heebo",
+                fontWeight = 300,
+                textOutline = "none"
+              )
+            )
+          )
+        ) %>%
+        viz_options(viz_title = "LHD Revenue Source as a Share of Total Revenue",
+                    viz_subtitle = "Estimated Across All LHDs",
+                    viz_caption = source_line,
+                    caption_align = "center",
+                    tooltip = "",
+                    legend_enable = TRUE)
+
+      ###FOR GROUPS
+      # data <- revenue_percentages_filter %>%
+      #   dplyr::filter(filter == "urbanrural2022") %>%
+      #   dplyr::rename(name = revenue_type,
+      #                 parent = category) %>%
+      #   dplyr::mutate(id = paste(name, parent, sep = " "),
+      #                 value = round(percentage*100,1)) %>%
+      #   dplyr::select(id, name, parent, value)
+      #
+      # add_info <- data.frame(
+      #   id = c("Urban", "Rural"),
+      #   name = c("Urban", "Rural"),
+      #   parent = c("Overall", "Overall"),
+      #   value = c(NA, NA)
+      # )
+      #
+      # data <- rbind(data, add_info)
+      #
+      # # Define the specific colors for each parent group
+      # male_color <- naccho.viz::teal   # Blue for male
+      # female_color <- naccho.viz::pink # Orange for female
+      #
+      # # Assign colors directly in the data for the parent nodes
+      # data <- data %>%
+      #   mutate(
+      #     color = case_when(
+      #       id == "Rural" ~ male_color,       # Assign male group color
+      #       id == "Urban" ~ female_color,   # Assign female group color
+      #       TRUE ~ NA_character_             # Others will inherit colors automatically or stay default
+      #     )
+      #   )
+      #
+      #
+      #
+      # # Create the grouped treemap with specified colors
+      # highchart() %>%
+      #   hc_add_series(
+      #     type = "treemap",
+      #     layoutAlgorithm = "squarified",
+      #     data = list_parse(data),   # Ensure colors are passed correctly
+      #     allowDrillToNode = TRUE,           # Enables zooming into the groups
+      #     borderColor = "#FFFFFF",
+      #     borderWidth = 2
+      #   ) %>%
+      #   hc_title(text = "Grouped Treemap: Revenue Sources by Gender") %>%
+      #   hc_tooltip(pointFormat = "<b>{point.name}:</b> {point.value}%") %>%
+      #   hc_plotOptions(
+      #     series = list(
+      #       dataLabels = list(
+      #         enabled = TRUE,
+      #         format = '{point.name} <br> {point.value}%',
+      #         align = "center",
+      #         verticalAlign = "middle",
+      #         style = list(fontSize = "12px", fontWeight = "bold", color = "#000000"),
+      #         textOutline = "none"
+      #       )
+      #     )
+      #   )
+      #
+    })
 
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
