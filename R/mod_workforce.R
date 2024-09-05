@@ -387,14 +387,14 @@ mod_workforce_server <- function(id){
     # used for jobs losses and gains
     output$figure_jobs <- highcharter::renderHighchart({
 
-      data <- filtered_jobs()
+      data <- nacchoProfile::filtered_jobs()
 
       set_bar(data) %>%
         viz_options(
           colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
           legend_enable = TRUE,
           viz_title = "Jobs Lost and Added - Estimated Total",
-          viz_caption = paste0("<b> N: </b>", unique(responses()$responses), "<br>", source_line),
+          viz_caption = paste0("<b> N: </b>", unique(nacchoProfile::responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y} <br>",
@@ -607,7 +607,7 @@ mod_workforce_server <- function(id){
       # Filters: All
       if (input$type_jobs == "jobs_standard") {
 
-        data <- filtered_jobs() %>%
+        data <- nacchoProfile::filtered_jobs() %>%
           dplyr::mutate(jobsgone = jobsgone_standard,
                         jobsgain = jobsgain_standard)
 
@@ -620,7 +620,7 @@ mod_workforce_server <- function(id){
       # View: Bar Graph
       } else {
 
-        data <- filtered_jobs()
+        data <- nacchoProfile::filtered_jobs()
 
         proxy_jobs %>%
           proxy_to_bar(data,
