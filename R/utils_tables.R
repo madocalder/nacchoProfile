@@ -38,20 +38,30 @@
 
 create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
-print(topic)
-  print(subtopic)
+
+
+
 
 
  num_format <- function(x) {
-    rounded_value <- round(x, 2)  # Round to 2 decimal places
+    rounded_value <- round(x, 1)  # Round to 2 decimal places
 
 
     if (topic == "tenure") {
-      paste0(rounded_value, " years")
+      paste0(rounded_value, " years (mean)")
+    } else if (subtopic == "jobs_total") {
+      scales::label_comma(rounded_value)
+      # paste0(rounded_value, " jobs")
+    } else if (subtopic == "b") {
+      paste0(rounded_value, " FTEs")
     } else if (subtopic == "fte_bypop") {
-      paste0(rounded_value, " per capita")
+      paste0(rounded_value, " FTE per capita (mean)")
     } else if (subtopic == "c5q37") {
-      paste0(rounded_value, " FTE")
+      paste0(rounded_value, " Total FTE (mean)")
+    } else if (subtopic == "employee_bypop") {
+      paste0(rounded_value, " Employees per capita (mean)")
+    } else if (subtopic == "c5q36") {
+      paste0(rounded_value, " Total Employees (mean)")
     } else {
       scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
     }
@@ -121,7 +131,10 @@ print(topic)
       header = with_tooltip("All LHDs", paste0("n = ", sum(data['Responses_All LHDs']))),
       cell = data_bars(data,
                        text_position = "outside-end",
-                       max_value = ifelse(topic == "tenure", 8, 100),
+                       max_value = ifelse(topic == "tenure", 8,
+                                           ifelse(subtopic == "jobs_total", 15000,
+                                                  ifelse(subtopic == "b", 21000,
+                                                  ifelse(subtopic == "jobs_standard", 10, 100)))),
                        fill_color = "#008A96",
                        background = 'none',
                        number_fmt = num_format
@@ -139,7 +152,7 @@ print(topic)
   }
 
   # Check if the data is for "All LHDs"
-  if (category == "All LHDs") {
+  if (category == "All LHDs" & topic != "jobs") {
     # Define column definitions for All LHDs
     column_definitions <- list(
       category = colDef(
@@ -170,7 +183,14 @@ print(topic)
 
     # Merge with hidden columns
     column_definitions <- c(column_definitions, hidden_col_definitions)
+
+
+
     # print(column_definitions)
+    print(topic)
+    print(subtopic)
+    print(category)
+    print(data)
 
     # Create the reactable table
     reactable(
@@ -191,7 +211,14 @@ print(topic)
       Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
       `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
       Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
+
     )
+
+    if (topic == "jobs") {
+      group_definitions$`All LHDs` <- list(columns = c("y_Jobs Lost", "y_Jobs Added", "y_Jobs Lost (Standardized)", "y_Jobs Added (Standardized)"))
+    }
+
+    print(group_definitions)
 
     selected_columns <- group_definitions[[category]]$columns
     selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
@@ -235,7 +262,10 @@ print(topic)
             ),
             cell = data_bars(data,
                              text_position = "outside-end",
-                             max_value = ifelse(topic == "tenure", 8, 100),
+                             max_value = ifelse(topic == "tenure", 8,
+                                                ifelse(subtopic == "jobs_total", 15000,
+                                                       ifelse(subtopic == "b", 21000,
+                                                              ifelse(subtopic == "jobs_standard", 10, 100)))),
                              fill_color = colors[i],
                              background = 'none',
                              number_fmt = num_format
@@ -261,19 +291,26 @@ print(topic)
     column_definitions <- c(column_definitions, hidden_col_definitions)
 
     # print(column_definitions)
+    print(topic)
+    print(subtopic)
+    print(category)
+    print(data)
 
 
 
     reactable(
       data = data,
       columns = column_definitions,
-      columnGroups = list(
-        # Ensure that the column group excludes the "All LHDs" column
-        colGroup(
-          name = unique(data$subtitle),
-          columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
+      columnGroups = if ("subtitle" %in% colnames(data)) {
+        list(
+          colGroup(
+            name = unique(data$subtitle),
+            columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
+          )
         )
-      ),
+      } else {
+        NULL  # No groups if "subtitle" is not present
+      },
       filterable = FALSE,
       showPageSizeOptions = TRUE,
       striped = FALSE,
