@@ -135,6 +135,7 @@ mod_workforce_ui <- function(id){
 
           br(),
 
+
           # add main page content here ----------------------------------------------
 
           div(
@@ -701,7 +702,7 @@ mod_workforce_server <- function(id){
 
 
 
-    # For tables--------
+    # For Tables--------
 
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
@@ -709,7 +710,7 @@ mod_workforce_server <- function(id){
 
 
 
-#all lhds------------
+##all lhds------------
 
       # Subtopic: FTEs by Category -------
       # Filters: All LHDs
@@ -797,7 +798,9 @@ mod_workforce_server <- function(id){
               `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
               y_Difference = `y_Jobs Added` - `y_Jobs Lost`) %>%
             dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
-                          `Responses_Jobs Lost`,`Responses_Jobs Added` )
+                          `Responses_Jobs Lost`,`Responses_Jobs Added` ) %>%
+            dplyr::mutate(`Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+                          `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`)
 
 
 #filters---------------
