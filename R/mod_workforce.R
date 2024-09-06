@@ -394,7 +394,7 @@ mod_workforce_server <- function(id){
           colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
           legend_enable = TRUE,
           viz_title = "Jobs Lost and Added - Estimated Total",
-          viz_caption = paste0("<b> N: </b>", unique(nacchoProfile::responses()$responses), "<br>", source_line),
+          viz_caption = paste0("<b> N: </b>", unique(responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
               {point.y} <br>",
@@ -707,25 +707,6 @@ mod_workforce_server <- function(id){
       req(input$view == "Table")
 
 
-      #add topic value for function
-      topic = input$topic
-
-       workforce_input <- get_workforce_input()
-
-       subtopic <- workforce_input
-
-
-      # Define colors reactively based on the filter
-      colors <- colors()
-
-      # Determine the category based on the input filter
-      category <- case_when(
-        input$filter == "urbanrural2022" ~ "Rurality",
-        input$filter == "c0govcat" ~ "Governance",
-        input$filter == "c0popcat3" ~ "LHD size",
-        input$filter == "censusregion" ~ "Region",
-        input$filter == "All LHDs" ~ "All LHDs"
-      )
 
 
 #all lhds------------
@@ -776,6 +757,8 @@ mod_workforce_server <- function(id){
             dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
                                                       TRUE ~ category))
 
+          # Subtopic: Jobs Added/Lost Total -------
+          # Filters: All LHDs
         } else if (input$topic == "jobs" & input$type_jobs == "jobs_total" & input$filter == "All LHDs") {
 
           data <- jobs_data %>%
@@ -834,6 +817,8 @@ mod_workforce_server <- function(id){
 
 
 
+
+
         # Subtopic: FTEs Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "c5q37" & input$type_fte != "FTE_numcat" & input$filter != "All LHDs") {
@@ -848,22 +833,28 @@ mod_workforce_server <- function(id){
 
         # Subtopic: Employees by Category -------
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q36" & input$type_fte == "employee_numcat" & input$filter != "All LHDs") {
+      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "All LHDs") {
 
-        data <- return_survey_weighted_counts("employee_numcat", input$filter)  %>%
-          dplyr::mutate(x_label = NA)%>%
-          dplyr::select(category, group, y, subtitle, Responses)%>%
+        data_all <- return_survey_weighted_counts("employee_numcat") %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, Responses)  %>%
           dplyr::group_by(category)%>%
-          dplyr::mutate('Responses_All LHDs' = sum(Responses), 'y_All LHDs' = mean(y, na.rm = TRUE))%>%
-          dplyr::ungroup() %>%
-          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
-          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
-                                                    TRUE ~ category))
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+
+
+        data <- return_survey_weighted_counts("employee_numcat", input$filter) %>%
+          dplyr::mutate(x_label = NA) %>%
+          dplyr::select(category, group, y, subtitle, Responses)  %>%
+          dplyr::group_by(category)%>%
+          dplyr::left_join(data_all %>% dplyr::select(category, `y_All LHDs`), by = "category") %>%
+          dplyr::mutate(
+            'Responses_All LHDs' = sum(Responses, na.rm = TRUE))%>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 
 
         # Subtopic: Employees Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q36" & input$type_fte != "employee_numcat" & input$filter != "All LHDs") {
+      } else if (input$topic == "c5q36" & input$type_emp != "employee_numcat" & input$filter != "All LHDs") {
 
         data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
           dplyr::mutate(x_label = NA)%>%
@@ -919,7 +910,42 @@ mod_workforce_server <- function(id){
     # }
 
 
+      # message("Unique categories after standardization:")
+      # print(unique(data$category))
+      #
+      # message("Checking for duplicate values in group and category:")
+      # print(any(duplicated(data$group)))
+      # print(any(duplicated(data$category)))
 
+
+      #add topic value for function
+      topic = input$topic
+
+      workforce_input <- get_workforce_input()
+
+      subtopic <- workforce_input
+
+
+      # Define colors reactively based on the filter
+      colors <- colors()
+
+
+      message("Before case_when - unique category values in dataset:")
+      print(unique(data$category))
+      print(data)
+
+      # Determine the category based on the input filter
+      category <- case_when(
+        input$filter == "urbanrural2022" ~ "Rurality",
+        input$filter == "c0govcat" ~ "Governance",
+        input$filter == "c0popcat3" ~ "LHD size",
+        input$filter == "censusregion" ~ "Region",
+        input$filter == "All LHDs" ~ "All LHDs"
+      )
+
+      message("Category variable after case_when:")
+      print(category)
+      print(data)
 
 
       # Call the table creation function with the appropriate data and parameters

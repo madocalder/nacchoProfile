@@ -40,18 +40,28 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
 
 
+data <- data %>%
+  dplyr::select(category, everything())  # Move 'category' to the first position
+
+
+if ("y_All LHDs" %in% colnames(data)) {
+  message("y_All LHDs column exists")
+} else {
+  message("y_All LHDs column does not exist")
+}
 
 
 
+
+#number formatting------------------
  num_format <- function(x) {
-    rounded_value <- round(x, 1)  # Round to 2 decimal places
+    rounded_value <- round(x, 1)  # Round to 1 decimal place
 
 
     if (topic == "tenure") {
       paste0(rounded_value, " years (mean)")
     } else if (subtopic == "jobs_total") {
-      scales::label_comma(rounded_value)
-      # paste0(rounded_value, " jobs")
+      scales::label_comma()(rounded_value)
     } else if (subtopic == "b") {
       paste0(rounded_value, " FTEs")
     } else if (subtopic == "fte_bypop") {
@@ -68,7 +78,7 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
   }
 
 
-  # Define theme
+  # Define theme----------
   options(
     reactable.theme = reactable::reactableTheme(
       color = "#3d4242",
@@ -124,12 +134,12 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
   # Check if y_All_LHDs column exists in the data
   if ("y_All LHDs" %in% colnames(data)) {
-    # Common column definition for y_All_LHDs
-    all_lhds_col <- colDef(
+    # Common column definition for y_All_LHDs-------------
+    all_lhds_col <- reactable::colDef(
       name = "All LHDs",
       align = "center",
       header = with_tooltip("All LHDs", paste0("n = ", sum(data['Responses_All LHDs']))),
-      cell = data_bars(data,
+      cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
                                            ifelse(subtopic == "jobs_total", 15000,
@@ -151,11 +161,18 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
     all_lhds_col <- NULL
   }
 
-  # Check if the data is for "All LHDs"
-  if (category == "All LHDs" & topic != "jobs") {
-    # Define column definitions for All LHDs
+
+
+#generate table if all LHDS -------------
+  # Check if the data is for "All LHDs" a
+
+  if (category == "All LHDs" & topic != "jobs"
+      # & subtopic == "no subtopic"
+      ) {
+
+    # Define column definitions for All LHDs------------
     column_definitions <- list(
-      category = colDef(
+      category = reactable::colDef(
         name = "Category",
         align = "center",
         style = list(
@@ -176,7 +193,7 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
     hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs"))
     hidden_col_definitions <- setNames(
       lapply(hidden_columns, function(col) {
-        colDef(show = FALSE)
+        reactable::colDef(show = FALSE)
       }),
       hidden_columns
     )
@@ -187,13 +204,13 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
 
     # print(column_definitions)
-    print(topic)
-    print(subtopic)
-    print(category)
-    print(data)
+    # print(topic)
+    # print(subtopic)
+    # print(category)
+    # print(data)
 
-    # Create the reactable table
-    reactable(
+    # Create the All LHDs reactable table--------
+    reactable::reactable(
       data = data,
       columns = column_definitions,
       filterable = FALSE,
@@ -205,6 +222,7 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
       resizable = TRUE
     )
   } else {
+    #reactable for other cases--------
     # Handle other cases with the existing logic
     group_definitions <- list(
       Rurality = list(columns = c("y_Urban", "y_Rural")),
@@ -214,14 +232,20 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
     )
 
-    if (topic == "jobs") {
-      group_definitions$`All LHDs` <- list(columns = c("y_Jobs Lost", "y_Jobs Added", "y_Jobs Lost (Standardized)", "y_Jobs Added (Standardized)"))
+    # If the selected category is defined in group_definitions
+    if (category %in% names(group_definitions)) {
+      selected_columns <- group_definitions[[category]]$columns
+    } else {
+      # Select all columns that start with 'y_' except 'y_All LHDs'
+      selected_columns <- grep("^y_", colnames(data), value = TRUE)
+      selected_columns <- setdiff(selected_columns, "y_All LHDs")
     }
 
-    print(group_definitions)
 
-    selected_columns <- group_definitions[[category]]$columns
-    selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
+    # print(group_definitions)
+#
+#     selected_columns <- group_definitions[[category]]$columns
+#     selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
 
     # Ensure y_All_LHDs is included if it exists
     if ("y_All LHDs" %in% colnames(data)) {
@@ -229,7 +253,7 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
     }
 
     column_definitions <- list(
-      category = colDef(
+      category = reactable::colDef(
         name = "Category",
         align = "center",
         style = list(
@@ -253,14 +277,14 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
         lapply(seq_along(selected_columns), function(i) {
           col <- selected_columns[i]
           col_name <- sub("^y_", "", col)
-          colDef(
+          reactable::colDef(
             name = stringr::str_replace_all(col_name, "_", " "),
             align = "center",
             header = with_tooltip(
               col_name,
               paste0("n = ", sum(data[[paste0("Responses_", col_name)]]))
             ),
-            cell = data_bars(data,
+            cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8,
                                                 ifelse(subtopic == "jobs_total", 15000,
@@ -283,7 +307,7 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
     hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs", selected_columns ))
     hidden_col_definitions <- setNames(
       lapply(hidden_columns, function(col) {
-        colDef(show = FALSE)
+        reactable::colDef(show = FALSE)
       }),
       hidden_columns
     )
@@ -291,26 +315,40 @@ create_non_time_table <- function(data, category, colors, topic, subtopic) {
     column_definitions <- c(column_definitions, hidden_col_definitions)
 
     # print(column_definitions)
-    print(topic)
-    print(subtopic)
-    print(category)
-    print(data)
+    # print(topic)
+    # print(subtopic)
+    # print(category)
+    # print(data$category)
+    # print(data)
+    # print(group_definitions)
+
+    print(unique(data$category))  # Check if the category has multiple values or just "Governance"
 
 
-
-    reactable(
+    reactable::reactable(
       data = data,
       columns = column_definitions,
-      columnGroups = if ("subtitle" %in% colnames(data)) {
+      columnGroups = if (category %in% names(group_definitions)) {
         list(
-          colGroup(
-            name = unique(data$subtitle),
+          reactable::colGroup(
+            name = category,
             columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
           )
         )
       } else {
-        NULL  # No groups if "subtitle" is not present
+        NULL  # No groups if not in group_definitions
       },
+
+      # columnGroups = if ("subtitle" %in% colnames(data)) {
+      #   list(
+      #     reactable::colGroup(
+      #       name = unique(data$subtitle),
+      #       columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
+      #     )
+      #   )
+      # } else {
+      #   NULL  # No groups if "subtitle" is not present
+      # },
       filterable = FALSE,
       showPageSizeOptions = TRUE,
       striped = FALSE,
@@ -418,7 +456,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #         name = stringr::str_replace_all(col_name, "_", " "),
 #         align = "center",
 #         header = with_tooltip(col_name, paste0("n = ", count)),
-#         cell = data_bars(data,
+#         cell = reactablefmtr::data_bars(data,
 #                          text_position = "outside-end",
 #                          max_value = 100,
 #                          fill_color = colors[i],
@@ -448,7 +486,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #           name = "All LHDs",
 #           align = "center",
 #           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
-#           cell = data_bars(data,
+#           cell = reactablefmtr::data_bars(data,
 #                            text_position = "outside-end",
 #                            max_value = 100,
 #                            fill_color = "#008A96",
@@ -485,7 +523,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #     data = data,
 #     columns = column_definitions,
 #     columnGroups = list(
-#       colGroup(name = unique(data$subtitle),
+#       reactable::colGroup(name = unique(data$subtitle),
 #                columns = selected_columns)
 #     ),
 #     filterable = FALSE,
@@ -524,7 +562,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #         name = stringr::str_replace_all(col_name, "_", " "),
 #         align = "center",
 #         header = with_tooltip(col_name, paste0("n = ", count)),
-#         cell = data_bars(data,
+#         cell = reactablefmtr::data_bars(data,
 #                          text_position = "outside-end",
 #                          max_value = 100,
 #                          fill_color = colors[i],
@@ -554,7 +592,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #           name = "All LHDs",
 #           align = "center",
 #           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
-#           cell = data_bars(data,
+#           cell = reactablefmtr::data_bars(data,
 #                            text_position = "outside-end",
 #                            max_value = 100,
 #                            fill_color = "#008A96",
@@ -588,7 +626,7 @@ with_tooltip <- function(value, tooltip, ...) {
 #     data = data,
 #     columns = column_definitions,
 #     columnGroups = list(
-#       colGroup(name = unique(data$subtitle),
+#       reactable::colGroup(name = unique(data$subtitle),
 #                columns = selected_columns)
 #     ),
 #     filterable = FALSE,
