@@ -918,6 +918,12 @@ mod_workforce_server <- function(id){
       # print(any(duplicated(data$category)))
 
 
+      data <- data %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )
+
+
       #add topic value for function
       topic = input$topic
 
