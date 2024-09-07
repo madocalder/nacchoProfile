@@ -421,7 +421,14 @@ label:not(.material-switch label) {
   border: 2px solid #80A14E !important;
 }
 
+/* ------------------------------------------------------------------- waiter */
+ .waiter-overlay {
+      background-color: #212F5B;
+ }
 
+.waiter-fullscreen {
+      background-color: #212F5B !important;
+}
 
 
 /* ------------------------------------------------------ home page accordion */

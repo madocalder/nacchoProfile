@@ -37,24 +37,10 @@ app_ui <- function(request) {
 
     waiter::useWaiter(),
 
-    tags$style(
-      ".waiter-overlay {
-      background-color: #fff;}
-
-      .waiter-fullscreen{
-      background-color: #fff !important;}"
-    ),
-
-    waiter::waiter_set_theme(
-      html = waiter::spin_pixel(),
-      color = "white"
-    ),
-
     waiter::waiterPreloader(
       html = div(
         div(
-          # style = "margin-left: -80%;",
-          img(src = "www/naccho_loading.gif", width = "40%")
+          img(src = "www/naccho.gif", width = "70%")
         )
       )
     ),
