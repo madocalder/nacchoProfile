@@ -366,29 +366,38 @@ mod_finance_server <- function(id){
     # used for budget changes
     output$figure_tree <- highcharter::renderHighchart({
       req(input$topic == "non_weighted_revenue_total")
-      data <- revenue_percentages %>%
-        dplyr::mutate(percentage = round(percentage*100, 1))
 
-      # Creating the treemap using the dataframe
-      data %>%
-        highcharter::hchart(
-          "treemap",
-          highcharter::hcaes(x = revenue_type,
-                value = percentage,
-                color = percentage),
-          borderColor = "#FFFFFF", # Set the border color to white
-          borderWidth = 2          # Set the border width
+
+      data <- revenue_percentages %>%
+        dplyr::rename(name = revenue_type) %>%
+        dplyr::mutate(id = paste(name, sep = " "),
+                      value = round(percentage*100,1)) %>%
+        dplyr::select(id, name, value)
+
+      add_info <- data.frame(
+        color = naccho.viz::green
+      )
+
+      data <- cbind(data, add_info)
+
+
+      # Create the grouped treemap with specified colors
+      highchart() %>%
+        hc_add_series(
+          type = "treemap",
+          layoutAlgorithm = "squarified",
+          data = list_parse(data),
+          allowDrillToNode = TRUE,           # Enables zooming into the groups
+          borderColor = "#FFFFFF",
+          borderWidth = 2
         ) %>%
-        hc_colorAxis(minColor = naccho.viz::pink,
-                     maxColor = naccho.viz::teal
-        ) %>%
-        highcharter::hc_add_theme(
-          naccho.viz::basic
-        ) %>%
+        hc_title(text = "Grouped Treemap: Revenue Sources by Gender") %>%
+        hc_tooltip(pointFormat = "<b>{point.name}:</b> {point.value}%") %>%
         highcharter::hc_plotOptions(
           series = list(
             dataLabels = list(
               enabled = TRUE,
+              color = "black",
               align = "center",
               verticalAlign = "middle",
               allowOverlap = TRUE,             # Allow labels to overlap other labels
