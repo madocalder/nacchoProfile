@@ -10,9 +10,10 @@ viz_options(
   viz_subtitle = "",
   viz_caption = "",
   caption_align = "center",
-  colors = naccho.viz::naccho_colors,
-  theme = naccho.viz::basic_theme,
+  colors = naccho.viz::colors,
+  theme = naccho.viz::basic,
   tooltip,
+  tooltip_align = "center",
   legend_enable = TRUE,
   legend_title = "",
   legend_align = "right"
@@ -29,11 +30,13 @@ viz_options(
 
 \item{caption_align}{character string; options include "left", "center", or "right" where the default is "center".}
 
-\item{colors}{vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::naccho_colors.}
+\item{colors}{vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::colors.}
 
 \item{theme}{hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.}
 
 \item{tooltip}{character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.}
+
+\item{tooltip_align}{character string; options include "left", "right", or "center".}
 
 \item{legend_enable}{boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.}
 

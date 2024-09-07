@@ -15,7 +15,7 @@ proxy_hist_to_group(
   size = "17px",
   overflow = "none",
   responses = sum(data$Responses),
-  theme = naccho.viz::hist_theme,
+  theme = naccho.viz::histogram,
   ...
 )
 }

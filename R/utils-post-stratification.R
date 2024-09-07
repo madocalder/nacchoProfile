@@ -89,7 +89,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
             y = round(Percentage,1),
-            category = stringr::str_to_title(Answer),
+            category = sapply(Answer, custom_str_to_title),
             group = Group,
             subtitle = paste0("Estimated Across All LHDs")
           )
@@ -132,8 +132,8 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
             y = round(Percentage,1),
-            category = stringr::str_to_title(Answer),
-            group = stringr::str_to_title(Group),
+            category = sapply(Answer, custom_str_to_title),
+            group = sapply(Group, custom_str_to_title),
             subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
           )
 
@@ -193,7 +193,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
     select(all_of(c("Group", "Percentage", "Answer"))) %>%
     mutate(
       y = round(Percentage,1),
-      category = stringr::str_to_title(Answer),
+      category = sapply(Answer, custom_str_to_title),
       group = Group,
       subtitle = paste0("Estimated Across All LHDs")
     )
@@ -253,7 +253,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
       mutate(
         y = round(Mean, 1),
         x = as.numeric(as.factor(Group)) - 1,
-        category = stringr::str_to_title(Group),
+        category = sapply(Group, custom_str_to_title),
         group = "All LHDs",
         subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
       )
@@ -279,7 +279,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         mutate(
           y = round(Mean, 1),
           x = as.numeric(as.factor(Group)) - 1,
-          category = stringr::str_to_title(Group),
+          category = sapply(Group, custom_str_to_title),
           group = "All LHDs",
           subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
         )
@@ -376,7 +376,7 @@ class_data_b <- function(args) {
 #'
 #' @export
 #' @return dataframe
-responses <- function(question = "jobsgone") {
+jobs_responses <- function(question = "jobsgone") {
   jobs_data %>%
   dplyr::filter(Question == question) %>%
   dplyr::group_by(filter) %>%
@@ -387,27 +387,227 @@ responses <- function(question = "jobsgone") {
 
 #' Retrieve filtered jobs dataset for visualization
 #'
-#' @description Filtering jobs_data.
+#' @description Filtering jobs_data or budget_data.
 #'
-#' @param question A variable from jobs_data, either "jobsgone" or "jobsgain" - either works.
+#' @param selected_data jobs_data or budget_jobs.
 #'
 #' @export
 #' @return dataframe
-filtered_jobs <- function(selected_data = jobs_data) {
+filtered_butterfly <- function(selected_data = "jobs_data") {
 
-  data <- selected_data %>%
-    dplyr::select(1:7, 14:20) %>%
-    dplyr::mutate(x = as.numeric(as.factor(group))-1,
-                  group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
-                                           TRUE ~ group)) %>%
-    dplyr::select(group, Question, y, x, total_employees)
+  if (selected_data == "jobs_data") {
+    data <- jobs_data %>%
+      dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                    group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                             TRUE ~ group)) %>%
+      dplyr::select(group, Question, y, x, total_employees)
 
 
-  data %>%
-    tidyr::pivot_wider(names_from = Question, values_from = y) %>%
-    dplyr::mutate(jobsgone_standard = round((jobsgone/total_employees)*100,1),
-                  jobsgain_standard = round((jobsgain/total_employees)*100,1),
-                  difference = jobsgain - jobsgone) %>%
-    dplyr::mutate(group = sub(" .*", "", group)) %>%
-    dplyr::mutate_if(is.numeric, round, 1)
+    data %>%
+      tidyr::pivot_wider(names_from = Question, values_from = y) %>%
+      dplyr::rename(left = jobsgone,
+                    right = jobsgain) %>%
+      dplyr::mutate(left_standard = round((left/total_employees)*100,1),
+                    right_standard = round((right/total_employees)*100,1),
+                    difference = right - left) %>%
+      dplyr::mutate(group = sub(" .*", "", group)) %>% # shorten labels
+      dplyr::mutate_if(is.numeric, round, 1)
+
+
+  } else if (selected_data == "budget_data") {
+    data <- budget_data %>%
+      dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                    group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                             TRUE ~ group)) %>%
+      dplyr::select(group, x, y, category, Responses) %>%
+      tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+      dplyr::rename(left = 3,
+                    right = 4,
+                    left_n = 5,
+                    right_n = 6) %>%
+      dplyr::mutate(group = sub(" .*", "", group)) # shorten labels
+  }
+}
+
+
+
+#' Create list for boxplot
+#'
+#' @description Create a list with a length of one or more for use in boxplot visualizations.
+#'
+#' @param args A variable from master_data.
+#'
+#' @export
+#' @return A list of one or more.
+boxplot_data <- function(args, grps = NULL) {
+
+  if (is.null(grps)) {
+    data <- return_survey_weighted_statistics(args) %>%
+      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3)))
+
+    find_limits <- master_data %>%
+      haven::as_factor() %>%
+      dplyr::left_join(add_weights(args, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
+      dplyr::mutate(y = get(args) * weights) %>%
+      tidyr::drop_na(y) %>%
+      dplyr::select(y)
+
+    # set upper and lower bounds for the box plot
+    iqr <- data$Quantile_q75 - data$Quantile_q25
+    find_lower <- data$Quantile_q25 - (1.5 * iqr)
+    upper_bound <- data$Quantile_q75 + (1.5 * iqr)
+    lower_bound <- ifelse((find_lower <= 1), 0, find_lower)
+
+    # mean
+    mean <- data.frame(x = 0, y = data$Mean)
+
+    # identify outliers, min, max, number of
+    outliers <- find_limits %>% dplyr::filter(y >= upper_bound | y <= lower_bound)
+
+    list(
+      list(
+        name = data$group,
+        low = lower_bound,
+        q1 = data$Quantile_q25,
+        median = data$Quantile_q50,
+        q3 = data$Quantile_q75,
+        high = upper_bound,
+        category = "All LHDs",
+        mean = mean,
+        responses = data$Responses,
+        outliers = outliers,
+        min_outlier = min(as.numeric(outliers$y)),
+        max_outlier = max(as.numeric(outliers$y)),
+        total_outliers = length(as.numeric(outliers$y)),
+        subtitle = data$subtitle
+      )
+    )
+
+  } else {
+
+    data <- return_survey_weighted_statistics(args, grps) %>%
+      dplyr::mutate(across(where(is.numeric), ~ signif(., digits = 3)),
+                    Group = as.character(Group)) %>%
+      dplyr::select(category, Group, Quantile_q25, Quantile_q50, Quantile_q75, Responses, Mean, subtitle) %>%
+      dplyr::rename(q1 = Quantile_q25,
+                    median = Quantile_q50,
+                    q3 = Quantile_q75,
+                    name = Group,
+                    mean = Mean,
+                    group_responses = Responses,
+                    category = category,
+                    subtitle = subtitle) %>%
+      dplyr::mutate(responses = sum(group_responses))
+
+
+    data <- split(data, data$category)
+
+    find_limits <- master_data %>%
+      haven::as_factor() %>%
+      dplyr::left_join(add_weights(args, popcat = "c0popcat7"), by = c("c0popcat7", "core_denom")) %>%
+      dplyr::mutate(y = get(args) * weights) %>%
+      tidyr::drop_na(y) %>%
+      dplyr::select(y, grps)
+
+    for(i in seq_along(data)) {
+
+      iqr <- data[[i]]$q3 - data[[i]]$q1
+      find_lower <- data[[i]]$q1 - (1.5 * iqr)
+      upper_bound <- data[[i]]$q3 + (1.5 * iqr)
+      lower_bound <- ifelse((find_lower <= 1), 0, find_lower)
+
+      outliers <- find_limits %>%
+        dplyr::filter(get(grps) == data[[i]]$name) %>%
+        dplyr::filter(y >= upper_bound | y <= lower_bound)
+
+      # add elements to the list
+      data[[i]][["mean"]] <- data.frame(x = i-1, y = data[[i]]$mean)
+      data[[i]][["high"]] <- upper_bound
+      data[[i]][["low"]] <- lower_bound
+      data[[i]][["outliers"]] <- list(outliers)
+      data[[i]][["min_outlier"]] <- min(as.numeric(outliers$y))
+      data[[i]][["max_outlier"]] <- max(as.numeric(outliers$y))
+      data[[i]][["total_outliers"]] <- length(as.numeric(outliers$y))
+    }
+
+    lapply(data, function(tbl) as.list(tbl[1, ]))
+
+  }
+}
+
+
+
+#' Data cleaning for the scatter plots
+#'
+#' @description Clean and format data for the scatter plot visualization
+#'
+#' @param set_filter value from the data, one of the filters
+#' @param set_service value(s) from the data, one of the service_types
+#'
+#' @export
+#' @return A list of one or more.
+scatter_data <- function(set_filter = "All LHDs",
+                         set_service = "Blood Lead Screening") {
+
+  data <- services_change_data %>%
+    dplyr::select(Group, filter:y)
+
+
+  data_wide <- tidyr::pivot_wider(data, names_from = service_provision, values_from = c(y)) %>%
+    dplyr::mutate(size = 1,
+                  x = `Reduced Service`,
+                  y = `Expanded Service`) %>%
+    dplyr::filter(filter %in% set_filter,
+                  service_type %in% set_service)
+
+
+  data_clean <- data_wide %>%
+    dplyr::mutate(verticalAlign = dplyr::case_when(service_type == "Blood Lead Screening" ~ "top",
+                                                   service_type == "Chronic Disease" ~ "bottom",
+                                                   service_type == "Communicable Disease Screening or Treatment" ~ "bottom",
+                                                   service_type == "Diabetes Screening" ~ "top",
+                                                   service_type == "Emergency Preparedness" ~ "top",
+                                                   service_type == "Environmental Health Including Food Safety" ~ "top",
+                                                   service_type == "Epidemiology and Surveillance" ~ "bottom",
+                                                   service_type == "High Blood Pressure Screening" ~ "middle",
+                                                   service_type == "Immunization" ~ "bottom",
+                                                   service_type == "Maternal and Child Health Services" ~ "bottom",
+                                                   service_type == "Mental Health" ~ "middle",
+                                                   service_type == "Obesity Prevention" ~ "top",
+                                                   service_type == "Substance Use Prevention" ~ "bottom")) %>%
+    dplyr::mutate(align = dplyr::case_when(service_type == "Blood Lead Screening" ~ "left",
+                                           service_type == "Chronic Disease" ~ "left",
+                                           service_type == "Communicable Disease Screening or Treatment" ~ "center",
+                                           service_type == "Diabetes Screening" ~ "center",
+                                           service_type == "Emergency Preparedness" ~ "center",
+                                           service_type == "Environmental Health Including Food Safety" ~ "center",
+                                           service_type == "Epidemiology and Surveillance" ~ "center",
+                                           service_type == "High Blood Pressure Screening" ~ "left",
+                                           service_type == "Immunization" ~ "center",
+                                           service_type == "Maternal and Child Health Services" ~ "center",
+                                           service_type == "Mental Health" ~ "left",
+                                           service_type == "Obesity Prevention" ~ "center",
+                                           service_type == "Substance Use Prevention" ~ "center")) %>%
+    dplyr::mutate(service_type_short = dplyr::case_when(service_type == "Blood Lead Screening" ~ "Blood Lead",
+                                                  service_type == "Chronic Disease" ~ "Chronic Disease",
+                                                  service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
+                                                  service_type == "Diabetes Screening" ~ "Diabetes Sx",
+                                                  service_type == "Emergency Preparedness" ~ "Emrgy Preparedness",
+                                                  service_type == "Environmental Health Including Food Safety" ~ "Env Health",
+                                                  service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
+                                                  service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
+                                                  service_type == "Immunization" ~ "Immunization",
+                                                  service_type == "Maternal and Child Health Services" ~ "MCH",
+                                                  service_type == "Mental Health" ~ "Mental Health",
+                                                  service_type == "Obesity Prevention" ~ "Obesity Prev.",
+                                                  service_type == "Substance Use Prevention" ~ "Substance Use Prev."))
+
+  data_clean %>%
+    dplyr::mutate(
+      dataLabels = purrr::map2(
+        verticalAlign, align,
+        ~ list(enabled = TRUE, verticalAlign = .x, align = .y)
+      )
+    )
+
 }

@@ -4,12 +4,22 @@
 \alias{proxy_to_bar}
 \title{Single Bar Proxy Redraw}
 \usage{
-proxy_to_bar(hc, data, max, meta, ...)
+proxy_to_bar(
+  hc,
+  data,
+  max,
+  meta,
+  name_one = "Jobs Lost",
+  name_two = "Jobs Added",
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}
 
 \item{data}{Dataframe; data object to feed the figure.}
+
+\item{max}{value, max value for the y axis.}
 
 \item{meta}{Dataframe; data object to set options (e.g., title, subtitle, etc).}
 

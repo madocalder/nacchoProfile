@@ -23,8 +23,8 @@ viz_export <- function(hc, enabled = TRUE) {
         contextButton = list(
           symbol = "menu",
           symbolStrokeWidth = 2,
-          symbolFill = naccho.viz::naccho_teal,
-          symbolStroke = naccho.viz::naccho_teal,
+          symbolFill = naccho.viz::teal,
+          symbolStroke = naccho.viz::teal,
           menuItems = c("printChart",
                         "separator",
                         "downloadPNG",
@@ -49,9 +49,10 @@ viz_export <- function(hc, enabled = TRUE) {
 #' @param viz_subtitle character string; subtitle to appear underneath the title. Defaults to nothing.
 #' @param viz_caption character string; source and data notes to appear underneath the figure. Defaults to nothing.
 #' @param caption_align character string; options include "left", "center", or "right" where the default is "center".
-#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::naccho_colors.
+#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values. Defaults to naccho.viz::colors.
 #' @param theme hc_theme, must be a defined hc_theme available in {highcharter}, {naccho.viz}, or otherwise defined.
 #' @param tooltip character string; text and values to appear in the tooltip, use {point.xx} to call a value from the data frame, where xx is a specific column.
+#' @param tooltip_align character string; options include "left", "right", or "center".
 #' @param legend_enable boolean, TRUE or FALSE, where TRUE enables the legend. Defaults to TRUE.
 #' @param legend_title character string; title of the legend, defaults to nothing unless defined.
 #' @param legend_title character string; options include "left", "center" or "right". Defaults to "right".
@@ -65,9 +66,10 @@ viz_options <- function(hc,
                         viz_subtitle = "",
                         viz_caption = "",
                         caption_align = "center",
-                        colors = naccho.viz::naccho_colors,
-                        theme = naccho.viz::basic_theme,
+                        colors = naccho.viz::colors,
+                        theme = naccho.viz::basic,
                         tooltip,
+                        tooltip_align = "center",
                         legend_enable = TRUE,
                         legend_title = "",
                         legend_align = "right") {
@@ -89,18 +91,26 @@ viz_options <- function(hc,
     highcharter::hc_caption(
       text = viz_caption, # source and data notes
       useHTML = TRUE,
-      margin = 20,
+      margin = 60,
       align = caption_align
     ) %>%
     highcharter::hc_tooltip(
       headerFormat = "",
       pointFormat = tooltip,
+      borderWidth = 2,
       useHTML = TRUE,
       style = list(
         fontWeight = 400,
-        textAlign = "center"
-      )
-    ) %>%
+        textAlign = tooltip_align,
+        fontSize = "13px",
+        color = "black"
+      ),
+      backgroundColor = "#EEEAE5",
+      borderRadius = 2,
+      headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+      hideDelay = 1000,
+      shadow = FALSE
+      ) %>%
     highcharter::hc_legend(
       enabled = legend_enable, # enabled legend
       reversed = FALSE,
@@ -145,15 +155,10 @@ proxy_to_single <- function(hc, data, meta, ...) {
     ) %>%
     highcharter::hcpxy_set_data(
       "column",
-      data = data
+      data = data,
+      highcharter::hcaes(x, y)
     ) %>%
     highcharter::hcpxy_update(
-      series = list(
-        list(type = "column"),
-        dataLabels = list(
-          format = meta$data_label
-        )
-      ),
       yAxis = list(
         title = list(
           text = meta$y_label
@@ -173,7 +178,7 @@ proxy_to_single <- function(hc, data, meta, ...) {
         text = meta$caption
       ),
       xAxis = list(
-        categories = data$category,
+        categories = unique(data$category),
         offset = 0
       ),
       tooltip = list(
@@ -348,7 +353,6 @@ set_column <- function(data,
     data,
     "column",
     id = "All",
-    name = "Estimated Across All LHDs",
     highcharter::hcaes(
       x = x,
       y = y,
@@ -361,7 +365,7 @@ set_column <- function(data,
       distance = 5,
       padding = 2,
       style = list(
-        color = naccho.viz::naccho_grey,
+        color = naccho.viz::grey,
         fontFamily = "Jost",
         fontWeight = "500",
         fontSize = "14px"
@@ -370,7 +374,7 @@ set_column <- function(data,
   ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
-      categories = data$category
+      categories = unique(data$category)
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -385,6 +389,60 @@ set_column <- function(data,
 
 
 
+
+#' Set First Highcharter Column Graph
+#'
+#' @description Create the first highcharter visualizations from which proxies will redraw.
+#'
+#' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param y_label character string; Label for the Y Axis.
+#'
+#' @export
+#'
+#'
+#' @return column graph
+set_simple_bar <- function(data,
+                           y_label = "% of LHDs") {
+
+  highcharter::hchart(
+    data,
+    "bar",
+    id = "All",
+    highcharter::hcaes(
+      x = x,
+      y = y,
+      group = group
+    ),
+    dataLabels = list(
+      enabled = TRUE,
+      format = "{point.y}%",
+      overflow = TRUE,
+      distance = 5,
+      padding = 2,
+      style = list(
+        color = naccho.viz::grey,
+        fontFamily = "Jost",
+        fontWeight = "500",
+        fontSize = "14px"
+      )
+    )
+  ) %>%
+    highcharter::hc_xAxis(
+      title = list(text = ""), # x-axis label
+      categories = unique(data$category)
+    ) %>%
+    highcharter::hc_yAxis(
+      title = list(
+        text = y_label
+      ), # y-axis label
+      min = 0,
+      labels = list(
+        format = "{value}%"
+      )
+    )
+}
+
+
 #' Set First Highcharter Bar Graph
 #'
 #' @description Create the first highcharter visualizations from which proxies will redraw.
@@ -397,19 +455,16 @@ set_column <- function(data,
 #'
 #' @return column graph
 set_bar <- function(data,
-                    y_label = "% of Population") {
+                    y_label = "% of Population",
+                    name_one = "Jobs Lost",
+                    name_two = "Jobs Added",
+                    set_max = 15000,
+                    set_format = NA) {
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
-      type = "bar",
-      margin = list(90, 0, 180, 0),
-      events = list(
-        load = highcharter::JS("
-          function() {
-            adjustXAxisOffset();
-          }
-        ")
-      )
+      type = "bar"
+      # margin = list(90, 0, 180, 0)
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
@@ -424,37 +479,216 @@ set_bar <- function(data,
     highcharter::hc_xAxis(
       categories = unique(data$group),
       labels = list(
-        useHTML = TRUE,
-        align = "center"
+        enabled = FALSE
       ),
-      offset = 0,
-      tickWidth = 0
+      plotBands = list(
+        list(
+          from = -0.5,
+          to = 0.5,
+          color = "transparent",
+          label = list(
+            text = "Rural",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 0.5,
+          to = 1.5,
+          color = "transparent",
+          label = list(
+            text = "Urban",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 1.5,
+          to = 2.5,
+          color = "transparent",
+          label = list(
+            text = "Local",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 2.5,
+          to = 3.5,
+          color = "transparent",
+          label = list(
+            text = "Shared",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 3.5,
+          to = 4.5,
+          color = "transparent",
+          label = list(
+            text = "State",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 4.5,
+          to = 5.5,
+          color = "transparent",
+          label = list(
+            text = "Small",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 5.5,
+          to = 6.5,
+          color = "transparent",
+          label = list(
+            text = "Medium",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 6.5,
+          to = 7.5,
+          color = "transparent",
+          label = list(
+            text = "Large",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 7.5,
+          to = 8.5,
+          color = "transparent",
+          label = list(
+            text = "Midwest",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 8.5,
+          to = 9.5,
+          color = "transparent",
+          label = list(
+            text = "Northeast",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 9.5,
+          to = 10.5,
+          color = "transparent",
+          label = list(
+            text = "South",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 10.5,
+          to = 11.5,
+          color = "transparent",
+          label = list(
+            text = "West",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        ),
+        list(
+          from = 11.5,
+          to = 12.5,
+          color = "#EEEAE4",
+          label = list(
+            text = "All LHDs",
+            align = "center",
+            x = -1,
+            style = list(
+              fontFamily = "Heebo",
+              fontWeight = 700
+            )
+          )
+        )
+      )
     ) %>%
     highcharter::hc_yAxis_multiples(
       list(
-        max = 15000,
+        max = set_max,
         title = list(text = NULL),
         width = "45%",
-        reversed = TRUE
+        reversed = TRUE,
+        offset = 0,
+        alignTicks = FALSE,
+        labels = list(
+          format = set_format
+        )
       ),
       list(
-        max = 15000,
+        max = set_max,
         title = list(text = NULL),
         offset = 0,
         left = "55%",
-        width = "45%"
+        width = "45%",
+        offset = 0,
+        alignTicks = FALSE ,
+        labels = list(
+          format = set_format
+        )
       )
     ) %>%
     highcharter::hc_add_series(
-      id = "Jobs Lost",
-      name = "Jobs Lost",
-      data = data$jobsgone,
+      id = "Left",
+      name = name_one,
+      data = data$left,
       yAxis = 0
     ) %>%
     highcharter::hc_add_series(
-      id = "Jobs Added",
-      name = "Jobs Added",
-      data = data$jobsgain,
+      id = "Right",
+      name = name_two,
+      data = data$right,
       yAxis = 1
     )
 }
@@ -555,6 +789,55 @@ set_hist <- function(data,
 
 
 
+#' Set First Boxplot Histogram
+#'
+#' @description Create the first highcharter boxplot visualizations from which proxies will redraw.
+#'
+#' @param data list, for the boxplot, the data needs to be a list.
+#'
+#' @export
+#'
+#' @return boxplot
+set_box <- function(data) {
+  highcharter::highchart() %>%
+    highcharter::hc_add_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      fillColor = "#EEEAE4",
+      lineWidth = 2,
+      medianWidth = 3,
+      stemWidth = 2,
+      whiskerWidth = 3
+    ) %>%
+    highcharter::hc_add_series(
+      id = "Mean",
+      data = highcharter::list_parse(data[[1]]$mean),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::terracotta
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      )
+    ) %>%
+    highcharter::hc_yAxis(
+      title = list(text = "USD")
+    ) %>%
+    highcharter::hc_xAxis(
+      categories = as.list(stringr::str_to_title(data[[1]]$category))
+    ) %>%
+    highcharter::hc_add_theme(
+      naccho.viz::basic
+    )
+}
+
+
+
 #' Histogram Bar Proxy Redraw Total FTEs
 #'
 #' @param hc A `highchart` `htmlwidget` object.
@@ -591,6 +874,7 @@ proxy_to_hist_total <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = 0,
         list(type = "column"),
         dataLabels = list(
@@ -667,6 +951,7 @@ proxy_to_hist_pc <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = 0,
         list(type = "column"),
         dataLabels = list(
@@ -746,6 +1031,7 @@ proxy_hist_to_single <- function(hc,
     ) %>%
     highcharter::hcpxy_update(
       series = list(
+        visible = TRUE,
         groupPadding = .2,
         type = "column",
         dataLabels = list(
@@ -755,7 +1041,7 @@ proxy_hist_to_single <- function(hc,
           distance = 5,
           padding = 2,
           style = list(
-            color = naccho.viz::naccho_grey,
+            color = naccho.viz::grey,
             fontFamily = "Jost",
             fontWeight = "500",
             fontSize = "14px"
@@ -772,7 +1058,7 @@ proxy_hist_to_single <- function(hc,
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
-        categories = data$category,
+        categories = as.list(data$category),
         title = list(
           text = unique(data$x_label)
         ),
@@ -819,7 +1105,7 @@ proxy_hist_to_group <- function(hc,
                                 size = "17px",
                                 overflow = "none",
                                 responses = sum(data$Responses),
-                                theme = naccho.viz::hist_theme, ...) {
+                                theme = naccho.viz::histogram, ...) {
 
   if (is.null(data_all)) {
 
@@ -848,6 +1134,7 @@ proxy_hist_to_group <- function(hc,
       ) %>%
       highcharter::hcpxy_update(
         series = list(
+          visible = FALSE,
           type = "column",
           dataLabels = list(
             enabled = TRUE,
@@ -856,7 +1143,7 @@ proxy_hist_to_group <- function(hc,
             distance = 5,
             padding = 2,
             style = list(
-              color = naccho.viz::naccho_grey,
+              color = naccho.viz::grey,
               fontFamily = "Jost",
               fontWeight = "500",
               fontSize = "14px"
@@ -927,6 +1214,7 @@ proxy_hist_to_group <- function(hc,
       highcharter::hcpxy_update(
         series = list(
           type = "column",
+          visible = FALSE,
           dataLabels = list(
             enabled = TRUE,
             format = meta$data_label,
@@ -934,7 +1222,7 @@ proxy_hist_to_group <- function(hc,
             distance = 5,
             padding = 2,
             style = list(
-              color = naccho.viz::naccho_grey,
+              color = naccho.viz::grey,
               fontFamily = "Jost",
               fontWeight = "500",
               fontSize = "14px"
@@ -983,25 +1271,32 @@ proxy_hist_to_group <- function(hc,
 #'
 #' @param hc A `highchart` `htmlwidget` object.
 #' @param data Dataframe; data object to feed the figure.
+#' @param max value, max value for the y axis.
 #' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
 #' @param ... Other arguments
 #'
 #' @return A redrawn figure.
 #' @export
 #'
-proxy_to_bar <- function(hc, data, max, meta, ...) {
+proxy_to_bar <- function(hc,
+                         data,
+                         max,
+                         meta,
+                         name_one = "Jobs Lost",
+                         name_two = "Jobs Added",
+                         ...) {
 
   hc %>%
     highcharter::hcpxy_update_series(
-      id = "Jobs Lost",
-      name = "Jobs Lost",
-      data = data$jobsgone,
+      id = "Left",
+      name = name_one,
+      data = data$left,
       redraw = TRUE
     ) %>%
     highcharter::hcpxy_update_series(
-      id = "Jobs Added",
-      name = "Jobs Added",
-      data = data$jobsgain,
+      id = "Right",
+      name = name_two,
+      data = data$right,
       redraw = TRUE
     ) %>%
     highcharter::hcpxy_update(
@@ -1019,6 +1314,505 @@ proxy_to_bar <- function(hc, data, max, meta, ...) {
       ),
       title = list(
         text = meta$title
+      )
+    )
+}
+
+
+
+
+
+#' Single Box Plot Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_box <- function(hc, data, meta, ...) {
+
+  hc %>%
+    highcharter::hcpxy_update_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update_series(
+      id = "Mean",
+      data = highcharter::list_parse(data[[1]]$mean),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::terracotta
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      ),
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update(
+      title = list(
+        text = meta$title
+      ),
+      title = list(
+        text = meta$title
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
+                      "<b> Note: </b> There were ", data[[1]]$total_outliers,
+                      " observations above the upper limit ranging from ",
+                      scales::dollar(data[[1]]$min_outlier)," to ",
+                      scales::dollar(data[[1]]$max_outlier), ". <br>",
+                      meta$caption)
+      ),
+      xAxis = list(
+        categories = as.list(stringr::str_to_title(sapply(data, function(x) x$name)))
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
+
+
+
+
+
+#' Box Plot Proxy Redraw - Two
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_group_box <- function(hc, data, meta, ...) {
+
+  get_means <- do.call(rbind, lapply(data, function(d) d$mean))
+
+  hc %>%
+    highcharter::hcpxy_update_series(
+      id = "All Box",
+      type = "boxplot",
+      data = data,
+      name = data[[1]]$name,
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update_series(
+      id = "Mean",
+      data = highcharter::list_parse(get_means),
+      type = "scatter",
+      name = "Mean",
+      marker = list(
+        symbol = "circle",
+        radius = 5,
+        fillColor = naccho.viz::terracotta
+      ),
+      tooltip = list(
+        pointFormat = "<b>Mean:</b> ${point.y}"
+      ),
+      redraw = TRUE
+    ) %>%
+    highcharter::hcpxy_update(
+      title = list(
+        text = meta$title
+      ),
+      title = list(
+        text = meta$title
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
+                      "<b> Note: </b> Refer to the tooltip for information on outliers in each group. <br>",
+                      meta$caption)
+      ),
+      xAxis = list(
+        categories = as.list(stringr::str_to_title(sapply(data, function(x) x$name)))
+      ),
+      tooltip = list(
+        pointFormat = "<b> Upper Limit: </b> ${point.high} <br>
+                      <b> 75th Percentile: </b> ${point.q3} <br>
+                      <b> Median: </b> ${point.median} <br>
+                      <b> 25th Percentile: </b> ${point.q1} <br>
+                      <b> Lower Limit: </b> ${point.low} <br>
+                      <hr class = 'tt'>
+                      <b> Responses in Group:</b> {point.group_responses} <br>
+                      <b> Number of Outliers:</b> {point.total_outliers} <br>
+                      <b> Range of Outliers: </b> ${point.min_outlier:,.0f} to ${point.max_outlier:,.0f}"
+
+      )
+    )
+}
+
+
+
+#' Scatter Plot
+#'
+#' @param data Dataframe for the viz
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+scatter_plot <- function(data, colors) {
+
+  data_for_n <- data
+
+  if (sum(stringr::str_detect(data_for_n$filter, "All LHDs")) > 0) {
+
+    n <- data_for_n$demoninator
+
+  } else {
+
+    data_for_n <- data_for_n %>%
+      dplyr::group_by(service_type, filter) %>%
+      dplyr::summarize(n = sum(demoninator))
+
+    n <- data_for_n$n
+  }
+
+  req(n)
+  highcharter::highchart() %>%
+    highcharter::hc_add_series(
+      id = "All",
+      data = data,
+      type = "scatter",
+      highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+    ) %>%
+    highcharter::hc_chart(
+      zoomType = "xy",
+      resetZoomButton = list(
+        theme = list(
+          fill = "white",
+          stroke = "#80A14E",
+          style = list(
+            color = "#80A14E",
+            fontWeight = "bold",
+            fontFamily = "Jost",
+            lineHeight = "25px" # positions text correctly inside button
+          ),
+          r = 20,  # border radius
+          padding = 10,
+          states = list(
+            hover = list(
+              fill = "#80A14E",
+              stroke = "white",
+              style = list(
+                color = "white"
+              )
+            )
+          )
+        )
+      )
+    ) %>%
+    highcharter::hc_plotOptions(
+      scatter = list(
+        events = list(
+          click = highcharter::JS("function() {
+                     this.selectionMarker.destroy();
+                     }")
+        ),
+        dataLabels = list(
+          enabled = TRUE,
+          allowOverlap = TRUE,
+          formatter = highcharter::JS("
+          function() {
+            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
+          }
+        "),
+          style = list(
+            textOutline = "none",
+            fontFamily = "Jost",
+            fontSize = "11px",
+            fontWeight = "bold"
+          )
+        ),
+        marker = list(
+          radius = 7,
+          lineWidth = 1
+        )
+      )
+    ) %>%
+    highcharter::hc_xAxis(
+      min = 0,
+      max = 35,
+      title = list(
+        text = "Percent of LHDs reducing service",
+        align = "high"
+      ),
+      plotLines = list(
+        list(
+          value = 20,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent reduced (20%)",
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 20,
+          to = 35,
+          color = "rgba(171, 97, 67, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "bottom",
+            align = "right")
+        )
+      )
+    ) %>%
+    highcharter::hc_yAxis(
+      min = 0,
+      title = list(
+        text = "Percent of LHDs expanding service"
+      ),
+      plotLines = list(
+        list(
+          value = 27,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent expanded (27%)",
+            style = list(
+              fontFamily = "Heebo"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 0,
+          to = 27,
+          color = "rgba(236, 229, 225, 0.3)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "right")
+        ),
+        list(
+          from = 27,
+          to = 100,
+          color = "rgba(0, 138, 150, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "left")
+        )
+      )
+    ) %>%
+    highcharter::hc_add_theme(
+      naccho.viz::scatter
+    ) %>%
+    highcharter::hc_colors(
+      colors = colors
+    ) %>%
+    # highcharter::hc_annotations(
+    #   list(
+    #     draggable = FALSE,
+    #     labels = list(
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Growing'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Stable'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 34,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Mixed Trend'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 33,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Shrinking'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "14px",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       )
+    #     )
+    #   )
+    # ) %>%
+    highcharter::hc_title(
+      text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
+      margin = 40,
+      widthAdjust = -60
+    ) %>%
+    highcharter::hc_subtitle(
+      text = "Click and span a range on the figure to zoom."
+    ) %>%
+    highcharter::hc_caption(
+      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 14px; color: black;\'>
+                  In the top left quadrant, services are <span style=\'color: #008A96; font-weight: bold;\'>growing</span>.
+                  In the top right quadrant, services show a <span style=\'color: #666; font-weight: bold;\'>mixed trend</span>.
+                  In the bottom left quadrant, services are <span style=\'color: #B8B3AE; font-weight: bold;\'>stable</span>.
+                  In the bottom right quadrant, services are <span style=\'color: #AB6143; font-weight: bold;\'>shrinking</span>.
+                  </span> <br>
+                  <b> N: </b>", min(n), " to ", max(n), "<br>",
+                  source_line),
+      useHTML = TRUE,
+      margin = 60,
+      align = "center"
+    )
+}
+
+
+
+
+#' Scatter Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_scatter_single <- function(hc, data,...) {
+
+    hc %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Urban", "Rural")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("State", "Local", "Shared")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Midwest", "South", "West", "Northeast")
+      ) %>%
+    # highcharter::hcpxy_remove_series(
+    #   id = "All"
+    # ) %>%
+      highcharter::hcpxy_set_data(
+        # id = "All",
+        data = data,
+        type = "scatter",
+        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+      ) %>%
+      highcharter::hcpxy_update(
+        chart = list(
+          zoomType = "xy"),
+        series = list(
+          visible = TRUE
+        )
+      )
+}
+
+
+
+
+
+#' Scatter Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors = NULL,...) {
+
+    hc %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Urban", "Rural")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("State", "Local", "Shared")
+      ) %>%
+      highcharter::hcpxy_remove_series(
+        id = c("Midwest", "South", "West", "Northeast")
+      ) %>%
+    # highcharter::hcpxy_remove_series(
+    #   id = "All"
+    # ) %>%
+      highcharter::hcpxy_add_series(
+        data = data,
+        type = "scatter",
+        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type),
+        id = id,
+        color = colors
+      ) %>%
+    highcharter::hcpxy_set_data(
+      data = data_all,
+      type = "scatter",
+      mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+    ) %>%
+    highcharter::hcpxy_update(
+      chart = list(
+        zoomType = "xy"
+      ),
+      series = list(
+        visible = FALSE
       )
     )
 }
