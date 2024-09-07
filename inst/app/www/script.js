@@ -1,13 +1,14 @@
+// Have the correct action links click upon load of app
+// =============================================================================
+// this is for the right sidebar
 $(document).on('shiny:connected', function() {
   $('#landscape_1-takeaway').addClass('clicked-link').click();
-});
-
-
-$(document).on('shiny:connected', function() {
   $('#workforce_1-takeaway').addClass('clicked-link').click();
+  $('#finance_1-takeaway').addClass('clicked-link').click();
 });
 
-
+// add and remove class to the right sidebar links when toggling
+// between the three
 $(document).on('click', '.action-link', function() {
   $('.action-link').removeClass('clicked-link'); // Remove class from all links
   $(this).addClass('clicked-link'); // Add class to the clicked link
@@ -20,19 +21,34 @@ $(document).on('click', '.action-link-2', function() {
 });
 
 
+$(document).on('click', '.action-link-3', function() {
+  $('.action-link-3').removeClass('clicked-link'); // Remove class from all links
+  $(this).addClass('clicked-link'); // Add class to the clicked link
+});
+
+
+
+
+// triggers the occupational classifications to click
+// =============================================================================
 Shiny.addCustomMessageHandler('triggerClick', function(id) {
+  document.getElementById(id).click();
+});
+
+
+Shiny.addCustomMessageHandler('triggerClickService', function(id) {
   document.getElementById(id).click();
 });
 
 
 
 
-
+// change the definitions link from plus to minus
+// =============================================================================
 $(document).on("shiny:value", (e) => {
     if(!e.name.match("show_definitions$")){
         return;
     }
-
     console.log(e.name);
 });
 $(() => {
@@ -57,59 +73,8 @@ $(() => {
 
 
 
-// for jobs chart
-function adjustXAxisOffset() {
-  var chart = $('#workforce_1-figure_jobs').highcharts();
-  var contentWidth = $('#resize-content').width();
-  if (chart && contentWidth > 0) {
-    var basePercentage = 0.53;  // Base percentage at shiny load
-    var minWidth = 400;  // Minimum width for the content div before max adjustment
-    var maxWidth = 1200; // Maximum width for the content div before minimum adjustment
-    var offsetPercentage;
-
-    if (contentWidth < minWidth) {
-      offsetPercentage = 0.0;
-      // Change alignment to "left" for narrow content widths
-      chart.xAxis[0].update({
-        labels: {
-          align: 'left'
-        }
-      });
-    } else {
-      // Reset alignment to "center" for wider content widths
-      chart.xAxis[0].update({
-        labels: {
-          align: 'center'
-        }
-      });
-    }
-
-    if (contentWidth < minWidth) {
-      offsetPercentage = 0.40;  // Decrease percentage as the window gets narrower
-    } else if (contentWidth > maxWidth) {
-      offsetPercentage = basePercentage;  // Use base percentage for wider windows
-    } else {
-      offsetPercentage = basePercentage + (0.60 - basePercentage) * ((maxWidth - contentWidth) / (maxWidth - minWidth));
-    }
-
-    var offsetValue = contentWidth * offsetPercentage;
-    chart.xAxis[0].update({
-      offset: -offsetValue
-    });
-  }
-}
-
-$(document).on('shiny:connected', function() {
-  adjustXAxisOffset();
-});
-
-$(window).on('resize', function() {
-  adjustXAxisOffset();
-});
-
-
-
 // For the dropdown button popover
+// =============================================================================
 document.addEventListener('DOMContentLoaded', function() {
   var popoverTriggerList = [].slice.call(document.querySelectorAll('#workforce_1-slide_button'));
   var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
@@ -123,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
+// changes the position of the extra filter button based on window size
+// =============================================================================
 window.addEventListener('load', function() {
 
   function updatePosition() {
@@ -157,3 +125,8 @@ window.addEventListener('load', function() {
   // Update position on window resize
   window.addEventListener('resize', updatePosition);
 });
+
+
+
+
+

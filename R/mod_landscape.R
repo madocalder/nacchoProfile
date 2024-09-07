@@ -24,7 +24,7 @@ mod_landscape_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-4 min-height-400",
+              class = "col-sm-6 min-height-400",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -34,21 +34,7 @@ mod_landscape_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-4",
-              br(),
-              selectInput(
-                inputId = ns("view"),
-                strong("Visualization Type"),
-                choices = c(
-                  "Bar Graph",
-                  "Line Graph",
-                  "Pie Chart",
-                  "Table"
-                )
-              )
-            ),
-            div(
-              class = "col-sm-4",
+              class = "col-sm-6",
               br(),
               selectInput(
                 inputId = ns("filter"),
@@ -60,9 +46,23 @@ mod_landscape_ui <- function(id){
 
           hr(),
 
+          # viz toggles here --------------------------------------------------
+          div(
+            class = "viz-view",
+            shinyWidgets::radioGroupButtons(
+              ns("view"),
+              "",
+              choiceNames = list(
+                HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
+                HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
+                HTML('<i class="fas fa-earth-americas"></i>')         # Map icon
+              ),
+              choiceValues = c('Bar Graph', 'Line Graph', 'Map')
+            )
+          ),
 
-          # add main page content here ----------------------------------------------
 
+          # add main page content here ----------------------------------------
           div(
             class = "viz-content",
 
@@ -179,43 +179,53 @@ mod_landscape_server <- function(id){
     # for example, if someone selects "geography," then the view will update to
     # include a map options.
     observe({
-      if (input$topic =="tenure") {
+      if (input$topic == "tenure") {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters[-1]
-        )
+                          choices = landscape_filters[-1])
+
+
       } else if (input$topic == "totpop") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[4])
 
+
       } else {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters
-        )
+                          choices = landscape_filters)
       }
     })
 
     observe({
-      if (input$topic == "c0govcatn") {
-        updateSelectInput(session, "view",
-                          choices = c("Map", "Bar Graph", "Line Graph", "Table"))
-      } else if (input$topic == "totpop") {
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Pie Chart", "Table"))
-      } else {
-        updateSelectInput(session, "view",
-                          choices = c("Bar Graph", "Line Graph", "Table"))
-      }
-    })
+      req(input$topic == "c0govcatn")
 
-    observe({
-      if (input$topic == "c0govcatn" & input$view == "Map") {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-earth-americas"></i>'),
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Map", "Bar Graph", "Line Graph", "Table"))
+
+      if (input$view == "Map") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1])
-      }
-      if (input$topic == "c0govcatn" & input$view != "Map") {
+
+      } else if (input$view != "Map") {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[-3])
       }
+    })
+
+    observe({
+      req(input$topic != "c0govcatn")
+      shinyWidgets::updateRadioGroupButtons(session, "view",
+                                            choiceNames = list(
+                                              HTML('<i class="fas fa-chart-simple"></i>'),
+                                              HTML('<i class="fas fa-chart-line"></i>'),
+                                              HTML('<i class="fas fa-table"></i>')
+                                            ),
+                                            choiceValues = c("Bar Graph", "Line Graph", "Table"))
     })
 
 
@@ -291,12 +301,12 @@ mod_landscape_server <- function(id){
     # reactively define the colors based on the filter
     colors <- reactive ({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green)
+        c(naccho.viz::navy,
+          naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
         c(naccho.viz::naccho_blue,
           naccho.viz::naccho_green,
@@ -305,14 +315,12 @@ mod_landscape_server <- function(id){
 
       } else if (input$filter %in% c("All LHDs")) {
       c(naccho.viz::naccho_blue)
-
       }
-    }
-    )
+    })
 
 
 
-    updatedInputs <- reactive({
+    updated_inputs <- reactive({
       input$topic
       input$filter
     }) %>% debounce(100)
@@ -321,7 +329,7 @@ mod_landscape_server <- function(id){
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
     # combinations selected by the user.
-    observeEvent(updatedInputs(), {
+    observeEvent(updated_inputs(), {
 
       # Topic: Population
       # Filters: Rurality, Governance, LHD Size, Region
@@ -339,16 +347,9 @@ mod_landscape_server <- function(id){
           dplyr::ungroup() %>%
           dplyr::mutate(group = "All LHDs")
 
-
-        if (input$view == "Bar Graph") {
           proxy %>%
             proxy_to_single(data = data,
                             meta = filter_meta())
-        } else {
-          proxy %>%
-            proxy_to_pie(data = data,
-                         meta = filter_meta())
-        }
 
 
 
@@ -357,6 +358,7 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "tenure" & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics("tenure", input$filter)
+        print(data)
 
           proxy %>%
             proxy_to_single(data = data,
@@ -381,7 +383,6 @@ mod_landscape_server <- function(id){
       } else if (input$topic == "field" & input$filter != "All LHDs") {
         data <- spec_data %>% dplyr::filter(filter == input$filter)
         series_id <- unique(data$group)
-        print(data)
 
         proxy %>%
           proxy_to_group(
@@ -435,28 +436,6 @@ mod_landscape_server <- function(id){
       }
     })
 
-
-
-
-    #   } else if (input$view == "Pie Chart") {
-    #     naccho.viz::create_pie(
-    #       data = filter_data(),
-    #       variable = "fig_filter",
-    #       value = "n",
-    #       my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_pink, naccho.viz::naccho_teal, naccho.viz::naccho_blue, naccho.viz::naccho_green),
-    #       legend_enable = TRUE,
-    #       title_text = filter_meta()$title,
-    #       subtitle_text = paste0("By ", names(landscape_filters[landscape_filters == input$filter])),
-    #       caption_text = filter_meta()$caption
-    #     ) %>%
-    #       naccho.viz::add_logo(
-    #         "https://toolbox.naccho.org/pages/img/logo-header.png",
-    #         width = 150L,
-    #         height = 40L
-    #       )
-    #
-    #   }
-    # })
 
    #tables output
     output$data_table <- reactable::renderReactable({
@@ -594,6 +573,7 @@ mod_landscape_server <- function(id){
 
 
 
+
     # right content ===========================================================
 
     # takeaway ----------------------------------------------------------------
@@ -606,7 +586,7 @@ mod_landscape_server <- function(id){
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        view == input$view,
+                        # view == input$view, # fix
                         filter == input$filter)
 
         p(htmltools::HTML(
@@ -626,7 +606,7 @@ mod_landscape_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        view == input$view,
+                        # view == input$view, # fix
                         filter == input$filter)
 
         if (is.na(notes$notes)) {

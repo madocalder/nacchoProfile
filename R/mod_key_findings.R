@@ -275,10 +275,10 @@ mod_key_findings_server <- function(id){
 
       naccho.viz::create_stacked_bar(
         data = data,
-        my_colors = c(naccho.viz::naccho_pink,
-                      naccho.viz::naccho_orange,
-                      naccho.viz::naccho_green,
-                      naccho.viz::naccho_blue),
+        my_colors = c(naccho.viz::pink,
+                      naccho.viz::terracotta,
+                      naccho.viz::green,
+                      naccho.viz::navy),
         x_variable = "year",
         y_variable = "value",
         title_text = "Workforce grew during the pandemic, but mostly among <span
@@ -404,7 +404,7 @@ mod_key_findings_server <- function(id){
         cuts their next fiscal year as federal resources expire.",
         x_group = "stat",
         y_label = "Per Capita Revenue",
-        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+        my_colors = c(naccho.viz::terracotta, naccho.viz::green),
         x_label = "",
         y_max = 35,
         y_format = "\u0024{value:,.0f}",
@@ -430,7 +430,7 @@ mod_key_findings_server <- function(id){
               borderRadius = 50,
               borderWidth = 0,
               style = list(
-                color = naccho.viz::naccho_orange,
+                color = naccho.viz::terracotta,
                 fontFamily = "Heebo",
                 fontWeight = "700",
                 fontSize = "14px"
@@ -458,7 +458,7 @@ mod_key_findings_server <- function(id){
         data = data,
         x_variable = "year",
         y_variable = "value",
-        my_colors = c(naccho.viz::naccho_green, naccho.viz::naccho_orange),
+        my_colors = c(naccho.viz::green, naccho.viz::terracotta),
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>spent
         an average</span> of \u002412.5 million in 2022, with most of the \u00244.12 million increase
         due to <span style='color:#80A14E;font-weight:bold;'>COVID\u221219.</span>",
@@ -518,7 +518,7 @@ mod_key_findings_server <- function(id){
         data = data,
         x_variable = "year",
         y_variable = "value",
-        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green, naccho.viz::naccho_pink),
+        my_colors = c(naccho.viz::terracotta, naccho.viz::green, naccho.viz::pink),
         y_format = "{value}\u0025",
         y_label = "Percent of LHDs",
         x_group = "type",
@@ -547,7 +547,7 @@ mod_key_findings_server <- function(id){
         item_group = "description",
         legend_enable = TRUE,
         tooltip = "{point.percent}\u0025 of LHDs were {point.description} <br> related to COVID\u221219 in 2022",
-        color_one = naccho.viz::naccho_orange,
+        color_one = naccho.viz::terracotta,
         color_two = "#ddd",
         title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
         subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219.",
@@ -588,7 +588,7 @@ mod_key_findings_server <- function(id){
         subtitle_text = "Participation in health information exchanges increased 24 percentage points over the same period, with fewer small LHDs using these systems.",
         x_group = "type",
         y_label = "Percent of LHDs",
-        my_colors = c(naccho.viz::naccho_orange, naccho.viz::naccho_green),
+        my_colors = c(naccho.viz::terracotta, naccho.viz::green),
         y_format = "{value}\u0025",
         legend_enable = TRUE,
         legend_title = "",
@@ -643,7 +643,7 @@ mod_key_findings_server <- function(id){
         legend_title = "",
         tooltip = "{point.perc}\u0025 of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
         allow_export = FALSE,
-        select_theme = naccho.viz::naccho_bare_theme
+        select_theme = naccho.viz::bare
       ) %>%
         highcharter::hc_plotOptions(
           series = list(
@@ -670,19 +670,19 @@ mod_key_findings_server <- function(id){
     output$finding_eight <- highcharter::renderHighchart({
       # First chart data
       data_2008 <- list(
-        list(name = "Under 50", y = 34, color = naccho.viz::naccho_orange),
+        list(name = "Under 50", y = 34, color = naccho.viz::terracotta),
         list(name = "Over 50", y = 66, color = "#ddd")
       )
 
       # Second chart data
       data_2022 <- list(
-        list(name = "Under 50", y = 42, color = naccho.viz::naccho_orange),
+        list(name = "Under 50", y = 42, color = naccho.viz::terracotta),
         list(name = "Over 50", y = 58, color = "#ddd")
       )
 
       # Legend data
       legend_data <- list(
-        list(name = "Under 50", y = 0, color = naccho.viz::naccho_orange),
+        list(name = "Under 50", y = 0, color = naccho.viz::terracotta),
         list(name = "Over 50", y = 0, color = "#ddd")
       )
 
@@ -758,7 +758,7 @@ mod_key_findings_server <- function(id){
           showInLegend = FALSE
         ) %>%
         highcharter::hc_add_theme(
-          naccho.viz::naccho_bare_theme
+          naccho.viz::bare
         ) %>%
         highcharter::hc_plotOptions(
           series = list(

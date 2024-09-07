@@ -18,6 +18,7 @@
 "landscape_filters"
 
 
+
 #' Workforce Topics
 #'
 #' @format list
@@ -40,35 +41,50 @@
 
 
 
-#' Workforce Types
+#' Finance Topics
 #'
 #' @format list
 #'
 #' A list of 3
 #'
 #' @source columns from master_data
-"workforce_fte_types"
+"finance_topics"
 
 
 
-#' Workforce Classifications Measure
+
+#' Services Topics
 #'
 #' @format list
 #'
 #' A list of 2
 #'
 #' @source columns from master_data
-"workforce_classifications_measure"
+"service_topics"
 
 
 
 
 
-#' Workforce Employee Types
+#' Services Provision Topics
 #'
 #' @format list
 #'
-#' A list of 0
+#' A list of 10
 #'
 #' @source columns from master_data
-"workforce_employee_types"
+"service_classifications"
+
+
+
+
+
+
+#' Services Changes Topics
+#'
+#' @format list
+#'
+#' A list of 13
+#'
+#' @source columns from master_data
+"change_classifications"

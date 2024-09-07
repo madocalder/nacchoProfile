@@ -4,7 +4,14 @@
 \alias{set_bar}
 \title{Set First Highcharter Bar Graph}
 \usage{
-set_bar(data, y_label = "\% of Population")
+set_bar(
+  data,
+  y_label = "\% of Population",
+  name_one = "Jobs Lost",
+  name_two = "Jobs Added",
+  set_max = 15000,
+  set_format = NA
+)
 }
 \arguments{
 \item{data}{dataframe; A dataframe with x, y, group, and category columns.}
