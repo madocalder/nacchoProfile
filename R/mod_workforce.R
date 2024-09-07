@@ -938,10 +938,10 @@ mod_workforce_server <- function(id){
       # Define colors reactively based on the filter
       colors <- colors()
 
-
-      message("Before case_when - unique category values in dataset:")
-      print(unique(data$category))
-      print(data)
+      #debugging
+      # message("Before case_when - unique category values in dataset:")
+      # print(unique(data$category))
+      # print(data)
 
       # Determine the category based on the input filter
       category <- case_when(
@@ -952,9 +952,10 @@ mod_workforce_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      message("Category variable after case_when:")
-      print(category)
-      print(data)
+      #debugging
+      # message("Category variable after case_when:")
+      # print(category)
+      # print(data)
 
 
       # Call the table creation function with the appropriate data and parameters
