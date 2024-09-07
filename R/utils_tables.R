@@ -78,7 +78,7 @@ data <- data %>%
   options(
     reactable.theme = reactable::reactableTheme(
       color = "#3d4242",
-      backgroundColor = "#F9F8F7",
+      backgroundColor = "",
       borderColor = NULL,
       stripedColor = NULL,
       highlightColor = "#EEEAE4",
