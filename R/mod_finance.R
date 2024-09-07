@@ -425,7 +425,7 @@ mod_finance_server <- function(id){
                         parent = category) %>%
           dplyr::mutate(id = paste(name, parent, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(id, name, parent, value)
+          dplyr::select(id, name, parent, value, subtitle)
 
         id_values <- unique(data$parent)
 
@@ -433,7 +433,8 @@ mod_finance_server <- function(id){
           id = id_values,
           name = id_values,
           parent = "Overall",
-          value = NA
+          value = NA,
+          subtitle = NA
         )
 
         # bind data
@@ -505,10 +506,10 @@ mod_finance_server <- function(id){
             )
           ) %>%
           viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
-                      viz_subtitle = "Estimated Across All LHDs",
+                      viz_subtitle = unique(data$subtitle),
                       viz_caption = source_line,
                       caption_align = "center",
-                      tooltip = "{point.value}% of all LHD revenue came from <b>{point.name} sources.</b>",
+                      tooltip = "{point.value}% of all revenue in {point.parent} LHDs came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE) %>%
           highcharter::hc_tooltip(
             useHTML = TRUE,
@@ -517,7 +518,7 @@ mod_finance_server <- function(id){
               if (this.point.node && this.point.node.level === 1) {
                 return '<b>' + this.point.name + '</b>';
               } else {
-                return this.point.value + '% of all LHD revenue came from <b>' + this.point.name + ' sources.</b>';
+          return this.point.value + '% of all revenue in ' + this.point.parent + ' LHDs came from <b>' + this.point.name + ' sources.</b>';
               }
             }"
             )

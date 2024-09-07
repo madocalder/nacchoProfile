@@ -421,6 +421,8 @@ label:not(.material-switch label) {
   border: 2px solid #80A14E !important;
 }
 
+
+
 /* ------------------------------------------------------------------- waiter */
  .waiter-overlay {
       background-color: #212F5B;
@@ -430,6 +432,22 @@ label:not(.material-switch label) {
       background-color: #212F5B !important;
 }
 
+
+/* -------------------------------------------------- highcharter breadcrumbs */
+.highcharts-drillup-button {
+    stroke: #80A14E !important;
+    font-family: Jost, sans-serif !important;
+    color: #80A14E !important;
+}
+
+.highcharts-drillup-button:hover {
+    stroke: #212F5B !important;
+    color: #212F5B !important;
+}
+
+.highcharts-button {
+  border: 2px solid #80A14E !important;
+}
 
 /* ------------------------------------------------------ home page accordion */
 .accordion-body {
