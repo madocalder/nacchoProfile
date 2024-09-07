@@ -5,6 +5,9 @@
 #' @import shiny
 #' @noRd
 #'
+#'
+#'
+
 
 theme <- bslib::bs_theme(
   version = 5L,
@@ -20,6 +23,8 @@ theme <- bslib::bs_theme(
 )
 
 
+
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -29,6 +34,32 @@ app_ui <- function(request) {
       src = "inst/app/www/fontawesome",
       stylesheet = "css/all.min.css"
     ),
+
+    waiter::useWaiter(),
+
+    tags$style(
+      ".waiter-overlay {
+      background-color: #fff;}
+
+      .waiter-fullscreen{
+      background-color: #fff !important;}"
+    ),
+
+    waiter::waiter_set_theme(
+      html = waiter::spin_pixel(),
+      color = "white"
+    ),
+
+    waiter::waiterPreloader(
+      html = div(
+        div(
+          # style = "margin-left: -80%;",
+          img(src = "www/naccho_loading.gif", width = "40%")
+        )
+      )
+    ),
+
+
 
 
     # Your application UI logic

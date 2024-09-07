@@ -38,6 +38,7 @@ spec_data_all <- map_dfr(args1[[1]], return_survey_weighted_counts) %>%
 
 
 
+
 spec_data_population <- pmap_dfr(args1, return_survey_weighted_counts) %>%
   filter(.data$Answer == "checked") %>%
   mutate(
@@ -46,7 +47,7 @@ spec_data_population <- pmap_dfr(args1, return_survey_weighted_counts) %>%
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By LHD Size")
-    ) %>%
+  ) %>%
   select(-c0popcat3)
 
 
@@ -59,7 +60,7 @@ spec_data_rurality <- pmap_dfr(args2, return_survey_weighted_counts) %>%
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Rurality")
-    ) %>%
+  ) %>%
   select(-urbanrural2022)
 
 
@@ -72,7 +73,7 @@ spec_data_governance <- pmap_dfr(args3, return_survey_weighted_counts) %>%
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Governance")
-    ) %>%
+  ) %>%
   select(-c0govcat)
 
 
@@ -85,7 +86,7 @@ spec_data_region <- pmap_dfr(args4, return_survey_weighted_counts) %>%
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("By Region")
-    ) %>%
+  ) %>%
   select(-censusregion)
 
 
