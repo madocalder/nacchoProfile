@@ -85,7 +85,9 @@ mod_landscape_ui <- function(id){
             # adding table
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              reactable::reactableOutput(ns("data_table"), height = "auto")
+              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              br(),
+             HTML(source_line)
             )
           )
         ),
@@ -442,7 +444,6 @@ mod_landscape_server <- function(id){
 
       #add topic value for function
       topic <- input$topic
-      subtopic <- "no subtopic"
 
       # Define colors reactively based on the filter
       colors <- colors()
@@ -560,7 +561,7 @@ mod_landscape_server <- function(id){
       }
 
       # Call the table creation function with the appropriate data and parameters
-      create_non_time_table(data, category, colors, topic, subtopic)
+      create_non_time_table(data, category, colors, topic)
     })
 
 

@@ -34,7 +34,7 @@
 #' @export
 # categorical tables--------
 
-create_non_time_table <- function(data, category, colors, topic, subtopic) {
+create_non_time_table <- function(data, category, colors, topic) {
 
 
 data <- data %>%
@@ -56,17 +56,17 @@ data <- data %>%
 
     if (topic == "tenure") {
       paste0(rounded_value, " years (mean)")
-    } else if (subtopic == "jobs_total") {
+    } else if (topic == "jobs_total") {
       scales::label_comma()(rounded_value)
-    } else if (subtopic == "b") {
+    } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
-    } else if (subtopic == "fte_bypop") {
+    } else if (topic == "fte_bypop") {
       paste0(rounded_value, " FTE per capita (mean)")
-    } else if (subtopic == "c5q37") {
+    } else if (topic == "c5q37") {
       paste0(rounded_value, " Total FTE (mean)")
-    } else if (subtopic == "employee_bypop") {
+    } else if (topic == "employee_bypop") {
       paste0(rounded_value, " Employees per capita (mean)")
-    } else if (subtopic == "c5q36") {
+    } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees (mean)")
     } else {
       scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
@@ -123,7 +123,9 @@ data <- data %>%
       cellPadding = "15px 25px",
       style = list(
         fontFamily = "Heebo",
-        fontSize = "12px"  # Define general font size for table cells here
+        fontSize = "12px",
+        borderTop = "1px solid #212F5B",
+        borderBottom = "1px solid #212F5B"
       )
     )
   )
@@ -138,10 +140,10 @@ data <- data %>%
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
-                                           ifelse(subtopic == "jobs_total", 15000,
-                                                  ifelse(subtopic == "b", 21000,
-                                                  ifelse(subtopic == "jobs_standard", 10, 100)))),
-                       fill_color = "#008A96",
+                                           ifelse(topic == "jobs_total", 15000,
+                                                  ifelse(topic == "b", 21000,
+                                                  ifelse(topic == "jobs_standard", 10, 100)))),
+                       fill_color = naccho.viz::green,
                        background = 'none',
                        number_fmt = num_format
                     ),
@@ -163,7 +165,6 @@ data <- data %>%
   # Check if the data is for "All LHDs" a
 
   if (category == "All LHDs" & topic != "jobs"
-      # & subtopic == "no subtopic"
       ) {
 
     # Define column definitions for All LHDs------------
@@ -276,9 +277,9 @@ data <- data %>%
             cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8,
-                                                ifelse(subtopic == "jobs_total", 15000,
-                                                       ifelse(subtopic == "b", 21000,
-                                                              ifelse(subtopic == "jobs_standard", 10, 100)))),
+                                                ifelse(topic == "jobs_total", 15000,
+                                                       ifelse(topic == "b", 21000,
+                                                              ifelse(topic == "jobs_standard", 10, 100)))),
                              fill_color = colors[i],
                              background = 'none',
                              number_fmt = num_format
@@ -318,16 +319,6 @@ data <- data %>%
         NULL  # No groups if not in group_definitions
       },
 
-      # columnGroups = if ("subtitle" %in% colnames(data)) {
-      #   list(
-      #     reactable::colGroup(
-      #       name = unique(data$subtitle),
-      #       columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
-      #     )
-      #   )
-      # } else {
-      #   NULL  # No groups if "subtitle" is not present
-      # },
       filterable = FALSE,
       showPageSizeOptions = TRUE,
       striped = FALSE,
