@@ -367,7 +367,6 @@ mod_finance_server <- function(id){
     output$figure_tree <- highcharter::renderHighchart({
       req(input$topic == "non_weighted_revenue_total")
 
-
       data <- revenue_percentages %>%
         dplyr::rename(name = revenue_type) %>%
         dplyr::mutate(id = paste(name, sep = " "),
@@ -412,11 +411,11 @@ mod_finance_server <- function(id){
             )
           )
         ) %>%
-        viz_options(viz_title = "LHD Revenue Source as a Share of Total Revenue",
+        viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
                     viz_subtitle = "Estimated Across All LHDs",
                     viz_caption = source_line,
                     caption_align = "center",
-                    tooltip = "",
+                    tooltip = "{point.value}% of all LHD revenue came from {point.name}",
                     legend_enable = TRUE)
 
       ###FOR GROUPS
