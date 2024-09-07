@@ -80,7 +80,9 @@ mod_workforce_ui <- function(id){
             # Adding the new table view
             conditionalPanel(
               condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
-              reactable::reactableOutput(ns("data_table"), height = "auto")
+              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              br(),
+               HTML(source_line)
             )
           )
         ),
@@ -567,13 +569,20 @@ mod_workforce_server <- function(id){
 
 
 
-    # Tables ------------------------------------------------------------------
+    # View: Tables ------------------------------------------------------------------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
 
 
-      # Subtopic: FTEs by Category -------
-      # Filters: All LHDs
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("input$filter =")
+      print(input$filter)
+
+
+      ## Subtopic: FTEs by Category -------
+      ## Filters: All LHDs
       if (input$topic == "FTE_numcat" & input$filter == "All LHDs") {
 
         data <- return_survey_weighted_counts("FTE_numcat") %>%
@@ -586,7 +595,7 @@ mod_workforce_server <- function(id){
         # Subtopic: FTEs per capita, Total FTEs
         # Filters: All LHDs
       } else if (input$topic %in% c("c5q37", "fte_bypop") & input$filter == "All LHDs") {
-        data <- return_survey_weighted_statistics(input$type_fte) %>%
+        data <- return_survey_weighted_statistics(input$topic) %>%
           dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter])))%>%
           dplyr::select(category, group, y, subtitle, Responses) %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
@@ -607,7 +616,7 @@ mod_workforce_server <- function(id){
         # Subtopic: Employees: Per capita, Total -------
         # Filters: All LHDs
       } else if (input$topic %in% c("c5q36", "employee_bypop") & input$filter == "All LHDs") {
-        data <- return_survey_weighted_statistics(input$type_emp) %>%
+        data <- return_survey_weighted_statistics(input$topic) %>%
           dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == "All LHDs"])))%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
@@ -680,7 +689,7 @@ mod_workforce_server <- function(id){
         # Subtopic: FTEs Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic %in% c("c5q37", "fte_bypop") & input$filter != "All LHDs") {
-        data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
+        data <- return_survey_weighted_statistics(input$topic, input$filter)  %>%
           dplyr::mutate(x_label = NA)%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
           dplyr::mutate('y_All LHDs' = mean(y, na.rm = TRUE), 'Responses_All LHDs' = sum(Responses)) %>%
@@ -710,7 +719,7 @@ mod_workforce_server <- function(id){
         # Subtopic: Employees Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic %in% c("c5q36", "employee_bypop") & input$filter != "All LHDs") {
-        data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
+        data <- return_survey_weighted_statistics(input$topic, input$filter)  %>%
           dplyr::mutate(x_label = NA)%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
           dplyr::mutate('y_All LHDs' = mean(y, na.rm = TRUE), 'Responses_All LHDs' = sum(Responses)) %>%
@@ -722,8 +731,8 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "occupation_class" ) {
         req(length(input$classifications) >= 1) # prevent error
 
-        selected_vars <- c(paste0(input$classifications, input$type_class))
-        selected_data <- get(paste0("classification_data_", input$type_class))
+        selected_vars <- c(paste0(input$classifications, input$topic))
+        selected_data <- get(paste0("classification_data_", input$topic))
         data <- selected_data %>%
           dplyr::filter(Question %in% selected_vars) %>%
           dplyr::filter(filter %in% input$filter)
@@ -742,7 +751,7 @@ mod_workforce_server <- function(id){
 
 
 
-    #   else if (input$topic == "jobs" & input$type_jobs == "jobs_total" & input$filter != "All LHDs") {
+    #   else if (input$topic == "jobs" & input$topic_jobs == "jobs_total" & input$filter != "All LHDs") {
     #
     #     data <- jobs_data %>%
     #       dplyr::select(1:7, 14:20) %>%
@@ -780,18 +789,13 @@ mod_workforce_server <- function(id){
       #add topic value for function
       topic = input$topic
 
-      workforce_input <- get_workforce_input()
-
-      subtopic <- workforce_input
-
-
       # Define colors reactively based on the filter
       colors <- colors()
 
       #debugging
       # message("Before case_when - unique category values in dataset:")
       # print(unique(data$category))
-      # print(data)
+      print(data)
 
       # Determine the category based on the input filter
       category <- case_when(
@@ -809,7 +813,7 @@ mod_workforce_server <- function(id){
 
 
       # Call the table creation function with the appropriate data and parameters
-      create_non_time_table(data, category, colors, topic, subtopic)
+      create_non_time_table(data, category, colors, topic)
     })
 
 
