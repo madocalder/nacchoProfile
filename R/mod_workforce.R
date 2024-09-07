@@ -565,130 +565,121 @@ mod_workforce_server <- function(id){
 
 
 
-    # For Tables--------
 
+
+    # Tables ------------------------------------------------------------------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
 
 
-
-
-##all lhds------------
-
       # Subtopic: FTEs by Category -------
       # Filters: All LHDs
-      if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter == "All LHDs") {
+      if (input$topic == "FTE_numcat" & input$filter == "All LHDs") {
 
         data <- return_survey_weighted_counts("FTE_numcat") %>%
-          dplyr::mutate(x_label = NA)%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
           dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
                                                     TRUE ~ category))
 
 
-        # Subtopic: FTEs per capita, Total FTEs -------
+        # Subtopic: FTEs per capita, Total FTEs
         # Filters: All LHDs
-      } else if (input$topic == "c5q37" & input$type_fte != "FTE_numcat" & input$filter == "All LHDs") {
+      } else if (input$topic %in% c("c5q37", "fte_bypop") & input$filter == "All LHDs") {
         data <- return_survey_weighted_statistics(input$type_fte) %>%
-          dplyr::mutate(x_label = NA,
-                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter])))%>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter])))%>%
           dplyr::select(category, group, y, subtitle, Responses) %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
           dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
                                                     TRUE ~ category))
 
-        # Subtopic: Employees by Category -------
+
+        # Subtopic: Employees by Category
         # Filters: All LHDs
-      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter == "All LHDs") {
-
-          data <- return_survey_weighted_counts("employee_numcat") %>%
-            dplyr::mutate(x_label = NA)%>%
-            dplyr::select(category, group, y, subtitle, Responses)  %>%
-            tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
-            dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
-                                                      TRUE ~ category))
+      } else if (input$topic == "employee_numcat" & input$filter == "All LHDs") {
+        data <- return_survey_weighted_counts("employee_numcat") %>%
+          dplyr::select(category, group, y, subtitle, Responses)  %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
 
 
-          # Subtopic: Employees: Per capita, Total -------
-          # Filters: All LHDs
-        } else if (input$topic == "c5q36" & input$type_emp != "employee_numcat" & input$filter == "All LHDs") {
-          data <- return_survey_weighted_statistics(input$type_emp) %>%
-            dplyr::mutate(x_label = NA,
-                          subtitle = paste0("By ", names(landscape_filters[landscape_filters == "All LHDs"])))%>%
-            dplyr::select(category, group, y, subtitle, Responses)  %>%
-            tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
-            dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
-                                                      TRUE ~ category))
-
-          # Subtopic: Jobs Added/Lost Total -------
-          # Filters: All LHDs
-        } else if (input$topic == "jobs" & input$type_jobs == "jobs_total" & input$filter == "All LHDs") {
-
-          data <- jobs_data %>%
-            dplyr::select(1:7, 14:20) %>%
-            dplyr::mutate(x = as.numeric(as.factor(group))-1,
-                          group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
-                                                   TRUE ~ group)) %>%
-            dplyr::select(group, category, y, x, total_employees, Responses, filter)%>%
-            # dplyr::rename(category = Question)%>%
-            dplyr::filter(filter == "All LHDs") %>%
-            dplyr::select(category, group, y, Responses) %>%
-            # dplyr::mutate(subtitle = paste0("By All LHDs"))%>%
-            tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))%>%
-            dplyr::ungroup()%>%
-            dplyr::rename(category = group)%>%
-            dplyr::select(category, `y_Jobs Added`, `y_Jobs Lost`,
-                          `Responses_Jobs Lost`,`Responses_Jobs Added` )
-
-
-        } else if (input$topic == "jobs" & input$type_jobs == "jobs_standard" & input$filter == "All LHDs") {
-
-          data <- jobs_data %>%
-            dplyr::select(1:7, 14:20) %>%
-            dplyr::mutate(x = as.numeric(as.factor(group))-1,
-                          group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
-                                                   TRUE ~ group)) %>%
-            dplyr::select(group, category, y, x, total_employees, Responses, filter)%>%
-            dplyr::filter(filter == "All LHDs") %>%
-            dplyr::select(category, group, y, Responses, total_employees) %>%
-            # dplyr::mutate(subtitle = paste0("By All LHDs"))%>%
-            tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))%>%
-            dplyr::ungroup() %>%
-            dplyr::rename(category = group) %>%
-            dplyr::mutate(
-              `y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
-              `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
-              y_Difference = `y_Jobs Added` - `y_Jobs Lost`) %>%
-            dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
-                          `Responses_Jobs Lost`,`Responses_Jobs Added` ) %>%
-            dplyr::mutate(`Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
-                          `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`)
-
-
-#filters---------------
-        # Subtopic: FTEs by Category -------
-        # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q37" & input$type_fte == "FTE_numcat" & input$filter != "All LHDs") {
-
-        data <- return_survey_weighted_counts("FTE_numcat", input$filter)  %>%
-          dplyr::mutate(x_label = NA)%>%
-          dplyr::select(category, group, y, subtitle, Responses)%>%
-          dplyr::group_by(category)%>%
-          dplyr::mutate('Responses_All LHDs' = sum(Responses), 'y_All LHDs' = mean(y, na.rm = TRUE))%>%
-          dplyr::ungroup() %>%
+        # Subtopic: Employees: Per capita, Total -------
+        # Filters: All LHDs
+      } else if (input$topic %in% c("c5q36", "employee_bypop") & input$filter == "All LHDs") {
+        data <- return_survey_weighted_statistics(input$type_emp) %>%
+          dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == "All LHDs"])))%>%
+          dplyr::select(category, group, y, subtitle, Responses)  %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))%>%
           dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
                                                     TRUE ~ category))
 
 
 
+        # Subtopic: Jobs Added/Lost Total -------
+        # Filters: All LHDs
+      } else if (input$topic == "jobs_total" & input$filter == "All LHDs") {
+        data <- jobs_data %>%
+          dplyr::select(1:7, 14:20) %>%
+          dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                        group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                                 TRUE ~ group)) %>%
+          dplyr::select(group, category, y, x, total_employees, Responses, filter)%>%
+          # dplyr::rename(category = Question)%>%
+          dplyr::filter(filter == "All LHDs") %>%
+          dplyr::select(category, group, y, Responses) %>%
+          # dplyr::mutate(subtitle = paste0("By All LHDs"))%>%
+          tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))%>%
+          dplyr::ungroup()%>%
+          dplyr::rename(category = group)%>%
+          dplyr::select(category, `y_Jobs Added`, `y_Jobs Lost`,
+                        `Responses_Jobs Lost`,`Responses_Jobs Added` )
+
+
+
+        # Subtopic: Jobs Added/Lost Standardized -------
+        # Filters: All LHDs
+      } else if (input$topic == "jobs_standard" & input$filter == "All LHDs") {
+        data <- jobs_data %>%
+          dplyr::select(1:7, 14:20) %>%
+          dplyr::mutate(x = as.numeric(as.factor(group))-1,
+                        group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
+                                                 TRUE ~ group)) %>%
+          dplyr::select(group, category, y, x, total_employees, Responses, filter) %>%
+          dplyr::filter(filter == "All LHDs") %>%
+          dplyr::select(category, group, y, Responses, total_employees) %>%
+          # dplyr::mutate(subtitle = paste0("By All LHDs"))%>%
+          tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+          dplyr::ungroup() %>%
+          dplyr::rename(category = group) %>%
+          dplyr::mutate(
+            `y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
+            `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
+            y_Difference = `y_Jobs Added` - `y_Jobs Lost`) %>%
+          dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
+                        `Responses_Jobs Lost`,`Responses_Jobs Added` ) %>%
+          dplyr::mutate(`Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+                        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`)
+
+
+
+        # Subtopic: FTEs by Category -------
+        # Filters: Rurality, Governance, LHD Size, Region
+      } else if (input$topic == "FTE_numcat" & input$filter != "All LHDs") {
+        data <- return_survey_weighted_counts("FTE_numcat", input$filter)  %>%
+          dplyr::select(category, group, y, subtitle, Responses) %>%
+          dplyr::group_by(category) %>%
+          dplyr::mutate('Responses_All LHDs' = sum(Responses), 'y_All LHDs' = mean(y, na.rm = TRUE)) %>%
+          dplyr::ungroup() %>%
+          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+          dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
+                                                    TRUE ~ category))
+
 
 
         # Subtopic: FTEs Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q37" & input$type_fte != "FTE_numcat" & input$filter != "All LHDs") {
-
+      } else if (input$topic %in% c("c5q37", "fte_bypop") & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
           dplyr::mutate(x_label = NA)%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
@@ -697,19 +688,16 @@ mod_workforce_server <- function(id){
           dplyr::mutate(category = dplyr::case_when(category == "All Lhds" ~ "All LHDs",
                                                     TRUE ~ category))
 
+
         # Subtopic: Employees by Category -------
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q36" & input$type_emp == "employee_numcat" & input$filter != "All LHDs") {
-
+      } else if (input$topic == "employee_numcat" & input$filter != "All LHDs") {
         data_all <- return_survey_weighted_counts("employee_numcat") %>%
-          dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, group, y, Responses)  %>%
           dplyr::group_by(category)%>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 
-
         data <- return_survey_weighted_counts("employee_numcat", input$filter) %>%
-          dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
           dplyr::group_by(category)%>%
           dplyr::left_join(data_all %>% dplyr::select(category, `y_All LHDs`), by = "category") %>%
@@ -718,10 +706,10 @@ mod_workforce_server <- function(id){
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 
 
+
         # Subtopic: Employees Total and Per Capita -------
         # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "c5q36" & input$type_emp != "employee_numcat" & input$filter != "All LHDs") {
-
+      } else if (input$topic %in% c("c5q36", "employee_bypop") & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics(input$type_fte, input$filter)  %>%
           dplyr::mutate(x_label = NA)%>%
           dplyr::select(category, group, y, subtitle, Responses)  %>%
@@ -731,27 +719,26 @@ mod_workforce_server <- function(id){
                                                     TRUE ~ category))
 
 
-    } else if (input$topic == "occupation_class" ) {
+      } else if (input$topic == "occupation_class" ) {
+        req(length(input$classifications) >= 1) # prevent error
 
-      req(length(input$classifications) >= 1)
+        selected_vars <- c(paste0(input$classifications, input$type_class))
+        selected_data <- get(paste0("classification_data_", input$type_class))
+        data <- selected_data %>%
+          dplyr::filter(Question %in% selected_vars) %>%
+          dplyr::filter(filter %in% input$filter)
 
-      selected_vars <- c(paste0(input$classifications, input$type_class))
-      selected_data <- get(paste0("classification_data_", input$type_class))
-      data <- selected_data %>%
-        dplyr::filter(Question %in% selected_vars) %>%
-        dplyr::filter(filter %in% input$filter)
+        data <- data %>%
+          dplyr::filter(category == "Yes") %>%
+          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                        x = 1:length(category) -1,
+                        x_label = NA) %>%
+          dplyr::select(category, group, subtitle, y, Responses)%>%
+          dplyr::mutate('y_All LHDs' = mean(y, na.rm = TRUE), 'Responses_All LHDs' = sum(Responses)) %>%
+          tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+          dplyr::rename(category = group)
 
-      data <- data %>%
-        dplyr::filter(category == "Yes") %>%
-        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
-                      x = 1:length(category) -1,
-                      x_label = NA) %>%
-        dplyr::select(category, group, subtitle, y, Responses)%>%
-        dplyr::mutate('y_All LHDs' = mean(y, na.rm = TRUE), 'Responses_All LHDs' = sum(Responses)) %>%
-        tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
-        dplyr::rename(category = group)
-
-    }
+      }
 
 
 
