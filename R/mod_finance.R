@@ -363,120 +363,166 @@ mod_finance_server <- function(id){
     })
 
 
-    # used for budget changes
+    # used for the tree map
     output$figure_tree <- highcharter::renderHighchart({
       req(input$topic == "non_weighted_revenue_total")
 
-      data <- revenue_percentages %>%
-        dplyr::rename(name = revenue_type) %>%
-        dplyr::mutate(id = paste(name, sep = " "),
-                      value = round(percentage*100,1)) %>%
-        dplyr::select(id, name, value)
+      if (input$filter == "All LHDs") {
 
-      add_info <- data.frame(
-        color = naccho.viz::green
-      )
+        data <- revenue_percentages %>%
+          dplyr::rename(name = revenue_type) %>%
+          dplyr::mutate(id = paste(name, sep = " "),
+                        value = round(percentage*100,1)) %>%
+          dplyr::select(id, name, value)
 
-      data <- cbind(data, add_info)
+        add_info <- data.frame(
+          color = naccho.viz::green
+        )
 
+        data <- cbind(data, add_info)
 
-      # Create the grouped treemap with specified colors
-      highchart() %>%
-        hc_add_series(
-          type = "treemap",
-          layoutAlgorithm = "squarified",
-          data = list_parse(data),
-          allowDrillToNode = TRUE,           # Enables zooming into the groups
-          borderColor = "#FFFFFF",
-          borderWidth = 2
-        ) %>%
-        hc_title(text = "Grouped Treemap: Revenue Sources by Gender") %>%
-        hc_tooltip(pointFormat = "<b>{point.name}:</b> {point.value}%") %>%
-        highcharter::hc_plotOptions(
-          series = list(
-            dataLabels = list(
-              enabled = TRUE,
-              color = "black",
-              align = "center",
-              verticalAlign = "middle",
-              allowOverlap = TRUE,             # Allow labels to overlap other labels
-              overflow = "allow",
-              format = '<b>{point.name}</b> <br> {point.value}%',
-              style = list(
-                fontSize = "13px",
-                fontFamily = "Heebo",
-                fontWeight = 300,
-                textOutline = "none"
+        # Create the grouped treemap with specified colors
+        highcharter::highchart() %>%
+          hc_add_series(
+            type = "treemap",
+            layoutAlgorithm = "squarified",
+            data = list_parse(data),
+            allowDrillToNode = TRUE, # enables drill down
+            borderColor = "#FFFFFF",
+            borderWidth = 2
+          ) %>%
+          highcharter::hc_plotOptions(
+            series = list(
+              dataLabels = list(
+                enabled = TRUE,
+                color = "black",
+                align = "center",
+                verticalAlign = "middle",
+                allowOverlap = TRUE,
+                overflow = "allow",
+                format = '<b>{point.name}</b> <br> {point.value}%',
+                style = list(
+                  fontSize = "13px",
+                  fontFamily = "Heebo",
+                  fontWeight = 300,
+                  textOutline = "none"
+                )
               )
             )
-          )
-        ) %>%
-        viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
-                    viz_subtitle = "Estimated Across All LHDs",
-                    viz_caption = source_line,
-                    caption_align = "center",
-                    tooltip = "{point.value}% of all LHD revenue came from {point.name}",
-                    legend_enable = TRUE)
+          ) %>%
+          viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
+                      viz_subtitle = "Estimated Across All LHDs",
+                      viz_caption = source_line,
+                      caption_align = "center",
+                      tooltip = "{point.value}% of all LHD revenue came from <b>{point.name} sources.</b>",
+                      legend_enable = TRUE)
 
-      ###FOR GROUPS
-      # data <- revenue_percentages_filter %>%
-      #   dplyr::filter(filter == "urbanrural2022") %>%
-      #   dplyr::rename(name = revenue_type,
-      #                 parent = category) %>%
-      #   dplyr::mutate(id = paste(name, parent, sep = " "),
-      #                 value = round(percentage*100,1)) %>%
-      #   dplyr::select(id, name, parent, value)
-      #
-      # add_info <- data.frame(
-      #   id = c("Urban", "Rural"),
-      #   name = c("Urban", "Rural"),
-      #   parent = c("Overall", "Overall"),
-      #   value = c(NA, NA)
-      # )
-      #
-      # data <- rbind(data, add_info)
-      #
-      # # Define the specific colors for each parent group
-      # male_color <- naccho.viz::teal   # Blue for male
-      # female_color <- naccho.viz::pink # Orange for female
-      #
-      # # Assign colors directly in the data for the parent nodes
-      # data <- data %>%
-      #   mutate(
-      #     color = case_when(
-      #       id == "Rural" ~ male_color,       # Assign male group color
-      #       id == "Urban" ~ female_color,   # Assign female group color
-      #       TRUE ~ NA_character_             # Others will inherit colors automatically or stay default
-      #     )
-      #   )
-      #
-      #
-      #
-      # # Create the grouped treemap with specified colors
-      # highchart() %>%
-      #   hc_add_series(
-      #     type = "treemap",
-      #     layoutAlgorithm = "squarified",
-      #     data = list_parse(data),   # Ensure colors are passed correctly
-      #     allowDrillToNode = TRUE,           # Enables zooming into the groups
-      #     borderColor = "#FFFFFF",
-      #     borderWidth = 2
-      #   ) %>%
-      #   hc_title(text = "Grouped Treemap: Revenue Sources by Gender") %>%
-      #   hc_tooltip(pointFormat = "<b>{point.name}:</b> {point.value}%") %>%
-      #   hc_plotOptions(
-      #     series = list(
-      #       dataLabels = list(
-      #         enabled = TRUE,
-      #         format = '{point.name} <br> {point.value}%',
-      #         align = "center",
-      #         verticalAlign = "middle",
-      #         style = list(fontSize = "12px", fontWeight = "bold", color = "#000000"),
-      #         textOutline = "none"
-      #       )
-      #     )
-      #   )
-      #
+      } else {
+
+        data <- revenue_percentages_filter %>%
+          dplyr::filter(filter == input$filter) %>%
+          dplyr::rename(name = revenue_type,
+                        parent = category) %>%
+          dplyr::mutate(id = paste(name, parent, sep = " "),
+                        value = round(percentage*100,1)) %>%
+          dplyr::select(id, name, parent, value)
+
+        id_values <- unique(data$parent)
+
+        add_info <- data.frame(
+          id = id_values,
+          name = id_values,
+          parent = "Overall",
+          value = NA
+        )
+
+        # bind data
+        data <- rbind(data, add_info)
+
+
+        # set colors for each parent group
+        set_colors <- c(
+          naccho.viz::teal,
+          naccho.viz::pink,
+          naccho.viz::terracotta,
+          naccho.viz::green
+        )
+
+        # map colors and ids
+        color_mapping <- setNames(set_colors[1:length(id_values)], id_values)
+
+        # final data
+        data <- data %>%
+          mutate(
+            color = color_mapping[id]
+          )
+
+        # Create the grouped treemap with specified colors
+        highcharter::highchart() %>%
+          hc_add_series(
+            type = "treemap",
+            layoutAlgorithm = "squarified",
+            data = list_parse(data),
+            allowDrillToNode = TRUE, # enables drill down
+            borderColor = "#FFFFFF",
+            borderWidth = 2,
+            levels = list(
+              list(
+                level = 1,
+                dataLabels = list(
+                  enabled = TRUE,
+                  format = '<b>{point.name}</b>',
+                  align = 'left',
+                  verticalAlign = 'top',
+                  style = list(
+                    fontSize = '15px',
+                    fontWeight = 'bold'
+                  )
+                )
+              ),
+              list(
+                level = 2
+              )
+            )
+          ) %>%
+          highcharter::hc_plotOptions(
+            series = list(
+              dataLabels = list(
+                enabled = TRUE,
+                color = "black",
+                align = "center",
+                verticalAlign = "middle",
+                allowOverlap = TRUE,
+                overflow = "allow",
+                format = '<b>{point.name}</b> <br> {point.value}%',
+                style = list(
+                  fontSize = "13px",
+                  fontFamily = "Heebo",
+                  fontWeight = 300,
+                  textOutline = "none"
+                )
+              )
+            )
+          ) %>%
+          viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
+                      viz_subtitle = "Estimated Across All LHDs",
+                      viz_caption = source_line,
+                      caption_align = "center",
+                      tooltip = "{point.value}% of all LHD revenue came from <b>{point.name} sources.</b>",
+                      legend_enable = TRUE) %>%
+          highcharter::hc_tooltip(
+            useHTML = TRUE,
+            formatter =  highcharter::JS(
+              "function() {
+              if (this.point.node && this.point.node.level === 1) {
+                return '<b>' + this.point.name + '</b>';
+              } else {
+                return this.point.value + '% of all LHD revenue came from <b>' + this.point.name + ' sources.</b>';
+              }
+            }"
+            )
+          )
+      }
     })
 
     # proxy -------------------------------------------------------------------
