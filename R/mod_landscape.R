@@ -308,13 +308,12 @@ mod_landscape_server <- function(id){
           naccho.viz::teal,
           naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
-
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       } else if (input$filter %in% c("All LHDs")) {
-      c(naccho.viz::naccho_blue)
+      c(naccho.viz::navy)
       }
     })
 
@@ -442,9 +441,8 @@ mod_landscape_server <- function(id){
       req(input$view == "Table")
 
       #add topic value for function
-      topic = input$topic
-
-      subtopic = "no subtopic"
+      topic <- input$topic
+      subtopic <- "no subtopic"
 
       # Define colors reactively based on the filter
       colors <- colors()
@@ -460,28 +458,26 @@ mod_landscape_server <- function(id){
       )
 
 
-
       if (input$topic == "field" & input$filter == "All LHDs") {
-
         data <- spec_data_all %>%
-          dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, y, subtitle, Responses) %>%
-          dplyr::summarise(category = category, 'y_All LHDs' = y,
+          dplyr::summarise(category = category,
+                           'y_All LHDs' = y,
                            'Responses_All LHDs' = sum(Responses),
-                           subtitle = subtitle )
+                           subtitle = subtitle)
+
 
         # } else if (input$topic == "tenure" & input$filter == "All LHDs") {
         # data <- return_survey_weighted_statistics("tenure", input$filter) %>%
         #   dplyr::select(category, 'y_ALL LHDs' = y, subtitle, 'Responses_All LHDs' = Responses)
 
+
         } else if (input$filter == "All LHDs") {
-          # Get the data for All LHDs
           data <- return_survey_weighted_counts(input$topic)
 
           # Calculate total responses and 'y_All LHDs'
           total_responses <- sum(data$Responses, na.rm = TRUE)
           data <- data %>%
-            dplyr::mutate(x_label = NA) %>%
             dplyr::mutate(
               y = 100 * (Responses / total_responses),
               Responses = total_responses
@@ -489,10 +485,10 @@ mod_landscape_server <- function(id){
             dplyr::select(category, group, y, Responses) %>%
             dplyr::left_join(., add_all_counts_long(input$topic), by = "category")
 
-      } else if (input$topic == "field" & input$filter != "All LHDs") {
 
+
+      } else if (input$topic == "field" & input$filter != "All LHDs") {
         data <- spec_data %>% dplyr::filter(filter == input$filter) %>%
-          dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, group, y, subtitle, Responses) %>%
           dplyr::group_by(category) %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
@@ -510,10 +506,11 @@ mod_landscape_server <- function(id){
         data <- data %>%
           dplyr::left_join(overall_data, by = "category")
 
+
+
       } else if (input$topic == "tenure" & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics("tenure", input$filter) %>%
             dplyr::mutate(
-              x_label = NA,
               'y_All LHDs' = mean(y, na.rm = TRUE),  # Adjust calculation as needed
               'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
             )  %>%
@@ -521,8 +518,9 @@ mod_landscape_server <- function(id){
             tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
             dplyr::rename(category = group)
 
-      } else if (input$topic == "totpop" & input$filter != "All LHDs") {
 
+
+      } else if (input$topic == "totpop" & input$filter != "All LHDs") {
         data <- master_data %>%
           haven::as_factor() %>%
           dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
@@ -548,24 +546,18 @@ mod_landscape_server <- function(id){
                         'Responses_All LHDs' = overall_totals$'Responses_All LHDs')%>%
           dplyr::rename(category = group)
 
+
+
       } else {
         # Process data as usual for other filters
         data <- return_survey_weighted_counts(input$topic, input$filter) %>%
-          dplyr::mutate(x_label = NA) %>%
           dplyr::select(category, group, y, subtitle, Responses) %>%
           tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
           dplyr::left_join(., add_all_counts_long(input$topic), by = "category") %>%
           dplyr::mutate(
             dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
           )
-
-
-
       }
-
-      # Debugging: Print the column names to check their contents
-      # print(colnames(data))
-      # view(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic, subtopic)

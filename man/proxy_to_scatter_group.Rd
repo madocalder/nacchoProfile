@@ -4,7 +4,15 @@
 \alias{proxy_to_scatter_group}
 \title{Scatter Proxy Redraw}
 \usage{
-proxy_to_scatter_group(hc, data, id = NULL, input, colors = NULL, ...)
+proxy_to_scatter_group(
+  hc,
+  data,
+  data_all,
+  id = NULL,
+  input,
+  colors = NULL,
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}

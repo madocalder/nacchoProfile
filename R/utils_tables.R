@@ -1,4 +1,3 @@
-
 #landscape tables function------
 
 #' Create a Custom Non-Time Table
@@ -33,23 +32,20 @@
 #' }
 #'
 #' @export
-#
 # categorical tables--------
 
 create_non_time_table <- function(data, category, colors, topic, subtopic) {
 
 
-
 data <- data %>%
   dplyr::select(category, everything())  # Move 'category' to the first position
 
-
-if ("y_All LHDs" %in% colnames(data)) {
-  message("y_All LHDs column exists")
-} else {
-  message("y_All LHDs column does not exist")
-}
-
+#
+# if ("y_All LHDs" %in% colnames(data)) {
+#   message("y_All LHDs column exists")
+# } else {
+#   message("y_All LHDs column does not exist")
+# }
 
 
 
@@ -202,13 +198,6 @@ if ("y_All LHDs" %in% colnames(data)) {
     column_definitions <- c(column_definitions, hidden_col_definitions)
 
 
-
-    # print(column_definitions)
-    # print(topic)
-    # print(subtopic)
-    # print(category)
-    # print(data)
-
     # Create the All LHDs reactable table--------
     reactable::reactable(
       data = data,
@@ -221,6 +210,7 @@ if ("y_All LHDs" %in% colnames(data)) {
       bordered = FALSE,
       resizable = TRUE
     )
+
   } else {
     #reactable for other cases--------
     # Handle other cases with the existing logic
@@ -229,12 +219,12 @@ if ("y_All LHDs" %in% colnames(data)) {
       Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
       `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
       Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
-
     )
 
     # If the selected category is defined in group_definitions
     if (category %in% names(group_definitions)) {
       selected_columns <- group_definitions[[category]]$columns
+
     } else {
       # Select all columns that start with 'y_' except 'y_All LHDs'
       selected_columns <- grep("^y_", colnames(data), value = TRUE)
@@ -242,7 +232,6 @@ if ("y_All LHDs" %in% colnames(data)) {
     }
 
 
-    # print(group_definitions)
 #
 #     selected_columns <- group_definitions[[category]]$columns
 #     selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
@@ -313,16 +302,6 @@ if ("y_All LHDs" %in% colnames(data)) {
     )
 
     column_definitions <- c(column_definitions, hidden_col_definitions)
-
-    # print(column_definitions)
-    # print(topic)
-    # print(subtopic)
-    # print(category)
-    # print(data$category)
-    # print(data)
-    # print(group_definitions)
-
-    print(unique(data$category))  # Check if the category has multiple values or just "Governance"
 
 
     reactable::reactable(

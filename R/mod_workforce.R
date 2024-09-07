@@ -53,9 +53,9 @@ mod_workforce_ui <- function(id){
               choiceNames = list(
                 HTML('<i class="fas fa-chart-simple"></i>'), # Chart icon
                 HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
-                HTML('<i class="fas fa-earth-americas"></i>') # Map icon
+                HTML('<i class="fas fa-table"></i>') # Table icon
               ),
-              choiceValues = c("Bar Graph", "Line Graph", "Map")
+              choiceValues = c("Bar Graph", "Line Graph", "Table")
             )
           ),
 
@@ -82,8 +82,8 @@ mod_workforce_ui <- function(id){
               condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
               reactable::reactableOutput(ns("data_table"), height = "auto")
             )
-          ),
-
+          )
+        ),
           # end of main content -----------------------------------------------------
 
         right = div(
@@ -186,7 +186,6 @@ mod_workforce_ui <- function(id){
       )
     )
   )
-  )
 }
 
 #' workforce Server Functions
@@ -202,7 +201,6 @@ mod_workforce_server <- function(id){
       if (input$topic %in% c("FTE_numcat", "employee_numcat", "a", "b")) {
         updateSelectInput(session, "filter",
                           choices = landscape_filters)
-
 
       } else if (input$topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
         updateSelectInput(session, "filter",
@@ -236,16 +234,15 @@ mod_workforce_server <- function(id){
           naccho.viz::teal,
           naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_green,
-          naccho.viz::naccho_orange,
-          naccho.viz::naccho_pink)
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
       } else if (input$filter %in% c("All LHDs")) {
-        c(naccho.viz::naccho_blue,
-          naccho.viz::naccho_orange)
-
-             }
-           })
+        c(naccho.viz::navy,
+          naccho.viz::terracotta)
+      }
+    })
 
 
 
@@ -492,8 +489,8 @@ mod_workforce_server <- function(id){
       }
     })
 
-    
-    
+
+
     # Need to keep separate from above observe
     observeEvent(updated_inputs_class(), {
       req(length(input$classifications) >= 1) # prevents error
