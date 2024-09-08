@@ -1,7 +1,6 @@
 /* MY STYLES */
 
 
-
 /* ---------------------------------------------------------- Data viz views */
 .viz-view {
     display: flex;
@@ -13,7 +12,6 @@
 .btn-group {
   display: inline-block !important;
 }
-
 
 .btn-group>.btn {
     background-color: white;
@@ -29,28 +27,27 @@
     color: #212F5B !important;
 }
 
-/* Hover state for buttons in a .btn-group */
 .btn-group > .btn:hover {
     background-color: white;
     color: #AB6143 !important;
     border: 1.5px solid #AB6143;
 }
 
-/* Focus state for buttons in a .btn-group */
 .btn-group > .btn:focus {
     background-color: white;
     color: #AB6143 !important;
     border: 1.5px solid #AB6143;
 }
 
-/* Active state for buttons in a .btn-group */
 .btn-check:checked+.btn {
     color: #AB6143 !important;
     background-color: white;
     border: 1.5px solid #AB6143;
 }
-/* --------------------------------------------- Dropdown button for measure */
 
+
+
+/* --------------------------------------------- Dropdown button for measure */
 .dropdown-button {
     border-radius: 0 0px 50px 50px !important;
     font-size: 20px;
@@ -68,7 +65,6 @@
     float: left;
     display: inline-block;
 }
-
 
 .dropdown-button:hover {
     color: white !important;
@@ -138,8 +134,8 @@
   margin-top: -30px;
 }
 
-/* -------------------------------------------------- Some Phone Sizing Stuff */
 
+/* -------------------------------------------------- Some Phone Sizing Stuff */
 @media (max-width: 991px) {
   .d-flex {
     display: block !important;
@@ -215,6 +211,10 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
   color: #945548 !important;
 }
 
+#key_findings_1-download:hover, #key_findings_1-download:focus {
+  color: #AB6143;
+}
+
 /* -------------------------------------------------------------- Definitions */
 
 .collapse {
@@ -229,8 +229,9 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
   padding-top: 5px;
 }
 
-/* ------------------------------------------------------------- Dynamic row */
 
+
+/* ------------------------------------------------------------- Dynamic row */
 #workforce_1-dynamic_row {
   transition: all 0.5s ease; /* for a smoothe transiti*/
 }
@@ -249,7 +250,9 @@ a:hover:not(.def-link), a:focus:not(.def-link) {
   margin-top: 25px;
 }
 
-/* ---------------------------------------------------------- Occupation List */
+
+
+/* ------------------------------------------------------ Left Pop Out Lists */
 ::selection {
   background: #80A14E;
   color: white;
@@ -269,9 +272,19 @@ label:not(.material-switch label) {
   margin-left: 60px;
 }
 
-
 .shiny-input-container .radio input {
   margin-right: 10px;
+}
+
+.radio-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.radio-wrap .pretty.p-default {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 
@@ -292,16 +305,14 @@ label:not(.material-switch label) {
   min-height: 400px;
 }
 
-
 .min-height-250 .selectize-dropdown-content {
   min-height: 250px;
 }
 
-
 .selectize-dropdown-content {
   border: 1px solid #ccc;
-  min-width: 150px; /* Set a minimum width */
-  min-height: 50px; /* Set a minimum height */
+  min-width: 150px;
+  min-height: 50px;
   text-align: left !important;
 }
 
@@ -310,11 +321,28 @@ label:not(.material-switch label) {
     color: #212F5B !important;
 }
 
-
 .selectize-input {
   text-align: left !important;
   display: block;
 }
+
+.selectize-input.full {
+  background-color: #F9F8F7 !important;
+}
+
+.selectize-input {
+  border: 1.5px solid #008A96 !important;
+  border-radius: 50px !important;
+}
+
+.selectize-control.single .selectize-input:not(.no-arrow):after {
+  border-top-color: #AB6143 !important; /* Change border color to red */
+  border-width: 11px 11px 0 11px !important;
+  top: 48% !important;
+  right: 10% !important;
+  color: #AB6143 !important;
+}
+
 
 
 
@@ -342,9 +370,9 @@ label:not(.material-switch label) {
 
 .sidebar-content {
     display: flex;
-    align-items: center; /* Vertically center */
-    justify-content: center; /* Horizontally center, optional */
-    height: 100vh; /* Full viewport height */
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 .nav-tabs {
@@ -492,7 +520,6 @@ label:not(.material-switch label) {
 .home-content-carousel {
   margin-top: 21.5em !important;
   padding-right: 2em !important;
-  /* border-left: 1.5px solid #008A96 !important; */
 }
 
 
@@ -536,8 +563,8 @@ label:not(.material-switch label) {
 
 .key-findings-content {
   padding-top: 4em;
-  padding-left: 4em;
-  padding-right: 5em;
+  padding-left: 11em;
+  padding-right: 12em;
 }
 
 .carousel-control-prev {
@@ -667,9 +694,9 @@ label:not(.material-switch label) {
   bottom: 0;
   left: 0;
   height: 1em; /* Initial height of the footer line */
-  overflow: hidden; /* Hide the content initially */
-  transition: height 0.3s ease-in-out; /* Smooth transition for expanding */
-  cursor: pointer; /* Change cursor to indicate it's interactive */
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 .footer:hover {
@@ -709,16 +736,16 @@ label:not(.material-switch label) {
 }
 
 .scroll-desc {
-    -ms-overflow-style: none;  /* IE and Edge */
+    -ms-overflow-style: none;  /* Edge */
     scrollbar-width: none;  /* Firefox */
 }
 
 .scroll-desc {
     min-height: 5em;
     max-height: 5em;
-    overflow-y: auto; /* Enables vertical scrolling */
-    overflow-x: hidden; /* Hides horizontal scrolling */
-    padding-right: 8em; /* Optional: Adds some padding inside the div */
+    overflow-y: auto; /* vertical scrolling */
+    overflow-x: hidden;
+    padding-right: 8em;
     margin-bottom: 1.5em;
 }
 
@@ -793,7 +820,6 @@ label:not(.material-switch label) {
 
 .hover-text-side .icon {
   display: inline-block;
-  /* Add any specific styles for the icon */
 }
 
 .hover-text-side .hover-text-content-side {
@@ -816,7 +842,7 @@ label:not(.material-switch label) {
 .hover-text-side .hover-text-content-side::before {
   content: '';
   position: absolute;
-  top: -10px; /* Adjust as needed to position the triangle */
+  top: -10px;
   left: 50%; /* Center the triangle horizontally */
   transform: translateX(-50%);
   border-width: 5px;
@@ -830,16 +856,7 @@ label:not(.material-switch label) {
 }
 
 
-
-/* ------------------------------------------------------- THESE NEED LABELS */
-
-/*
-.form-control {
-  background-color: transparent !important;
-  border-radius: 50px !important;
-}
-*/
-
+/* -------------------------------------------------- Key findings search bar */
 .search-input {
   position: relative;
   display: inline-block;
@@ -847,46 +864,24 @@ label:not(.material-switch label) {
 }
 
 .search-input input[type="text"] {
-  padding-left: 3em; /* Adjust as necessary for the icon size */
+  padding-left: 3em; /* Adjust for the icon size */
   padding-top: 1em;
 }
 
 .search-input::before {
-  padding-left: 1em; /* Adjust as necessary for the icon size */
+  padding-left: 1em; /* Adjust for the icon size */
   padding-bottom: .3em;
   content: "\f002"; /* Unicode for the FontAwesome search icon */
   font-family: "FontAwesome";
   position: absolute;
-  left: 0.5em; /* Adjust as necessary */
+  left: 0.5em;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
 }
 
 
-.offcanvas-body {
-  padding: 0;
-}
-
-.sidebar {
-  min-height: 100%;
-}
-
-
-.offcanvas-menu-trigger{
-  position: absolute;
-  top: 0.25rem;
-  left: 0.25rem;
-}
-
-#offcanvas-menu{
-  width: 250px;
-}
-
-
-
-
-
+/* ---------------------------------------------------- General Button Styles */
 .my-button {
   border: .75px solid #C1C1C1 !important;
   border-radius: 5px !important; /* Make it pill-shaped */
@@ -914,13 +909,13 @@ label:not(.material-switch label) {
 
 
 
-
+/* ----------------------------------------------------- Left Side Bar Styles */
 .color-block {
   background-color: #EEEAE5;
   height: 80vh;
-  border-radius: 0 50px 50px 50px; /* Top left: 0, Other sides: 50px */
+  border-radius: 0 50px 50px 50px;
   width: 100%;
-  z-index: -1; /* Place behind other content */
+  z-index: -1;
   align-content: baseline;
   overflow: hidden;
   overflow-y: auto;
@@ -930,8 +925,8 @@ label:not(.material-switch label) {
  .color-block-header {
   background-color: #EEEAE5; /* Match the parent background color */
   border-radius: 0 50px 0 0; /* Only top corners rounded */
-  padding: 10px; /* Adjust padding as needed */
-  z-index: 1; /* Ensure it stays above the scrollable content */
+  padding: 10px;
+  z-index: 1; /* to stay above the scrollable stuff */
   width: 100%;
   margin-top: 20px;
   margin-left: -20px;
@@ -961,11 +956,9 @@ label:not(.material-switch label) {
   margin-left: -20px;
 }
 
-/*.fa, .fa-brands, .fa-classic, .fa-regular, .fa-sharp, .fa-solid, .fab, .far, .fas {
-  display: block !important;
-}*/
 
-.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick, .fa-chart-scatter, .fa-chart-tree-map) {
+/* ------------------------------------------------------- Font Awesome Stuff */
+.fas:not(.fa-filter, .fa-chart-simple, .fa-chart-line, .fa-earth-americas, .fa-table, .fa-chart-candlestick, .fa-chart-scatter, .fa-chart-tree-map, .fa-chart-bar) {
   color: #008A96;
 }
 
@@ -974,31 +967,7 @@ label:not(.material-switch label) {
 }
 
 
-.download-input {
-  position: relative;
-  display: inline-block;
-}
-
-.download-input input[type="text"] {
-}
-
-.download-input::before {
-  content: "\f063"; /* Unicode for the FontAwesome search icon */
-  font-family: "FontAwesome";
-  position: absolute;
-  left: 0em; /* Adjust as necessary */
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  margin-left: -20px;
-}
-
-
-#key_findings_1-download:hover, #key_findings_1-download:focus {
-  color: #AB6143;
-}
-
-
+/* ---------------------------------------------- General Page Layout Styles */
 .col-pad {
   padding-left: 45px;
   padding-right: 45px;
@@ -1013,12 +982,37 @@ label:not(.material-switch label) {
   padding-right: 5%;
 }
 
+.home-content {
+  padding-top: 7em;
+  padding-left: 6em;
+  padding-right: 6em;
+  padding-bottom: 4em;
+}
 
+.viz-content {
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 2em;
+}
+
+.viz-content-buttons {
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 0em !important;
+}
+
+.context-content {
+  padding-left: 2.5em !important;
+  padding-right: 2em !important;
+}
+
+
+
+/* ---------------------------------------------------------- HR line styles */
 hr:not(.tt, .right-hr) {
   border-top: 1.5px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
-/*  margin-bottom: -10px;*/
   margin-left: 50px;
   margin-right: 50px;
   margin-top: 45px;
@@ -1038,6 +1032,46 @@ hr .tt {
   margin-left: auto;
   margin-right: auto;
   width: 85%;
+}
+
+
+
+/* -------------------------------------------- Stuff that I need to organize */
+.offcanvas-body {
+  padding: 0;
+}
+
+.sidebar {
+  min-height: 100%;
+}
+
+.offcanvas-menu-trigger{
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+}
+
+#offcanvas-menu{
+  width: 250px;
+}
+
+.download-input {
+  position: relative;
+  display: inline-block;
+}
+
+.download-input input[type="text"] {
+}
+
+.download-input::before {
+  content: "\f063"; /* Unicode for the FontAwesome search icon */
+  font-family: "FontAwesome";
+  position: absolute;
+  left: 0em;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  margin-left: -20px;
 }
 
 p {
@@ -1074,51 +1108,8 @@ b, strong {
   color: #212F5B;
 }
 
-.selectize-input.full {
-  background-color: #F9F8F7 !important;
-}
 
-.selectize-input {
-  border: 1.5px solid #008A96 !important;
-  border-radius: 50px !important;
-}
-
-.selectize-control.single .selectize-input:not(.no-arrow):after {
-  border-top-color: #AB6143 !important; /* Change border color to red */
-  border-width: 11px 11px 0 11px !important;
-  top: 48% !important;
-  right: 10% !important;
-  color: #AB6143 !important;
-}
-
-.home-content {
-  padding-top: 7em;
-  padding-left: 6em;
-  padding-right: 6em;
-  padding-bottom: 4em;
-}
-
-.viz-content {
-  padding-left: 4em;
-  padding-right: 4em;
-  padding-top: 2em;
-}
-
-.viz-content-buttons {
-  padding-left: 4em;
-  padding-right: 4em;
-  padding-top: 0em !important;
-}
-
-.context-content {
-  padding-left: 2.5em !important;
-  padding-right: 2em !important;
-}
-
-
-
-/* HIGHCHARTS */
-
+/* -------------------------------------------------------  Highcharter Things */
 .highcharts-tooltip span {
     height: auto;
     min-width: 200px;

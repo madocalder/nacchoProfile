@@ -67,13 +67,13 @@ mod_workforce_ui <- function(id){
 
             # display when map is selected and view is not Table
             conditionalPanel(
-              condition = paste('input["', ns("topic"), '"] != "jobs" && input["', ns("view"), '"] != "Table"', sep = ""),
+              condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               highcharter::highchartOutput(ns("figure"), height = 575)
             ),
 
             # display when map is not selected and view is not Table
             conditionalPanel(
-              condition = paste('input["', ns("topic"), '"] == "jobs" && input["', ns("view"), '"] != "Table"', sep = ""),
+              condition = paste0("input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               highcharter::highchartOutput(ns("figure_jobs"), height = 675)
             ),
 
@@ -208,7 +208,7 @@ mod_workforce_server <- function(id){
 
       } else if (input$topic %in% c("jobs_total", "jobs_standard")) {
         updateSelectInput(session, "filter",
-                          choices = "All LHDs")
+                          choices = "All Filters")
       }
     })
 

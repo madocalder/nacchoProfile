@@ -42,137 +42,105 @@ mod_key_findings_ui <- function(id){
             controls = TRUE,
             class = "carousel-dark alt-2",
             bsutils::carouselItem(
-              div(
-                class = "row",
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_one"))
-                    )
-                  )
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
                 ),
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_two"))
-                    )
-                  )
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_one"))
                 )
               ),
               interval = 60000L
             ),
             bsutils::carouselItem(
-              div(
-                class = "row",
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_three"))
-                    )
-                  )
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
                 ),
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_four"))
-                    )
-                  )
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_two"))
                 )
               ),
               interval = 60000L
             ),
             bsutils::carouselItem(
-              div(
-                class = "row",
-                div(
-                  class = "col-lg-6",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_five"))
-                    )
-                  )
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
                 ),
-                div(
-                  class = "col-lg-6",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_six"))
-                    )
-                  )
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_three"))
                 )
               ),
               interval = 60000L
             ),
             bsutils::carouselItem(
-              div(
-                class = "row",
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_seven"))
-                    )
-                  )
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
                 ),
-                div(
-                  class = "col-xl-6 col-lg-12",
-                  align = "center",
-                  bslib::card(
-                    height = 600,
-                    class = "key-findings-cards",
-                    bslib::card_header(
-                      fill = FALSE
-                    ),
-                    bslib::card_body(
-                      highcharter::highchartOutput(ns("finding_eight"))
-                    )
-                  )
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_four"))
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
+                ),
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_five"))
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
+                ),
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_six"))
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
+                ),
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_seven"))
+                )
+              ),
+              interval = 60000L
+            ),
+            bsutils::carouselItem(
+              bslib::card(
+                height = 600,
+                class = "key-findings-cards",
+                bslib::card_header(
+                  fill = FALSE
+                ),
+                bslib::card_body(
+                  highcharter::highchartOutput(ns("finding_eight"))
                 )
               ),
               interval = 60000L
