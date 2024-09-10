@@ -438,7 +438,7 @@ mod_landscape_server <- function(id){
     })
 
 
-   #tables output
+   #Tables output ------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
 
