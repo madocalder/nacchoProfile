@@ -468,11 +468,6 @@ mod_landscape_server <- function(id){
                            subtitle = subtitle)
 
 
-        # } else if (input$topic == "tenure" & input$filter == "All LHDs") {
-        # data <- return_survey_weighted_statistics("tenure", input$filter) %>%
-        #   dplyr::select(category, 'y_ALL LHDs' = y, subtitle, 'Responses_All LHDs' = Responses)
-
-
         } else if (input$filter == "All LHDs") {
           data <- return_survey_weighted_counts(input$topic)
 
