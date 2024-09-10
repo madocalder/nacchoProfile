@@ -1,16 +1,18 @@
 ## code to prepare `landscape_topics` dataset goes here
 landscape_topics <- list(
-  "Jurisdiction & Governance" = list("Population Served" = "totpop",
-                                     "Governance" = "c0govcatn",
-                                     "Structure" = "c2q501",
-                                     "Board of Health" = "lboh"),
+  "Population Characteristics" = list("Population Served" = "totpop"
+  ),
+  "Agency Characteristics" = list("Governance" = "c0govcatn",
+                                  "Structure" = "c2q501",
+                                  "Board of Health" = "lboh"),
 
-  "Top Executives" = list("Age" = "age_cat",
-                          "Race" = "race",
-                          "Tenure" = "tenure",
-                          "Highest Degree" = "c4q34",
-                          "Specialization" = "field",
-                          "Gender" = "c4q29")
+  "Executive Characteristics" = list("Age" = "age_cat",
+                                     "Race" = "race",
+                                     "Tenure" = "tenure",
+                                     "Highest Degree" = "c4q34",
+                                     "Specialization" = "field",
+                                     "Gender" = "c4q29"),
+  "Partnerships" = list("Formal & Informal" = "work")
 )
 
 usethis::use_data(landscape_topics, overwrite = TRUE)

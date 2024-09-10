@@ -253,21 +253,6 @@ mod_services_server <- function(id){
       }
     })
 
-    colors_scatter <- reactive ({
-      if (input$filter == "urbanrural2022") {
-        c("#1A2545",
-          "#2C6A77")
-      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c("#1A2545",
-          "#2C6A77",
-          "#7A3C23")
-      } else if (input$filter == "censusregion") {
-        c("#1A2545",
-          "#2C6A77",
-          "#7A3C23",
-          "#B090B1")
-      }
-    })
 
 
     # main content ============================================================
@@ -291,6 +276,8 @@ mod_services_server <- function(id){
       input$filter
       input$service_changes_single
     }) %>% debounce(100)
+
+
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
@@ -512,7 +499,7 @@ mod_services_server <- function(id){
                                  data_all = data_all,
                                  input = input$filter,
                                  id = series_id,
-                                 colors = colors_scatter())
+                                 colors = colors())
 
 
       } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {

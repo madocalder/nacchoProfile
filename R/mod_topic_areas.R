@@ -26,7 +26,7 @@ mod_topic_areas_ui <- function(id){
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
-                choices = finance_topics,
+                choices = other_topics,
                 selectize = TRUE
               )
             ),
@@ -63,7 +63,8 @@ mod_topic_areas_ui <- function(id){
 
           div(
             class = "viz-content",
-            "things here"
+
+              highcharter::highchartOutput(ns("figure_bar"), height = 675)
           )
         ),
 
@@ -157,6 +158,130 @@ mod_topic_areas_ui <- function(id){
 mod_topic_areas_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+
+    # update inputs based on selections ---------------------------------------
+    observe({
+      if (input$topic %in% c("tech_use", "comm_channels", "medical", "dental", "behavioral")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+
+
+      } else {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
+      }
+    })
+
+
+    # colors ------------------------------------------------------------------
+    # reactively define the colors based on the filter
+    colors <- reactive ({
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::navy,
+          naccho.viz::teal)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::navy,
+          naccho.viz::teal,
+          naccho.viz::terracotta,
+          naccho.viz::pink)
+      } else {
+        naccho.viz::green
+      }
+    })
+
+
+    # main content ============================================================
+
+    # inputs for each topic ---------------------------------------------------
+    updated_inputs <- reactive({
+      input$topic
+      input$filter
+    }) %>% debounce(100)
+
+
+
+    # filter meta data --------------------------------------------------------
+    # used to display the correct title, caption, labels, etc...
+    filter_meta <- reactive({
+      req(!is.null(input$topic))
+      meta %>% dplyr::filter(field == input$topic)
+    })
+
+
+    # figure output -----------------------------------------------------------
+    # used for bar graph
+    output$figure_bar <- highcharter::renderHighchart({
+      data <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented")) %>%
+        dplyr::mutate(category = tech_type) %>%
+        dplyr::group_by(group) %>%
+        dplyr::mutate(x = 1:length(tech_type)-1)
+
+      responses <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs") %>%
+        dplyr::mutate(category = tech_type) %>%
+        dplyr::group_by(category) %>%
+        dplyr::summarise(n = sum(Responses))
+
+      set_simple_bar(data) %>%
+        viz_options(
+          viz_title = "Percent of LHDs that Have Implemented the Following Informatics Systems",
+          viz_subtitle = unique(data$subtitle),
+          viz_caption = paste0("<b> N: </b>",  min(responses$n), " to ", max(responses$n), "<br>", source_line),
+          tooltip = "",
+          theme = naccho.viz::butterfly,
+          legend_enable = FALSE,
+          colors = colors()
+        ) %>%
+        viz_export()
+    })
+
+
+
+    # proxy -------------------------------------------------------------------
+    # save the figure as a proxy to redraw
+    proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
+
+
+
+    # update proxy ------------------------------------------------------------
+    observeEvent(updated_inputs(), {
+
+      if (input$topic == "tech_use") {
+        data <- tech_use_data %>%
+          dplyr::filter(filter == input&filter,
+                        category %in% c("Implemented")) %>%
+          dplyr::mutate(category = tech_type) %>%
+          dplyr::group_by(group) %>%
+          dplyr::mutate(x = 1:length(tech_type)-1)
+
+        responses <- tech_use_data %>%
+          dplyr::filter(filter == input&filter) %>%
+          dplyr::mutate(category = tech_type) %>%
+          dplyr::group_by(category) %>%
+          dplyr::summarise(n = sum(Responses))
+
+
+
+      }
+    })
+
+
 
   })
 }
