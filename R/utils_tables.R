@@ -29,7 +29,7 @@ pivot_data_cat <- function(data) {
 # }
 
 # Helper to calculate overall LHD data ---------
-add_all_ldh_count <- function(data) {
+add_all_ldh_count <- function(data = data, data_all = data_all) {
   dplyr::left_join(data,
                    data_all %>% dplyr::select(category, `y_All LHDs`, `Responses_All LHDs`),
                    by = "category")
@@ -75,6 +75,79 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
   }
 }
 
+
+process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
+  if (is_standardized) {
+    jobs_data %>%
+      dplyr::mutate(
+        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+      ) %>%
+      dplyr::filter(filter == "All LHDs") %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_cat() %>%
+      dplyr::mutate(
+        `y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
+        `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
+        `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`
+      ) %>%
+      dplyr::select(category, `y_Jobs Added (Standardized)`,`y_Jobs Lost (Standardized)`,
+                    `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`)
+  } else {
+
+    jobs_data %>%
+      dplyr::mutate(
+        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+      ) %>%
+      dplyr::filter(filter == "All LHDs") %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_group()
+  }
+}
+
+
+#Helper to process job classifications data
+clean_class_data <- function(topic, classifications, filtering) {
+  # Check if classifications are valid
+  if (!is.null(classifications) && length(classifications) >= 1) {
+
+    selected_vars <- paste0(classifications, topic)  # Handle multiple classifications
+    selected_data <- get(paste0("classification_data_", topic))
+
+    # Process data_all (for "All LHDs")
+    data_all_class <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == "All LHDs") %>%
+      dplyr::mutate(
+        category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+      ) %>%
+      pivot_data_group()
+
+    # If filtering is "All LHDs", return only data_all (no need to process further)
+    if (filtering == "All LHDs") {
+      return(data_all_class)
+    }
+
+    # Process for non "All LHDs"
+    data <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == filtering) %>%
+      dplyr::mutate(
+        category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+      ) %>%
+      pivot_data_group() %>%
+      add_all_ldh_count(data_all = data_all_class)
+
+    return(data)
+  }
+
+  # Return NULL if classifications are invalid
+  return(NULL)
+}
+
+
 #Function to filter data for tables--------
 process_data <- function(topic, filtering, classifications = NULL) {
   # Handle All LHDs cases
@@ -104,25 +177,13 @@ process_data <- function(topic, filtering, classifications = NULL) {
                          'Responses_All LHDs' = sum(Responses),
                          subtitle = subtitle)
 
-     } else if (topic %in% c("a", "b")) {
-       if (topic %in% c("a", "b")) {
-         if (!is.null(classifications) && length(classifications) >= 1) {
-           selected_vars <- paste0(classifications, topic)  # Handle multiple classifications
-           selected_data <- get(paste0("classification_data_", topic))
+     } else if (topic == "a") {
 
-           data <- selected_data %>%
-             dplyr::filter(Question %in% selected_vars) %>%
-             dplyr::filter(category == "Yes",
-                           filter == "All LHDs") %>%
+         data <- clean_class_data(topic, classifications, filtering)
 
-             dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
-             dplyr::mutate(
-               group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-             ) %>%
-             pivot_data_group()
-         }
+     } else if (topic == "b") {
 
-       }
+         data <- clean_class_data(topic, classifications, filtering)
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -164,37 +225,13 @@ process_data <- function(topic, filtering, classifications = NULL) {
         add_all_ldh_count()
 
 
-    } else if (topic %in% c("a", "b")) {
-      if (!is.null(classifications) && length(classifications) >= 1) {
+    } else if (topic == "a") {
 
-        selected_vars <- paste0(classifications, topic)  # Handle multiple classifications
-        selected_data <- get(paste0("classification_data_", topic))
+      data <- clean_class_data(topic, classifications, filtering)
 
-        data_all <- selected_data %>%
-          dplyr::filter(Question %in% selected_vars) %>%
-          dplyr::filter(category == "Yes",
-                        filter == "All LHDs") %>%
+    } else if (topic == "b") {
 
-          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
-          dplyr::mutate(
-            group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-          ) %>%
-          pivot_data_group()
-
-
-      data <- selected_data %>%
-          dplyr::filter(Question %in% selected_vars) %>%
-          dplyr::filter(category == "Yes",
-                        filter == filtering) %>%
-
-          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
-          dplyr::mutate(
-            group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-          ) %>%
-          pivot_data_group()%>%
-          add_all_ldh_count()
-      }
-
+      data <- clean_class_data(topic, classifications, filtering)
 
     } else if (topic == "field") {
 
