@@ -260,26 +260,26 @@ mod_topic_areas_server <- function(id){
 
 
     # update proxy ------------------------------------------------------------
-    observeEvent(updated_inputs(), {
-
-      if (input$topic == "tech_use") {
-        data <- tech_use_data %>%
-          dplyr::filter(filter == input&filter,
-                        category %in% c("Implemented")) %>%
-          dplyr::mutate(category = tech_type) %>%
-          dplyr::group_by(group) %>%
-          dplyr::mutate(x = 1:length(tech_type)-1)
-
-        responses <- tech_use_data %>%
-          dplyr::filter(filter == input&filter) %>%
-          dplyr::mutate(category = tech_type) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(n = sum(Responses))
-
-
-
-      }
-    })
+    # observeEvent(updated_inputs(), {
+    #
+    #   if (input$topic == "tech_use") {
+    #     data <- tech_use_data %>%
+    #       dplyr::filter(filter == input$filter,
+    #                     category %in% c("Implemented")) %>%
+    #       dplyr::mutate(category = tech_type) %>%
+    #       dplyr::group_by(group) %>%
+    #       dplyr::mutate(x = 1:length(tech_type)-1)
+    #
+    #     responses <- tech_use_data %>%
+    #       dplyr::filter(filter == input&filter) %>%
+    #       dplyr::mutate(category = tech_type) %>%
+    #       dplyr::group_by(category) %>%
+    #       dplyr::summarise(n = sum(Responses))
+    #
+    #
+    #
+    #   }
+    # })
 
 
 
