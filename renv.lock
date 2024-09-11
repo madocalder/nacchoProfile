@@ -1310,7 +1310,7 @@
       "RemoteRepo": "nacchoProfile",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "391636faca2dd950f890afdf772b19c58c1523af",
+      "RemoteSha": "e16947434cadca495a6ea66b14f03397a6bcd8a9",
       "Requirements": [
         "R",
         "bslib",
@@ -1338,7 +1338,7 @@
         "tippy",
         "waiter"
       ],
-      "Hash": "3cfa5cdc6f2102960a394a00c4fdd649"
+      "Hash": "960d77a5c80feb12f2615497e73ecef5"
     },
     "numDeriv": {
       "Package": "numDeriv",
