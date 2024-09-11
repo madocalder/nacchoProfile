@@ -4,7 +4,15 @@
 \alias{proxy_to_group}
 \title{Grouped Column Proxy Redraw}
 \usage{
-proxy_to_group(hc, data, meta, id, colors, ...)
+proxy_to_group(
+  hc,
+  data,
+  meta,
+  id,
+  colors,
+  add_n = paste(sum(data$Responses)),
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}
