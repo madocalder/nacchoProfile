@@ -1304,12 +1304,13 @@
       "Package": "nacchoProfile",
       "Version": "0.0.0.9000",
       "Source": "GitHub",
+      "Remotes": "lindsayjorgenson/naccho.viz, the-y-company/bsutils",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "nacchoProfile",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "70961b43791b7d055e548a3b1665653846f11854",
+      "RemoteSha": "391636faca2dd950f890afdf772b19c58c1523af",
       "Requirements": [
         "R",
         "bslib",
@@ -1326,10 +1327,10 @@
         "purrr",
         "reactable",
         "reactablefmtr",
+        "scales",
         "shiny",
         "shinyWidgets",
         "shinyjs",
-        "sparkline",
         "srvyr",
         "stringr",
         "tibble",
@@ -1337,7 +1338,7 @@
         "tippy",
         "waiter"
       ],
-      "Hash": "dd2b2cc076a0e51f78ff3e337cb0011c"
+      "Hash": "3cfa5cdc6f2102960a394a00c4fdd649"
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -2078,17 +2079,6 @@
         "R"
       ],
       "Hash": "5f5a7629f956619d519205ec475fe647"
-    },
-    "sparkline": {
-      "Package": "sparkline",
-      "Version": "2.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "htmltools",
-        "htmlwidgets"
-      ],
-      "Hash": "06e5e4017ecb00fd142bada4b380c59a"
     },
     "spelling": {
       "Package": "spelling",
