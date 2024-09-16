@@ -229,24 +229,24 @@ process_data <- function(topic, filtering, classifications = NULL) {
     # Handle filters other than All LHDs
     if (topic %in% c("FTE_numcat", "employee_numcat")) {
 
-      data_all <- return_survey_weighted_counts(topic) %>%
+      grp_data_all <- return_survey_weighted_counts(topic) %>%
         pivot_data_group()
 
       data <- return_survey_weighted_counts(topic, filtering) %>%
         pivot_data_group()  %>%
-        add_all_ldh_count()
+        add_all_ldh_count(data_all = grp_data_all)
 
 
     } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
       data <- process_weighted_stats(topic, filtering) %>%
         pivot_data_cat()
 
-      data_all <- process_weighted_stats(topic) %>%
+      stat_data_all <- process_weighted_stats(topic) %>%
         pivot_data_cat()
 
       data <- process_weighted_stats(topic, filtering) %>%
         pivot_data_cat() %>%
-        add_all_ldh_count()
+        add_all_ldh_count(data_all = stat_data_all)
 
 
     } else if (topic == "a") {
