@@ -29,9 +29,9 @@ pivot_data_cat <- function(data) {
 # }
 
 # Helper to calculate overall LHD data ---------
-add_all_ldh_count <- function(data = data, data_all = data_all) {
+add_all_ldh_count <- function(data = data, data_all) {
   dplyr::left_join(data,
-                   data_all %>% dplyr::select(category, `y_All LHDs`, `Responses_All LHDs`),
+                   data_all %>% dplyr::select(category, `y_All LHDs`, dplyr::any_of("Responses_All LHDs")),
                    by = "category")
 }
 
@@ -80,8 +80,8 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
   if (is_standardized) {
     jobs_data %>%
       dplyr::mutate(
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-      ) %>%
+        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group,
+                               )) %>%
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_cat() %>%
@@ -112,19 +112,21 @@ clean_class_data <- function(topic, classifications, filtering) {
   if (!is.null(classifications) && length(classifications) >= 1) {
 
     selected_vars <- paste0(classifications, topic)  # Handle multiple classifications
-    selected_data <- get(paste0("classification_data_", topic))
+    selected_data <- get(paste0("classification_data_", topic))  # Alternatively, pass as argument
 
-    # Process data_all (for "All LHDs")
+    # Process data for "All LHDs"
     data_all_class <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(
-        category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+        category = stringr::str_to_title(q_remap[as.character(Question)]),
+        group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)
       ) %>%
       pivot_data_group()
 
-    # If filtering is "All LHDs", return only data_all (no need to process further)
+    print.data.frame(data_all_class)
+
+    # If filtering is "All LHDs", return only the processed "All LHDs" data
     if (filtering == "All LHDs") {
       return(data_all_class)
     }
@@ -134,8 +136,7 @@ clean_class_data <- function(topic, classifications, filtering) {
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == filtering) %>%
       dplyr::mutate(
-        category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
+        category = stringr::str_to_title(q_remap[as.character(.data$Question)])
       ) %>%
       pivot_data_group() %>%
       add_all_ldh_count(data_all = data_all_class)
@@ -146,6 +147,7 @@ clean_class_data <- function(topic, classifications, filtering) {
   # Return NULL if classifications are invalid
   return(NULL)
 }
+
 
 
 #Function to filter data for tables--------
