@@ -12,6 +12,9 @@ revenue_percentages <- do.call(rbind, lapply(args, function(i) {
 
   data.frame(
     revenue_total = sum(data$Total, na.rm = TRUE),
+    Responses = sum(data$Responses, na.rm = TRUE),
+    group = data$group,
+    subtitle = data$subtitle,
     revenue_type = i
   )
 }))
@@ -66,7 +69,7 @@ revenue_percentages_filter <- do.call(rbind, revenue_by_filter_percentages) %>%
                                                 Question == "c3q17m" ~ "Other")) %>%
   dplyr::mutate(percentage = Total / overall_total) %>%
   ungroup() %>%
-  dplyr::select(revenue_type, percentage, x, category, subtitle, filter)
+  dplyr::select(revenue_type, percentage, x, category, subtitle, filter, Responses)
 
 
 

@@ -187,6 +187,28 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
          data <- clean_class_data(topic, classifications, filtering)
 
+     } else if (topic == "budget_changes") {
+
+       data <- budget_data %>%
+         dplyr::filter(filter == "All LHDs") %>%
+         pivot_data_group()
+
+     } else if (topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & filtering == "All LHDs") {
+
+       data <- return_survey_weighted_counts(topic) %>%
+         dplyr::mutate(x_label = NA)%>%
+         pivot_data_group()
+
+     } else if (topic == "non_weighted_revenue_total" &  filtering == "All LHDs") {
+
+       data <- revenue_percentages%>%
+         dplyr::mutate(
+           category = revenue_type,
+           y = (percentage*100)
+         ) %>%
+         pivot_data_group()
+
+
     } else {
       data <- return_survey_weighted_counts(topic)
 
@@ -292,6 +314,49 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::mutate('y_All LHDs' = overall_totals$'y_All LHDs',
                       'Responses_All LHDs' = overall_totals$'Responses_All LHDs')%>%
         dplyr::rename(category = group)
+
+    } else if (topic == "budget_changes") {
+
+      budget_data_all <- budget_data %>%
+        dplyr::filter(filter == "All LHDs") %>%
+        pivot_data_group()
+
+      data <- budget_data %>%
+        dplyr::filter(filter == filtering) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = budget_data_all)
+
+    } else if (topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & filtering != "All LHDs") {
+
+        exp_data_all <- return_survey_weighted_counts(topic) %>%
+          dplyr::mutate(x_label = NA)%>%
+          pivot_data_group()
+
+        data <- return_survey_weighted_counts(topic, filtering) %>%
+          dplyr::mutate(x_label = NA)%>%
+          pivot_data_group() %>%
+          add_all_ldh_count(data_all = exp_data_all)
+
+
+    } else if (topic == "non_weighted_revenue_total" &  filtering != "All LHDs") {
+
+      rev_data_all <- revenue_percentages%>%
+        dplyr::mutate(
+          category = revenue_type,
+          y = (percentage*100)
+        ) %>%
+        pivot_data_group()
+
+
+      data <- revenue_percentages_filter %>%
+        dplyr::mutate(
+          group = category,
+          category = revenue_type,
+          y = (percentage*100)
+        ) %>%
+        dplyr::filter(filter == filtering)%>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = rev_data_all )
 
     } else {
       # Process data as usual for other filters
