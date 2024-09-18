@@ -220,6 +220,21 @@ process_data <- function(topic, filtering, classifications = NULL) {
                        category = service_type)%>%
          pivot_data_group()
 
+     } else if (topic == "Reduced/Expanded Services" & filtering == "All LHDs") {
+
+       data <- services_change_data%>%
+         dplyr::filter(filter == "All LHDs",
+                       service_type %in% classifications) %>%
+         dplyr::group_by(category) %>%
+         dplyr::reframe(
+           y = mean(y, na.rm = TRUE),
+           Responses = sum(Responses, na.rm = TRUE),
+           group = unique(group),
+           category = unique(category)
+         ) %>%
+         pivot_data_group() %>%
+         dplyr::mutate(group = "All LHDs")
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -390,6 +405,35 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::mutate(category = service_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
+
+    } else if (topic == "Reduced/Expanded Services" & filtering != "All LHDs") {
+
+      services_data_all <- services_change_data%>%
+        dplyr::filter(filter == "All LHDs",
+                      service_type %in% classifications) %>%
+        dplyr::group_by(category) %>%
+        dplyr::reframe(
+          y = mean(y, na.rm = TRUE),
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group),
+          category = unique(category)
+        ) %>%
+        pivot_data_group() %>%
+        dplyr::mutate(group = "All LHDs")
+
+
+      data <- services_change_data%>%
+        dplyr::filter(filter == filtering,
+                      service_type %in% classifications)%>%
+        dplyr::group_by(group, category) %>%
+        dplyr::reframe(
+          y = mean(y, na.rm = TRUE),
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group)
+        ) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = services_data_all)
+
 
     } else {
       # Process data as usual for other filters

@@ -570,10 +570,12 @@ mod_services_server <- function(id){
 
       filtering = input$filter
 
-      classifications <- if (!is.null(input$services) && length(input$services) > 0) {
-        input$services
+      classifications <- if (!is.null(input$service_changes) && length(input$service_changes) > 0) {
+        input$service_changes
 
-      } else if (!is.null(input$service_changes) && length(input$service_changes) > 0) {
+      } else if (!is.null(input$services) && length(input$services) > 0) {
+
+          input$services
 
       } else {
         NULL  # If input$classifications does not exist, set it to NULL
