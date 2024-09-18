@@ -675,7 +675,7 @@ mod_finance_server <- function(id){
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
-    })
+    }) #end of tables output code
 
 
 

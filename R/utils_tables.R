@@ -208,6 +208,18 @@ process_data <- function(topic, filtering, classifications = NULL) {
          ) %>%
          pivot_data_group()
 
+     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
+                            "Other Entity", "Not Available in Community")
+                & filtering == "All LHDs") {
+
+       data <- services_data %>%
+         dplyr::filter(service_category == classifications,
+                       filter == "All LHDs",
+                       service_provision == topic) %>%
+         dplyr::mutate(group = filter,
+                       category = service_type)%>%
+         pivot_data_group()
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -357,6 +369,27 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::filter(filter == filtering)%>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = rev_data_all )
+
+    } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
+                           "Other Entity", "Not Available in Community") & filtering != "All LHDs") {
+
+      services_data_all <- services_data %>%
+        dplyr::filter(service_category == classifications,
+                      filter == "All LHDs",
+                      service_provision == topic) %>%
+        dplyr::mutate(group = filter,
+                      category = service_type)%>%
+        pivot_data_group()
+
+
+
+      data <- services_data %>%
+        dplyr::filter(service_category == classifications,
+                      filter == filtering,
+                      service_provision == topic) %>%
+        dplyr::mutate(category = service_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = services_data_all)
 
     } else {
       # Process data as usual for other filters

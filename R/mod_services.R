@@ -86,6 +86,14 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
               highcharter::highchartOutput(ns("figure_butterfly"), height = 675)
             ),
+
+            # display when view Table is selected
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
+              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              br(),
+              HTML(source_line)
+            ),
             br(),
           )
         ),
@@ -243,6 +251,9 @@ mod_services_server <- function(id){
           naccho.viz::teal,
           naccho.viz::terracotta,
           naccho.viz::pink)
+      } else if (input$filter %in% c("All LHDs")) {
+        c(naccho.viz::navy,
+          naccho.viz::terracotta)
       }
     })
 
@@ -549,6 +560,74 @@ mod_services_server <- function(id){
           )
       }
     })
+
+    # for Tables -------
+    output$data_table <- reactable::renderReactable({
+      req(input$view == "Table")
+
+      #add topic value for function
+      topic = input$topic
+
+      filtering = input$filter
+
+      classifications <- if (!is.null(input$services) && length(input$services) > 0) {
+        input$services
+
+      } else if (!is.null(input$service_changes) && length(input$service_changes) > 0) {
+
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("topic variable =")
+      print(topic)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+      #debug
+      message("input$services =")
+      print(input$services)
+      message("input$service_changes =")
+      print(input$service_changes)
+
+      message("classifications variable =")
+      print(classifications)
+
+
+
+      data <- process_data(topic, filtering, classifications)
+
+      data <- data %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )
+
+
+      # Define colors reactively based on the filter
+      colors <- colors()
+
+
+      # Determine the category based on the input filter
+      category <- case_when(
+        input$filter == "urbanrural2022" ~ "Rurality",
+        input$filter == "c0govcat" ~ "Governance",
+        input$filter == "c0popcat3" ~ "LHD size",
+        input$filter == "censusregion" ~ "Region",
+        input$filter == "All LHDs" ~ "All LHDs"
+      )
+
+      print(data)
+
+      # Call the table creation function with the appropriate data and parameters
+      create_non_time_table(data, category, colors, topic)
+    }) #end of tables output code
 
 
 
