@@ -2,42 +2,23 @@
 % Please edit documentation in R/utils_tables.R
 \name{create_non_time_table}
 \alias{create_non_time_table}
-\title{Create a Custom Non-Time Table}
+\title{Function to create a non-time series table}
 \usage{
 create_non_time_table(data, category, colors, topic)
 }
 \arguments{
-\item{data}{A data frame containing the data to be displayed in the table. The first column is expected to contain category names, and the remaining columns should contain numeric values.}
+\item{data}{The data frame to display in the table.}
 
-\item{category}{A character string representing the category to group by. Valid options are "Rurality", "Governance", "LHD size", and "Region".}
+\item{category}{The category for grouping columns.}
 
-\item{colors}{A character vector of colors to be used for the data bars in the table. The length of the vector should match the number of columns in the selected category.}
+\item{colors}{A vector of colors to use for the data bars.}
+
+\item{topic}{The topic to customize the formatting and styles.}
 }
 \value{
-A reactable table object that can be rendered in a Shiny app or RMarkdown document.
+A reactable table object.
 }
 \description{
-This function creates a customized non-time table using the `reactable` package. It allows for grouping data by categories such as Rurality, Governance, LHD size, and Region, and applying custom themes and color schemes.
-}
-\details{
-The function dynamically creates a table with columns corresponding to the selected category, adds a custom theme, and displays data bars within the table cells to visualize the values.
-}
-\examples{
-\dontrun{
-# Example data
-data <- data.frame(
-  category = c("Category 1", "Category 2", "Category 3"),
-  y_Urban = c(50, 70, 60),
-  y_Rural = c(30, 40, 20),
-  y_All_LHDs = c(40, 60, 50),
-  subtitle = c("Subtitle 1", "Subtitle 2", "Subtitle 3")
-)
-
-# Define colors for the data bars
-colors <- c("#FF5733", "#33FF57", "#3357FF")
-
-# Create the table
-create_non_time_table(data, category = "Rurality", colors = colors)
-}
-
+This function creates a reactable table for non-time series data, applying custom
+column definitions, styles, and formatting based on the specified `topic`.
 }

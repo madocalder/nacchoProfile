@@ -1,155 +1,155 @@
-# Helper to handle common pivoting logic when names from group -------
+#' Helper to handle common pivoting logic when names from group
+#'
+#' This function is a helper for pivoting a dataset where the `group` column
+#' needs to be used as the pivot point. It selects a subset of columns and
+#' uses `tidyr::pivot_wider` to widen the data based on the `group`.
+#'
+#' @param data A data frame containing the columns: `category`, `group`, `y`,
+#' `Responses`, and optionally `subtitle` and `total_employees`.
+#' @return A data frame with the `group` column pivoted wider.
+#' @import dplyr
+#' @import tidyr
 pivot_data_group <- function(data) {
-
   data %>%
     dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
     tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
-
 }
 
-
-# Helper to handle common pivoting logic when names from category---------
+#' Helper to handle common pivoting logic when names from category
+#'
+#' This function pivots a dataset where the `category` column is used as the pivot point.
+#' It selects a subset of columns and pivots them wider using `category`. The function
+#' then renames `group` to `category` for consistency.
+#'
+#' @param data A data frame containing the columns: `category`, `group`, `y`,
+#' `Responses`, and optionally `subtitle` and `total_employees`.
+#' @return A data frame with the `category` column pivoted wider.
+#' @import dplyr
+#' @import tidyr
 pivot_data_cat <- function(data) {
-
   data %>%
-    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees" ))) %>%
-    tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))%>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
+    tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
     dplyr::rename(category = group)
-
-
 }
 
-# Helper to mutate and rename categories based on "All Lhds"
-# rename_category <- function(data, category_col = "category") {
-#   data %>%
-#     dplyr::mutate(!!category_col := dplyr::case_when(
-#       .[[category_col]] == "All Lhds" ~ "All LHDs",
-#       TRUE ~ .[[category_col]]
-#     ))
-# }
-
-# Helper to calculate overall LHD data ---------
+#' Helper to calculate overall LHD data
+#'
+#' This function adds overall data for "All LHDs" by performing a left join
+#' between the input `data` and `data_all` based on the `category` column.
+#'
+#' @param data A data frame to be augmented with "All LHDs" data.
+#' @param data_all A data frame containing "All LHDs" data with `y_All LHDs`
+#' and optionally `Responses_All LHDs`.
+#' @return A data frame with additional columns for "All LHDs" values.
+#' @import dplyr
 add_all_ldh_count <- function(data = data, data_all) {
   dplyr::left_join(data,
                    data_all %>% dplyr::select(category, `y_All LHDs`, dplyr::any_of("Responses_All LHDs")),
                    by = "category")
 }
 
-# Helper to process weighted statistics ---------
+#' Helper to process weighted statistics
+#'
+#' This function processes weighted statistics for a given topic and optional filter.
+#' It also adds a subtitle indicating the filter used and selects relevant columns.
+#'
+#' @param topic The topic to process statistics for.
+#' @param filtering An optional filter to apply during processing.
+#' @return A data frame with weighted statistics and additional metadata.
+#' @import dplyr
 process_weighted_stats <- function(topic, filtering = NULL) {
   return_survey_weighted_statistics(topic, filtering) %>%
-    dplyr::mutate(subtitle = paste0("By ",
-                                    names(landscape_filters[landscape_filters == filtering]))) %>%
+    dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
     dplyr::select(category, group, y, subtitle, Responses)
 }
 
-
-
-# Helper to process jobs-related data -------
+#' Helper to process jobs-related data
+#'
+#' This function processes jobs data, either standardized or non-standardized.
+#' If standardized, it calculates job metrics as percentages of total employees.
+#'
+#' @param jobs_data A data frame containing jobs data.
+#' @param is_standardized A logical value indicating whether the data should be
+#' processed in a standardized format (as percentages).
+#' @return A processed data frame with job-related statistics.
+#' @import dplyr
 process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
   if (is_standardized) {
     jobs_data %>%
-      dplyr::mutate(
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-      ) %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_cat() %>%
-      dplyr::mutate(
-        `y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
-        `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
-        `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
-        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`
-      ) %>%
-      dplyr::select(category, `y_Jobs Added (Standardized)`,`y_Jobs Lost (Standardized)`,
+      dplyr::mutate(`y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
+                    `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
+                    `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+                    `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`) %>%
+      dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
                     `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`)
   } else {
-
     jobs_data %>%
-      dplyr::mutate(
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-      ) %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_group()
   }
 }
 
-
-process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
-  if (is_standardized) {
-    jobs_data %>%
-      dplyr::mutate(
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group,
-                               )) %>%
-      dplyr::filter(filter == "All LHDs") %>%
-      dplyr::select(category, group, y, Responses, total_employees) %>%
-      pivot_data_cat() %>%
-      dplyr::mutate(
-        `y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
-        `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
-        `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
-        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`
-      ) %>%
-      dplyr::select(category, `y_Jobs Added (Standardized)`,`y_Jobs Lost (Standardized)`,
-                    `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`)
-  } else {
-
-    jobs_data %>%
-      dplyr::mutate(
-        group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)
-      ) %>%
-      dplyr::filter(filter == "All LHDs") %>%
-      dplyr::select(category, group, y, Responses, total_employees) %>%
-      pivot_data_group()
-  }
-}
-
-
-#Helper to process job classifications data
+#' Helper to clean and process classification data
+#'
+#' This function processes classification data for a given topic, applying the necessary
+#' filtering and pivoting logic. If `filtering` is set to "All LHDs", it returns only
+#' the processed "All LHDs" data.
+#'
+#' @param topic The topic for classification processing.
+#' @param classifications A vector of classifications to process.
+#' @param filtering The filter to apply during processing (e.g., "All LHDs").
+#' @return A data frame with processed classification data or NULL if classifications are invalid.
+#' @import dplyr
+#' @import tidyr
 clean_class_data <- function(topic, classifications, filtering) {
-  # Check if classifications are valid
   if (!is.null(classifications) && length(classifications) >= 1) {
+    selected_vars <- paste0(classifications, topic)
+    selected_data <- get(paste0("classification_data_", topic))
 
-    selected_vars <- paste0(classifications, topic)  # Handle multiple classifications
-    selected_data <- get(paste0("classification_data_", topic))  # Alternatively, pass as argument
-
-    # Process data for "All LHDs"
     data_all_class <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
-      dplyr::mutate(
-        category = stringr::str_to_title(q_remap[as.character(Question)]),
-        group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)
-      ) %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
+                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
       pivot_data_group()
 
     print.data.frame(data_all_class)
 
-    # If filtering is "All LHDs", return only the processed "All LHDs" data
     if (filtering == "All LHDs") {
       return(data_all_class)
     }
 
-    # Process for non "All LHDs"
     data <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == filtering) %>%
-      dplyr::mutate(
-        category = stringr::str_to_title(q_remap[as.character(.data$Question)])
-      ) %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
       pivot_data_group() %>%
       add_all_ldh_count(data_all = data_all_class)
 
     return(data)
   }
 
-  # Return NULL if classifications are invalid
   return(NULL)
 }
 
-
-
+#' Helper to process general data for tables
+#'
+#' This function processes data based on different topics and filtering options,
+#' including handling special cases like "All LHDs", jobs-related data, and more.
+#'
+#' @param topic The topic to process.
+#' @param filtering The filter to apply to the data (e.g., "All LHDs").
+#' @param classifications Optional classifications to apply to the data.
+#' @return A processed data frame for the specified topic and filtering.
+#' @import dplyr
+#' @import tidyr
 #Function to filter data for tables--------
 process_data <- function(topic, filtering, classifications = NULL) {
   # Handle All LHDs cases
@@ -455,7 +455,19 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
 
 # Tables function--------
-
+#' Function to create a non-time series table
+#'
+#' This function creates a reactable table for non-time series data, applying custom
+#' column definitions, styles, and formatting based on the specified `topic`.
+#'
+#' @param data The data frame to display in the table.
+#' @param category The category for grouping columns.
+#' @param colors A vector of colors to use for the data bars.
+#' @param topic The topic to customize the formatting and styles.
+#' @return A reactable table object.
+#' @import reactable
+#' @import reactablefmtr
+#' @importFrom scales percent_format
 create_non_time_table <- function(data, category, colors, topic) {
 
 
@@ -765,7 +777,16 @@ data <- data %>%
 
 }
 
-# Helper function to add tooltips
+#' Helper function to add tooltips
+#'
+#' This function adds tooltips to column headers for additional context.
+#'
+#' @param value The text to display.
+#' @param tooltip The tooltip message to display on hover.
+#' @param ... Additional arguments passed to the tooltip function.
+#' @return A div with tooltip-enabled text.
+#' @importFrom tippy tippy
+
 with_tooltip <- function(value, tooltip, ...) {
   div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
       tippy::tippy(value, tooltip, ...))
