@@ -209,18 +209,17 @@ process_data <- function(topic, filtering, classifications = NULL) {
          pivot_data_group()
 
      } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
-                            "Other Entity", "Not Available in Community")
-                & filtering == "All LHDs") {
+                            "Other Entity", "Not Available in Community")) {
 
        data <- services_data %>%
-         dplyr::filter(service_category == classifications,
+         dplyr::filter(service_category %in% classifications,
                        filter == "All LHDs",
                        service_provision == topic) %>%
          dplyr::mutate(group = filter,
                        category = service_type)%>%
          pivot_data_group()
 
-     } else if (topic == "Reduced/Expanded Services" & filtering == "All LHDs") {
+     } else if (topic == "Reduced/Expanded Services") {
 
        data <- services_change_data%>%
          dplyr::filter(filter == "All LHDs",
@@ -235,6 +234,14 @@ process_data <- function(topic, filtering, classifications = NULL) {
          pivot_data_group() %>%
          dplyr::mutate(group = "All LHDs")
 
+     } else if (topic == "tech_use") {
+
+       data <- tech_use_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% c("Implemented"))%>%
+         dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
+         dplyr::rename(category = tech_type)%>%
+         pivot_data_group()
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -386,10 +393,10 @@ process_data <- function(topic, filtering, classifications = NULL) {
         add_all_ldh_count(data_all = rev_data_all )
 
     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
-                           "Other Entity", "Not Available in Community") & filtering != "All LHDs") {
+                           "Other Entity", "Not Available in Community")) {
 
       services_data_all <- services_data %>%
-        dplyr::filter(service_category == classifications,
+        dplyr::filter(service_category %in% classifications,
                       filter == "All LHDs",
                       service_provision == topic) %>%
         dplyr::mutate(group = filter,
@@ -399,14 +406,14 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
 
       data <- services_data %>%
-        dplyr::filter(service_category == classifications,
+        dplyr::filter(service_category %in% classifications,
                       filter == filtering,
                       service_provision == topic) %>%
         dplyr::mutate(category = service_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
 
-    } else if (topic == "Reduced/Expanded Services" & filtering != "All LHDs") {
+    } else if (topic == "Reduced/Expanded Services") {
 
       services_data_all <- services_change_data%>%
         dplyr::filter(filter == "All LHDs",
@@ -433,6 +440,24 @@ process_data <- function(topic, filtering, classifications = NULL) {
         ) %>%
         pivot_data_group() %>%
         add_all_ldh_count(data_all = services_data_all)
+
+    } else if (topic == "tech_use") {
+
+      tech_data_all <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented"))%>%
+        dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
+        dplyr::rename(category = tech_type)%>%
+        pivot_data_group()
+
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% c("Implemented"))%>%
+        dplyr::select(y, group, subtitle, Responses, filter, tech_type) %>%
+        dplyr::rename(category = tech_type)%>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = tech_data_all)
 
 
     } else {
