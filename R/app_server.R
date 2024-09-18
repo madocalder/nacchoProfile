@@ -20,11 +20,11 @@ app_server <- function(input, output, session) {
 
 
   # footer modal
-  # modal
   observeEvent(
     input$citation,
     bsutils::modal_show("modal")
   )
+
 
   # modals
   mod_key_findings_server("key_findings_1")
@@ -33,5 +33,6 @@ app_server <- function(input, output, session) {
   mod_finance_server("finance_1")
   mod_services_server("services_1")
   mod_data_stories_server("data_stories_1")
+  mod_topic_areas_server("topic_areas_1")
 
 }

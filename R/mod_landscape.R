@@ -24,7 +24,7 @@ mod_landscape_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-6 min-height-400",
+              class = "col-sm-6 min-height-450",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -69,16 +69,12 @@ mod_landscape_ui <- function(id){
             # display when map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-              br(),
-              br(),
               highcharter::highchartOutput(ns("map"), height = 675)
             ),
 
             # display when map is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\''),
-              br(),
-              br(),
               highcharter::highchartOutput(ns("figure"), height = 575)
             ),
 
@@ -278,20 +274,23 @@ mod_landscape_server <- function(id){
     # used for bar and line graphs
     output$figure <- highcharter::renderHighchart({
 
+      # required to manually set the data because
+      # this does not come from the dataset but rather from the overall
+      # population. Refer to NACCHO's codebook for details.
       data <- data.frame(
-        x = c(0, 1),
-        y = c(10.1, 89.9),
-        category = c("Rural", "Urban"),
+        x = c(0, 1, 2),
+        y = c(9.3, 37.5, 53.2),
+        category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
         group = "Estimated Across All LHDs"
       )
 
-     set_column(data) %>%
+      set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
-          viz_caption = source_line,
-          tooltip = "{point.y}% of the U.S. population is served by {point.category} LHDs"
-        ) %>%
-        viz_export()
+          viz_caption = paste("<b> N: </b>2,512 <br>", source_line),
+                              tooltip = "{point.y}% of the U.S. population is served by {point.category} LHDs"
+          ) %>%
+            viz_export()
     })
 
 
@@ -324,7 +323,7 @@ mod_landscape_server <- function(id){
     updated_inputs <- reactive({
       input$topic
       input$filter
-    }) %>% debounce(100)
+    })
 
 
     # this observe is needed to redraw the figure based on the input selected
@@ -336,17 +335,15 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       # Weighting Performed:
       if (input$topic == "totpop" & input$filter != "All LHDs") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
-                        fig_value = get(input$topic)) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarise(fig_value = sum(fig_value)) %>%
-          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
-                        x = as.numeric(as.factor(category)) -1, # -1 is required so the numbers start at 0 for the proxy to correctly draw
-                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(group = "All LHDs")
+        # required to manually set the data because
+        # this does not come from the dataset but rather from the overall
+        # population. Refer to NACCHO's codebook for details.
+        data <- data.frame(
+          x = c(0, 1, 2),
+          y = c(9.3, 37.5, 53.2),
+          category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
+          group = "Estimated Across All LHDs"
+        )
 
           proxy %>%
             proxy_to_single(data = data,
@@ -359,7 +356,6 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       } else if (input$topic == "tenure" & input$filter != "All LHDs") {
         data <- return_survey_weighted_statistics("tenure", input$filter)
-        print(data)
 
           proxy %>%
             proxy_to_single(data = data,
@@ -399,7 +395,6 @@ mod_landscape_server <- function(id){
       # Filters: All LHDs
       } else if (input$filter == "All LHDs") {
         req(input$topic %not_in% c("totpop", "tenure"))
-
         data <- return_survey_weighted_counts(input$topic)
 
         if(input$topic == "c4q29") {
@@ -416,7 +411,6 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       } else {
         req(input$topic %not_in% c("totpop", "tenure"))
-
         data <- return_survey_weighted_counts(input$topic, input$filter)
 
         if(input$topic == "c4q29") {

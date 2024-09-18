@@ -28,8 +28,8 @@ devtools::build()
 
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
-# golem::add_shinyappsio_file()
-
+golem::add_shinyappsio_file()
+golem::add_dockerfile_with_renv()
 
 # Deploy to ShinyApps.io
 # In command line.
@@ -45,7 +45,6 @@ rsconnect::deployApp(
     "DESCRIPTION",
     "app.R"
   ),
-  appId = rsconnect::deployments(".")$appID,
   lint = FALSE,
   forceUpdate = TRUE
 )

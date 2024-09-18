@@ -236,6 +236,13 @@ mod_services_server <- function(id){
     })
 
 
+    observe({
+      if (input$topic == "Reduced/Expanded Services" && input$view == "Butterfly Graph") {
+        updateSelectInput(session, "filter",
+                          choices = "All Filters")
+      }
+    })
+
     # colors ------------------------------------------------------------------
     # reactively define the colors based on the filter
     colors <- reactive ({
@@ -257,21 +264,6 @@ mod_services_server <- function(id){
       }
     })
 
-    colors_scatter <- reactive ({
-      if (input$filter == "urbanrural2022") {
-        c("#1A2545",
-          "#2C6A77")
-      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c("#1A2545",
-          "#2C6A77",
-          "#7A3C23")
-      } else if (input$filter == "censusregion") {
-        c("#1A2545",
-          "#2C6A77",
-          "#7A3C23",
-          "#B090B1")
-      }
-    })
 
 
     # main content ============================================================
@@ -295,6 +287,8 @@ mod_services_server <- function(id){
       input$filter
       input$service_changes_single
     }) %>% debounce(100)
+
+
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
@@ -374,7 +368,7 @@ mod_services_server <- function(id){
           viz_caption = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line),
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>
-              {point.y} <br>",
+              {point.y}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
@@ -516,7 +510,7 @@ mod_services_server <- function(id){
                                  data_all = data_all,
                                  input = input$filter,
                                  id = series_id,
-                                 colors = colors_scatter())
+                                 colors = colors())
 
 
       } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {
@@ -650,18 +644,24 @@ mod_services_server <- function(id){
       output$show_get_services <- renderUI({
 
         if (input$topic != "Reduced/Expanded Services") {
-          shinyWidgets::prettyRadioButtons(
-            ns("services"),
-            strong("Select Service Topic"),
-            service_classifications,
-            selected = "Immunization"
+          div(
+            class = "radio-wrap",
+            radioButtons(
+              ns("services"),
+              strong("Select Service Topic"),
+              service_classifications,
+              selected = "Immunization"
+            )
           )
         } else if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
-          shinyWidgets::prettyRadioButtons(
-            ns("service_changes_single"),
-            strong("Select Service Topic"),
-            change_classifications,
-            selected = "Immunization"
+          div(
+            class = "radio-wrap",
+            radioButtons(
+              ns("service_changes_single"),
+              strong("Select Service Topic"),
+              change_classifications,
+              selected = "Immunization"
+            )
           )
         } else {
           checkboxGroupInput(

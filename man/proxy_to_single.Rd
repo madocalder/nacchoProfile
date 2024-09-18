@@ -4,7 +4,7 @@
 \alias{proxy_to_single}
 \title{Single Column Proxy Redraw}
 \usage{
-proxy_to_single(hc, data, meta, ...)
+proxy_to_single(hc, data, meta, add_n = paste(sum(data$Responses)), ...)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}

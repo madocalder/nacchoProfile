@@ -138,7 +138,12 @@ viz_options <- function(hc,
 #' @return A redrawn figure.
 #' @export
 #'
-proxy_to_single <- function(hc, data, meta, ...) {
+proxy_to_single <- function(
+    hc,
+    data,
+    meta,
+    add_n = paste(sum(data$Responses)),
+    ...) {
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -175,7 +180,7 @@ proxy_to_single <- function(hc, data, meta, ...) {
         text = unique(data$subtitle)
       ),
       caption = list(
-        text = meta$caption
+        text = paste("<b> N: </b>", add_n, "<br>", source_line)
       ),
       xAxis = list(
         categories = unique(data$category),
@@ -206,6 +211,7 @@ proxy_to_group <- function(
     meta,
     id,
     colors,
+    add_n = paste(sum(data$Responses)),
     ...) {
 
   hc %>%
@@ -251,7 +257,7 @@ proxy_to_group <- function(
         text = unique(data$subtitle)
       ),
       caption = list(
-        text = meta$caption
+        text = paste("<b> N: </b>", add_n,"<br>", source_line)
       ),
       xAxis = list(
         categories = unique(data$category),
