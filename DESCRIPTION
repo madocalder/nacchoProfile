@@ -12,7 +12,6 @@ Depends:
     R (>= 2.10)
 Imports: 
     bslib,
-    bsutils,
     config (>= 0.3.2),
     dplyr,
     flexlayout,
@@ -21,7 +20,6 @@ Imports:
     highcharter,
     htmltools,
     magrittr,
-    naccho.viz,
     purrr,
     reactable,
     reactablefmtr,
@@ -41,6 +39,7 @@ Suggests:
 Remotes:
     lindsayjorgenson/naccho.viz,
     the-y-company/bsutils
+    lindsayjorgenson/custom.map
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US

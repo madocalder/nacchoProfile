@@ -88,7 +88,7 @@ meta <- data.frame(
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHDs have the following Local Board of Health: {point.category}",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHD Top Executives are {point.category} ",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHD Top Executives identify as {point.category}",
-              "<span style=\"color:{point.color}\">\u25CF</span> LHD Top Executives at {point.category}  agencies have been in their position an average of {point.y} years",
+              "<span style=\"color:{point.color}\">\u25CF</span> LHD Top Executives at {point.group} agencies have been in their position an average of {point.y} years",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHD Top Executives have the following highest degree: {point.category} ",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHD Top Executives have a degree in {point.category}",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHD Top Executives identify as {point.category}",

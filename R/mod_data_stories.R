@@ -22,7 +22,8 @@ mod_data_stories_ui <- function(id){
             div(
               class = "col-sm-9",
               align = "left",
-              h1("Data Stories")
+              h1("Data Stories"),
+              hr(class = "header-hr")
             ),
             div(
               class = "col-sm-3 findings-align",

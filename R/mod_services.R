@@ -681,7 +681,12 @@ mod_services_server <- function(id){
         })
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
-          links
+
+          if (length(links) == 0) {
+            paste("No relevant definitions.")
+          } else {
+            links
+          }
         )
       })
     })

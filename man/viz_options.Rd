@@ -16,7 +16,7 @@ viz_options(
   tooltip_align = "center",
   legend_enable = TRUE,
   legend_title = "",
-  legend_align = "right"
+  legend_align = "left"
 )
 }
 \arguments{

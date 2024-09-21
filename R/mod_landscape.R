@@ -10,9 +10,6 @@
 mod_landscape_ui <- function(id){
   ns <- NS(id)
   tagList(
-    tags$head(
-      tags$script(src = "www/script.js") # Correct path if the file is in inst/app/www/
-    ),
     conditionalPanel(
       condition = "input.tabs == 'landscape_tab'",
       flexlayout::flexlayout(
@@ -24,7 +21,7 @@ mod_landscape_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-6 min-height-450",
+              class = "col-sm-6 min-height-400",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -39,7 +36,7 @@ mod_landscape_ui <- function(id){
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters[4]
+                choices = landscape_filters
               )
             )
           ),
@@ -55,9 +52,9 @@ mod_landscape_ui <- function(id){
               choiceNames = list(
                 HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
                 HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
-                HTML('<i class="fas fa-earth-americas"></i>')         # Map icon
+                HTML('<i class="fas fa-table"></i>')         # Map icon
               ),
-              choiceValues = c('Bar Graph', 'Line Graph', 'Map')
+              choiceValues = c('Bar Graph', 'Line Graph', 'Table')
             )
           ),
 
@@ -171,59 +168,6 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
-    # update inputs based on selections ---------------------------------------
-    # for example, if someone selects "geography," then the view will update to
-    # include a map options.
-    observe({
-      if (input$topic == "tenure") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[-1])
-
-
-      } else if (input$topic == "totpop") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[4])
-
-
-      } else {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters)
-      }
-    })
-
-    observe({
-      req(input$topic == "c0govcatn")
-
-        shinyWidgets::updateRadioGroupButtons(session, "view",
-                                              choiceNames = list(
-                                                HTML('<i class="fas fa-earth-americas"></i>'),
-                                                HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-chart-line"></i>'),
-                                                HTML('<i class="fas fa-table"></i>')
-                                              ),
-                                              choiceValues = c("Map", "Bar Graph", "Line Graph", "Table"))
-
-      if (input$view == "Map") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[1])
-
-      } else if (input$view != "Map") {
-        updateSelectInput(session, "filter",
-                          choices = landscape_filters[-3])
-      }
-    })
-
-    observe({
-      req(input$topic != "c0govcatn")
-      shinyWidgets::updateRadioGroupButtons(session, "view",
-                                            choiceNames = list(
-                                              HTML('<i class="fas fa-chart-simple"></i>'),
-                                              HTML('<i class="fas fa-chart-line"></i>'),
-                                              HTML('<i class="fas fa-table"></i>')
-                                            ),
-                                            choiceValues = c("Bar Graph", "Line Graph", "Table"))
-    })
-
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
@@ -233,68 +177,38 @@ mod_landscape_server <- function(id){
     })
 
 
-
-    # map output --------------------------------------------------------------
-    # used for the map only, displayed in the UI using a conditional panel
-    output$map <- highcharter::renderHighchart({
-
-      req(input$filter == "All LHDs") # needed to prevent glitch
-
-      # filters the data for a map, specifically
-      data <- master_data %>%
-        haven::as_factor() %>%
-        dplyr::mutate(fig_filter = stringr::str_to_title(get(input$topic))) %>%
-        dplyr::distinct(fips, .keep_all = TRUE) %>%
-        dplyr::select(fips, state_name, fig_filter)
-
-      # uses a function from the naccho.viz package
-      naccho.viz::create_cat_map(
-        data = data,
-        fips_column = "fips",
-        selected_value = "fig_filter",
-        title_text = filter_meta()$title,
-        subtitle_text = "",
-        caption_text = filter_meta()$caption,
-        accessible_desc = ""
-      ) %>%
-        highcharter::hc_chart(
-          marginBottom = 120,
-          spacingTop = 10,
-          spacingBottom = 0
-        ) %>%
-        highcharter::hc_legend(
-          margin = 60
-        )
-    })
-
-
     # figure output -----------------------------------------------------------
     # used for bar and line graphs
     output$figure <- highcharter::renderHighchart({
-
-      # required to manually set the data because
-      # this does not come from the dataset but rather from the overall
-      # population. Refer to NACCHO's codebook for details.
-      data <- data.frame(
-        x = c(0, 1, 2),
-        y = c(9.3, 37.5, 53.2),
-        category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
-        group = "Estimated Across All LHDs"
-      )
+      data <- return_survey_weighted_counts("c2q501")
 
       set_column(data) %>%
         viz_options(
-          viz_title = "Percent of U.S. Population Served by LHDs",
-          viz_caption = paste("<b> N: </b>2,512 <br>", source_line),
-                              tooltip = "{point.y}% of the U.S. population is served by {point.category} LHDs"
+          viz_title = "Structure of LHDs",
+          viz_caption = paste("<b> N: </b>938 <br>", source_line),
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHDs are {point.category}"
           ) %>%
-            viz_export()
+        viz_export()
     })
-
 
 
     # save the figure as a proxy to redraw below
     proxy <- highcharter::highchartProxy(ns("figure"))
+
+
+    # update the yAxis title while maintaining the line animation
+    use_js_proxy <- reactive({
+      shinyjs::runjs(paste0("
+        var chart = $('#landscape_1-figure').highcharts();
+        chart.yAxis[0].update({
+          title: {
+            text: '", filter_meta()$y_label, "',
+            style: { color: '#333333' }
+          }
+        }, true, { duration: 1000 });
+    "))
+    })
+
 
 
     # reactively define the colors based on the filter
@@ -318,57 +232,51 @@ mod_landscape_server <- function(id){
 
 
 
-    updated_inputs <- reactive({
-      input$topic
-      input$filter
-    })
-
-
     # this observe is needed to redraw the figure based on the input selected
     # by the user. It also filters and stores tables based on the inputs
     # combinations selected by the user.
-    observeEvent(updated_inputs(), {
-
-      # Topic: Population
-      # Filters: Rurality, Governance, LHD Size, Region
-      # Weighting Performed:
-      if (input$topic == "totpop" & input$filter != "All LHDs") {
-        # required to manually set the data because
-        # this does not come from the dataset but rather from the overall
-        # population. Refer to NACCHO's codebook for details.
-        data <- data.frame(
-          x = c(0, 1, 2),
-          y = c(9.3, 37.5, 53.2),
-          category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
-          group = "Estimated Across All LHDs"
-        )
-
-          proxy %>%
-            proxy_to_single(data = data,
-                            meta = filter_meta())
-
-
+    observe({
+      use_js_proxy()
 
       # Topic: Tenure
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
-      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
-        data <- return_survey_weighted_statistics("tenure", input$filter)
+      if (input$topic == "tenure" & input$filter == "All LHDs") {
+        data <- return_survey_weighted_statistics("tenure") %>%
+          dplyr::mutate(category = "Average Tenure")
+
+        proxy %>%
+          proxy_hist_to_single(data = data,
+                          meta = filter_meta())
+
+        # Topic: Tenure
+        # View: Bar Graph
+        # Filters: Rurality, Governance, LHD Size, Region
+        } else if (input$topic == "tenure" & input$filter != "All LHDs") {
+          data <- return_survey_weighted_statistics("tenure", input$filter) %>%
+            dplyr::mutate(group = stringr::str_to_title(Group),
+                          x = 0,
+                          category = "Average Tenure")
+
+          series_id <- unique(data$group)
 
           proxy %>%
-            proxy_to_single(data = data,
-                            meta = filter_meta())
+            proxy_hist_to_group(
+              data = data,
+              meta = filter_meta(),
+              id = series_id,
+              colors = colors() # comes from earlier reactive and needs to match length of field input
+            )
 
 
       # Topic: Specialization
       # View: Bar Graph
       # Filters: All LHDs
       } else if (input$topic == "field" & input$filter == "All LHDs") {
-        req(input$topic %not_in% c("totpop", "tenure"))
         data <- spec_data_all
 
           proxy %>%
-            proxy_to_single(data = data,
+            proxy_hist_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -380,7 +288,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_to_group(
+          proxy_hist_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,
@@ -392,15 +300,14 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: All LHDs
       } else if (input$filter == "All LHDs") {
-        req(input$topic %not_in% c("totpop", "tenure"))
         data <- return_survey_weighted_counts(input$topic)
 
-        if(input$topic == "c4q29") {
+        if (input$topic == "c4q29") {
           data$x[3] <- 2 # this may need to be hand-edited in 2025
         }
 
           proxy %>%
-            proxy_to_single(data = data,
+            proxy_hist_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -408,10 +315,9 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else {
-        req(input$topic %not_in% c("totpop", "tenure"))
         data <- return_survey_weighted_counts(input$topic, input$filter)
 
-        if(input$topic == "c4q29") {
+        if (input$topic == "c4q29") {
           data <- data %>%
             dplyr::mutate(x = dplyr::case_when(x == 3 ~ 2,
                                                TRUE ~ x))
@@ -420,7 +326,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_to_group(
+          proxy_hist_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,
@@ -645,7 +551,12 @@ mod_landscape_server <- function(id){
         })
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
-          links
+
+          if (length(links) == 0) {
+            paste("No relevant definitions.")
+          } else {
+            links
+          }
         )
       })
     })

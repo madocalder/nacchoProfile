@@ -7,25 +7,21 @@
 #'
 #'
 #'
-
-
-theme <- bslib::bs_theme(
-  version = 5L,
-  bootswatch = "lux",
-  base_font = bslib::font_google("Heebo", local = FALSE, wght = "300..800"),
-  bg = "#fff",
-  fg = "#212F5B",
-  primary = "#008A96",
-  secondary = "#212F5B",
-  success = "#80A14E",
-  info = "#80648E",
-  warning = "#AB6143"
-)
-
-
-
-
 app_ui <- function(request) {
+
+  theme <- bslib::bs_theme(
+    version = 5L,
+    bootswatch = "lux",
+    base_font = bslib::font_google("Heebo", local = FALSE, wght = "300..800"),
+    bg = "#fff",
+    fg = "#212F5B",
+    primary = "#008A96",
+    secondary = "#212F5B",
+    success = "#80A14E",
+    info = "#80648E",
+    warning = "#AB6143"
+  )
+
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -33,6 +29,10 @@ app_ui <- function(request) {
       name = "fontawesome", version = "99.0",
       src = "inst/app/www/fontawesome",
       stylesheet = "css/all.min.css"
+    ),
+
+    tags$head(
+      tags$script(src = "www/script.js") # Correct path if the file is in inst/app/www/
     ),
 
     waiter::useWaiter(),
@@ -50,26 +50,35 @@ app_ui <- function(request) {
 
     # Your application UI logic
     bslib::page_sidebar(
+      options = list(
+        sidebar_collapse_breakpoint = "md"  # Set collapse breakpoint (e.g., "sm", "md", "lg")
+      ),
       theme = theme,
       sidebar = bslib::sidebar(
+
 
         tabsetPanel(
           id = "tabs",
 
           tabPanel(
             div(
-                img(
-                  src = "www/logo.png",
-                  alt = "NACCHO logo, Home page",
-                  height = 120,
-                  style = "position: absolute; left: 47px; top: 0;")
-              ),
+              img(
+                src = "www/logo.png",
+                alt = "NACCHO logo, Home page",
+                height = 120,
+                style = "position: absolute; left: 47px; top: 0;")
+            ),
             value = "home_tab",
             class = "no-underline",
-            ),
+          ),
 
           tabPanel(
-            "LHD Landscape",
+            "Overview",
+            value = "overview_tab"
+          ),
+
+          tabPanel(
+            "Agency & Leadership",
             value = "landscape_tab"
           ),
 
@@ -93,16 +102,10 @@ app_ui <- function(request) {
             value = "topics_tab"
           ),
 
-          # tabPanel(
-          #   "Key Findings",
-          #   value = "key_findings_tab"
-          # ),
-
           tabPanel(
             "Data Stories",
             value = "data_stories_tab"
           ),
-
 
           tabPanel(
             actionButton("playground_button", "Key Findings", class = "pill-button"),
@@ -111,6 +114,7 @@ app_ui <- function(request) {
         )
       ),
 
+      mod_overview_ui("overview_1"),
       mod_home_ui("home_1"),
       mod_landscape_ui("landscape_1"),
       mod_key_findings_ui("key_findings_1"),
@@ -124,7 +128,7 @@ app_ui <- function(request) {
     ),
 
     div(
-      class = "footer",
+    class = "footer",
       align = "center",
       p(
         tags$a(

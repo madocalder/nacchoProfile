@@ -129,4 +129,17 @@ window.addEventListener('load', function() {
 
 
 
+//---------------------------------------------------------- nav toggle /
+$(document).ready(function() {
+  // Toggle the visibility of the menu when the hamburger icon is clicked
+  $('.toggle-hide').click(function() {
+    $('.toggle-show').toggle();
+  });
 
+  // Ensure the menu reappears when the window height exceeds 600px
+  $(window).resize(function() {
+    if ($(window).height() > 600) {
+      $('.toggle-show').show();  // Reset to visible when the screen height is large
+    }
+  });
+});

@@ -27,6 +27,7 @@ app_server <- function(input, output, session) {
 
 
   # modals
+  mod_overview_server("overview_1")
   mod_key_findings_server("key_findings_1")
   mod_landscape_server("landscape_1")
   mod_workforce_server("workforce_1")

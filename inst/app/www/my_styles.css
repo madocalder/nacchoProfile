@@ -355,6 +355,10 @@ label:not(.material-switch label) {
   background-color: #212F5B !important;
 }
 
+.nav:not(.nav-hidden) {
+  display: block !important;
+}
+
 .bslib-sidebar-layout>.main {
   color: #212F5B !important;
   padding: 0 !important;
@@ -373,16 +377,45 @@ label:not(.material-switch label) {
 }
 
 .sidebar-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav {
+    --bs-nav-link-padding-x: 0 !important;
+    --bs-nav-link-padding-y: 0 !important;
 }
 
 .nav-tabs {
   justify-content: center !important;
-  text-transform: uppercase;
-  padding-top: 50px !important;
+  align-content: center !important;
+  display: block!important;
+  height: 100vh !important;
+  margin-top: -50px;
+}
+
+@media (max-height: 700px) {
+  .nav-tabs {
+    margin-top: 0 !important;
+  }
+  .nav {
+    font-size: 13px !important;
+    margin-top: 0 !important;
+  }
+  .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
+    padding-top: 1.0em !important;
+    transform: transition .5s ease;
+  }
+  .nav-item:nth-child(9) {
+    padding-top: 30% !important;
+  }
+}
+
+@media (max-height: 500px) {
+  .nav-item:nth-child(9) {
+    padding-top: 5% !important;
+  }
 }
 
 .nav:not(.nav-hidden):not(.nav-stacked):not(.flex-column) {
@@ -390,25 +423,25 @@ label:not(.material-switch label) {
 }
 
 .sidebar>.sidebar-content {
-    display: flex;
-    flex-direction: column;
-    /* gap: var(--bslib-spacer, 1rem); */
-    /* padding: var(--_padding); */
-    padding-top: var(--_padding-icon);
-    padding-left: 40px !important;
-    padding-right: 0px !important;
+  display: flex;
+  flex-direction: column;
+  /* gap: var(--bslib-spacer, 1rem); */
+  /* padding: var(--_padding); */
+  padding-top: var(--_padding-icon);
+  padding-left: 40px !important;
+  padding-right: 0px !important;
 }
 
 .nav {
-  font-size: 1.0em !important;
+  font-size: 1.0em;
 }
 
-.nav-item:nth-child(8) {
-  padding-top: 60% !important;
+.nav-item:nth-child(9) {
+  padding-top: 50%;
   margin-left: -8%;
 }
 
-.nav-item:nth-child(8) .nav-link {
+.nav-item:nth-child(9) .nav-link {
   padding-right: 0px !important;
 }
 
@@ -416,19 +449,24 @@ label:not(.material-switch label) {
   border: none !important;
   box-shadow: none !important;
   color: white !important;
-  padding-top: 2.0em; !important
+  padding-top: 2.5em;
+  transform: transition .5s ease;
 }
 
 .nav-tabs .nav-link.active {
-    background-color: transparent !important;
-    color: #80A14E !important;
-    font-weight: 700 !important;
-    border-bottom: none !important;
+  background-color: transparent !important;
+  color: #80A14E !important;
+  font-weight: 700 !important;
+  border-bottom: none !important;
   }
 
 .nav-item:nth-child(1) .nav-link.active, .nav-item:nth-child(8) .nav-link.active {
     border-bottom: none !important;
-  }
+}
+
+.nav-item, :where(ul.nav.navbar-nav > li):not(.dropdown), .nav-tabs>li, .nav-pills>li {
+  text-align: center;
+}
 
 /* this is for the data playground button */
 .pill-button {
@@ -526,7 +564,17 @@ label:not(.material-switch label) {
   padding-right: 2em !important;
 }
 
+.color-carousel {
+    padding-right: 20px;
+    padding-top: 50px;
+    line-height: 15px;
+}
 
+.color-carousel-2 {
+    padding-right: 0px;
+    padding-top: 50px;
+    line-height: 15px;
+}
 
 /* ----------------------------------------------------- key findings content */
 .key-findings-cards .html-fill-container {
@@ -567,8 +615,8 @@ label:not(.material-switch label) {
 
 .key-findings-content {
   padding-top: 4em;
-  padding-left: 11em;
-  padding-right: 12em;
+  padding-left: 5em;
+  padding-right: 7em;
 }
 
 .carousel-control-prev {
@@ -1013,7 +1061,7 @@ label:not(.material-switch label) {
 
 
 /* ---------------------------------------------------------- HR line styles */
-hr:not(.tt, .right-hr) {
+hr:not(.tt, .right-hr, .header-hr) {
   border-top: 1.5px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
@@ -1036,6 +1084,15 @@ hr .tt {
   margin-left: auto;
   margin-right: auto;
   width: 85%;
+}
+
+.header-hr {
+  margin-left: 0px;
+  margin-right: 80%;
+  border-top: 2px solid !important;
+  color: #212F5B !important;
+  opacity: 1 !important;
+  border-radius: 100px;
 }
 
 
@@ -1104,7 +1161,10 @@ h2 {
 }
 
 h1 {
-  color: #008489;
+    color: #212F5B;
+    text-transform: none;
+    font-weight: 700;
+    letter-spacing: 1.8px;
 }
 
 b, strong {
