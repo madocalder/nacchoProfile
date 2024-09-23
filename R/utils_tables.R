@@ -11,7 +11,7 @@
 #' @import tidyr
 pivot_data_group <- function(data) {
   data %>%
-    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees", "filter"))) %>%
     tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 }
 
@@ -43,7 +43,7 @@ pivot_data_cat <- function(data) {
 #' and optionally `Responses_All LHDs`.
 #' @return A data frame with additional columns for "All LHDs" values.
 #' @import dplyr
-add_all_ldh_count <- function(data = data, data_all) {
+add_all_ldh_count <- function(data = data, data_all = data_all) {
   dplyr::left_join(data,
                    data_all %>% dplyr::select(category, `y_All LHDs`, dplyr::any_of("Responses_All LHDs")),
                    by = "category")
@@ -242,6 +242,37 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
          dplyr::rename(category = tech_type)%>%
          pivot_data_group()
+
+     } else if (topic == "comm_channels") {
+
+       data <- comms_use_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked")%>%
+         dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+         dplyr::rename(category = comms_type) %>%
+         pivot_data_group()
+
+     } else if (topic == "medical") {
+
+       data <- med_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
+     } else if (topic == "dental") {
+
+       data <- dental_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
+     } else if (topic == "behavioral") {
+
+       data <- behav_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -458,6 +489,66 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::rename(category = tech_type)%>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = tech_data_all)
+
+
+    } else if (topic == "comm_channels") {
+
+      comms_data_all <- comms_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked")%>%
+        dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+        dplyr::rename(category = comms_type) %>%
+        pivot_data_group()
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked")%>%
+        dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+        dplyr::rename(category = comms_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = comms_data_all)
+
+    } else if (topic == "medical") {
+
+      med_data_all <- med_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+
+
+      data <- med_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = med_data_all)
+
+    } else if (topic == "dental") {
+
+      dental_data_all <- dental_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+      data <- dental_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = dental_data_all)
+
+    } else if (topic == "behavioral") {
+
+      behav_data_all <- behav_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+      data <- behav_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = behav_data_all)
+
 
 
     } else {
