@@ -87,14 +87,15 @@ mod_home_ui <- function(id){
                 Foundation.",
             br(),
             br(),
-            "This dashboard was created using R Shiny. Lindsay Jorgenson
-                served as the lead developer, with contributions from John Coene
-                and Pierre Saoter from the Y Company, and Madoc Marshall and
-                Elizabeth Woods from the Association of State and Territorial
-                Health Officials. For questions or to report an issue, please
-                visit Lindsay's GitHub account at ",
-            tags$a(href="https://github.com/lindsayjorgenson",
-                   "https://github.com/lindsayjorgenson.")
+            "This dashboard was developed using R Shiny. Lindsay Jorgenson served
+            as the lead developer, with Madoc Marshall as the senior developer
+            representing the Association of State and Territorial Health Officials (ASTHO).
+            Additional contributions were provided by John Coene and Pierre Saoter
+            from the Y Company, and Elizabeth Woods from ASTHO.
+            For inquiries or to report an issue, please visit",
+            tags$a(href="https://github.com/lindsayjorgenson/nacchoProfile",
+                   "the nacchoProfile GitHub repository"),
+            "."
           ),
 
           bslib::accordion_panel(
