@@ -63,31 +63,39 @@ mod_finance_ui <- function(id){
           div(
             class = "viz-content",
 
-            # display when Box Plot is selected
+            # display when Box Plot is selected and Table is not selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), "\'] == \'Box Plot\'"),
+              condition = paste0('input[\'', ns('view'), "\'] == \'Box Plot\' && input[\'", ns('view'), "\'] != \'Table\'"),
               highcharter::highchartOutput(ns("figure_box"), height = 575)
             ),
 
-            # display when Bar Graph is selected and Budget Changes is not selected
+            # display when Bar Graph is selected, Budget Changes is not selected, and Table is not selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), "\'] == \'Bar Graph\' && input[\'", ns('topic'), "\'] != \'budget_changes\'"),
+              condition = paste0('input[\'', ns('view'), "\'] == \'Bar Graph\' && input[\'", ns('topic'), "\'] != \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
               highcharter::highchartOutput(ns("figure"), height = 575)
             ),
 
-            # display when Budget Changes is selected
+            # display when Budget Changes is selected and Table is not selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\'"),
+              condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
               highcharter::highchartOutput(ns("figure_budget"), height = 675)
             ),
 
-            # display when Budget Changes is selected
+            # display when Tree Map is selected, non-weighted revenue total is selected, and Table is not selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\' && input[\'", ns('topic'), "\'] == \'non_weighted_revenue_total\'"),
+              condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\' && input[\'", ns('topic'), "\'] == \'non_weighted_revenue_total\' && input[\'", ns('view'), "\'] != \'Table\'"),
               highcharter::highchartOutput(ns("figure_tree"), height = 675)
+            ),
+
+            # Table view
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
+              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              br(),
+              HTML(source_line)
             )
-          )
-        ),
+          ),
+
 
         # end of main content -----------------------------------------------------
 
@@ -171,6 +179,8 @@ mod_finance_ui <- function(id){
       )
     )
   )
+)
+
 }
 
 
@@ -227,7 +237,7 @@ mod_finance_server <- function(id){
     observe({
       if (input$topic == "budget_changes") {
         updateSelectInput(session, "filter",
-                          choices = "All Filters")
+                          choices = landscape_filters)
 
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
@@ -259,6 +269,9 @@ mod_finance_server <- function(id){
           naccho.viz::teal,
           naccho.viz::terracotta,
           naccho.viz::pink)
+      } else if (input$filter %in% c("All LHDs")) {
+        c(naccho.viz::navy,
+          naccho.viz::terracotta)
       }
     })
 
@@ -607,6 +620,65 @@ mod_finance_server <- function(id){
                               theme = naccho.viz::basic)
       }
     })
+
+# for Tables -------
+    output$data_table <- reactable::renderReactable({
+      req(input$view == "Table")
+
+      #add topic value for function
+      topic = input$topic
+
+      filtering = input$filter
+
+      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
+        input$classifications
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("topic variable =")
+      print(topic)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+
+
+      data <- process_data(topic, filtering, classifications)
+
+      data <- data %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )
+
+
+      # Define colors reactively based on the filter
+      colors <- colors()
+
+
+      # Determine the category based on the input filter
+      category <- case_when(
+        input$filter == "urbanrural2022" ~ "Rurality",
+        input$filter == "c0govcat" ~ "Governance",
+        input$filter == "c0popcat3" ~ "LHD size",
+        input$filter == "censusregion" ~ "Region",
+        input$filter == "All LHDs" ~ "All LHDs"
+      )
+
+      print(data)
+
+      # Call the table creation function with the appropriate data and parameters
+      create_non_time_table(data, category, colors, topic)
+    }) #end of tables output code
+
+
+
   })
 }
 

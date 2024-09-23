@@ -78,7 +78,9 @@ mod_landscape_ui <- function(id){
             # adding table
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              reactable::reactableOutput(ns("data_table"), height = "auto")
+              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              br(),
+             HTML(source_line)
             )
           )
         ),
@@ -336,13 +338,12 @@ mod_landscape_server <- function(id){
     })
 
 
-   #tables output
+   #Tables output ------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
 
       #add topic value for function
       topic <- input$topic
-      subtopic <- "no subtopic"
 
       # Define colors reactively based on the filter
       colors <- colors()
@@ -365,11 +366,6 @@ mod_landscape_server <- function(id){
                            'y_All LHDs' = y,
                            'Responses_All LHDs' = sum(Responses),
                            subtitle = subtitle)
-
-
-        # } else if (input$topic == "tenure" & input$filter == "All LHDs") {
-        # data <- return_survey_weighted_statistics("tenure", input$filter) %>%
-        #   dplyr::select(category, 'y_ALL LHDs' = y, subtitle, 'Responses_All LHDs' = Responses)
 
 
         } else if (input$filter == "All LHDs") {
@@ -460,7 +456,7 @@ mod_landscape_server <- function(id){
       }
 
       # Call the table creation function with the appropriate data and parameters
-      create_non_time_table(data, category, colors, topic, subtopic)
+      create_non_time_table(data, category, colors, topic)
     })
 
 

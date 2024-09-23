@@ -1,40 +1,590 @@
-#landscape tables function------
+#' Helper to handle common pivoting logic when names from group
+#'
+#' This function is a helper for pivoting a dataset where the `group` column
+#' needs to be used as the pivot point. It selects a subset of columns and
+#' uses `tidyr::pivot_wider` to widen the data based on the `group`.
+#'
+#' @param data A data frame containing the columns: `category`, `group`, `y`,
+#' `Responses`, and optionally `subtitle` and `total_employees`.
+#' @return A data frame with the `group` column pivoted wider.
+#' @import dplyr
+#' @import tidyr
+pivot_data_group <- function(data) {
+  data %>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees", "filter"))) %>%
+    tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+}
 
-#' Create a Custom Non-Time Table
+#' Helper to handle common pivoting logic when names from category
 #'
-#' This function creates a customized non-time table using the `reactable` package. It allows for grouping data by categories such as Rurality, Governance, LHD size, and Region, and applying custom themes and color schemes.
+#' This function pivots a dataset where the `category` column is used as the pivot point.
+#' It selects a subset of columns and pivots them wider using `category`. The function
+#' then renames `group` to `category` for consistency.
 #'
-#' @param data A data frame containing the data to be displayed in the table. The first column is expected to contain category names, and the remaining columns should contain numeric values.
-#' @param category A character string representing the category to group by. Valid options are "Rurality", "Governance", "LHD size", and "Region".
-#' @param colors A character vector of colors to be used for the data bars in the table. The length of the vector should match the number of columns in the selected category.
-#'
-#' @details
-#' The function dynamically creates a table with columns corresponding to the selected category, adds a custom theme, and displays data bars within the table cells to visualize the values.
-#'
-#' @return A reactable table object that can be rendered in a Shiny app or RMarkdown document.
-#'
-#' @examples
-#' \dontrun{
-#' # Example data
-#' data <- data.frame(
-#'   category = c("Category 1", "Category 2", "Category 3"),
-#'   y_Urban = c(50, 70, 60),
-#'   y_Rural = c(30, 40, 20),
-#'   y_All_LHDs = c(40, 60, 50),
-#'   subtitle = c("Subtitle 1", "Subtitle 2", "Subtitle 3")
-#' )
-#'
-#' # Define colors for the data bars
-#' colors <- c("#FF5733", "#33FF57", "#3357FF")
-#'
-#' # Create the table
-#' create_non_time_table(data, category = "Rurality", colors = colors)
-#' }
-#'
-#' @export
-# categorical tables--------
+#' @param data A data frame containing the columns: `category`, `group`, `y`,
+#' `Responses`, and optionally `subtitle` and `total_employees`.
+#' @return A data frame with the `category` column pivoted wider.
+#' @import dplyr
+#' @import tidyr
+pivot_data_cat <- function(data) {
+  data %>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
+    tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+    dplyr::rename(category = group)
+}
 
-create_non_time_table <- function(data, category, colors, topic, subtopic) {
+#' Helper to calculate overall LHD data
+#'
+#' This function adds overall data for "All LHDs" by performing a left join
+#' between the input `data` and `data_all` based on the `category` column.
+#'
+#' @param data A data frame to be augmented with "All LHDs" data.
+#' @param data_all A data frame containing "All LHDs" data with `y_All LHDs`
+#' and optionally `Responses_All LHDs`.
+#' @return A data frame with additional columns for "All LHDs" values.
+#' @import dplyr
+add_all_ldh_count <- function(data = data, data_all = data_all) {
+  dplyr::left_join(data,
+                   data_all %>% dplyr::select(category, `y_All LHDs`, dplyr::any_of("Responses_All LHDs")),
+                   by = "category")
+}
+
+#' Helper to process weighted statistics
+#'
+#' This function processes weighted statistics for a given topic and optional filter.
+#' It also adds a subtitle indicating the filter used and selects relevant columns.
+#'
+#' @param topic The topic to process statistics for.
+#' @param filtering An optional filter to apply during processing.
+#' @return A data frame with weighted statistics and additional metadata.
+#' @import dplyr
+process_weighted_stats <- function(topic, filtering = NULL) {
+  return_survey_weighted_statistics(topic, filtering) %>%
+    dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
+    dplyr::select(category, group, y, subtitle, Responses)
+}
+
+#' Helper to process jobs-related data
+#'
+#' This function processes jobs data, either standardized or non-standardized.
+#' If standardized, it calculates job metrics as percentages of total employees.
+#'
+#' @param jobs_data A data frame containing jobs data.
+#' @param is_standardized A logical value indicating whether the data should be
+#' processed in a standardized format (as percentages).
+#' @return A processed data frame with job-related statistics.
+#' @import dplyr
+process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
+  if (is_standardized) {
+    jobs_data %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
+      dplyr::filter(filter == "All LHDs") %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_cat() %>%
+      dplyr::mutate(`y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
+                    `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
+                    `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+                    `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`) %>%
+      dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
+                    `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`)
+  } else {
+    jobs_data %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
+      dplyr::filter(filter == "All LHDs") %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_group()
+  }
+}
+
+#' Helper to clean and process classification data
+#'
+#' This function processes classification data for a given topic, applying the necessary
+#' filtering and pivoting logic. If `filtering` is set to "All LHDs", it returns only
+#' the processed "All LHDs" data.
+#'
+#' @param topic The topic for classification processing.
+#' @param classifications A vector of classifications to process.
+#' @param filtering The filter to apply during processing (e.g., "All LHDs").
+#' @return A data frame with processed classification data or NULL if classifications are invalid.
+#' @import dplyr
+#' @import tidyr
+clean_class_data <- function(topic, classifications, filtering) {
+  if (!is.null(classifications) && length(classifications) >= 1) {
+    selected_vars <- paste0(classifications, topic)
+    selected_data <- get(paste0("classification_data_", topic))
+
+    data_all_class <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == "All LHDs") %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
+                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
+      pivot_data_group()
+
+    print.data.frame(data_all_class)
+
+    if (filtering == "All LHDs") {
+      return(data_all_class)
+    }
+
+    data <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == filtering) %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
+      pivot_data_group() %>%
+      add_all_ldh_count(data_all = data_all_class)
+
+    return(data)
+  }
+
+  return(NULL)
+}
+
+#' Helper to process general data for tables
+#'
+#' This function processes data based on different topics and filtering options,
+#' including handling special cases like "All LHDs", jobs-related data, and more.
+#'
+#' @param topic The topic to process.
+#' @param filtering The filter to apply to the data (e.g., "All LHDs").
+#' @param classifications Optional classifications to apply to the data.
+#' @return A processed data frame for the specified topic and filtering.
+#' @import dplyr
+#' @import tidyr
+#Function to filter data for tables--------
+process_data <- function(topic, filtering, classifications = NULL) {
+  # Handle All LHDs cases
+  if (filtering == "All LHDs") {
+
+    if (topic %in% c("FTE_numcat", "employee_numcat")) {
+      data <- return_survey_weighted_counts(topic) %>%
+        pivot_data_group()
+
+    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
+
+      data <- process_weighted_stats("c5q37") %>%
+        pivot_data_group()
+
+    } else if (topic == "jobs_total") {
+      data <- process_jobs_data(jobs_data)
+
+
+    } else if (topic == "jobs_standard") {
+      data <- process_jobs_data(jobs_data, is_standardized = TRUE)
+
+    } else if (topic == "field") {
+      data <- spec_data_all %>%
+        dplyr::select(category, y, subtitle, Responses) %>%
+        dplyr::summarise(category = category,
+                         'y_All LHDs' = y,
+                         'Responses_All LHDs' = sum(Responses),
+                         subtitle = subtitle)
+
+     } else if (topic == "a") {
+
+         data <- clean_class_data(topic, classifications, filtering)
+
+     } else if (topic == "b") {
+
+         data <- clean_class_data(topic, classifications, filtering)
+
+     } else if (topic == "budget_changes") {
+
+       data <- budget_data %>%
+         dplyr::filter(filter == "All LHDs") %>%
+         pivot_data_group()
+
+     } else if (topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & filtering == "All LHDs") {
+
+       data <- return_survey_weighted_counts(topic) %>%
+         dplyr::mutate(x_label = NA)%>%
+         pivot_data_group()
+
+     } else if (topic == "non_weighted_revenue_total" &  filtering == "All LHDs") {
+
+       data <- revenue_percentages%>%
+         dplyr::mutate(
+           category = revenue_type,
+           y = (percentage*100)
+         ) %>%
+         pivot_data_group()
+
+     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
+                            "Other Entity", "Not Available in Community")) {
+
+       data <- services_data %>%
+         dplyr::filter(service_category %in% classifications,
+                       filter == "All LHDs",
+                       service_provision == topic) %>%
+         dplyr::mutate(group = filter,
+                       category = service_type)%>%
+         pivot_data_group()
+
+     } else if (topic == "Reduced/Expanded Services") {
+
+       data <- services_change_data%>%
+         dplyr::filter(filter == "All LHDs",
+                       service_type %in% classifications) %>%
+         dplyr::group_by(category) %>%
+         dplyr::reframe(
+           y = mean(y, na.rm = TRUE),
+           Responses = sum(Responses, na.rm = TRUE),
+           group = unique(group),
+           category = unique(category)
+         ) %>%
+         pivot_data_group() %>%
+         dplyr::mutate(group = "All LHDs")
+
+     } else if (topic == "tech_use") {
+
+       data <- tech_use_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% c("Implemented"))%>%
+         dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
+         dplyr::rename(category = tech_type)%>%
+         pivot_data_group()
+
+     } else if (topic == "comm_channels") {
+
+       data <- comms_use_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked")%>%
+         dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+         dplyr::rename(category = comms_type) %>%
+         pivot_data_group()
+
+     } else if (topic == "medical") {
+
+       data <- med_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
+     } else if (topic == "dental") {
+
+       data <- dental_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
+     } else if (topic == "behavioral") {
+
+       data <- behav_data %>%
+         dplyr::filter(filter == "All LHDs")%>%
+         dplyr::group_by(category) %>%
+         pivot_data_group()
+
+
+    } else {
+      data <- return_survey_weighted_counts(topic)
+
+      # Calculate total responses and 'y_All LHDs'
+      total_responses <- sum(data$Responses, na.rm = TRUE)
+      data <- data %>%
+        dplyr::mutate(
+          y = 100 * (Responses / total_responses),
+          Responses = total_responses
+        ) %>%
+        dplyr::select(category, group, y, Responses) %>%
+        dplyr::left_join(., add_all_counts_long(topic), by = "category")
+
+    }
+
+  } else {
+
+    # Handle filters other than All LHDs
+    if (topic %in% c("FTE_numcat", "employee_numcat")) {
+
+      grp_data_all <- return_survey_weighted_counts(topic) %>%
+        pivot_data_group()
+
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        pivot_data_group()  %>%
+        add_all_ldh_count(data_all = grp_data_all)
+
+
+    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
+      data <- process_weighted_stats(topic, filtering) %>%
+        pivot_data_cat()
+
+      stat_data_all <- process_weighted_stats(topic) %>%
+        pivot_data_cat()
+
+      data <- process_weighted_stats(topic, filtering) %>%
+        pivot_data_cat() %>%
+        add_all_ldh_count(data_all = stat_data_all)
+
+
+    } else if (topic == "a") {
+
+      data <- clean_class_data(topic, classifications, filtering)
+
+    } else if (topic == "b") {
+
+      data <- clean_class_data(topic, classifications, filtering)
+
+    } else if (topic == "field") {
+
+      data <- spec_data %>% dplyr::filter(filter == filtering) %>%
+        dplyr::select(category, group, y, subtitle, Responses) %>%
+        dplyr::group_by(category) %>%
+        tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+
+      # Calculate overall y and Responses for "All LHDs"
+      overall_data <- spec_data %>%
+        dplyr::filter(filter == filtering) %>%
+        dplyr::group_by(category) %>%
+        dplyr::summarize(
+          'y_All LHDs' = sum(y * Responses, na.rm = TRUE) / sum(Responses, na.rm = TRUE),
+          'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
+        )
+
+      # Join the overall data to the pivoted data
+      data <- data %>%
+        dplyr::left_join(overall_data, by = "category")
+
+    } else if (topic == "tenure") {
+      data <- return_survey_weighted_statistics("tenure", filtering) %>%
+        dplyr::mutate(
+          'y_All LHDs' = mean(y, na.rm = TRUE),  # Adjust calculation as needed
+          'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
+        )  %>%
+        dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
+        tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
+        dplyr::rename(category = group)
+
+
+
+    } else if (topic == "totpop") {
+      data <- master_data %>%
+        haven::as_factor() %>%
+        dplyr::mutate(category = stringr::str_to_title(get(filtering)),
+                      fig_value = get("totpop")) %>%
+        dplyr::group_by(category)%>%
+        dplyr::summarise(Responses = n(),
+                         fig_value = sum(fig_value))%>%
+        dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+                      subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(group = "All LHDs") %>%
+        dplyr::select(category, group, y, subtitle, Responses) %>%
+        tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))
+
+      overall_totals <- master_data %>%
+        dplyr::summarise('Responses_All LHDs' = n(),
+                         fig_value_All_LHDs = sum(get("totpop"))) %>%
+        dplyr::mutate('y_All LHDs' = round(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100, 1))
+
+      # Add the calculated columns to your data
+      data <- data %>%
+        dplyr::mutate('y_All LHDs' = overall_totals$'y_All LHDs',
+                      'Responses_All LHDs' = overall_totals$'Responses_All LHDs')%>%
+        dplyr::rename(category = group)
+
+    } else if (topic == "budget_changes") {
+
+      budget_data_all <- budget_data %>%
+        dplyr::filter(filter == "All LHDs") %>%
+        pivot_data_group()
+
+      data <- budget_data %>%
+        dplyr::filter(filter == filtering) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = budget_data_all)
+
+    } else if (topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & filtering != "All LHDs") {
+
+        exp_data_all <- return_survey_weighted_counts(topic) %>%
+          dplyr::mutate(x_label = NA)%>%
+          pivot_data_group()
+
+        data <- return_survey_weighted_counts(topic, filtering) %>%
+          dplyr::mutate(x_label = NA)%>%
+          pivot_data_group() %>%
+          add_all_ldh_count(data_all = exp_data_all)
+
+
+    } else if (topic == "non_weighted_revenue_total" &  filtering != "All LHDs") {
+
+      rev_data_all <- revenue_percentages%>%
+        dplyr::mutate(
+          category = revenue_type,
+          y = (percentage*100)
+        ) %>%
+        pivot_data_group()
+
+
+      data <- revenue_percentages_filter %>%
+        dplyr::mutate(
+          group = category,
+          category = revenue_type,
+          y = (percentage*100)
+        ) %>%
+        dplyr::filter(filter == filtering)%>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = rev_data_all )
+
+    } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
+                           "Other Entity", "Not Available in Community")) {
+
+      services_data_all <- services_data %>%
+        dplyr::filter(service_category %in% classifications,
+                      filter == "All LHDs",
+                      service_provision == topic) %>%
+        dplyr::mutate(group = filter,
+                      category = service_type)%>%
+        pivot_data_group()
+
+
+
+      data <- services_data %>%
+        dplyr::filter(service_category %in% classifications,
+                      filter == filtering,
+                      service_provision == topic) %>%
+        dplyr::mutate(category = service_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = services_data_all)
+
+    } else if (topic == "Reduced/Expanded Services") {
+
+      services_data_all <- services_change_data%>%
+        dplyr::filter(filter == "All LHDs",
+                      service_type %in% classifications) %>%
+        dplyr::group_by(category) %>%
+        dplyr::reframe(
+          y = mean(y, na.rm = TRUE),
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group),
+          category = unique(category)
+        ) %>%
+        pivot_data_group() %>%
+        dplyr::mutate(group = "All LHDs")
+
+
+      data <- services_change_data%>%
+        dplyr::filter(filter == filtering,
+                      service_type %in% classifications)%>%
+        dplyr::group_by(group, category) %>%
+        dplyr::reframe(
+          y = mean(y, na.rm = TRUE),
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group)
+        ) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = services_data_all)
+
+    } else if (topic == "tech_use") {
+
+      tech_data_all <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented"))%>%
+        dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
+        dplyr::rename(category = tech_type)%>%
+        pivot_data_group()
+
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% c("Implemented"))%>%
+        dplyr::select(y, group, subtitle, Responses, filter, tech_type) %>%
+        dplyr::rename(category = tech_type)%>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = tech_data_all)
+
+
+    } else if (topic == "comm_channels") {
+
+      comms_data_all <- comms_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked")%>%
+        dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+        dplyr::rename(category = comms_type) %>%
+        pivot_data_group()
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked")%>%
+        dplyr::select(y, group, subtitle, Responses, filter, comms_type)%>%
+        dplyr::rename(category = comms_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = comms_data_all)
+
+    } else if (topic == "medical") {
+
+      med_data_all <- med_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+
+
+      data <- med_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = med_data_all)
+
+    } else if (topic == "dental") {
+
+      dental_data_all <- dental_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+      data <- dental_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = dental_data_all)
+
+    } else if (topic == "behavioral") {
+
+      behav_data_all <- behav_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group()
+
+      data <- behav_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category) %>%
+        pivot_data_group() %>%
+        add_all_ldh_count(data_all = behav_data_all)
+
+
+
+    } else {
+      # Process data as usual for other filters
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::select(category, group, y, subtitle, Responses) %>%
+        tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+        dplyr::left_join(., add_all_counts_long(topic), by = "category") %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )
+    }
+
+  } #closes not All LHDs filter else
+
+
+
+  return(data)
+}
+
+
+# Tables function--------
+#' Function to create a non-time series table
+#'
+#' This function creates a reactable table for non-time series data, applying custom
+#' column definitions, styles, and formatting based on the specified `topic`.
+#'
+#' @param data The data frame to display in the table.
+#' @param category The category for grouping columns.
+#' @param colors A vector of colors to use for the data bars.
+#' @param topic The topic to customize the formatting and styles.
+#' @return A reactable table object.
+#' @import reactable
+#' @import reactablefmtr
+#' @importFrom scales percent_format
+create_non_time_table <- function(data, category, colors, topic) {
 
 
 data <- data %>%
@@ -56,17 +606,17 @@ data <- data %>%
 
     if (topic == "tenure") {
       paste0(rounded_value, " years (mean)")
-    } else if (subtopic == "jobs_total") {
+    } else if (topic == "jobs_total") {
       scales::label_comma()(rounded_value)
-    } else if (subtopic == "b") {
+    } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
-    } else if (subtopic == "fte_bypop") {
+    } else if (topic == "fte_bypop") {
       paste0(rounded_value, " FTE per capita (mean)")
-    } else if (subtopic == "c5q37") {
+    } else if (topic == "c5q37") {
       paste0(rounded_value, " Total FTE (mean)")
-    } else if (subtopic == "employee_bypop") {
+    } else if (topic == "employee_bypop") {
       paste0(rounded_value, " Employees per capita (mean)")
-    } else if (subtopic == "c5q36") {
+    } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees (mean)")
     } else {
       scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
@@ -78,7 +628,7 @@ data <- data %>%
   options(
     reactable.theme = reactable::reactableTheme(
       color = "#3d4242",
-      backgroundColor = "#F9F8F7",
+      backgroundColor = "",
       borderColor = NULL,
       stripedColor = NULL,
       highlightColor = "#EEEAE4",
@@ -123,7 +673,9 @@ data <- data %>%
       cellPadding = "15px 25px",
       style = list(
         fontFamily = "Heebo",
-        fontSize = "12px"  # Define general font size for table cells here
+        fontSize = "12px",
+        borderTop = "1px solid #212F5B",
+        borderBottom = "2px solid #212F5B"
       )
     )
   )
@@ -138,10 +690,10 @@ data <- data %>%
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
-                                           ifelse(subtopic == "jobs_total", 15000,
-                                                  ifelse(subtopic == "b", 21000,
-                                                  ifelse(subtopic == "jobs_standard", 10, 100)))),
-                       fill_color = "#008A96",
+                                           ifelse(topic == "jobs_total", 15000,
+                                                  ifelse(topic == "b", 21000,
+                                                  ifelse(topic == "jobs_standard", 10, 100)))),
+                       fill_color = naccho.viz::green,
                        background = 'none',
                        number_fmt = num_format
                     ),
@@ -162,9 +714,8 @@ data <- data %>%
 #generate table if all LHDS -------------
   # Check if the data is for "All LHDs" a
 
-  if (category == "All LHDs" & topic != "jobs"
-      # & subtopic == "no subtopic"
-      ) {
+ if (category == "All LHDs" && !(topic %in% c("jobs_standard", "jobs_total")))
+   {
 
     # Define column definitions for All LHDs------------
     column_definitions <- list(
@@ -204,6 +755,7 @@ data <- data %>%
       columns = column_definitions,
       filterable = FALSE,
       showPageSizeOptions = TRUE,
+      defaultPageSize = 8,
       striped = FALSE,
       highlight = TRUE,
       searchable = FALSE,
@@ -276,9 +828,9 @@ data <- data %>%
             cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8,
-                                                ifelse(subtopic == "jobs_total", 15000,
-                                                       ifelse(subtopic == "b", 21000,
-                                                              ifelse(subtopic == "jobs_standard", 10, 100)))),
+                                            ifelse(topic == "jobs_total", 15000,
+                                                ifelse(topic == "b", 21000,
+                                                      ifelse(topic == "jobs_standard", 10, 100)))),
                              fill_color = colors[i],
                              background = 'none',
                              number_fmt = num_format
@@ -318,16 +870,7 @@ data <- data %>%
         NULL  # No groups if not in group_definitions
       },
 
-      # columnGroups = if ("subtitle" %in% colnames(data)) {
-      #   list(
-      #     reactable::colGroup(
-      #       name = unique(data$subtitle),
-      #       columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
-      #     )
-      #   )
-      # } else {
-      #   NULL  # No groups if "subtitle" is not present
-      # },
+      defaultPageSize = 8,
       filterable = FALSE,
       showPageSizeOptions = TRUE,
       striped = FALSE,
@@ -337,283 +880,32 @@ data <- data %>%
       resizable = TRUE
     )
   }
+
+ # message("Column definitions:")
+ # print(column_definitions)
+
+ # message("the topic is:")
+ # print(topic)
+ #
+ # message("These are the data:")
+ # print(data)
+
+
 }
 
-# Helper function to add tooltips
+#' Helper function to add tooltips
+#'
+#' This function adds tooltips to column headers for additional context.
+#'
+#' @param value The text to display.
+#' @param tooltip The tooltip message to display on hover.
+#' @param ... Additional arguments passed to the tooltip function.
+#' @return A div with tooltip-enabled text.
+#' @importFrom tippy tippy
+
 with_tooltip <- function(value, tooltip, ...) {
   div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
       tippy::tippy(value, tooltip, ...))
 }
 
 
-
-
-
-# create_non_time_table <- function(data, category, colors) {
-#
-#   # Extract the relevant Responses columns
-#   response_columns <- grep("^Responses_", colnames(data), value = TRUE)
-#
-#   # Calculate total N counts for each corresponding Responses column
-#   total_counts <- sapply(response_columns, function(col) sum(data[[col]], na.rm = TRUE))
-#
-#   # Define theme
-#   options(
-#     reactable.theme = reactableTheme(
-#       color = "#3d4242",
-#       backgroundColor = "#F9F8F7",
-#       borderColor = NULL,
-#       stripedColor = NULL,
-#       highlightColor = "#EEEAE4",
-#       inputStyle = list(
-#         backgroundColor = "white"
-#       ),
-#       selectStyle = list(
-#         backgroundColor = "white"
-#       ),
-#       pageButtonHoverStyle = list(
-#         backgroundColor = ""
-#       ),
-#       pageButtonActiveStyle = list(
-#         backgroundColor = ""
-#       ),
-#       headerStyle = list(
-#         borderWidth = "3px",
-#         paddingTop = "10px",
-#         verticalAlign = "bottom",
-#         textAlign = "center",
-#         background = "white",
-#         textTransform = "uppercase",
-#         borderColor = "#3d4242",
-#         color = "#3d4242",
-#         fontSize = "14px",
-#         fontWeight = "normal"
-#       ),
-#       groupHeaderStyle = list(
-#         "&:not(:empty)" = list(
-#           paddingBottom = "2px",
-#           verticalAlign = "bottom",
-#           borderWidth = "3px",
-#           borderColor = "#3d4242",
-#           textAlign = "center",
-#           backgroundColor = "#ffffff",
-#           textTransform = "uppercase",
-#           fontSize = "14px",
-#           fontWeight = "bold",
-#           color = "#3d4242"
-#         )
-#       ),
-#       cellPadding = "15px 25px",
-#       style = list(
-#         fontFamily = "Heebo",
-#         fontSize = "12px"  # Define general font size for table cells here
-#       )
-#     )
-#   )
-#
-#   # Define the groups and their corresponding columns
-#   group_definitions <- list(
-#     Rurality = list(columns = c("y_Urban", "y_Rural")),
-#     Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
-#     `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
-#     Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
-#   )
-#
-#   # Get the columns for the selected category
-#   selected_columns <- group_definitions[[category]]$columns
-#   selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
-#
-#   # Dynamically create column definitions
-#   column_definitions <- setNames(
-#     lapply(seq_along(selected_columns), function(i) {
-#       col <- selected_columns[i]
-#       col_name <- sub("^y_", "", col)
-#       response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
-#       count <- total_counts[[response_col]]  # Get the count for the current column
-#
-#       colDef(
-#         name = stringr::str_replace_all(col_name, "_", " "),
-#         align = "center",
-#         header = with_tooltip(col_name, paste0("n = ", count)),
-#         cell = reactablefmtr::data_bars(data,
-#                          text_position = "outside-end",
-#                          max_value = 100,
-#                          fill_color = colors[i],
-#                          background = 'none',
-#                          number_fmt = scales::percent_format(scale = 1))
-#       )
-#     }),
-#     selected_columns
-#   )
-#
-#   # Add the All LHDs column definition if it exists in the data
-#   if ("y_All LHDs" %in% colnames(data)) {
-#     column_definitions <- c(
-#       list(
-#         category = colDef(
-#           name = stringr::str_to_title(colnames(data)[1]),
-#           align = "center",
-#           style = list(
-#             fontFamily = "Heebo",
-#             borderRight = "3px solid #3d4242"
-#           ),
-#           headerStyle = list(
-#             fontWeight = "bold"
-#           )
-#         ),
-#         `y_All LHDs` = colDef(
-#           name = "All LHDs",
-#           align = "center",
-#           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
-#           cell = reactablefmtr::data_bars(data,
-#                            text_position = "outside-end",
-#                            max_value = 100,
-#                            fill_color = "#008A96",
-#                            background = 'none',
-#                            number_fmt = scales::percent_format(scale = 1)),
-#           style = list(
-#             borderRight = "3px solid #3d4242"
-#           ),
-#           headerStyle = list(
-#             fontWeight = "bolder"
-#           )
-#         )
-#       ),
-#       column_definitions
-#     )
-#   }
-#
-#   # Add the subtitle column definition to hide it
-#   column_definitions$subtitle <- colDef(show = FALSE)
-#
-#   # Add hidden columns for Responses_*
-#   response_col_definitions <- setNames(
-#     lapply(response_columns, function(col) {
-#       colDef(show = FALSE)
-#     }),
-#     response_columns
-#   )
-#
-#   # Combine the main column definitions with the hidden Response columns
-#   column_definitions <- c(column_definitions, response_col_definitions)
-#
-#   # Create the reactable table
-#   reactable(
-#     data = data,
-#     columns = column_definitions,
-#     columnGroups = list(
-#       reactable::colGroup(name = unique(data$subtitle),
-#                columns = selected_columns)
-#     ),
-#     filterable = FALSE,
-#     showPageSizeOptions = TRUE,
-#     striped = FALSE,
-#     highlight = TRUE,
-#     searchable = FALSE,
-#     bordered = FALSE,
-#     resizable = TRUE
-#   )
-# }
-#
-# # Helper function to add tooltips
-# with_tooltip <- function(value, tooltip, ...) {
-#   div(style = "text-decoration: underline; text-decoration-style: dotted; cursor: help",
-#       tippy(value, tooltip, ...))
-# }
-
-
-
-
-
-#   # Get the columns for the selected category
-#   selected_columns <- group_definitions[[category]]$columns
-#   selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
-#
-#   # Dynamically create column definitions
-#   column_definitions <- setNames(
-#     lapply(seq_along(selected_columns), function(i) {
-#       col <- selected_columns[i]
-#       col_name <- sub("^y_", "", col)
-#       response_col <- paste0("Responses_", col_name)  # Get the corresponding Responses column
-#       count <- total_counts[[response_col]]  # Get the count for the current column
-#
-#       colDef(
-#         name = stringr::str_replace_all(col_name, "_", " "),
-#         align = "center",
-#         header = with_tooltip(col_name, paste0("n = ", count)),
-#         cell = reactablefmtr::data_bars(data,
-#                          text_position = "outside-end",
-#                          max_value = 100,
-#                          fill_color = colors[i],
-#                          background = 'none',
-#                          number_fmt = scales::percent_format(scale = 1))
-#       )
-#     }),
-#     selected_columns
-#   )
-#
-#   # Add the All LHDs column definition if not already included
-#   if ("y_All LHDs" %in% colnames(data)) {
-#     column_definitions <- c(
-#       list(
-#         category = colDef(
-#           name = stringr::str_to_title(colnames(data)[1]),
-#           align = "center",
-#           style = list(
-#             fontFamily = "Heebo",
-#             borderRight = "3px solid #3d4242"
-#           ),
-#           headerStyle = list(
-#             fontWeight = "bold"
-#           )
-#         ),
-#         `y_All LHDs` = colDef(
-#           name = "All LHDs",
-#           align = "center",
-#           header = with_tooltip("All LHDs", paste0("n = ", total_counts[["Responses_All LHDs"]])),
-#           cell = reactablefmtr::data_bars(data,
-#                            text_position = "outside-end",
-#                            max_value = 100,
-#                            fill_color = "#008A96",
-#                            background = 'none',
-#                            number_fmt = scales::percent_format(scale = 1)),
-#           style = list(
-#             borderRight = "3px solid #3d4242"
-#           ),
-#           headerStyle = list(
-#             fontWeight = "bolder"
-#           )
-#         )
-#       ),
-#       column_definitions
-#     )
-#   }
-#
-#   # Add hidden columns for Responses_*
-#   response_col_definitions <- setNames(
-#     lapply(response_columns, function(col) {
-#       colDef(show = FALSE)
-#     }),
-#     response_columns
-#   )
-#
-#   # Combine the main column definitions with the hidden Response columns
-#   column_definitions <- c(column_definitions, response_col_definitions)
-#
-#   # Create the reactable table
-#   reactable(
-#     data = data,
-#     columns = column_definitions,
-#     columnGroups = list(
-#       reactable::colGroup(name = unique(data$subtitle),
-#                columns = selected_columns)
-#     ),
-#     filterable = FALSE,
-#     showPageSizeOptions = TRUE,
-#     striped = FALSE,
-#     highlight = TRUE,
-#     searchable = FALSE,
-#     bordered = FALSE,
-#     resizable = TRUE
-#   )
-# }
