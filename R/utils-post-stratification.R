@@ -91,7 +91,8 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             y = round(Percentage,1),
             category = sapply(Answer, custom_str_to_title),
             group = Group,
-            subtitle = paste0("Estimated Across All LHDs")
+            subtitle = paste0("Estimated Across All LHDs"),
+            x_label = NA
           )
 
         add_responses <- master_data %>%
@@ -134,7 +135,8 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
             y = round(Percentage,1),
             category = sapply(Answer, custom_str_to_title),
             group = sapply(Group, custom_str_to_title),
-            subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+            subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
+            x_label = NA
           )
 
         add_responses <- master_data %>%
@@ -255,7 +257,8 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         x = as.numeric(as.factor(Group)) - 1,
         category = sapply(Group, custom_str_to_title),
         group = "All LHDs",
-        subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+        subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
+        x_label = NA
       )
 
     } else {
@@ -281,7 +284,8 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
           x = as.numeric(as.factor(Group)) - 1,
           category = sapply(Group, custom_str_to_title),
           group = "All LHDs",
-          subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps]))
+          subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
+          x_label = NA
         )
 
     }

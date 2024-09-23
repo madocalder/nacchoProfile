@@ -27,8 +27,6 @@ viz_export <- function(hc, enabled = TRUE) {
           symbolStroke = naccho.viz::teal,
           menuItems = c("printChart",
                         "separator",
-                        "downloadPNG",
-                        "downloadJPEG",
                         "downloadPDF",
                         "downloadSVG",
                         "separator",
@@ -72,7 +70,7 @@ viz_options <- function(hc,
                         tooltip_align = "center",
                         legend_enable = TRUE,
                         legend_title = "",
-                        legend_align = "right") {
+                        legend_align = "left") {
   hc %>%
     highcharter::hc_colors(
       colors = colors
@@ -183,7 +181,7 @@ proxy_to_single <- function(
         text = paste("<b> N: </b>", add_n, "<br>", source_line)
       ),
       xAxis = list(
-        categories = unique(data$category),
+        categories = as.list(unique(data$category)),
         offset = 0
       ),
       tooltip = list(
@@ -353,7 +351,7 @@ proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
 #'
 #' @return column graph
 set_column <- function(data,
-                       y_label = "% of Population") {
+                       y_label = "% of LHDs") {
 
   highcharter::hchart(
     data,
@@ -388,7 +386,7 @@ set_column <- function(data,
       ), # y-axis label
       min = 0,
       labels = list(
-        format = "{value}%"
+        format = "{value}"
       )
     )
 }
@@ -905,7 +903,7 @@ proxy_to_hist_total <- function(hc,
           step = 20,
           format = "{value:,.0f}",
           style = list(
-            fontSize = "17px",
+            fontSize = "14px",
             textOverflow = "none"
           )
         )
@@ -982,7 +980,7 @@ proxy_to_hist_pc <- function(hc,
           step = 20,
           format = "{value:,.1f}",
           style = list(
-            fontSize = "17px",
+            fontSize = "14px",
             textOverflow = "none"
           )
         )
@@ -1064,7 +1062,7 @@ proxy_hist_to_single <- function(hc,
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
-        categories = as.list(data$category),
+        categories = as.list(unique(data$category)),
         title = list(
           text = unique(data$x_label)
         ),
@@ -1166,7 +1164,7 @@ proxy_hist_to_group <- function(hc,
           text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
         ),
         xAxis = list(
-          categories = unique(data$category),
+          categories = as.list(unique(data$category)),
           title = list(
             text = unique(data$x_label)
           ),

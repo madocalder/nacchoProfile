@@ -22,7 +22,8 @@ mod_key_findings_ui <- function(id){
             div(
               class = "col-sm-8",
               align = "left",
-              h1("Key Findings")
+              h1("Key Findings"),
+              hr(class = "header-hr")
             ),
             div(
               class = "col-sm-3 findings-align",

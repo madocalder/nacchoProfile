@@ -1,9 +1,6 @@
 ## code to prepare `landscape_topics` dataset goes here
 landscape_topics <- list(
-  "Population Characteristics" = list("Population Served" = "totpop"
-  ),
-  "Agency Characteristics" = list("Governance" = "c0govcatn",
-                                  "Structure" = "c2q501",
+  "Agency Characteristics" = list("Structure" = "c2q501",
                                   "Board of Health" = "lboh"),
 
   "Executive Characteristics" = list("Age" = "age_cat",

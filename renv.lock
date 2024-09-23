@@ -533,13 +533,13 @@
     },
     "curl": {
       "Package": "curl",
-      "Version": "5.2.2",
+      "Version": "5.2.3",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
-      "Hash": "8f27335f2bcff4d6035edcc82d7d46de"
+      "Hash": "d91263322a58af798f6cf3b13fd56dde"
     },
     "data.table": {
       "Package": "data.table",
@@ -697,14 +697,13 @@
     },
     "evaluate": {
       "Package": "evaluate",
-      "Version": "0.24.0",
+      "Version": "1.0.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
-        "R",
-        "methods"
+        "R"
       ],
-      "Hash": "a1066cbc05caee9a4bf6d90f194ff4da"
+      "Hash": "6b567375113ceb7d9f800de4dd42218e"
     },
     "fansi": {
       "Package": "fansi",
@@ -1108,13 +1107,13 @@
     },
     "jsonlite": {
       "Package": "jsonlite",
-      "Version": "1.8.8",
+      "Version": "1.8.9",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "methods"
       ],
-      "Hash": "e1b9c55281c5adc4dd113652d9e26768"
+      "Hash": "4e993b65c2c3ffbffce7bb3e2c6f832b"
     },
     "knitr": {
       "Package": "knitr",
@@ -1290,7 +1289,7 @@
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "1c7cc84c81856952caeda53fdd2a93ee3dc24709",
+      "RemoteSha": "3d07c310e6848033a7f5c31e29ffc3967b9516d2",
       "Requirements": [
         "R",
         "highcharter",
@@ -1298,7 +1297,7 @@
         "magrittr",
         "rsvg"
       ],
-      "Hash": "4e10b3b9232dd6ec3e4a1b608a4bfe69"
+      "Hash": "14dabbc8dde3c20bbf49041deb3fa68c"
     },
     "nacchoProfile": {
       "Package": "nacchoProfile",
@@ -1783,13 +1782,13 @@
     },
     "rjson": {
       "Package": "rjson",
-      "Version": "0.2.21",
+      "Version": "0.2.23",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
-      "Hash": "f9da75e6444e95a1baf8ca24909d63b9"
+      "Hash": "7a04e9eff95857dbf557b4e5f0b3d1a8"
     },
     "rlang": {
       "Package": "rlang",
@@ -1907,10 +1906,10 @@
     },
     "rsvg": {
       "Package": "rsvg",
-      "Version": "2.6.0",
+      "Version": "2.6.1",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "7aaf92c4adddc8a85696ae7f0123a725"
+      "Repository": "RSPM",
+      "Hash": "7772252f515fb6ab21cf1c08b07a9abd"
     },
     "rversions": {
       "Package": "rversions",
@@ -2312,13 +2311,13 @@
     },
     "tinytex": {
       "Package": "tinytex",
-      "Version": "0.52",
+      "Version": "0.53",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "xfun"
       ],
-      "Hash": "cfbad971a71f0e27cec22e544a08bc3b"
+      "Hash": "9db859e8aabbb474293dde3097839420"
     },
     "tippy": {
       "Package": "tippy",
