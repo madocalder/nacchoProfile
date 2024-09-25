@@ -199,7 +199,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::mutate(x_label = NA)%>%
          pivot_data_group()
 
-     } else if (topic == "non_weighted_revenue_total" &  filtering == "All LHDs") {
+     } else if (topic == "non_weighted_revenue_total") {
 
        data <- revenue_percentages%>%
          dplyr::mutate(
@@ -207,6 +207,12 @@ process_data <- function(topic, filtering, classifications = NULL) {
            y = (percentage*100)
          ) %>%
          pivot_data_group()
+
+     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+
+       data <- return_survey_weighted_statistics(topic)%>%
+         pivot_data_cat()
+
 
      } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                             "Other Entity", "Not Available in Community")) {
@@ -449,7 +455,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
           add_all_ldh_count(data_all = exp_data_all)
 
 
-    } else if (topic == "non_weighted_revenue_total" &  filtering != "All LHDs") {
+    } else if (topic == "non_weighted_revenue_total") {
 
       rev_data_all <- revenue_percentages%>%
         dplyr::mutate(
@@ -468,6 +474,17 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::filter(filter == filtering)%>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = rev_data_all )
+
+
+    } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+
+      exp_data_all <- return_survey_weighted_statistics(topic)%>%
+        pivot_data_cat()
+
+
+      data <- process_weighted_stats(topic, filtering)%>%
+        pivot_data_cat() %>%
+        add_all_ldh_count(data_all = exp_data_all)
 
     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                            "Other Entity", "Not Available in Community")) {
@@ -728,6 +745,8 @@ data <- data %>%
       paste0(rounded_value, " Employees per capita (mean)")
     } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees (mean)")
+    } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+      scales::label_currency()(rounded_value)
     } else {
       scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
     }
@@ -800,9 +819,10 @@ data <- data %>%
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
-                                           ifelse(topic == "jobs_total", 15000,
-                                                  ifelse(topic == "b", 21000,
-                                                  ifelse(topic == "jobs_standard", 10, 100)))),
+                                          ifelse(topic == "c3q15", 13000000,
+                                                 ifelse(topic == "jobs_total", 15000,
+                                                        ifelse(topic == "b", 21000,
+                                                               ifelse(topic == "jobs_standard", 10, 100))))),
                        fill_color = naccho.viz::green,
                        background = 'none',
                        number_fmt = num_format
@@ -938,9 +958,11 @@ data <- data %>%
             cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8,
-                                            ifelse(topic == "jobs_total", 15000,
-                                                ifelse(topic == "b", 21000,
-                                                      ifelse(topic == "jobs_standard", 10, 100)))),
+                                                ifelse(topic == "c3q15", 200000000,
+                                                       ifelse(topic == "jobs_total", 15000,
+                                                              ifelse(topic == "b", 21000,
+                                                                     ifelse(topic == "jobs_standard", 10, 100))))),
+
                              fill_color = colors[i],
                              background = 'none',
                              number_fmt = num_format
