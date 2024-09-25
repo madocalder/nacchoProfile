@@ -273,6 +273,25 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::group_by(category) %>%
          pivot_data_group()
 
+     } else if (topic == "chachip") {
+
+       data <- return_survey_weighted_counts("chachip")
+
+       # Calculate total responses and 'y_All LHDs'
+       total_responses <- sum(data$Responses, na.rm = TRUE)
+       data <- data %>%
+         dplyr::mutate(
+           y = 100 * (Responses / total_responses),
+           Responses = total_responses
+         ) %>%
+         dplyr::select(category, group, y, Responses) %>%
+         dplyr::left_join(., add_all_counts_long("chachip"), by = "category")%>%
+         dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+         dplyr::mutate(category = dplyr::recode(category,
+                                                "Yes" = "Completed both in past 5 years",
+                                                "No" = " Completed one or none in past 5 years"))
+
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -549,6 +568,19 @@ process_data <- function(topic, filtering, classifications = NULL) {
         pivot_data_group() %>%
         add_all_ldh_count(data_all = behav_data_all)
 
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::select(category, group, y, subtitle, Responses) %>%
+        tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+        dplyr::left_join(., add_all_counts_long(topic), by = "category") %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )%>%
+        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
 
 
     } else {

@@ -19,9 +19,9 @@ mod_home_ui <- function(id){
         p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
         h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
         br(),
-        br(),
-        br(),
-        br(),
+        # br(),
+        # br(),
+        # br(),
         bslib::accordion(
           id = "cord",
           open = FALSE,

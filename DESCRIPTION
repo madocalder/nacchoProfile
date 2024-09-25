@@ -14,7 +14,6 @@ Imports:
     bslib,
     config (>= 0.3.2),
     dplyr,
-    flexlayout,
     golem (>= 0.4.1),
     haven,
     highcharter,
@@ -38,7 +37,8 @@ Suggests:
     testthat (>= 3.0.0)
 Remotes:
     lindsayjorgenson/naccho.viz,
-    the-y-company/bsutils
+    the-y-company/bsutils,
+    the-y-company/flexlayout,
     lindsayjorgenson/custom.map
 Config/testthat/edition: 3
 Encoding: UTF-8
