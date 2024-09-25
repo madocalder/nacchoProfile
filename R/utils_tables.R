@@ -310,6 +310,15 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::rename(category = new_advocacy_type) %>%
          pivot_data_group()
 
+     } else if (topic == "m9q240") {
+
+       data <- chip_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked") %>%
+         dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+         dplyr::rename(category = action) %>%
+         pivot_data_group()
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -633,6 +642,23 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::rename(category = new_advocacy_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = new_advocacy_data_all)
+
+    } else if (topic == "m9q240") {
+
+      chip_data_all <- chip_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+        dplyr::rename(category = action) %>%
+        pivot_data_group()
+
+      data <- chip_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+        dplyr::rename(category = action) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = chip_data_all)
 
 
     } else {

@@ -75,7 +75,7 @@ advocacy_data <- rbind(advocacy_with_filters, advocacy_no_filter) %>%
                                                  Question %in% c("c12q260af") ~ "Reforms related to community policing",
                                                  Question %in% c("c12q260ag") ~ "Planning external resource allocation using an equity lens",
                                                  Question %in% c("c12q260t") ~ "Safe and healthy housing",
-                                                 Question %in% c("c12q260u") ~ "TAOD",
+                                                 Question %in% c("c12q260u") ~ "Tobacco, alcohol, and other drugs",
                                                  Question %in% c("c12q260v") ~ "Wastewater/sanitation",
                                                  Question %in% c("c12q260z") ~ "Other environmental health",
                                                  Question %in% c("c12q260j") ~ "Other policy areas",
@@ -86,7 +86,7 @@ advocacy_data <- rbind(advocacy_with_filters, advocacy_no_filter) %>%
 usethis::use_data(advocacy_data, overwrite = TRUE)
 
 
-View(advocacy_data)
+# View(advocacy_data)
 
 
 ## code to prepare `new_advocacy_data` dataset goes here ----
@@ -141,7 +141,7 @@ for (i in 1:length(filters)) {
 # bind the data generated in loop
 new_advocacy_with_filters <- do.call(rbind, new_advocacy_list)
 
-View(new_advocacy_with_filters)
+# View(new_advocacy_with_filters)
 
 vars <- c("newc12q502x", "newc12q502aa",
           "newc12q502b", "newc12q502ab",
@@ -171,7 +171,7 @@ new_advocacy_no_filter <- map_dfr(vars, function(var) {
   select(1:12, "Responses") %>%
   mutate(filter = paste("All LHDs"))
 
-View(new_advocacy_no_filter)
+# View(new_advocacy_no_filter)
 
 # join the two datasets -- with filters and with no filter
 new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>%
@@ -192,14 +192,14 @@ new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>
     Question %in% c("newc12q502l") ~ "Obesity/physical activity",
     Question %in% c("newc12q502p") ~ "Oral health",
     Question %in% c("newc12q502t") ~ "Safe and healthy housing",
-    Question %in% c("newc12q502k") ~ "TAOD",
+    Question %in% c("newc12q502k") ~ "Tobacco, alcohol, and other drugs",
     Question %in% c("newc12q502v") ~ "Wastewater/sanitation",
     Question %in% c("newc12q502z") ~ "Other environmental health",
     Question %in% c("newc12q502f") ~ "Other area"
   )
   )
 
-View(new_advocacy_data)
+# View(new_advocacy_data)
 
 usethis::use_data(new_advocacy_data, overwrite = TRUE)
 
