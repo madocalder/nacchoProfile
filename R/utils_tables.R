@@ -301,6 +301,15 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::rename(category = advocacy_type) %>%
          pivot_data_group()
 
+     } else if (topic == "Newc12q502") {
+
+       data <- new_advocacy_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked") %>%
+         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+         dplyr::rename(category = new_advocacy_type) %>%
+         pivot_data_group()
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -607,6 +616,23 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::rename(category = advocacy_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = advocacy_data_all)
+
+    } else if (topic == "Newc12q502") {
+
+      new_advocacy_data_all <- new_advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+        dplyr::rename(category = new_advocacy_type) %>%
+        pivot_data_group()
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+        dplyr::rename(category = new_advocacy_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = new_advocacy_data_all)
 
 
     } else {
