@@ -359,7 +359,37 @@ mod_landscape_server <- function(id){
       req(input$view == "Table")
 
       #add topic value for function
-      topic <- input$topic
+      topic = input$topic
+
+      filtering = input$filter
+
+      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
+        input$classifications
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("topic variable =")
+      print(topic)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+
+
+      data <- process_data(topic, filtering, classifications)
+
+      data <- data %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )
+
 
       # Define colors reactively based on the filter
       colors <- colors()
@@ -374,105 +404,11 @@ mod_landscape_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-
-      if (input$topic == "field" & input$filter == "All LHDs") {
-        data <- spec_data_all %>%
-          dplyr::select(category, y, subtitle, Responses) %>%
-          dplyr::summarise(category = category,
-                           'y_All LHDs' = y,
-                           'Responses_All LHDs' = sum(Responses),
-                           subtitle = subtitle)
-
-
-        } else if (input$filter == "All LHDs") {
-          data <- return_survey_weighted_counts(input$topic)
-
-          # Calculate total responses and 'y_All LHDs'
-          total_responses <- sum(data$Responses, na.rm = TRUE)
-          data <- data %>%
-            dplyr::mutate(
-              y = 100 * (Responses / total_responses),
-              Responses = total_responses
-            ) %>%
-            dplyr::select(category, group, y, Responses) %>%
-            dplyr::left_join(., add_all_counts_long(input$topic), by = "category")
-
-
-
-      } else if (input$topic == "field" & input$filter != "All LHDs") {
-        data <- spec_data %>% dplyr::filter(filter == input$filter) %>%
-          dplyr::select(category, group, y, subtitle, Responses) %>%
-          dplyr::group_by(category) %>%
-          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
-
-        # Calculate overall y and Responses for "All LHDs"
-        overall_data <- spec_data %>%
-          dplyr::filter(filter == input$filter) %>%
-          dplyr::group_by(category) %>%
-          dplyr::summarize(
-            'y_All LHDs' = sum(y * Responses, na.rm = TRUE) / sum(Responses, na.rm = TRUE),
-            'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
-          )
-
-        # Join the overall data to the pivoted data
-        data <- data %>%
-          dplyr::left_join(overall_data, by = "category")
-
-
-
-      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
-        data <- return_survey_weighted_statistics("tenure", input$filter) %>%
-            dplyr::mutate(
-              'y_All LHDs' = mean(y, na.rm = TRUE),  # Adjust calculation as needed
-              'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
-            )  %>%
-            dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
-            tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
-            dplyr::rename(category = group)
-
-
-
-      } else if (input$topic == "totpop" & input$filter != "All LHDs") {
-        data <- master_data %>%
-          haven::as_factor() %>%
-          dplyr::mutate(category = stringr::str_to_title(get(input$filter)),
-                        fig_value = get("totpop")) %>%
-          dplyr::group_by(category)%>%
-          dplyr::summarise(Responses = n(),
-                           fig_value = sum(fig_value))%>%
-          dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
-                        subtitle = paste0("By ", names(landscape_filters[landscape_filters == input$filter]))) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(group = "All LHDs") %>%
-          dplyr::select(category, group, y, subtitle, Responses) %>%
-          tidyr::pivot_wider(names_from = category, values_from = c(y, Responses))
-
-        overall_totals <- master_data %>%
-          dplyr::summarise('Responses_All LHDs' = n(),
-                           fig_value_All_LHDs = sum(get("totpop"))) %>%
-          dplyr::mutate('y_All LHDs' = round(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100, 1))
-
-        # Add the calculated columns to your data
-        data <- data %>%
-          dplyr::mutate('y_All LHDs' = overall_totals$'y_All LHDs',
-                        'Responses_All LHDs' = overall_totals$'Responses_All LHDs')%>%
-          dplyr::rename(category = group)
-
-
-
-      } else {
-        # Process data as usual for other filters
-        data <- return_survey_weighted_counts(input$topic, input$filter) %>%
-          dplyr::select(category, group, y, subtitle, Responses) %>%
-          tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
-          dplyr::left_join(., add_all_counts_long(input$topic), by = "category") %>%
-          dplyr::mutate(
-            dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
-          )
-      }
+      print(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
+
     })
 
 

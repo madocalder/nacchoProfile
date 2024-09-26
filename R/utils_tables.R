@@ -179,6 +179,11 @@ process_data <- function(topic, filtering, classifications = NULL) {
                          'Responses_All LHDs' = sum(Responses),
                          subtitle = subtitle)
 
+    } else if (topic == "tenure") {
+
+      data <- return_survey_weighted_statistics("tenure")%>%
+        pivot_data_cat()
+
      } else if (topic == "a") {
 
          data <- clean_class_data(topic, classifications, filtering)
@@ -323,6 +328,8 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::select(y, group, subtitle, Responses, filter, action)%>%
          dplyr::rename(category = action) %>%
          pivot_data_group()
+
+
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -727,7 +734,7 @@ data <- data %>%
 
 
     if (topic == "tenure") {
-      paste0(rounded_value, " years (mean)")
+      paste0(rounded_value, " years")
     } else if (topic == "jobs_total") {
       scales::label_comma()(rounded_value)
     } else if (topic == "b") {
