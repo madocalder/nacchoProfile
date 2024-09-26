@@ -64,24 +64,26 @@ mod_workforce_ui <- function(id){
           div(
             class = "viz-content",
 
-            # display when map is selected and view is not Table
+            # Display bar graph when the topic is NOT jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
               condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               highcharter::highchartOutput(ns("figure"), height = 575)
             ),
 
-            # display when map is not selected and view is not Table
+            # Display bar graph when the topic is jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
-              condition = paste0("input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
+              condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               highcharter::highchartOutput(ns("figure_jobs"), height = 675)
             ),
 
             # Adding the new table view
             conditionalPanel(
               condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
+              uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-               HTML(source_line)
+              HTML('<div style="font-size: 13px;">', source_line,'
+                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
             )
           )
         ),
@@ -209,7 +211,7 @@ mod_workforce_server <- function(id){
 
       } else if (input$topic %in% c("jobs_total", "jobs_standard")) {
         updateSelectInput(session, "filter",
-                          choices = "All Filters")
+                          choices = "All LHDs")
       }
     })
 
@@ -246,7 +248,17 @@ mod_workforce_server <- function(id){
     })
 
 
+    #table titles---------------------------------------------------------------
+    output$table_title <- renderUI({
+      # Ensure input$topic exists before using it
+      req(input$topic)
 
+      # Subset based on the reactive input$topic and convert to character
+      title_values <- as.character(subset(meta, field == input$topic)$title)
+
+      # Render the HTML
+      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+    })
 
     # figure output -----------------------------------------------------------
     # used for first histogram
@@ -463,7 +475,7 @@ mod_workforce_server <- function(id){
 
         # Topic: Jobs Standard
         # View: Bar Graph
-        # Filters: All Filters
+        # Filters: All LHDs
       } else if (input$topic == "jobs_standard") {
         data <- filtered_butterfly() %>%
           dplyr::mutate(left = left_standard,
@@ -479,7 +491,7 @@ mod_workforce_server <- function(id){
 
         # Topic: Jobs Total
         # View: Bar Graph
-        # Filters: All Filters
+        # Filters: All LHDs
       } else if (input$topic == "jobs_total") {
         data <- filtered_butterfly()
 

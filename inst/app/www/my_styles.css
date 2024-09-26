@@ -6,7 +6,7 @@
     display: flex;
     justify-content: center;
     margin-top: -67px;
-    padding-bottom: 25px;
+    padding-bottom: 5px;
 }
 
 .btn-group {
@@ -1044,7 +1044,7 @@ label:not(.material-switch label) {
 .viz-content {
   padding-left: 4em;
   padding-right: 4em;
-  padding-top: 2em;
+  padding-top: 0em!important;
 }
 
 .viz-content-buttons {

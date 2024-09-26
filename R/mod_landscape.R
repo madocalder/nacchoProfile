@@ -78,9 +78,12 @@ mod_landscape_ui <- function(id){
             # adding table
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
+              uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-             HTML(source_line)
+              HTML('<div style="font-size: 13px;">', source_line,'
+                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+
             )
           )
         ),
@@ -171,11 +174,24 @@ mod_landscape_server <- function(id){
 
 
 
+
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
       meta %>%
         dplyr::filter(field == input$topic)
+    })
+
+    #table titles-----------------
+    output$table_title <- renderUI({
+      # Ensure input$topic exists before using it
+      req(input$topic)
+
+      # Subset based on the reactive input$topic and convert to character
+      title_values <- as.character(subset(meta, field == input$topic)$title)
+
+      # Render the HTML
+      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
     })
 
 

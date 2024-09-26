@@ -199,7 +199,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::mutate(x_label = NA)%>%
          pivot_data_group()
 
-     } else if (topic == "non_weighted_revenue_total" &  filtering == "All LHDs") {
+     } else if (topic == "non_weighted_revenue_total") {
 
        data <- revenue_percentages%>%
          dplyr::mutate(
@@ -207,6 +207,11 @@ process_data <- function(topic, filtering, classifications = NULL) {
            y = (percentage*100)
          ) %>%
          pivot_data_group()
+
+     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+
+       data <- return_survey_weighted_statistics(topic)%>%
+         pivot_data_cat()
 
      } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                             "Other Entity", "Not Available in Community")) {
@@ -273,6 +278,51 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::group_by(category) %>%
          pivot_data_group()
 
+     } else if (topic == "chachip") {
+
+       data <- return_survey_weighted_counts("chachip")
+
+       # Calculate total responses and 'y_All LHDs'
+       total_responses <- sum(data$Responses, na.rm = TRUE)
+       data <- data %>%
+         dplyr::mutate(
+           y = 100 * (Responses / total_responses),
+           Responses = total_responses
+         ) %>%
+         dplyr::select(category, group, y, Responses) %>%
+         dplyr::left_join(., add_all_counts_long("chachip"), by = "category")%>%
+         dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+         dplyr::mutate(category = dplyr::recode(category,
+                                                "Yes" = "Completed both in past 5 years",
+                                                "No" = " Completed one or none in past 5 years"))
+
+
+     } else if (topic == "c12q260") {
+
+       data <- advocacy_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked") %>%
+         dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
+         dplyr::rename(category = advocacy_type) %>%
+         pivot_data_group()
+
+     } else if (topic == "Newc12q502") {
+
+       data <- new_advocacy_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked") %>%
+         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+         dplyr::rename(category = new_advocacy_type) %>%
+         pivot_data_group()
+
+     } else if (topic == "m9q240") {
+
+       data <- chip_data %>%
+         dplyr::filter(filter == "All LHDs",
+                       category %in% "Checked") %>%
+         dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+         dplyr::rename(category = action) %>%
+         pivot_data_group()
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -402,8 +452,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
           pivot_data_group() %>%
           add_all_ldh_count(data_all = exp_data_all)
 
-
-    } else if (topic == "non_weighted_revenue_total" &  filtering != "All LHDs") {
+    } else if (topic == "non_weighted_revenue_total") {
 
       rev_data_all <- revenue_percentages%>%
         dplyr::mutate(
@@ -422,6 +471,16 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::filter(filter == filtering)%>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = rev_data_all )
+
+    } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+
+      exp_data_all <- return_survey_weighted_statistics(topic)%>%
+        pivot_data_cat()
+
+
+      data <- process_weighted_stats(topic, filtering)%>%
+        pivot_data_cat() %>%
+        add_all_ldh_count(data_all = exp_data_all)
 
     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                            "Other Entity", "Not Available in Community")) {
@@ -549,7 +608,70 @@ process_data <- function(topic, filtering, classifications = NULL) {
         pivot_data_group() %>%
         add_all_ldh_count(data_all = behav_data_all)
 
+    } else if (topic == "chachip") {
 
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::select(category, group, y, subtitle, Responses) %>%
+        tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+        dplyr::left_join(., add_all_counts_long(topic), by = "category") %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+        )%>%
+        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+    } else if (topic == "c12q260") {
+
+      advocacy_data_all <- advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
+        dplyr::rename(category = advocacy_type) %>%
+        pivot_data_group()
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
+        dplyr::rename(category = advocacy_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = advocacy_data_all)
+
+    } else if (topic == "Newc12q502") {
+
+      new_advocacy_data_all <- new_advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+        dplyr::rename(category = new_advocacy_type) %>%
+        pivot_data_group()
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+        dplyr::rename(category = new_advocacy_type) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = new_advocacy_data_all)
+
+    } else if (topic == "m9q240") {
+
+      chip_data_all <- chip_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+        dplyr::rename(category = action) %>%
+        pivot_data_group()
+
+      data <- chip_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(y, group, subtitle, Responses, filter, action)%>%
+        dplyr::rename(category = action) %>%
+        pivot_data_group()%>%
+        add_all_ldh_count(data_all = chip_data_all)
 
     } else {
       # Process data as usual for other filters
@@ -618,6 +740,8 @@ data <- data %>%
       paste0(rounded_value, " Employees per capita (mean)")
     } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees (mean)")
+    } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+      scales::label_currency()(rounded_value)
     } else {
       scales::percent_format(scale = 1)(rounded_value)  # Format as percentage with rounded value
     }
@@ -690,9 +814,11 @@ data <- data %>%
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
-                                           ifelse(topic == "jobs_total", 15000,
-                                                  ifelse(topic == "b", 21000,
-                                                  ifelse(topic == "jobs_standard", 10, 100)))),
+
+                                          ifelse(topic == "c3q15", 13000000,
+                                                 ifelse(topic == "jobs_total", 15000,
+                                                        ifelse(topic == "b", 21000,
+                                                               ifelse(topic == "jobs_standard", 10, 100))))),
                        fill_color = naccho.viz::green,
                        background = 'none',
                        number_fmt = num_format
@@ -828,9 +954,11 @@ data <- data %>%
             cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
                              max_value = ifelse(topic == "tenure", 8,
-                                            ifelse(topic == "jobs_total", 15000,
-                                                ifelse(topic == "b", 21000,
-                                                      ifelse(topic == "jobs_standard", 10, 100)))),
+                                                ifelse(topic == "c3q15", 200000000,
+                                                       ifelse(topic == "jobs_total", 15000,
+                                                              ifelse(topic == "b", 21000,
+                                                                     ifelse(topic == "jobs_standard", 10, 100))))),
+
                              fill_color = colors[i],
                              background = 'none',
                              number_fmt = num_format
@@ -880,18 +1008,8 @@ data <- data %>%
       resizable = TRUE
     )
   }
-
- # message("Column definitions:")
- # print(column_definitions)
-
- # message("the topic is:")
- # print(topic)
- #
- # message("These are the data:")
- # print(data)
-
-
 }
+
 
 #' Helper function to add tooltips
 #'
