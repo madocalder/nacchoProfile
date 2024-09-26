@@ -83,6 +83,7 @@ mod_landscape_ui <- function(id){
               br(),
               HTML('<div style="font-size: 13px;">', source_line,'
                    <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+
             )
           )
         ),

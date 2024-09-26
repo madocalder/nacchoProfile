@@ -213,7 +213,6 @@ process_data <- function(topic, filtering, classifications = NULL) {
        data <- return_survey_weighted_statistics(topic)%>%
          pivot_data_cat()
 
-
      } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                             "Other Entity", "Not Available in Community")) {
 
@@ -324,7 +323,6 @@ process_data <- function(topic, filtering, classifications = NULL) {
          dplyr::select(y, group, subtitle, Responses, filter, action)%>%
          dplyr::rename(category = action) %>%
          pivot_data_group()
-
 
     } else {
       data <- return_survey_weighted_counts(topic)
@@ -454,7 +452,6 @@ process_data <- function(topic, filtering, classifications = NULL) {
           pivot_data_group() %>%
           add_all_ldh_count(data_all = exp_data_all)
 
-
     } else if (topic == "non_weighted_revenue_total") {
 
       rev_data_all <- revenue_percentages%>%
@@ -474,7 +471,6 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::filter(filter == filtering)%>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = rev_data_all )
-
 
     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
 
@@ -677,7 +673,6 @@ process_data <- function(topic, filtering, classifications = NULL) {
         pivot_data_group()%>%
         add_all_ldh_count(data_all = chip_data_all)
 
-
     } else {
       # Process data as usual for other filters
       data <- return_survey_weighted_counts(topic, filtering) %>%
@@ -819,6 +814,7 @@ data <- data %>%
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
+
                                           ifelse(topic == "c3q15", 13000000,
                                                  ifelse(topic == "jobs_total", 15000,
                                                         ifelse(topic == "b", 21000,
@@ -1012,18 +1008,8 @@ data <- data %>%
       resizable = TRUE
     )
   }
-
- # message("Column definitions:")
- # print(column_definitions)
-
- # message("the topic is:")
- # print(topic)
- #
- # message("These are the data:")
- # print(data)
-
-
 }
+
 
 #' Helper function to add tooltips
 #'

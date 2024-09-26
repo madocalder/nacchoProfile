@@ -90,11 +90,13 @@ mod_finance_ui <- function(id){
             # Table view
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
+
               uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
               HTML('<div style="font-size: 13px;">', source_line,
                    '<br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+
             )
           ),
 

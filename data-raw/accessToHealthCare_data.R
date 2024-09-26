@@ -3,6 +3,7 @@
 devtools::load_all()
 
 #medical services------
+
 vars <- c("medical")
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
@@ -44,7 +45,6 @@ View(med_data)
 usethis::use_data(med_data, overwrite = TRUE)
 
 #dental services-----
-
 vars <- c("dental")
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
@@ -85,7 +85,6 @@ dental_data <- rbind(dental_with_filters, dental_no_filter) %>%
 View(dental_data)
 
 usethis::use_data(dental_data, overwrite = TRUE)
-
 
 #behavioral services-----
 
@@ -129,5 +128,6 @@ behav_data <- rbind(behav_with_filters, behav_no_filter) %>%
 View(behav_data)
 
 usethis::use_data(behav_data, overwrite = TRUE)
+
 
 
