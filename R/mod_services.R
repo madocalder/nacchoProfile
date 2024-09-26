@@ -90,9 +90,10 @@ mod_services_ui <- function(id){
             # display when view Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
+              uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-              HTML(source_line)
+              HTML('<div style="font-size: 13px;">', source_line, '</div>')
             ),
             br(),
           )
@@ -239,7 +240,7 @@ mod_services_server <- function(id){
     observe({
       if (input$topic == "Reduced/Expanded Services" && input$view == "Butterfly Graph") {
         updateSelectInput(session, "filter",
-                          choices = "All Filters")
+                          choices = "All LHDs")
       }
     })
 
@@ -264,6 +265,17 @@ mod_services_server <- function(id){
       }
     })
 
+    #table titles---------------------------------------------------------------
+    output$table_title <- renderUI({
+      # Ensure input$topic exists before using it
+      req(input$topic)
+
+      # Subset based on the reactive input$topic and convert to character
+      title_values <- as.character(subset(meta, field == input$topic)$title)
+
+      # Render the HTML
+      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+    })
 
 
     # main content ============================================================
