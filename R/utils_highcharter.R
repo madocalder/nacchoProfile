@@ -105,7 +105,7 @@ viz_options <- function(hc,
       ),
       backgroundColor = "#EEEAE5",
       borderRadius = 2,
-      headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+      headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
       hideDelay = 1000,
       shadow = FALSE
       ) %>%
@@ -364,7 +364,7 @@ set_column <- function(data,
     ),
     dataLabels = list(
       enabled = TRUE,
-      format = "{point.y}%",
+      format = "{point.y:.0f}%",
       overflow = TRUE,
       distance = 5,
       padding = 2,
@@ -419,7 +419,7 @@ set_simple_bar <- function(data,
     ),
     dataLabels = list(
       enabled = TRUE,
-      format = "{point.y}%",
+      format = "{point.y:.0f}%",
       overflow = TRUE,
       distance = 5,
       padding = 2,
@@ -826,7 +826,7 @@ set_box <- function(data) {
         fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
-        pointFormat = "<b>Mean:</b> ${point.y}"
+        pointFormat = "<b>Mean:</b> ${point.y:.0f}"
       )
     ) %>%
     highcharter::hc_yAxis(
@@ -978,7 +978,7 @@ proxy_to_hist_pc <- function(hc,
         ),
         labels = list(
           step = 20,
-          format = "{value:,.1f}",
+          format = "{value:,.0f}",
           style = list(
             fontSize = "14px",
             textOverflow = "none"
@@ -1357,7 +1357,7 @@ proxy_to_box <- function(hc, data, meta, ...) {
         fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
-        pointFormat = "<b>Mean:</b> ${point.y}"
+        pointFormat = "<b>Mean:</b> ${point.y:.0f}"
       ),
       redraw = TRUE
     ) %>%
@@ -1422,7 +1422,7 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
         fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
-        pointFormat = "<b>Mean:</b> ${point.y}"
+        pointFormat = "<b>Mean:</b> ${point.y:.0f}"
       ),
       redraw = TRUE
     ) %>%
@@ -1442,14 +1442,14 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
         categories = as.list(stringr::str_to_title(sapply(data, function(x) x$name)))
       ),
       tooltip = list(
-        pointFormat = "<b> Upper Limit: </b> ${point.high} <br>
-                      <b> 75th Percentile: </b> ${point.q3} <br>
-                      <b> Median: </b> ${point.median} <br>
-                      <b> 25th Percentile: </b> ${point.q1} <br>
-                      <b> Lower Limit: </b> ${point.low} <br>
+        pointFormat = "<b> Upper Limit: </b> ${point.high:.0f} <br>
+                      <b> 75th Percentile: </b> ${point.q3:.0f} <br>
+                      <b> Median: </b> ${point.median:.0f} <br>
+                      <b> 25th Percentile: </b> ${point.q1:.0f} <br>
+                      <b> Lower Limit: </b> ${point.low:.0f} <br>
                       <hr class = 'tt'>
-                      <b> Responses in Group:</b> {point.group_responses} <br>
-                      <b> Number of Outliers:</b> {point.total_outliers} <br>
+                      <b> Responses in Group:</b> {point.group_responses:.0f} <br>
+                      <b> Number of Outliers:</b> {point.total_outliers:.0f} <br>
                       <b> Range of Outliers: </b> ${point.min_outlier:,.0f} to ${point.max_outlier:,.0f}"
 
       )

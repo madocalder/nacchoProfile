@@ -272,7 +272,7 @@ mod_workforce_server <- function(id){
           viz_title = "The Distribution of Total FTEs Across LHDs",
           viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
           viz_subtitle = unique(data$subtitle),
-          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
+          tooltip = "{point.y:.0f} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
         ) %>%
         viz_export()
     })
@@ -291,13 +291,13 @@ mod_workforce_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y} <br>",
+              {point.y:.0f} <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),

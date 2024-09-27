@@ -163,7 +163,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
-          tooltip = "{point.y} {point.group} are served by {point.category}",
+          tooltip = "{point.y:.0f} {point.group} are served by {point.category}",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%
@@ -236,7 +236,7 @@ mod_overview_server <- function(id){
         stacking = "normal",
         dataLabels = list(
           enabled = TRUE,
-          format = "{point.y}%",
+          format = "{point.y:.0f}%",
           overflow = TRUE,
           distance = 5,
           padding = 2,
@@ -269,7 +269,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y}% of {point.category} serve {point.group} areas",
+          tooltip = "{point.y:.0f}% of {point.category} serve {point.group} areas",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

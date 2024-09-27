@@ -381,13 +381,13 @@ mod_services_server <- function(id){
           viz_caption = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line),
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>
-              {point.y}% <br>",
+              {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),

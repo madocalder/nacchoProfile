@@ -320,11 +320,11 @@ mod_finance_server <- function(id){
                                scales::dollar(data[[1]]$max_outlier), ". <br>",
                                source_line),
           viz_subtitle = "",
-          tooltip = "<b> Upper Limit: </b> ${point.high} <br>
-                     <b> 75th Percentile: </b> ${point.q3} <br>
-                     <b> Median: </b> ${point.median} <br>
-                     <b> 25th Percentile: </b> ${point.q1} <br>
-                     <b> Lower Limit: </b> ${point.low} <br>",
+          tooltip = "<b> Upper Limit: </b> ${point.high:.0f} <br>
+                     <b> 75th Percentile: </b> ${point.q3:.0f} <br>
+                     <b> Median: </b> ${point.median:.0f} <br>
+                     <b> 25th Percentile: </b> ${point.q1:.0f} <br>
+                     <b> Lower Limit: </b> ${point.low:.0f} <br>",
           tooltip_align = "left"
         ) %>%
         viz_export()
@@ -341,7 +341,7 @@ mod_finance_server <- function(id){
           viz_caption = source_line,
           viz_subtitle = "Estimated Across All LHDs",
           tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
-                    {point.y}% of LHDs had per capita expenditures between
+                    {point.y:.0f}% of LHDs had per capita expenditures between
                     {point.category}."
         ) %>%
         viz_export()
@@ -369,13 +369,13 @@ mod_finance_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(responses$n), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y}% <br>",
+              {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
@@ -430,7 +430,7 @@ mod_finance_server <- function(id){
                 verticalAlign = "middle",
                 allowOverlap = TRUE,
                 overflow = "allow",
-                format = '<b>{point.name}</b> <br> {point.value}%',
+                format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
                   fontSize = "13px",
                   fontFamily = "Heebo",
@@ -444,7 +444,7 @@ mod_finance_server <- function(id){
                       viz_subtitle = "Estimated Across All LHDs",
                       viz_caption = source_line,
                       caption_align = "center",
-                      tooltip = "{point.value}% of all LHD revenue came from <b>{point.name} sources.</b>",
+                      tooltip = "{point.value:.0f}% of all LHD revenue came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE)
 
       } else {
@@ -525,7 +525,7 @@ mod_finance_server <- function(id){
                 verticalAlign = "middle",
                 allowOverlap = TRUE,
                 overflow = "allow",
-                format = '<b>{point.name}</b> <br> {point.value}%',
+                format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
                   fontSize = "13px",
                   fontFamily = "Heebo",
@@ -539,7 +539,7 @@ mod_finance_server <- function(id){
                       viz_subtitle = unique(data$subtitle),
                       viz_caption = source_line,
                       caption_align = "center",
-                      tooltip = "{point.value}% of all revenue in {point.parent} LHDs came from <b>{point.name} sources.</b>",
+                      tooltip = "{point.value:.0f}% of all revenue in {point.parent} LHDs came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE) %>%
           highcharter::hc_tooltip(
             useHTML = TRUE,
@@ -548,7 +548,7 @@ mod_finance_server <- function(id){
               if (this.point.node && this.point.node.level === 1) {
                 return '<b>' + this.point.name + '</b>';
               } else {
-          return this.point.value + '% of all revenue in ' + this.point.parent + ' LHDs came from <b>' + this.point.name + ' sources.</b>';
+          return this.point.value:.0f + '% of all revenue in ' + this.point.parent + ' LHDs came from <b>' + this.point.name + ' sources.</b>';
               }
             }"
             )

@@ -204,7 +204,7 @@ mod_landscape_server <- function(id){
         viz_options(
           viz_title = "Structure of LHDs",
           viz_caption = paste("<b> N: </b>938 <br>", source_line),
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHDs are {point.category}"
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}"
           ) %>%
         viz_export()
     })
