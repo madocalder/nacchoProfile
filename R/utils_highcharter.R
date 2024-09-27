@@ -120,7 +120,8 @@ viz_options <- function(hc,
       title = list(
         text = legend_title
       )
-    )
+    ) %>%
+   highcharter::hc_chart(spacingBottom = 10)
 }
 
 
@@ -1700,7 +1701,7 @@ scatter_plot <- function(data, colors) {
     # ) %>%
     highcharter::hc_title(
       text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
-      margin = 40,
+      margin = 10,
       widthAdjust = -60
     ) %>%
     highcharter::hc_subtitle(
@@ -1716,9 +1717,14 @@ scatter_plot <- function(data, colors) {
                   <b> N: </b>", min(n), " to ", max(n), "<br>",
                   source_line),
       useHTML = TRUE,
-      margin = 60,
+      margin = 30,
       align = "center"
-    )
+    ) %>%
+    highcharter::hc_chart(spacingBottom = 0) %>%
+    highcharter::hc_legend(enabled = TRUE,
+                           padding = 0,
+                           itemMarginTop = 0,
+                           itemMarginBottom = 0)
 }
 
 
