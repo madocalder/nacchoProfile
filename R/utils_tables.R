@@ -730,7 +730,7 @@ data <- data %>%
 
 #number formatting------------------
  num_format <- function(x) {
-    rounded_value <- round(x, 1)  # Round to 1 decimal place
+    rounded_value <- round(x, 0)  # no decimals
 
 
     if (topic == "tenure") {
