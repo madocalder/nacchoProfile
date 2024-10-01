@@ -721,7 +721,7 @@ set_hist <- function(data,
     data,
     type = "column",
     id = "All",
-    name = "Estimated Across All LHDs",
+    name = "Denominator of LHDs",
     highcharter::hcaes(x = x, y = y)
   ) %>%
     highcharter::hc_chart(

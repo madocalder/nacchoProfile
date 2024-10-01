@@ -5,10 +5,11 @@ landscape_topics <- list(
 
   "Executive Characteristics" = list("Age" = "age_cat",
                                      "Race" = "race",
+                                     "Gender" = "c4q29",
                                      "Tenure" = "tenure",
                                      "Highest Degree" = "c4q34",
-                                     "Specialization" = "field",
-                                     "Gender" = "c4q29"),
+                                     "Specialization" = "field"
+                                     ),
   "Partnerships" = list("Formal & Informal" = "work")
 )
 
