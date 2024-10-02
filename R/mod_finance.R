@@ -66,36 +66,47 @@ mod_finance_ui <- function(id){
             # display when Box Plot is selected and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Box Plot\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_box"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure_box"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Bar Graph is selected, Budget Changes is not selected, and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Bar Graph\' && input[\'", ns('topic'), "\'] != \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Budget Changes is selected and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_budget"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_budget"), height = "100%"),
+                  style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Tree Map is selected, non-weighted revenue total is selected, and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\' && input[\'", ns('topic'), "\'] == \'non_weighted_revenue_total\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_tree"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_tree"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Table view
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
 
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,
-                   '<br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 13px;">', source_line,'
+                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
 
             )
           ),

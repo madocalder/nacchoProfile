@@ -20,7 +20,7 @@ meta <- data.frame(
             "Racial Identity of LHD Top Executives",
             "Average Length of Tenure of LHD Top Executives",
             "Highest Degree Obtained by LHD Top Executives",
-            "Field of Educational Study of LHD Top Executives",
+            "Educational Specializations of LHD Top Executives",
             "Gender of LHD Top Executives",
             "Percent of LHDs within FTE Size Groupings",
             "The Distribution of Total FTEs Across LHDs",

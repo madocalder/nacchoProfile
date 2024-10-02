@@ -67,23 +67,30 @@ mod_workforce_ui <- function(id){
             # Display bar graph when the topic is NOT jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
               condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Display bar graph when the topic is jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
               condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
-              highcharter::highchartOutput(ns("figure_jobs"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_jobs"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Adding the new table view
             conditionalPanel(
               condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 13px;">', source_line,'
+                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
             )
           )
         ),

@@ -34,6 +34,10 @@ viz_export <- function(hc, enabled = TRUE) {
                         "downloadXLS",
                         "openInCloud")
         )
+      ),
+
+      chart = list(
+        backgroundColor = "#FFFFFF"  # Set the background color to white
       )
     )
 }

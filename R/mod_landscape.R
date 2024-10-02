@@ -66,23 +66,30 @@ mod_landscape_ui <- function(id){
             # display when map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-              highcharter::highchartOutput(ns("map"), height = 675)
+              div(
+              highcharter::highchartOutput(ns("map"), height = "100%"),
+              style = "height: 65vh; width: 50vw;")
             ),
 
             # display when map is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\''),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # adding table
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 13px;">', source_line,'
+                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
 
             )
           )
