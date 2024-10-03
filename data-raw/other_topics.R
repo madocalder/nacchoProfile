@@ -8,7 +8,7 @@ other_topics <- list(
                                  "Behavioral Services" = "behavioral"),
 
   "Policy & Advocacy" = list("Advocacy by Topic Area" = "c12q260",
-                             "New or Revised Ordinanaces" = "Newc12q502"),
+                             "New or Revised Ordinances" = "Newc12q502"),
 
   "Planning & QI" = list("CHA and CHIP" = "chachip",
                          "CHIP Activities" = "m9q240")

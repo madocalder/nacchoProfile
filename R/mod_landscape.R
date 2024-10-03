@@ -86,7 +86,7 @@ mod_landscape_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 13px;">', source_line,'
+                HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
@@ -108,7 +108,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("takeaway"), # key takeaway
                   "",
                   icon = tags$i(class = "fa-light fa-key",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 5vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Takeaways")
               ),
@@ -120,7 +120,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("context"), # survey questions and responses
                   "",
                   icon = tags$i(class = "fa-light fa-circle-info",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 5vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Notes")
               ),
@@ -132,7 +132,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("definitions"), # related definitions
                   "",
                   icon = tags$i(class = "fa-light fa-list",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 5vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Definitions")
               ),
@@ -198,7 +198,7 @@ mod_landscape_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 

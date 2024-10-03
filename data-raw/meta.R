@@ -41,7 +41,7 @@ meta <- data.frame(
             "Estimated Total Revenues",
             "Estimated Per Capita Revenues",
             "Percent of LHDs that Directly Provide Selected Services",
-            "Percent of LHDs that Contract Out the Provision Selected Services",
+            "Percent of LHDs that Contract Out of the Provision Selected Services",
             "Percent of LHDs Reporting that Selected Services are Provided by Another Entity",
             "Percent of LHDs Reporting that Selected Services are Not Available Within Their Community"),
   alt = NA,
@@ -111,7 +111,7 @@ meta <- data.frame(
               "<span style=\"color:{point.color}\">\u25CF</span> <b> Upper Limit: </b> ${point.high:.0f} <br> <b> 75th Percentile: </b> ${point.q3:.0f} <br> <b> Median: </b> ${point.median:.0f} <br> <b> 25th Percentile: </b> ${point.q1:.0f} <br> <b> Lower Limit: </b> ${point.low:.0f}  <br>",
               "<span style=\"color:{point.color}\">\u25CF</span> <b> Upper Limit: </b> ${point.high:.0f} <br> <b> 75th Percentile: </b> ${point.q3:.0f} <br> <b> Median: </b> ${point.median:.0f} <br> <b> 25th Percentile: </b> ${point.q1:.0f} <br> <b> Lower Limit: </b> ${point.low:.0f} <br>",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs provide {point.category} in their community.",
-              "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs contract out the provision of {point.category} in their community.",
+              "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs contract out of the provision of {point.category} in their community.",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs reported that another entity within their community provides {point.category}.",
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs reported that {point.category} is not available within their community.")
 )

@@ -16,8 +16,8 @@ mod_home_ui <- function(id){
       div(
         class = "home-content",
         openMenu(),
-        p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
-        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
+        p("welcome to the", style = "font-size: 4vmin; font-weight: 400 !important;"),
+        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 7vmin; text-transform: none !important;"),
         br(),
         # br(),
         # br(),

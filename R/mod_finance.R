@@ -103,7 +103,7 @@ mod_finance_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 13px;">', source_line,'
+                HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
@@ -217,7 +217,7 @@ mod_finance_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 

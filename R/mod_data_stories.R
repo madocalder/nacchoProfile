@@ -101,7 +101,7 @@ mod_data_stories_server <- function(id){
             image = "www/small_town.jpeg",
             date = "08/01/2024"
           ),
-          title = actionLink(ns("story_link"), strong("This is the title of the first story", style = "font-size: 20px;")),
+          title = actionLink(ns("story_link"), strong("This is the title of the first story", style = "font-size: 3vmin;")),
           description =
             "This is an amazing story, you have to check it out! It
             is about rural health.",
@@ -116,7 +116,7 @@ mod_data_stories_server <- function(id){
             image = "www/small_town.jpeg",
             date = "08/01/2024"
           ),
-          title = actionLink(ns("story_link"), strong("This is the title of the second story", style = "font-size: 20px;")),
+          title = actionLink(ns("story_link"), strong("This is the title of the second story", style = "font-size: 3vmin;")),
           description =
             "Wow, such interesting information in this story about
             urban health versus rural health in local agencies.",
@@ -130,7 +130,7 @@ mod_data_stories_server <- function(id){
             image = "www/small_town.jpeg",
             date = "08/01/2024"
           ),
-          title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 20px;")),
+          title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 3vmin;")),
           description =
             "Oh boy, this is a really good story about some things and
             you should read it.",
