@@ -800,7 +800,7 @@ mod_services_server <- function(id){
 
       output$show_definitions <- renderUI({
         definitions <- definitions %>%
-          dplyr::filter(field %in% input$filter)
+          dplyr::filter(field %in% input$topic)
 
         links <- lapply(seq_along(definitions$item), function(i) {
           div(
