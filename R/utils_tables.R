@@ -784,7 +784,7 @@ data <- data %>%
         textTransform = "uppercase",
         borderColor = "#3d4242",
         color = "#3d4242",
-        fontSize = "2.5vmin",
+        fontSize = "2vmin",
         fontWeight = "normal"
       ),
       groupHeaderStyle = list(
@@ -796,7 +796,7 @@ data <- data %>%
           textAlign = "center",
           backgroundColor = "#ffffff",
           textTransform = "uppercase",
-          fontSize = "2.5vmin",
+          fontSize = "2vmin",
           fontWeight = "bold",
           color = "#3d4242"
         )
@@ -804,7 +804,7 @@ data <- data %>%
       cellPadding = "15px 25px",
       style = list(
         fontFamily = "Heebo",
-        fontSize = "2vmin",
+        fontSize = "1.75vmin",
         borderTop = "1px solid #212F5B",
         borderBottom = "2px solid #212F5B"
       )

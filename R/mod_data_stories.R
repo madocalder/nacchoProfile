@@ -13,6 +13,9 @@ mod_data_stories_ui <- function(id){
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'data_stories_tab'",
+      # flexlayout::flexlayout(
+      #   left = NULL,
+      #   center =
       div(
         openMenu(),
         div(
@@ -20,16 +23,16 @@ mod_data_stories_ui <- function(id){
           div(
             class = "row",
             div(
-              class = "col-sm-9",
+              class = "col-sm-8",
               align = "left",
               h1("Data Stories"),
               hr(class = "header-hr")
             ),
             div(
-              class = "col-sm-3 findings-align",
+              class = "col-sm-4 findings-align",
               div(class = "search-input",
                   textInput(ns("search"), NULL, placeholder = "Search tags"),
-                  style = "margin-right: 5%;"
+                  style = "margin-right: 2vw;"
               )
             )
           )
@@ -45,7 +48,11 @@ mod_data_stories_ui <- function(id){
             uiOutput(ns("full_page_content"))
           )
         )
-      )
+      # ),
+      #
+      # right = div(),
+      # right_width = 0
+    )
     )
   )
 }
@@ -103,8 +110,10 @@ mod_data_stories_server <- function(id){
           ),
           title = actionLink(ns("story_link"), strong("This is the title of the first story", style = "font-size: 3vmin;")),
           description =
-            "This is an amazing story, you have to check it out! It
-            is about rural health.",
+            div(
+              "This is an amazing story, you have to check it out! It is about rural health.",
+              style = "font-size: 2vmin;"  # Define the font size for the description here
+            ),
           tags = list(
             actionButton(ns("tag"), "rural health", class = "my-button"),
             actionButton(ns("tag"), "finance", class = "my-button"),
@@ -117,9 +126,10 @@ mod_data_stories_server <- function(id){
             date = "08/01/2024"
           ),
           title = actionLink(ns("story_link"), strong("This is the title of the second story", style = "font-size: 3vmin;")),
-          description =
+          description = div(
             "Wow, such interesting information in this story about
             urban health versus rural health in local agencies.",
+            style = "font-size: 2vmin;"),
           tags = list(
             actionButton(ns("tag"), "urban health", class = "my-button"),
             actionButton(ns("tag"), "rural health", class = "my-button")
@@ -131,9 +141,9 @@ mod_data_stories_server <- function(id){
             date = "08/01/2024"
           ),
           title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 3vmin;")),
-          description =
+          description = div(
             "Oh boy, this is a really good story about some things and
-            you should read it.",
+            you should read it.", style = "font-size: 2vmin;"),
           tags = list(
             actionButton(ns("tag"), "workforce", class = "my-button")
           )
@@ -177,12 +187,15 @@ mod_data_stories_server <- function(id){
 
         lapply(card_list, function(card) {
           div(class = "col-xl-4 col-lg-6 col-md-6 col-sm-12",
+              style = "padding: 5vh; margin-bottom: 50vmin; height: 20vh",  # Adding padding between cards
               div(
+                style = "height: 20vh;",  # Define card height and padding
                 card$thumbnail,
                 card$title,
                 div(
                   p(card$description),
-                  class = "scroll-desc"
+                  class = "scroll-desc",
+                  style = "width: 25vw;"
                 ),
                 do.call(tagList, card$tags)
               )

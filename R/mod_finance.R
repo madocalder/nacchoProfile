@@ -109,6 +109,7 @@ mod_finance_ui <- function(id){
                 style = "height: 65vh; width: 50vw;")
 
             )
+          )
           ),
 
 
@@ -194,7 +195,7 @@ mod_finance_ui <- function(id){
       )
     )
   )
-)
+
 
 }
 

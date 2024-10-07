@@ -562,7 +562,7 @@ mod_key_findings_server <- function(id){
         legend_enable = TRUE,
         legend_title = "",
         x_label = "",
-        tooltip = "{point.value:.0f}\u0025 of LHDs implemented <br> {point.type} in {point.year}",
+        tooltip = "{point.value:.0f}\u0025 of LHDs had implemented <br> {point.type} in {point.year}",
         allow_export = FALSE
       )
     })

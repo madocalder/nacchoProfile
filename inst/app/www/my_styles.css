@@ -404,7 +404,7 @@ label:not(.material-switch label) {
     margin-top: 0 !important;
   }
   .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
-    padding-top: 1.0em !important;
+    padding-top: 2vh !important;
     transform: transition .5s ease;
   }
   .nav-item:nth-child(9) {
@@ -414,7 +414,7 @@ label:not(.material-switch label) {
 
 @media (max-height: 500px) {
   .nav-item:nth-child(9) {
-    padding-top: 5% !important;
+    padding-top: 10% !important;
   }
 }
 
@@ -793,12 +793,12 @@ label:not(.material-switch label) {
 }
 
 .scroll-desc {
-    min-height: 5em;
-    max-height: 5em;
-    overflow-y: auto; /* vertical scrolling */
+    min-height: 15vh;
+    max-height: 15vh;
+    overflow-y: hidden; /* vertical scrolling */
     overflow-x: hidden;
-    padding-right: 8em;
-    margin-bottom: 1.5em;
+    padding-right: 3vw;
+    margin-bottom: 3vh;
 }
 
 
@@ -1006,7 +1006,7 @@ label:not(.material-switch label) {
   z-index: 2;
   width: 100%;
   margin-left: -20px;
-}
+}r
 
 
 /* ------------------------------------------------------- Font Awesome Stuff */
@@ -1155,9 +1155,9 @@ label:select-input {
 
 h2 {
   text-transform: none !important;
-  font-size: 1.4em !important;
+  font-size: 3vmin !important;
   letter-spacing: 1px !important;
-  padding-top: 10px !important;
+  padding-top: 1.5vmin !important;
 }
 
 h1 {
