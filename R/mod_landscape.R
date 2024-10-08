@@ -108,7 +108,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("takeaway"), # key takeaway
                   "",
                   icon = tags$i(class = "fa-light fa-key",
-                                style = "font-size: 5vmin; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Takeaways")
               ),
@@ -120,7 +120,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("context"), # survey questions and responses
                   "",
                   icon = tags$i(class = "fa-light fa-circle-info",
-                                style = "font-size: 5vmin; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Notes")
               ),
@@ -132,7 +132,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("definitions"), # related definitions
                   "",
                   icon = tags$i(class = "fa-light fa-list",
-                                style = "font-size: 5vmin; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Definitions")
               ),

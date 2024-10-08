@@ -68,11 +68,11 @@ app_ui <- function(request) {
               img(
                 src = "www/logo.png",
                 alt = "NACCHO logo, Home page",
-                height = 120,
-                style = "position: absolute; left: 47px; top: 0;")
+                height = "120vmin",
+                style = "position: absolute; left: 47px; top: 0; ")
             ),
             value = "home_tab",
-            class = "no-underline",
+            class = "no-underline"
           ),
 
           tabPanel(

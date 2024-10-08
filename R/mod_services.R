@@ -68,7 +68,7 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 65vh; width: 50vw;")
+              style = "height: 70vh; width: 48vw;")
             ),
 
 
