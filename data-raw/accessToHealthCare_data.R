@@ -45,12 +45,11 @@ for (i in 1:length(filters)) {
   args <- list(vars, filters[[i]])
 
   data <- pmap_dfr(args, return_survey_weighted_counts) %>%
-    select(1:12, "Responses") %>%
+    select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
     dplyr::mutate(filter = paste(filters[i]))
 
   medical_list[[i]] <- data
 }
-
 # Bind the data generated in loop
 medical_with_filters <- do.call(rbind, medical_list)
 
@@ -59,7 +58,7 @@ View(medical_with_filters)
 
 # Create data with no filter
 med_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
-  select(1:12, "Responses") %>%
+  select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
   mutate(filter = paste("All LHDs"))
 
 # Join the two datasets -- with filters and without filters
@@ -86,7 +85,7 @@ for (i in 1:length(filters)) {
   args <- list(vars, filters[[i]])
 
   data <- pmap_dfr(args, return_survey_weighted_counts) %>%
-    select(1:12, "Responses") %>%
+    select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
     dplyr::mutate(filter = paste(filters[i]))
 
   dental_list[[i]] <- data
@@ -100,7 +99,7 @@ View(dental_with_filters)
 
 # Create data with no filter
 dental_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
-  select(1:12, "Responses") %>%
+  select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
   mutate(filter = paste("All LHDs"))
 
 # Join the two datasets -- with filters and without filters
@@ -126,7 +125,7 @@ for (i in 1:length(filters)) {
   args <- list(vars, filters[[i]])
 
   data <- pmap_dfr(args, return_survey_weighted_counts) %>%
-    select(1:12, "Responses") %>%
+    select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
     dplyr::mutate(filter = paste(filters[i]))
 
   behav_list[[i]] <- data
@@ -140,7 +139,7 @@ View(behav_with_filters)
 
 # Create data with no filter
 behav_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
-  select(1:12, "Responses") %>%
+  select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
   mutate(filter = paste("All LHDs"))
 
 # Join the two datasets -- with filters and without filters

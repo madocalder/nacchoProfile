@@ -101,8 +101,8 @@ mod_services_ui <- function(id){
                 uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+              HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
             style = "height: 65vh; width: 50vw;")
             ),
@@ -758,7 +758,7 @@ mod_services_server <- function(id){
             but not every unit was included in the Profile study.
             For the purposes of surveying and developing national estimates of
             the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without “double counting.”
+            for the most unique individuals in the U.S. population without \"double counting.\"
             Therefore, the denominator of LHDs used for surveying and national
             estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
             while still covering all local jurisdictions uniquely.
@@ -778,7 +778,7 @@ mod_services_server <- function(id){
             but not every unit was included in the Profile study.
             For the purposes of surveying and developing national estimates of
             the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without “double counting.”
+            for the most unique individuals in the U.S. population without \"double counting.\"
             Therefore, the denominator of LHDs used for surveying and national
             estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
             while still covering all local jurisdictions uniquely.

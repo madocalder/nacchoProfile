@@ -440,6 +440,7 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
 #' @description Create a list with a length of one or more for use in boxplot visualizations.
 #'
 #' @param args A variable from master_data.
+#' @param grps A value from the master_data file to use for grouping statistics.
 #'
 #' @export
 #' @return A list of one or more.

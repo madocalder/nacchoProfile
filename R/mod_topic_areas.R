@@ -78,8 +78,8 @@ mod_topic_areas_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+                HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
             ),

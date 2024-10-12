@@ -153,8 +153,8 @@ mod_overview_server <- function(id){
       data <- data.frame(
         x = c(0, 1, 2, 0, 1, 2),
         y = c(9, 37, 53, 62, 32, 6),
-        category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)",
-                     "Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
+        category = c("Small", "Medium", "Large",
+                     "Small", "Medium", "Large"),
         group = c("Percent of all LHDs", "Percent of all LHDs", "Percent of all LHDs",
                   "Percent of population served by LHDs", "Percent of population served by LHDs", "Percent of population served by LHDs")
       )
@@ -212,9 +212,9 @@ mod_overview_server <- function(id){
               68, 12, 14, 6,
               69, 7, 23, 1),
         category = c("All LHDs", "All LHDs", "All LHDs", "All LHDs",
-                     "Small (<50,000)", "Small (<50,000)", "Small (<50,000)", "Small (<50,000)",
-                     "Medium (50,000–499,999)", "Medium (50,000–499,999)", "Medium (50,000–499,999)", "Medium (50,000–499,999)",
-                     "Large (500,000+)", "Large (500,000+)", "Large (500,000+)", "Large (500,000+)"),
+                     "Small", "Small", "Small", "Small",
+                     "Medium", "Medium", "Medium", "Medium",
+                     "Large", "Large", "Large", "Large"),
         group = c("County", "City or Town", "Multi-county", "Other*",
                   "County", "City or Town", "Multi-county", "Other*",
                   "County", "City or Town", "Multi-county", "Other*",

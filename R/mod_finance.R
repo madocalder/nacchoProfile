@@ -104,7 +104,7 @@ mod_finance_ui <- function(id){
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>'),
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
 
@@ -415,7 +415,7 @@ mod_finance_server <- function(id){
           dplyr::rename(name = revenue_type) %>%
           dplyr::mutate(id = paste(name, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(id, name, value)
+          dplyr::select(all_of(id, name, value))
 
         add_info <- data.frame(
           color = naccho.viz::green
@@ -467,7 +467,7 @@ mod_finance_server <- function(id){
                         parent = category) %>%
           dplyr::mutate(id = paste(name, parent, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(id, name, parent, value, subtitle)
+          dplyr::select(all_off(id, name, parent, value, subtitle))
 
         id_values <- unique(data$parent)
 

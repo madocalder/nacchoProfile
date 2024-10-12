@@ -61,7 +61,7 @@ for (i in 1:length(filters)) {
 
   # Bind the rows after ensuring consistent types
   data <- dplyr::bind_rows(data_list) %>%
-    select(1:12, "Responses") %>%
+    select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
     mutate(filter = paste(filters[i]))
 
   # Store in the result list
@@ -89,7 +89,7 @@ chip_no_filter <- map_dfr(vars, function(var) {
 
   return(data)
 }) %>%
-  select(1:12, "Responses") %>%
+  select(1:12, all_of("Responses")) %>%  # Use all_of() for future-proofing
   mutate(filter = paste("All LHDs"))
 
 # Join the two datasets -- with filters and without filters
