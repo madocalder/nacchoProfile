@@ -66,23 +66,30 @@ mod_landscape_ui <- function(id){
             # display when map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-              highcharter::highchartOutput(ns("map"), height = 675)
+              div(
+              highcharter::highchartOutput(ns("map"), height = "100%"),
+              style = "height: 65vh; width: 50vw;")
             ),
 
             # display when map is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\''),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # adding table
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
 
             )
           )
@@ -101,7 +108,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("takeaway"), # key takeaway
                   "",
                   icon = tags$i(class = "fa-light fa-key",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Takeaways")
               ),
@@ -113,7 +120,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("context"), # survey questions and responses
                   "",
                   icon = tags$i(class = "fa-light fa-circle-info",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Notes")
               ),
@@ -125,7 +132,7 @@ mod_landscape_ui <- function(id){
                   inputId = ns("definitions"), # related definitions
                   "",
                   icon = tags$i(class = "fa-light fa-list",
-                                style = "font-size: 30px; text-align: center;"),
+                                style = "font-size: 4vmin; text-align: center;"),
                   class = "link-no-underline action-link"),
                 span(class = "hover-text-content-side", "Definitions")
               ),
@@ -191,7 +198,7 @@ mod_landscape_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -202,9 +209,9 @@ mod_landscape_server <- function(id){
 
       set_column(data) %>%
         viz_options(
-          viz_title = "Structure of LHDs",
+          viz_title = "LHDs Combined with HHSA",
           viz_caption = paste("<b> N: </b>938 <br>", source_line),
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y}% of LHDs are {point.category}"
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}"
           ) %>%
         viz_export()
     })
@@ -454,7 +461,19 @@ mod_landscape_server <- function(id){
             "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response))
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            "There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
 
         } else {
           p(htmltools::HTML(
@@ -463,7 +482,18 @@ mod_landscape_server <- function(id){
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,
             "<br> <br> <b> Notes: </b>",
-            notes$notes))
+            notes$notes,
+            "<br> There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
         }
       })
     })

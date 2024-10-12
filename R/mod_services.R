@@ -59,15 +59,18 @@ mod_services_ui <- function(id){
           ),
 
 
-          # add main page content here ----------------------------------------------
+          # main page content ----------------------------------------------
           div(
             class = "viz-content",
 
             # display when Service Provision and Bar Graph are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
-              highcharter::highchartOutput(ns("figure_bar"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
+              style = "height: 70vh; width: 48vw;")
             ),
+
 
             # display when Service Provision and Line Graph are selected
             conditionalPanel(
@@ -78,29 +81,38 @@ mod_services_ui <- function(id){
             # display when Service Changes and Scatter Plot are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
-              highcharter::highchartOutput(ns("figure_scatter"), height = 775)
+              div(
+              highcharter::highchartOutput(ns("figure_scatter"), height = "90%"), #775
+              style = "height: 70vh; width: 50vw;")
             ),
 
             # display when Service Changes and Butterfly Graph are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
-              highcharter::highchartOutput(ns("figure_butterfly"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # display when view Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              uiOutput(ns("table_title")),
+              div(
+                uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+
+            style = "height: 65vh; width: 50vw;")
             ),
-            br(),
-          )
+
+            # br(),
+
+        )
         ),
 
-        # end of main content -----------------------------------------------------
+     # end of main content -----------------------------------------------------
 
         right = div(
           div(
@@ -175,7 +187,7 @@ mod_services_ui <- function(id){
               div(
                 id = ns("toggle_takeaway"),
                 class = "context-content",
-                # uiOutput(ns("show_takeaway"))
+                uiOutput(ns("show_takeaway"))
               )
             ),
 
@@ -183,7 +195,7 @@ mod_services_ui <- function(id){
               div(
                 id = ns("toggle_context"),
                 class = "context-content",
-                # uiOutput(ns("show_context"))
+                uiOutput(ns("show_context"))
               )
             ),
 
@@ -191,7 +203,7 @@ mod_services_ui <- function(id){
               div(
                 id = ns("toggle_definitions"),
                 class = "context-content",
-                # uiOutput(ns("show_definitions"))
+                uiOutput(ns("show_definitions"))
               )
             )
           ),
@@ -381,13 +393,13 @@ mod_services_server <- function(id){
           viz_caption = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line),
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>
-              {point.y}% <br>",
+              {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
@@ -401,7 +413,12 @@ mod_services_server <- function(id){
             };
           }
         ")
-        )
+        ) %>%
+        highcharter::hc_legend(enabled = TRUE,
+                               padding = 0,
+                               itemMarginTop = 0,
+                               itemMarginBottom = 0)%>%
+        highcharter::hc_caption(margin = 20)
     })
 
 
@@ -417,8 +434,13 @@ mod_services_server <- function(id){
     # update proxy ------------------------------------------------------------
     observeEvent(updated_inputs(), {
 
+      message("input$services =")
+      print(input$services)
+
       if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter == "All LHDs") {
         req(length(input$services) >= 1) # prevents error
+
+
 
         data <- services_data %>%
           dplyr::filter(service_category %in% c(input$services),
@@ -647,7 +669,7 @@ mod_services_server <- function(id){
         session$sendCustomMessage(type = "triggerClickService", message = "services_1-get_services")
     })
 
-    # show services by cateogry  ---------------------------------------
+    # show services by category  ---------------------------------------
     observeEvent(input$get_services, {
       shinyjs::show("toggle_get_services")
       shinyjs::hide("toggle_takeaway")
@@ -730,7 +752,19 @@ mod_services_server <- function(id){
             "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response))
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>
+            <br> There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
 
         } else {
           p(htmltools::HTML(
@@ -739,7 +773,18 @@ mod_services_server <- function(id){
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,
             "<br> <br> <b> Notes: </b>",
-            notes$notes))
+            notes$notes,
+            "<br> There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
         }
       })
     })
@@ -755,7 +800,7 @@ mod_services_server <- function(id){
 
       output$show_definitions <- renderUI({
         definitions <- definitions %>%
-          dplyr::filter(field %in% input$filter)
+          dplyr::filter(field %in% input$topic)
 
         links <- lapply(seq_along(definitions$item), function(i) {
           div(

@@ -67,23 +67,30 @@ mod_workforce_ui <- function(id){
             # Display bar graph when the topic is NOT jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
               condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Display bar graph when the topic is jobs_standard or jobs_total and view is Bar Graph
             conditionalPanel(
               condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
-              highcharter::highchartOutput(ns("figure_jobs"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_jobs"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Adding the new table view
             conditionalPanel(
               condition = paste('input["', ns("view"), '"] == "Table"', sep = ""),
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
             )
           )
         ),
@@ -272,7 +279,7 @@ mod_workforce_server <- function(id){
           viz_title = "The Distribution of Total FTEs Across LHDs",
           viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
           viz_subtitle = unique(data$subtitle),
-          tooltip = "{point.y} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
+          tooltip = "{point.y:.0f} LHDs have between {point.low_bin} and {point.high_bin} total FTEs"
         ) %>%
         viz_export()
     })
@@ -291,13 +298,13 @@ mod_workforce_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y} <br>",
+              {point.y:.0f} <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
@@ -714,7 +721,19 @@ mod_workforce_server <- function(id){
             "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response))
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>
+            <br> There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
 
         } else {
           p(htmltools::HTML(
@@ -723,7 +742,18 @@ mod_workforce_server <- function(id){
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,
             "<br> <br> <b> Notes: </b>",
-            notes$notes))
+            notes$notes,
+            "<br> There were more than 3,300 LHDs in the U.S.,
+            but not every unit was included in the Profile study.
+            For the purposes of surveying and developing national estimates of
+            the LHD landscape, NACCHO designed and utilizes a methodology to account
+            for the most unique individuals in the U.S. population without \"double counting.\"
+            Therefore, the denominator of LHDs used for surveying and national
+            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+            while still covering all local jurisdictions uniquely.
+            NACCHO is in frequent contact and consultation with state and local
+            officials to update the denominator. There were 2,512 LHDs included
+            in the 2022 Profile study population."))
         }
       })
     })

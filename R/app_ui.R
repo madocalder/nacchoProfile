@@ -3,6 +3,7 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @importFrom flexlayout defineGlobal
 #' @noRd
 #'
 #'
@@ -68,11 +69,11 @@ app_ui <- function(request) {
               img(
                 src = "www/logo.png",
                 alt = "NACCHO logo, Home page",
-                height = 120,
-                style = "position: absolute; left: 47px; top: 0;")
+                height = "120vmin",
+                style = "position: absolute; left: 47px; top: 0; ")
             ),
             value = "home_tab",
-            class = "no-underline",
+            class = "no-underline"
           ),
 
           tabPanel(
@@ -155,7 +156,7 @@ app_ui <- function(request) {
                        class = "linkedin-button",
                        icon = icon("linkedin"),
                        onclick ="window.open('https://www.linkedin.com/showcase/naccho-research', '_blank')"),
-        style = "font-size: 13px; font-weight: 700; color: white !important;")
+        style = "font-size: 2vmin; font-weight: 700; color: white !important;")
       ),
 
     # modal for key findings download

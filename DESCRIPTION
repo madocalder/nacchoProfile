@@ -1,8 +1,12 @@
 Package: nacchoProfile
 Title: NACCHO Profile Study Dashboard
 Version: 0.0.0.9000
-Authors@R: 
-    person("Lindsay", "Jorgenson", , "ljorgenson@astho.org", role = c("cre", "aut"))
+Authors@R: c(
+    person("Lindsay", "Jorgenson", role = "aut"),
+    person("Madoc", "Marshall", "Alder", email = "mmarshall@astho.org", role = c("cre", "aut")),
+    person("John", "Coene", role = "ctb"),
+    person("Pierre", "Saoter", role = "ctb"),
+    person("Elizabeth", "Woods", role = "ctb"))
 Description: A Shiny application that visualizes findings from NACCHO's
     National Profile of Local Health Departments.
 License: GPL (>= 3)
@@ -12,13 +16,16 @@ Depends:
     R (>= 2.10)
 Imports: 
     bslib,
+    bsutils,
     config (>= 0.3.2),
     dplyr,
+    flexlayout,
     golem (>= 0.4.1),
     haven,
     highcharter,
     htmltools,
     magrittr,
+    naccho.viz,
     purrr,
     reactable,
     reactablefmtr,

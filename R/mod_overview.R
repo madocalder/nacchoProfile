@@ -153,8 +153,8 @@ mod_overview_server <- function(id){
       data <- data.frame(
         x = c(0, 1, 2, 0, 1, 2),
         y = c(9, 37, 53, 62, 32, 6),
-        category = c("Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)",
-                     "Small (<50,000)", "Medium (50,000–499,999)", "Large (500,000+)"),
+        category = c("Small", "Medium", "Large",
+                     "Small", "Medium", "Large"),
         group = c("Percent of all LHDs", "Percent of all LHDs", "Percent of all LHDs",
                   "Percent of population served by LHDs", "Percent of population served by LHDs", "Percent of population served by LHDs")
       )
@@ -163,7 +163,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
-          tooltip = "{point.y} {point.group} are served by {point.category}",
+          tooltip = "{point.y:.0f} {point.group} are served by {point.category}",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%
@@ -212,9 +212,9 @@ mod_overview_server <- function(id){
               68, 12, 14, 6,
               69, 7, 23, 1),
         category = c("All LHDs", "All LHDs", "All LHDs", "All LHDs",
-                     "Small (<50,000)", "Small (<50,000)", "Small (<50,000)", "Small (<50,000)",
-                     "Medium (50,000–499,999)", "Medium (50,000–499,999)", "Medium (50,000–499,999)", "Medium (50,000–499,999)",
-                     "Large (500,000+)", "Large (500,000+)", "Large (500,000+)", "Large (500,000+)"),
+                     "Small", "Small", "Small", "Small",
+                     "Medium", "Medium", "Medium", "Medium",
+                     "Large", "Large", "Large", "Large"),
         group = c("County", "City or Town", "Multi-county", "Other*",
                   "County", "City or Town", "Multi-county", "Other*",
                   "County", "City or Town", "Multi-county", "Other*",
@@ -236,7 +236,7 @@ mod_overview_server <- function(id){
         stacking = "normal",
         dataLabels = list(
           enabled = TRUE,
-          format = "{point.y}%",
+          format = "{point.y:.0f}%",
           overflow = TRUE,
           distance = 5,
           padding = 2,
@@ -269,7 +269,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y}% of {point.category} serve {point.group} areas",
+          tooltip = "{point.y:.0f}% of {point.category} serve {point.group} areas",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

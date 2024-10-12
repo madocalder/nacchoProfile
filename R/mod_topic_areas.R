@@ -66,17 +66,22 @@ mod_topic_areas_ui <- function(id){
 
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_bar"), height = 675)
+              div(
+              highcharter::highchartOutput(ns("figure_bar"), height = "100%"),
+              style = "height: 65vh; width: 50vw;")
               ),
 
             # display when view Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,'
-                   <br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
             ),
             br(),
           )

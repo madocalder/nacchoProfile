@@ -16,8 +16,8 @@ mod_home_ui <- function(id){
       div(
         class = "home-content",
         openMenu(),
-        p("welcome to the", style = "font-size: 30px; font-weight: 400 !important;"),
-        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 60px; text-transform: none !important;"),
+        p("welcome to the", style = "font-size: 4vmin; font-weight: 400 !important;"),
+        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 7vmin; text-transform: none !important;"),
         br(),
         # br(),
         # br(),
@@ -57,18 +57,20 @@ mod_home_ui <- function(id){
                 through September 2022. Overall, 942 local health departments
                 responded, for a response rate of 38%. For a full description
                 of the methods, read our comprehensive report at",
-            tags$a(href="naccho.org/profile", "naccho.org/profile.")
+            tags$a(href="https://www.naccho.org/profile", "www.naccho.org/profile.",
+                   style = "text-decoration: underline !important;")
           ),
 
           bslib::accordion_panel(
             title = h2("Access the Data"),
             value = "cord_access",
             "Deidentified data from the 2022 Profile Study will be made
-                publicly available through ICSPR's data repository in summer
+                publicly available through ICSPR's data repository in late
                 2024. For access to prior years' Profile data and data use
                 policies for Profile data, please visit",
             tags$a(href="icpsr.umich.edu/web/pages/ICPSR/index.html",
-                   "ICPSR's website.")
+                   "ICPSR's website.",
+                   style = "text-decoration: underline !important;")
           ),
 
           bslib::accordion_panel(
@@ -94,7 +96,8 @@ mod_home_ui <- function(id){
             from the Y Company, and Elizabeth Woods from ASTHO.
             For inquiries or to report an issue, please visit",
             tags$a(href="https://github.com/lindsayjorgenson/nacchoProfile",
-                   "the nacchoProfile GitHub repository"),
+                   "the nacchoProfile GitHub repository",
+                   style = "text-decoration: underline !important;"),
             "."
           ),
 
@@ -104,7 +107,8 @@ mod_home_ui <- function(id){
             "For more information about the 2022 Profile Study, please
                 reach out to our Research team at",
             tags$a(href="mailto: profile@naccho.org",
-                   "profile@naccho.org.")
+                   "profile@naccho.org.",
+                   style = "text-decoration: underline !important;")
           )
         )
       )

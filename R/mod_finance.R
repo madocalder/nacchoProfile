@@ -66,38 +66,50 @@ mod_finance_ui <- function(id){
             # display when Box Plot is selected and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Box Plot\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_box"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure_box"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Bar Graph is selected, Budget Changes is not selected, and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Bar Graph\' && input[\'", ns('topic'), "\'] != \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure"), height = 575)
+              div(
+                highcharter::highchartOutput(ns("figure"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Budget Changes is selected and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_budget"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_budget"), height = "100%"),
+                  style = "height: 65vh; width: 50vw;")
             ),
 
             # display when Tree Map is selected, non-weighted revenue total is selected, and Table is not selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\' && input[\'", ns('topic'), "\'] == \'non_weighted_revenue_total\' && input[\'", ns('view'), "\'] != \'Table\'"),
-              highcharter::highchartOutput(ns("figure_tree"), height = 675)
+              div(
+                highcharter::highchartOutput(ns("figure_tree"), height = "100%"),
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Table view
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
 
-              uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
-              br(),
-              HTML('<div style="font-size: 13px;">', source_line,
-                   '<br> <b> N: </b> Hover over a column’s header to view the respective N count. </div>')
+              div(
+                uiOutput(ns("table_title")),
+                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                br(),
+                HTML('<div style="font-size: 2vmin;">', source_line,'
+                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+
+                style = "height: 65vh; width: 50vw;")
 
             )
+          )
           ),
 
 
@@ -183,7 +195,7 @@ mod_finance_ui <- function(id){
       )
     )
   )
-)
+
 
 }
 
@@ -206,7 +218,7 @@ mod_finance_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -320,11 +332,11 @@ mod_finance_server <- function(id){
                                scales::dollar(data[[1]]$max_outlier), ". <br>",
                                source_line),
           viz_subtitle = "",
-          tooltip = "<b> Upper Limit: </b> ${point.high} <br>
-                     <b> 75th Percentile: </b> ${point.q3} <br>
-                     <b> Median: </b> ${point.median} <br>
-                     <b> 25th Percentile: </b> ${point.q1} <br>
-                     <b> Lower Limit: </b> ${point.low} <br>",
+          tooltip = "<b> Upper Limit: </b> ${point.high:.0f} <br>
+                     <b> 75th Percentile: </b> ${point.q3:.0f} <br>
+                     <b> Median: </b> ${point.median:.0f} <br>
+                     <b> 25th Percentile: </b> ${point.q1:.0f} <br>
+                     <b> Lower Limit: </b> ${point.low:.0f} <br>",
           tooltip_align = "left"
         ) %>%
         viz_export()
@@ -341,7 +353,7 @@ mod_finance_server <- function(id){
           viz_caption = source_line,
           viz_subtitle = "Estimated Across All LHDs",
           tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
-                    {point.y}% of LHDs had per capita expenditures between
+                    {point.y:.0f}% of LHDs had per capita expenditures between
                     {point.category}."
         ) %>%
         viz_export()
@@ -369,13 +381,13 @@ mod_finance_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(responses$n), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y}% <br>",
+              {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
           backgroundColor = "transparent",
-          headerFormat = "<b>{point.x} LHDs </b> <hr class = 'tt'>",
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
@@ -403,7 +415,7 @@ mod_finance_server <- function(id){
           dplyr::rename(name = revenue_type) %>%
           dplyr::mutate(id = paste(name, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(id, name, value)
+          dplyr::select(all_of(id, name, value))
 
         add_info <- data.frame(
           color = naccho.viz::green
@@ -430,7 +442,7 @@ mod_finance_server <- function(id){
                 verticalAlign = "middle",
                 allowOverlap = TRUE,
                 overflow = "allow",
-                format = '<b>{point.name}</b> <br> {point.value}%',
+                format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
                   fontSize = "13px",
                   fontFamily = "Heebo",
@@ -444,7 +456,7 @@ mod_finance_server <- function(id){
                       viz_subtitle = "Estimated Across All LHDs",
                       viz_caption = source_line,
                       caption_align = "center",
-                      tooltip = "{point.value}% of all LHD revenue came from <b>{point.name} sources.</b>",
+                      tooltip = "{point.value:.0f}% of all LHD revenue came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE)
 
       } else {
@@ -455,7 +467,7 @@ mod_finance_server <- function(id){
                         parent = category) %>%
           dplyr::mutate(id = paste(name, parent, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(id, name, parent, value, subtitle)
+          dplyr::select(all_off(id, name, parent, value, subtitle))
 
         id_values <- unique(data$parent)
 
@@ -525,7 +537,7 @@ mod_finance_server <- function(id){
                 verticalAlign = "middle",
                 allowOverlap = TRUE,
                 overflow = "allow",
-                format = '<b>{point.name}</b> <br> {point.value}%',
+                format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
                   fontSize = "13px",
                   fontFamily = "Heebo",
@@ -539,7 +551,7 @@ mod_finance_server <- function(id){
                       viz_subtitle = unique(data$subtitle),
                       viz_caption = source_line,
                       caption_align = "center",
-                      tooltip = "{point.value}% of all revenue in {point.parent} LHDs came from <b>{point.name} sources.</b>",
+                      tooltip = "{point.value:.0f}% of all revenue in {point.parent} LHDs came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE) %>%
           highcharter::hc_tooltip(
             useHTML = TRUE,
@@ -548,7 +560,7 @@ mod_finance_server <- function(id){
               if (this.point.node && this.point.node.level === 1) {
                 return '<b>' + this.point.name + '</b>';
               } else {
-          return this.point.value + '% of all revenue in ' + this.point.parent + ' LHDs came from <b>' + this.point.name + ' sources.</b>';
+          return this.point.value:.0f + '% of all revenue in ' + this.point.parent + ' LHDs came from <b>' + this.point.name + ' sources.</b>';
               }
             }"
             )

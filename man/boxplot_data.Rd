@@ -8,6 +8,8 @@ boxplot_data(args, grps = NULL)
 }
 \arguments{
 \item{args}{A variable from master_data.}
+
+\item{grps}{A value from the master_data file to use for grouping statistics.}
 }
 \value{
 A list of one or more.

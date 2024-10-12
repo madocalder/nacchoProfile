@@ -260,8 +260,8 @@ mod_key_findings_server <- function(id){
         y_max = 200000,
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "{point.job_type} employees: <b> {point.value:,.0f} </b><br>
-                   Change from 2019 to 2022: <b> {point.perc_change}</b> <br>",
+        tooltip = "{point.job_type} employees: <b> {point.value:.0f} </b><br>
+                   Change from 2019 to 2022: <b> {point.perc_change:.0f}</b> <br>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -379,8 +379,8 @@ mod_key_findings_server <- function(id){
         y_format = "\u0024{value:,.0f}",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = " {point.stat} per capita revenue:  <b>\u0024{point.value:,.0f}</b> <br>
-                   Change from 2019 to 2022: <b> {point.perc_change}</b>",
+        tooltip = " {point.stat} per capita revenue:  <b>\u0024{point.value:.0f}</b> <br>
+                   Change from 2019 to 2022: <b> {point.perc_change:.0f}</b>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -439,7 +439,7 @@ mod_key_findings_server <- function(id){
         y_format = "\u0024{value:,.0f} m",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "{point.type}: <b>\u0024{point.value:,.2f} million </b>",
+        tooltip = "{point.type}: <b>\u0024{point.value:.0f} million </b>",
         allow_export = FALSE
       ) %>%
         highcharter::hc_add_annotation(
@@ -492,7 +492,7 @@ mod_key_findings_server <- function(id){
         y_label = "Percent of LHDs",
         x_group = "type",
         allow_export = FALSE,
-        tooltip = "{point.value}\u0025 of LHDs {point.type} <br> immunization services in {point.year}",
+        tooltip = "{point.value:.0f}\u0025 of LHDs {point.type} <br> immunization services in {point.year}",
         legend_enable = TRUE,
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
         immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
@@ -515,7 +515,7 @@ mod_key_findings_server <- function(id){
         y_variable = "value",
         item_group = "description",
         legend_enable = TRUE,
-        tooltip = "{point.percent}\u0025 of LHDs were {point.description} <br> related to COVID\u221219 in 2022",
+        tooltip = "{point.percent:.0f}\u0025 of LHDs were {point.description} <br> related to COVID\u221219 in 2022",
         color_one = naccho.viz::terracotta,
         color_two = "#ddd",
         title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
@@ -562,7 +562,7 @@ mod_key_findings_server <- function(id){
         legend_enable = TRUE,
         legend_title = "",
         x_label = "",
-        tooltip = "{point.value}\u0025 of LHDs implemented <br> {point.type} in {point.year}",
+        tooltip = "{point.value:.0f}\u0025 of LHDs had implemented <br> {point.type} in {point.year}",
         allow_export = FALSE
       )
     })
@@ -610,7 +610,7 @@ mod_key_findings_server <- function(id){
         y_format = "{value}\u0025",
         legend_enable = TRUE,
         legend_title = "",
-        tooltip = "{point.perc}\u0025 of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
+        tooltip = "{point.perc:.0f}\u0025 of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
         allow_export = FALSE,
         select_theme = naccho.viz::bare
       ) %>%
@@ -625,7 +625,7 @@ mod_key_findings_server <- function(id){
                 fontSize = "11px",
                 fontFamily = "Heebo",
                 textOutline = "none"),
-              format = "{point.perc}\u0025",
+              format = "{point.perc:.0f}\u0025",
               formatter = highcharter::JS("function() {
                         var color = (this.point.color === '#008489' || this.point.color === '#80A14E') ? '#333' : '#FFF';
                         return '<span style=\"color:' + color + '\">' + this.x + ': ' + this.y + '</span>';
@@ -740,7 +740,7 @@ mod_key_findings_server <- function(id){
                 fontSize = "11px",
                 fontFamily = "Heebo",
                 textOutline = "none"),
-              format = "{point.y}\u0025",
+              format = "{point.y:.0f}\u0025",
               distance = 5)
           )
         ) %>%

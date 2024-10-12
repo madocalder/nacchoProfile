@@ -88,10 +88,10 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
           mutate(
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
-            y = round(Percentage,1),
+            y = round(Percentage,0),
             category = sapply(Answer, custom_str_to_title),
             group = Group,
-            subtitle = paste0("Estimated Across All LHDs"),
+            subtitle = paste0("Denominator of LHDs"),
             x_label = NA
           )
 
@@ -132,7 +132,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
           mutate(
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
-            y = round(Percentage,1),
+            y = round(Percentage,0),
             category = sapply(Answer, custom_str_to_title),
             group = sapply(Group, custom_str_to_title),
             subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
@@ -194,10 +194,10 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
     rename_all(~new_names) %>%
     select(all_of(c("Group", "Percentage", "Answer"))) %>%
     mutate(
-      y = round(Percentage,1),
+      y = round(Percentage,0),
       category = sapply(Answer, custom_str_to_title),
       group = Group,
-      subtitle = paste0("Estimated Across All LHDs")
+      subtitle = paste0("Denominator of LHDs")
     )
 
   add_responses <- master_data %>%
@@ -440,6 +440,7 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
 #' @description Create a list with a length of one or more for use in boxplot visualizations.
 #'
 #' @param args A variable from master_data.
+#' @param grps A value from the master_data file to use for grouping statistics.
 #'
 #' @export
 #' @return A list of one or more.
