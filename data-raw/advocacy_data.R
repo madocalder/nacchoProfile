@@ -1,40 +1,39 @@
-## code to prepare `advocacy_data` dataset goes here -------
+#' Prepare Advocacy and New Advocacy Datasets with Filters
+#'
+#' This script prepares datasets for advocacy activities by applying various filters (e.g., urban-rural classification,
+#' government category, population category, census region) and generating survey-weighted counts for Local Health Departments (LHDs).
+#' It creates filtered and unfiltered versions of each dataset and binds them together. The datasets are saved for further use.
+#'
+#' @details
+#' This script performs the following steps for each dataset (advocacy, new advocacy):
+#' - Apply filters such as "urbanrural2022", "c0govcat", "c0popcat3", and "censusregion".
+#' - Generate survey-weighted counts using the `return_survey_weighted_counts` function.
+#' - Combine filtered and unfiltered data.
+#' - Add category labels for each advocacy type based on specific survey questions.
+#' - Save the resulting dataset using `usethis::use_data()`.
+#'
+#' @param vars Character vector specifying the advocacy-related questions (e.g., "c12q260x" for advocacy, "newc12q502x" for new advocacy).
+#' @param filters Character vector specifying the filters applied to each dataset (e.g., "urbanrural2022", "c0govcat").
+#'
+#' @return Saves the datasets (`advocacy_data`, `new_advocacy_data`) as `.rda` files in the package.
+#'
+#' @seealso [return_survey_weighted_counts()] for the function used to generate the survey-weighted counts.
+#'
+#' @examples
+#' # Load all package functions
+#' devtools::load_all()
+#'
+#' # Prepare and save advocacy data
+#' vars <- c("c12q260x", "c12q260aa", "c12q260n", "c12q260o", "c12q260e", "c12q260y")
+#' filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
+#'
+#' # Prepare new advocacy data similarly
+#'
+#' @export
+NULL
 
+# Code to prepare `advocacy_data` dataset -------
 devtools::load_all()
-
-vars <- c("c12q260x", "c12q260aa",
-          "c12q260n", "c12q260o",
-          "c12q260e", "c12q260y",
-          "c12q260ac", "c12q260w",
-          "c12q260p", "c12q260f",
-          "c12q260q", "c12q260h",
-          "c12q260r", "c12q260s",
-          "c12q260af", "c12q260ag",
-          "c12q260t", "c12q260u",
-          "c12q260v", "c12q260z",
-          "c12q260j", "c12q260k"
-          )
-
-filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
-
-advocacy_list <- list() # create an empty list
-
-# loop used to shorten code and create the dataframes with each filter
-for (i in 1:length(filters)) {
-  args <- list(vars, filters[[i]])
-
-  data <- pmap_dfr(args, return_survey_weighted_counts) %>%
-    select(1:12, "Responses") %>%
-    mutate(filter = paste(filters[i]))
-
-  advocacy_list[[i]] <- data
-}
-
-
-# bind the data generated in loop
-advocacy_with_filters <- do.call(rbind, advocacy_list)
-
-# View(advocacy_with_filters)
 
 vars <- c("c12q260x", "c12q260aa",
           "c12q260n", "c12q260o",
@@ -49,50 +48,61 @@ vars <- c("c12q260x", "c12q260aa",
           "c12q260j", "c12q260k"
 )
 
-# create data with no filter
+filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
+
+advocacy_list <- list() # create an empty list
+
+# Loop to create the dataframes with each filter
+for (i in 1:length(filters)) {
+  args <- list(vars, filters[[i]])
+
+  data <- pmap_dfr(args, return_survey_weighted_counts) %>%
+    select(1:12, "Responses") %>%
+    mutate(filter = paste(filters[i]))
+
+  advocacy_list[[i]] <- data
+}
+
+# Bind the data generated in loop
+advocacy_with_filters <- do.call(rbind, advocacy_list)
+
+# Create data with no filter
 advocacy_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
   select(1:12, "Responses") %>%
   mutate(filter = paste("All LHDs"))
 
-
-
-# join the two datasets -- with filters and with no filter
+# Join the two datasets -- with filters and without filters
 advocacy_data <- rbind(advocacy_with_filters, advocacy_no_filter) %>%
-  dplyr::mutate(advocacy_type = dplyr::case_when(Question %in% c("c12q260x") ~ "Climate Change",
-                                                 Question %in% c("c12q260aa") ~ "Emergency preparedness and response",
-                                                 Question %in% c("c12q260n") ~ "Emergency Preparedness Response",
-                                                 Question %in% c("c12q260o") ~ "Food safety",
-                                                 Question %in% c("c12q260e") ~ "Funding for access to healthcare",
-                                                 Question %in% c("c12q260y") ~ "Funding for local public health",
-                                                 Question %in% c("c12q260ac") ~ "COVID-19 Infectious disease",
-                                                 Question %in% c("c12q260w") ~ "Infectious disease",
-                                                 Question %in% c("c12q260p") ~ "Injury/violence prevention",
-                                                 Question %in% c("c12q260f") ~ "Land use",
-                                                 Question %in% c("c12q260q") ~ "Mental health",
-                                                 Question %in% c("c12q260h") ~ "Occupational health and safety",
-                                                 Question %in% c("c12q260r") ~ "Obesity/physical activity",
-                                                 Question %in% c("c12q260s") ~ "Oral health",
-                                                 Question %in% c("c12q260af") ~ "Reforms related to community policing",
-                                                 Question %in% c("c12q260ag") ~ "Planning external resource allocation using an equity lens",
-                                                 Question %in% c("c12q260t") ~ "Safe and healthy housing",
-                                                 Question %in% c("c12q260u") ~ "Tobacco, alcohol, and other drugs",
-                                                 Question %in% c("c12q260v") ~ "Wastewater/sanitation",
-                                                 Question %in% c("c12q260z") ~ "Other environmental health",
-                                                 Question %in% c("c12q260j") ~ "Other policy areas",
-                                                 Question %in% c("c12q260k") ~ "None")
-  )
+  dplyr::mutate(advocacy_type = dplyr::case_when(
+    Question %in% c("c12q260x") ~ "Climate Change",
+    Question %in% c("c12q260aa") ~ "Emergency preparedness and response",
+    Question %in% c("c12q260n") ~ "Emergency Preparedness Response",
+    Question %in% c("c12q260o") ~ "Food safety",
+    Question %in% c("c12q260e") ~ "Funding for access to healthcare",
+    Question %in% c("c12q260y") ~ "Funding for local public health",
+    Question %in% c("c12q260ac") ~ "COVID-19 Infectious disease",
+    Question %in% c("c12q260w") ~ "Infectious disease",
+    Question %in% c("c12q260p") ~ "Injury/violence prevention",
+    Question %in% c("c12q260f") ~ "Land use",
+    Question %in% c("c12q260q") ~ "Mental health",
+    Question %in% c("c12q260h") ~ "Occupational health and safety",
+    Question %in% c("c12q260r") ~ "Obesity/physical activity",
+    Question %in% c("c12q260s") ~ "Oral health",
+    Question %in% c("c12q260af") ~ "Reforms related to community policing",
+    Question %in% c("c12q260ag") ~ "Planning external resource allocation using an equity lens",
+    Question %in% c("c12q260t") ~ "Safe and healthy housing",
+    Question %in% c("c12q260u") ~ "Tobacco, alcohol, and other drugs",
+    Question %in% c("c12q260v") ~ "Wastewater/sanitation",
+    Question %in% c("c12q260z") ~ "Other environmental health",
+    Question %in% c("c12q260j") ~ "Other policy areas",
+    Question %in% c("c12q260k") ~ "None"
+  ))
 
-
+# Save the advocacy_data
 usethis::use_data(advocacy_data, overwrite = TRUE)
 
-
-# View(advocacy_data)
-
-
-## code to prepare `new_advocacy_data` dataset goes here ----
-
+# Code to prepare `new_advocacy_data` dataset ----
 devtools::load_all()
-
 
 vars <- c("newc12q502x", "newc12q502aa",
           "newc12q502b", "newc12q502ab",
@@ -104,15 +114,13 @@ vars <- c("newc12q502x", "newc12q502aa",
           "newc12q502p", "newc12q502t",
           "newc12q502k", "newc12q502v",
           "newc12q502z", "newc12q502f"
-
 )
-
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
 
 new_advocacy_list <- list() # create an empty list
 
-# loop used to shorten code and create the dataframes with each filter
+# Loop to create the dataframes with each filter
 for (i in 1:length(filters)) {
   args <- list(vars, filters[[i]])
 
@@ -137,26 +145,10 @@ for (i in 1:length(filters)) {
   new_advocacy_list[[i]] <- data
 }
 
-
-# bind the data generated in loop
+# Bind the data generated in loop
 new_advocacy_with_filters <- do.call(rbind, new_advocacy_list)
 
-# View(new_advocacy_with_filters)
-
-vars <- c("newc12q502x", "newc12q502aa",
-          "newc12q502b", "newc12q502ab",
-          "newc12q502o", "newc12q502i",
-          "newc12q502y", "newc12q502ac",
-          "newc12q502r", "newc12q502m",
-          "newc12q502s", "newc12q502q",
-          "newc12q502j", "newc12q502l",
-          "newc12q502p", "newc12q502t",
-          "newc12q502k", "newc12q502v",
-          "newc12q502z", "newc12q502f"
-
-)
-
-# create data with no filter
+# Create data with no filter
 new_advocacy_no_filter <- map_dfr(vars, function(var) {
   data <- return_survey_weighted_counts(var)  # Apply the function to get the data
 
@@ -171,9 +163,7 @@ new_advocacy_no_filter <- map_dfr(vars, function(var) {
   select(1:12, "Responses") %>%
   mutate(filter = paste("All LHDs"))
 
-# View(new_advocacy_no_filter)
-
-# join the two datasets -- with filters and with no filter
+# Join the two datasets -- with filters and without filters
 new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>%
   dplyr::mutate(new_advocacy_type = dplyr::case_when(
     Question %in% c("newc12q502x") ~ "Climate Change",
@@ -196,10 +186,7 @@ new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>
     Question %in% c("newc12q502v") ~ "Wastewater/sanitation",
     Question %in% c("newc12q502z") ~ "Other environmental health",
     Question %in% c("newc12q502f") ~ "Other area"
-  )
-  )
+  ))
 
-# View(new_advocacy_data)
-
+# Save the new_advocacy_data
 usethis::use_data(new_advocacy_data, overwrite = TRUE)
-
