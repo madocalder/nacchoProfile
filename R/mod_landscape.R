@@ -63,23 +63,25 @@ mod_landscape_ui <- function(id){
           div(
             class = "viz-content",
 
-            # display when map is selected
+            # display when Map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
               div(
-              highcharter::highchartOutput(ns("map"), height = "100%"),
-              style = "height: 65vh; width: 50vw;")
+                highcharter::highchartOutput(ns("map"), height = "100%"),
+                style = "height: 65vh; width: 50vw;"
+              )
             ),
 
-            # display when map is not selected
+            # display when Bar is selected and not Map, Table, or Line
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\''),
+              condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\' && input[\'', ns('view'), "\'] != \'Line Graph\'"),
               div(
                 highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 65vh; width: 50vw;"
+              )
             ),
 
-            # adding table
+            # display when Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
@@ -87,10 +89,18 @@ mod_landscape_ui <- function(id){
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
-                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+         <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+                style = "height: 65vh; width: 50vw;"
+              )
+            ),
 
-                style = "height: 65vh; width: 50vw;")
-
+            # view output Line
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
+              div(
+                uiOutput(ns("line")),
+                style = "height: 65vh; width: 50vw;"
+              )
             )
           )
         ),
@@ -202,8 +212,8 @@ mod_landscape_server <- function(id){
     })
 
 
-    # figure output -----------------------------------------------------------
-    # used for bar and line graphs
+    # Bar figure output -----------------------------------------------------------
+    # used for bar graphs
     output$figure <- highcharter::renderHighchart({
       data <- return_survey_weighted_counts("c2q501")
 
@@ -417,6 +427,43 @@ mod_landscape_server <- function(id){
       create_non_time_table(data, category, colors, topic)
 
     })
+
+
+    # Line Output-------------------
+
+    output$line <- highcharter::renderHighchart(
+      naccho.viz::create_single_line({
+        data <- data.frame(
+          year = c("2019", "2022", "2019", "2022"),
+          value = c(17, 31, 10, 18),
+          stat = c("Mean", "Mean", "Median", "Median"),
+          perc_change = c("\u002b45\u0025", "\u002b45\u0025", "\u002b44\u0025", "\u002b44\u0025")
+        )
+
+        data$year <- factor(data$year)
+
+        naccho.viz::create_grouped_line(
+          data = data,
+          x_variable = "year",
+          y_variable = "value",
+          title_text = "<span style='color:#AB6143;font-weight:bold;'>Average per capita revenues</span> from federal sources nearly
+        doubled from 2019 to 2022.",
+          subtitle_text = "Nonetheless, nearly one in five LHDs foresaw budget
+        cuts their next fiscal year as federal resources expire.",
+          x_group = "stat",
+          y_label = "Per Capita Revenue",
+          my_colors = c(naccho.viz::terracotta, naccho.viz::green),
+          x_label = "",
+          y_max = 35,
+          y_format = "\u0024{value:,.0f}",
+          legend_enable = TRUE,
+          legend_title = "",
+          tooltip = " {point.stat} per capita revenue:  <b>\u0024{point.value:.0f}</b> <br>
+                   Change from 2019 to 2022: <b> {point.perc_change:.0f}</b>",
+          allow_export = FALSE
+        )
+      })
+    )
 
 
 
