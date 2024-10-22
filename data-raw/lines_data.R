@@ -23,7 +23,12 @@
 #' @export
 # code to prepare lines data------
 
-lines_data <- utils::read.csv("data-raw/time_data.csv")
+lines_data <- utils::read.csv("data-raw/time_data.csv")%>%
+  dplyr::mutate(
+    category = case_when(
+    category %in% c("Under 30", "30-39") ~ "Under 40",
+    TRUE ~ category)
+  )
 
 # save data ---------------------------------------------------------------
 usethis::use_data(lines_data, overwrite = TRUE)
