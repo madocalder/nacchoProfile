@@ -1,24 +1,721 @@
-View(lines_data)
+#' Process Line Data for Various Topics and Filters
+#'
+#' This function processes line data based on different topics and filtering options for local health departments (LHDs).
+#' It supports topics related to local boards of health, executive age, gender, race, tenure, field of study, and highest degree earned.
+#' The function merges historical data and current survey data, performs necessary transformations, and prepares descriptive labels for visualization.
+#'
+#' @param topic A character string specifying the topic to process. Supported topics include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).
+#' @param filtering A character string indicating the filter to apply. Common filters include "All LHDs" or specific regional or demographic filters.
+#' @param classifications Optional; A character string or list for additional classifications to use during data processing. Default is NULL.
+#'
+#' @return A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `topic` input.
+#' @details
+#' The function performs the following steps based on the specified topic:
+#'
+#' - **"lboh"**: Processes data related to the existence of local boards of health at LDHs.
+#' - **"age_cat"**: Processes data related to LHD top executives' age categories.
+#' - **"c4q29"**: Processes data related to LHD top executives' gender identification.
+#' - **"race"**: Processes data related to LHD top executives' race.
+#' - **"tenure"**: Processes data related to LHD top executives' mean tenure.
+#' - **"field"**: Processes data related to LHD top executives' field of study.
+#' - **"c4q34"**: Processes data related to the highest degree earned by top executives.
+#'
+#' The function handles both historical data from the `lines_data` dataset and current survey data retrieved via custom functions like `return_survey_weighted_counts` and `return_survey_weighted_statistics`.
+#' It performs data transformations such as recoding categories, calculating percentages, and creating descriptive labels for use in visualizations.
+#'
+#' @examples
+#' # Example usage for processing data on local boards of health for all LHDs
+#' data <- process_line_data("lboh", "All LHDs")
+#'
+#' # Example usage for processing executive age data with a specific filter
+#' data <- process_line_data("age_cat", "urbanrurall2022")
+#'
+#' @export
 
 
-data <- lines_data %>%
-  dplyr::filter(topic == "lboh"),
-                filter == "All LHDs")
+#data helper for lines ----
 
-View(data)
+process_line_data <- function(topic, filtering, classifications = NULL) {
+#All LHD CASES------------
+  if (filtering == "All LHDs") {
+##Local board of health------------------
+    if (topic == "lboh") {
+      ###historical data-----------
+      hist_data <- lines_data %>%
+        dplyr::filter(topic == "lboh",
+                      filter == "All LHDs",
+                      category %in% c("Yes", "No"))%>%
+        dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
 
-naccho.viz::create_single_line(
-      data = data,
-      x_variable = data$year,
-      y_variable = data$y,
-      select_theme = naccho.viz::line,
-      tooltip = ""
-)
+      # View(hist_data)
 
-View(lboh_data)
+      ### 2022 data-------------
+      current_data <- return_survey_weighted_counts("lboh") %>%
+        dplyr::select(Question, y, category, group, Group)%>%
+        dplyr::mutate(category =dplyr::case_when(
+          category %in% c("Advisory", "Governing") ~ "Yes",  # Recode both variations to "Yes"
+          category == "None" ~ "No",
+          FALSE ~ category
+        ))%>%
+        dplyr::group_by(category, group, Group, Question) %>%
+        dplyr::summarize(y = sum(y))
 
-lboh_data <- return_survey_weighted_counts("lboh") %>%
-  dplyr::select(Question, y, category,
+      current_data$year <- 2022
+      View(current_data)
 
-  )
+      ###combine the two datasets
+      combined <- full_join(current_data, hist_data,
+                       by = c("Question" = "topic",
+                              "Group" = "filter",
+                              "group" = "group",
+                              "y" = "y",
+                              "year" = "year",
+                              "category" = "category"
+                       ))%>%
+        arrange(year)%>%
+          dplyr::mutate(
+            legend_label =dplyr::case_when(
+              category == "Yes" ~ "had a Local Board of Health",
+              category == "No" ~ "did not have a Local Board of Health",
+              FALSE ~ category  # Handle any other cases, though we don't expect others
+            ),
+            tt = paste("% of LHDs", tolower(legend_label)
+              )
+          )
 
+
+      } else if (topic == "age_cat"){
+  ##Top executive age---------
+        ### historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "age_cat",
+                        filter == "All LHDs")%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0)
+          ) %>%
+          dplyr::group_by(category, group, year, filter, topic) %>%
+          dplyr::summarize(y = sum(y))
+
+       ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(category =dplyr::case_when(
+            category == "40-49 Years" ~ "40-49",
+            category == "50-59 Years" ~ "50-59",
+            category == "60-69 Years" ~ "60-69",
+            category == "70 Or Older" ~ "70+",
+            TRUE ~ category  # Handle any other cases, though we don't expect others
+          ),
+          year = 2022,
+          filter = "All LHDs")
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, group) %>%
+          dplyr::mutate(
+            base = paste(category, "years"),
+            legend_label = paste(base, "of age"),
+            tt = paste("% of LHD executives were", tolower(base), "old")
+          )
+
+        combined$legend_label <- factor(combined$legend_label,
+                                        levels = c("Under 40 years of age", "40-49 years of age",
+                                                   "50-59 years of age", "60-69 years of age",
+                                                   "70+ years of age"))
+
+        combined <- combined %>%
+          arrange(legend_label)
+      } else if(topic == "c4q29"){
+##Top executive gender -------
+
+          ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "c4q29",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = (round((100*as.numeric(y)), digits = 0)),
+            category =dplyr::case_when(
+              category == "Prefer not to answer" ~ "Not specified",
+              category == "Other" ~ "Not specified",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            )
+          ) %>%
+          dplyr::summarize(y = sum(y))
+
+        # View(hist_data)
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic)%>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            category =dplyr::case_when(
+              category == "Prefer Not To Answer" ~ "Not specified",
+              category == "Other" ~ "Not specified",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            ),
+            year = 2022,
+            filter = "All LHDs")
+
+        # View(current_data)
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, category) %>%
+          dplyr::mutate(
+            legend_label = paste(category, "identifying"),
+            tt = paste("% of top LHD executives identified as", tolower(category)),
+          )%>%
+          dplyr::filter(category %in% c("Male", "Female"))
+
+
+      } else if (topic == "race") {
+  ##Top exec race------------
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "race",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0),
+            category =dplyr::case_when(
+              category == "Some other race" ~ "Mixed Identity or Other Race",
+              category == "American Indian/Alaska Native" ~ "American Indian or Alaska Native",
+              category == "Black/African American" ~ "Black or African American",
+              category == "Native Hawaiian/Other Pacific Islander" ~ "Native Hawaiian or Other     Pacific Islander",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            ))
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(category =dplyr::case_when(
+            category == "American Indian Or Alaska Native" ~ "American Indian or Alaska Native",
+            category == "Black Or African American" ~ "Black or African American",
+            category == "Native Hawaiian Or Other Pacific Islander" ~
+              "Native Hawaiian or Other Pacific Islander",
+            category == "Mixed Identity Or Other Race" ~ "Mixed Identity or Other Race",
+            TRUE ~ category),  # Handle any other cases, though we don't expect others
+            year = 2022,
+            filter = "All LHDs")
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, category) %>%
+          dplyr::filter(category != "Na") %>%
+          dplyr::mutate(
+            legend_label = paste(category),
+            tt = paste("% of top LHD executives identified as", category),
+          )
+
+      } else if (topic == "tenure"){
+##Top exec tenure--------
+       ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "tenure",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)
+
+       ### 2022 data-------------
+        current_data <- return_survey_weighted_statistics("tenure") %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            group = category,
+            category = "Mean",
+            year = 2022,
+            filter = "All LHDs",
+            y = as.character(y))
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          dplyr::mutate(y = as.numeric(y))%>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(category),
+            tt = paste(" years was the average tenure of top LHD executives"))
+
+        ##Top exec field of study --------
+      } else if (topic == "field"){
+        ###create other 2016 rows
+        other_2016 <- lines_data %>%
+          dplyr::filter(topic == "field",
+                        year == 2016,
+                        filter == "All LHDs") %>%  # Only for 2016
+          dplyr::group_by(year, group, filter, topic) %>%
+          dplyr::summarise(
+            y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
+          dplyr::mutate(
+            y = round((100*as.numeric(1 - y_sum)), digits = 0),  # Subtract the sum of 'y' from 100
+            category = "Other Field"  # Create the "Other Field" category
+          ) %>%
+          dplyr::select(year, category, group, filter, topic, y)  # Select relevant columns
+
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "field",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0),
+                        category =dplyr::case_when(
+                          category == "None of the above" ~ "Other Field",
+                          TRUE ~ category
+                        ),
+                        year = as.integer(year))
+
+        hist_data <- rbind(hist_data, other_2016)
+
+        ###2022 data-------------
+        current_data <- spec_data_all %>%
+          # dplyr::filter(filter == "All LHDs") %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            filter = filtering,
+            year = 2022,
+            Question = "field",
+            y = as.numeric(y))
+
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(category),
+            tt_base =dplyr::case_when(
+              category == "Other Field" ~ "in a field other than Public Health, Nursing, or Medical",
+              category %in% c("Public Health", "Nursing") ~ paste("in the field of", category),
+              TRUE ~ paste("in the", category, "field")
+            ),
+            tt = paste("% of LHD top executives studied", tt_base)
+          )
+      } else if (topic == "c4q34"){
+##Top executive highest degree earned----------
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "c4q34",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts("c4q34") %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            year = 2022,
+            filter = "All LHDs",
+            y = as.numeric(y))
+
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          dplyr::mutate(y = as.numeric(y)) %>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(category),
+            tt =dplyr::case_when(
+              category == "Associates" ~ paste("% of LHD top executives' highest
+                                               degree earned was an",
+                                               category, "degree"),
+              category %in% c("Masters", "Bachelors") ~ paste("% of LHD top
+                                                        executives' highest degree
+                                                              earned was a",
+                                                              category, "degree"),
+              TRUE ~  paste("% of LHD top executives' highest degree earned was a",
+                            category))
+          )
+
+      } else { message("ERROR: No input identified")}
+
+
+    } else {
+#NON ALL LHD CASES-------------
+      ## Local Board of Health ----------
+      if (topic %in% c("lboh")){
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "lboh",
+                        filter == filtering,
+                        category %in% c("Yes", "No"))%>%
+          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+
+        View(hist_data)
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+          dplyr::select(Question, y, category, group, Group)%>%
+          dplyr::group_by(category, group, Group, Question) %>%
+          dplyr::mutate(category =dplyr::case_when(
+            category %in% c("Advisory", "Governing") ~ "Yes",  # Recode both variations to "Yes"
+            category == "None" ~ "No",
+            FALSE ~ category
+          ))%>%
+          dplyr::summarize(y = sum(y)) %>%
+          dplyr::ungroup()
+
+        current_data$year <- 2022
+        current_data$filter <- filtering
+
+        # View(current_data)
+
+        ### Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, group) %>%
+          dplyr::mutate(
+            tt =dplyr::case_when(
+              category == "Yes" ~ paste("% of", tolower(group), "LHDs had a Local Board of Health"),
+              category == "No" ~  paste("% of", tolower(group), "LHDs did not have a Local Board of Health"),
+              FALSE ~ category  # Handle any other cases
+            ),
+            # Create descriptive legend labels
+            legend_label =dplyr::case_when(
+              category == "Yes" ~ paste(group, "LHDs with a Local Board of Health"),
+              category == "No" ~ paste(group, "LHDs without a Local Board of Health"),
+              TRUE ~ category  # Handle any other cases
+            )
+          )%>%
+          arrange(year, group, legend_label)
+
+
+        ##Executive age-------------
+      } else if (topic == "age_cat"){
+
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "age_cat",
+                        filter == filtering)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0)
+          ) %>%
+          dplyr::group_by(category, group, year, filter, topic) %>%
+          dplyr::summarize(y = sum(y))
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(category =dplyr::case_when(
+            category == "40-49 Years" ~ "40-49",
+            category == "50-59 Years" ~ "50-59",
+            category == "60-69 Years" ~ "60-69",
+            category == "70 Or Older" ~ "70+",
+            TRUE ~ category  # Handle any other cases, though we don't expect others
+          ),
+          year = 2022,
+          filter = "urbanrurall2022")
+
+        ### Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, group) %>%
+          dplyr::mutate(
+            base = paste(category, "years"),
+            legend_label = paste(group, "LHD executives", tolower(base), "of age"),
+            tt = paste("% of", tolower(group), "LHD executives were", tolower(base), "old"),
+          )
+
+        combined$legend_label <- factor(combined$legend_label, levels =
+                                          c("Rural LHD executives under 40 years of age",
+                                            "Rural LHD executives 40-49 years of age",
+                                            "Rural LHD executives 50-59 years of age",
+                                            "Rural LHD executives 60-69 years of age",
+                                            "Rural LHD executives 70+ years of age",
+                                            "Urban LHD executives under 40 years of age",
+                                            "Urban LHD executives 40-49 years of age",
+                                            "Urban LHD executives 50-59 years of age",
+                                            "Urban LHD executives 60-69 years of age",
+                                            "Urban LHD executives 70+ years of age"
+                                          ))
+
+        combined <- combined %>%
+          arrange(legend_label)
+
+##Top executive gender---------
+      } else if (topic == "c4q29"){
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "c4q29",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0),
+            category =dplyr::case_when(
+              category == "Prefer not to answer" ~ "Not specified",
+              category == "Other" ~ "Not specified",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            )
+          ) %>%
+          dplyr::summarize(y = sum(y))
+
+        # View(hist_data)
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic, filtering)%>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            category =dplyr::case_when(
+              category == "Prefer Not To Answer" ~ "Not specified",
+              category == "Other" ~ "Not specified",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            ),
+            year = 2022,
+            filter = "All LHDs")
+
+        #
+        # View(current_data)
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, category) %>%
+          dplyr::mutate(
+            legend_label = paste(category, "identifying top", tolower(group), "executives"),
+            tt = paste("% of top executives from", tolower(group), "LHDs identified as", tolower(category)),
+          )%>%
+          dplyr::filter(category %in% c("Male", "Female"))
+
+      } else if (topic == "race"){
+##Top executive race ----------
+       ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "race",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0),
+            category =dplyr::case_when(
+              category == "Some other race" ~ "Mixed Identity or Other Race",
+              category == "American Indian/Alaska Native" ~ "American Indian or Alaska Native",
+              category == "Black/African American" ~ "Black or African American",
+              category == "Native Hawaiian/Other Pacific Islander" ~ "Native Hawaiian or Other Pacific Islander",
+              TRUE ~ category  # Handle any other cases, though we don't expect others
+            ))
+
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(category =dplyr::case_when(
+            category == "American Indian Or Alaska Native" ~ "American Indian or Alaska Native",
+            category == "Black Or African American" ~ "Black or African American",
+            category == "Native Hawaiian Or Other Pacific Islander" ~
+              "Native Hawaiian or Other Pacific Islander",
+            category == "Mixed Identity Or Other Race" ~ "Mixed Identity or Other Race",
+            TRUE ~ category),  # Handle any other cases, though we don't expect others
+            year = 2022,
+            filter = "All LHDs")
+
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year, category) %>%
+          dplyr::filter(category != "Na") %>%
+          dplyr::mutate(
+            legend_label = paste(group, "--", category),
+            tt = paste("% of top executives from", tolower(group), "LHDs identified as", category)
+          )
+      } else if (topic == "tenure") {
+
+        ##Top exec tenure--------
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "tenure",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_statistics("tenure", filtering) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            group = category,
+            category = "Mean",
+            year = 2022,
+            filter = "All LHDs",
+            y = as.character(y))
+
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          dplyr::mutate(y = as.numeric(y))%>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(group),
+            tt = paste(" years was the average tenure of top executives at",
+                       tolower(group), "LHDs"))
+
+        ##Top exec field of study --------
+      } else if (topic == "field"){
+          ###create other 2016 rows
+        other_2016 <- lines_data %>%
+          dplyr::filter(topic == "field",
+                        year == 2016,
+                        filter == filtering) %>%  # Only for 2016
+          dplyr::group_by(year, group, filter, topic) %>%
+          dplyr::summarise(
+            y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
+          dplyr::mutate(
+            y = round((100*as.numeric(1 - y_sum)), digits = 0),  # Subtract the sum of 'y' from 100
+            category = "Other Field"  # Create the "Other Field" category
+          ) %>%
+          dplyr::select(year, category, group, filter, topic, y)  # Select relevant columns
+
+       ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "field",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0),
+                        category =dplyr::case_when(
+                          category == "None of the above" ~ "Other Field",
+                          TRUE ~ category
+                        ),
+                        year = as.integer(year))
+
+        hist_data <- rbind(hist_data, other_2016)
+
+        ###2022 data-------------
+        current_data <- spec_data %>%
+          dplyr::filter(filter == filtering) %>%
+          dplyr::select(Question, y, category, group, filter) %>%
+          dplyr::mutate(
+            year = 2022,
+            Question = "field",
+            y = as.numeric(y))
+
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(group, "--", category),
+            tt_base =dplyr::case_when(
+              category == "Other Field" ~ "in a field other than Public Health, Nursing, or Medical",
+              category %in% c("Public Health", "Nursing") ~ paste("in the field of", category),
+              TRUE ~ paste("in the", category, "field")
+            ),
+            tt = paste("% of top executives from", tolower(group), "LHDs studied", tt_base)
+          )
+
+      } else if (topic == "c4q34"){
+  ##Top exec highest degree earned-------
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "c4q34",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts("c4q34", filtering) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            year = 2022,
+            filter = "All LHDs",
+            y = as.numeric(y))
+
+        # Combine data and create more descriptive legend labels
+        combined <- full_join(current_data, hist_data,
+                              by = c("Question" = "topic",
+                                     "group" = "group",
+                                     "filter" = "filter",
+                                     "y" = "y",
+                                     "year" = "year",
+                                     "category" = "category"
+                              )) %>%
+          dplyr::mutate(y = as.numeric(y)) %>%
+          arrange(year) %>%
+          dplyr::mutate(
+            legend_label = paste(group, "--", category),
+            tt =dplyr::case_when(
+              category == "Associates" ~ paste("% of", tolower(group), "LHD top executives' highest degree obtained was an", category, "degree"),
+              category %in% c("Bachelors", "Masters") ~  paste("% of", tolower(group), "LHD top executives' highest degree obtained was a", category, "degree"),
+              TRUE ~  paste("% of", tolower(group), "LHD top executives' highest degree obtained was a", category))
+          )
+      }
+
+    }
+}

@@ -1,25 +1,25 @@
 ## code to prepare `spec_data` dataset goes here
 
 args1 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "c4q502d"),
   grps = "c0popcat3",
   popcat = "c0popcat7"
 )
 
 args2 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "c4q502d"),
   grps = "urbanrural2022",
   popcat = "c0popcat7"
 )
 
 args3 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "c4q502d"),
   grps = "c0govcat",
   popcat = "c0popcat7"
 )
 
 args4 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "c4q502d"),
   grps = "censusregion",
   popcat = "c0popcat7"
 )
@@ -35,7 +35,6 @@ spec_data_all <- map_dfr(args1[[1]], return_survey_weighted_counts) %>%
     category = sapply(AnswerLabel, custom_str_to_title),
     subtitle = paste0("Estimated Across All LHDs")
     )
-
 
 
 

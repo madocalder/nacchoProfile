@@ -98,7 +98,7 @@ mod_landscape_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                uiOutput(ns("line")),
+                highcharter::highchartOutput(ns("line")),
                 style = "height: 65vh; width: 50vw;"
               )
             )
@@ -190,7 +190,27 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
+    # update inputs based on selections ---------------------------------------
+    observe({
+      if (input$topic %in% c("c2q501", "work")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
 
+
+      } else {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+      }
+    })
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
@@ -215,6 +235,9 @@ mod_landscape_server <- function(id){
     # Bar figure output -----------------------------------------------------------
     # used for bar graphs
     output$figure <- highcharter::renderHighchart({
+
+      req(input$view == "Bar Graph")
+
       data <- return_survey_weighted_counts("c2q501")
 
       set_column(data) %>%
@@ -431,39 +454,53 @@ mod_landscape_server <- function(id){
 
     # Line Output-------------------
 
-    output$line <- highcharter::renderHighchart(
-      naccho.viz::create_single_line({
-        data <- data.frame(
-          year = c("2019", "2022", "2019", "2022"),
-          value = c(17, 31, 10, 18),
-          stat = c("Mean", "Mean", "Median", "Median"),
-          perc_change = c("\u002b45\u0025", "\u002b45\u0025", "\u002b44\u0025", "\u002b44\u0025")
-        )
+    output$line <- highcharter::renderHighchart({
+      req(input$view == "Line Graph")
 
-        data$year <- factor(data$year)
+      #add topic value for function
+      topic <- input$topic
 
-        naccho.viz::create_grouped_line(
-          data = data,
-          x_variable = "year",
-          y_variable = "value",
-          title_text = "<span style='color:#AB6143;font-weight:bold;'>Average per capita revenues</span> from federal sources nearly
-        doubled from 2019 to 2022.",
-          subtitle_text = "Nonetheless, nearly one in five LHDs foresaw budget
-        cuts their next fiscal year as federal resources expire.",
-          x_group = "stat",
-          y_label = "Per Capita Revenue",
-          my_colors = c(naccho.viz::terracotta, naccho.viz::green),
-          x_label = "",
-          y_max = 35,
-          y_format = "\u0024{value:,.0f}",
-          legend_enable = TRUE,
-          legend_title = "",
-          tooltip = " {point.stat} per capita revenue:  <b>\u0024{point.value:.0f}</b> <br>
-                   Change from 2019 to 2022: <b> {point.perc_change:.0f}</b>",
-          allow_export = FALSE
-        )
-      })
-    )
+      filtering <- input$filter
+
+      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
+        input$classifications
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("topic variable =")
+      print(topic)
+
+      message("view selected =")
+      print(input$view)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+      data <- process_line_data(topic, filtering)
+
+      View(data)
+
+      naccho.viz::create_grouped_line(
+        data = data,
+        x_variable = "year",
+        x_group = "legend_label",
+        y_variable = "y",
+        y_label = filter_meta()$y_label,
+        x_label = "Year",
+        select_theme = naccho.viz::minimal,
+        title = filter_meta()$title,
+        tooltip = "In {point.year}, {point.y}{point.tt}."
+      )
+
+
+    })
 
 
 
