@@ -51,10 +51,9 @@ mod_topic_areas_ui <- function(id){
               "",
               choiceNames = list(
                 HTML('<i class="fas fa-chart-simple"></i>'), # Chart icon
-                HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
                 HTML('<i class="fas fa-table"></i>') # Map icon
               ),
-              choiceValues = c("Bar Graph", "Line Graph", "Table")
+              choiceValues = c("Bar Graph", "Table")
             )
           ),
 
@@ -185,10 +184,9 @@ mod_topic_areas_server <- function(id){
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-chart-line"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+                                              choiceValues = c("Bar Graph", "Table"))
 
 
       } else {
