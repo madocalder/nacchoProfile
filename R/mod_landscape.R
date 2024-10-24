@@ -190,8 +190,6 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
-
-
     # update inputs based on selections ---------------------------------------
     observe({
       if (input$topic %in% c("c2q501", "work")) {

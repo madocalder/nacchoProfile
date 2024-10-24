@@ -239,6 +239,40 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             one = paste(y),
             two = paste("% of top LHD executives identified as", category),
           )
+      } else if (option == "ethnicity"){
+
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "ethnicity",
+                        filter == "All LHDs") %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0))
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts("ethnicity") %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            y = round(as.numeric(y), digits = 0),
+            year = 2022,
+            filter = "All LHDs"
+          )
+
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::arrange(year, category) %>%
+          dplyr::filter(!category %in% c("Na", "Prefer Not To Answer")) %>%
+          dplyr::mutate(
+            legend_label = paste(category),
+            one = paste(y),
+            two = paste("% of top LHD executives were", tolower(category)),
+          )
 
       } else if (option == "tenure"){
 ##Top exec tenure--------
@@ -686,6 +720,41 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             one = paste(y),
             two = paste("% of top executives from", tolower(group), "LHDs identified as", category)
           )
+      } else if (option == "ethnicity"){
+
+        ###historical data-----------
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == "ethnicity",
+                        filter == filtering) %>%
+          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::mutate(
+            y = round((100*as.numeric(y)), digits = 0))
+
+        ### 2022 data-------------
+        current_data <- return_survey_weighted_counts("ethnicity", filtering) %>%
+          dplyr::select(Question, y, category, group) %>%
+          dplyr::mutate(
+            y = round(as.numeric(y), digits = 0),
+            year = 2022,
+            filter = filtering
+          )
+
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::arrange(year, category) %>%
+          dplyr::filter(!category %in% c("Na", "Prefer Not To Answer")) %>%
+          dplyr::mutate(
+            legend_label = paste(group, "--",category),
+            one = paste(y),
+            two = paste("% of top LHD executives from", tolower(group), "LHDs were", tolower(category)),
+          )
+
       } else if (option == "tenure") {
 
         ##Top exec tenure--------
