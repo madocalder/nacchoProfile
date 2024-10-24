@@ -4,13 +4,13 @@
 #' It supports topics related to local boards of health, executive age, gender, race, tenure, field of study, and highest degree earned.
 #' The function merges historical data and current survey data, performs necessary transformations, and prepares descriptive labels for visualization.
 #'
-#' @param topic A character string specifying the topic to process. Supported topics include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).
+#' @param option A character string specifying the topic to process. Supported options include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).
 #' @param filtering A character string indicating the filter to apply. Common filters include "All LHDs" or specific regional or demographic filters.
 #' @param classifications Optional; A character string or list for additional classifications to use during data processing. Default is NULL.
 #'
-#' @return A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `topic` input.
+#' @return A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `option` input.
 #' @details
-#' The function performs the following steps based on the specified topic:
+#' The function performs the following steps based on the specified option:
 #'
 #' - **"lboh"**: Processes data related to the existence of local boards of health at LDHs.
 #' - **"age_cat"**: Processes data related to LHD top executives' age categories.
@@ -35,11 +35,11 @@
 
 #data helper for lines ----
 
-process_line_data <- function(topic, filtering, classifications = NULL) {
+process_line_data <- function(option, filtering, classifications = NULL) {
 #All LHD CASES------------
   if (filtering == "All LHDs") {
 ##Local board of health------------------
-    if (topic == "lboh") {
+    if (option == "lboh") {
       ###historical data-----------
       hist_data <- lines_data %>%
         dplyr::filter(topic == "lboh",
@@ -75,16 +75,22 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
         arrange(year)%>%
           dplyr::mutate(
             legend_label =dplyr::case_when(
+              category == "Yes" ~ "Local Board of Health",
+              category == "No" ~ "No Local Board of Health",
+              FALSE ~ category
+            ),
+            base =dplyr::case_when(
               category == "Yes" ~ "had a Local Board of Health",
               category == "No" ~ "did not have a Local Board of Health",
-              FALSE ~ category  # Handle any other cases, though we don't expect others
+              FALSE ~ category
             ),
-            tt = paste("% of LHDs", tolower(legend_label)
+            one = paste(y),
+            two = paste("% of LHDs", tolower(base)
               )
           )
 
 
-      } else if (topic == "age_cat"){
+      } else if (option == "age_cat"){
   ##Top executive age---------
         ### historical data-----------
         hist_data <- lines_data %>%
@@ -97,7 +103,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           dplyr::summarize(y = sum(y))
 
        ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic) %>%
+        current_data <- return_survey_weighted_counts(option) %>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(category =dplyr::case_when(
             category == "40-49 Years" ~ "40-49",
@@ -120,19 +126,20 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
                               )) %>%
           arrange(year, group) %>%
           dplyr::mutate(
-            base = paste(category, "years"),
-            legend_label = paste(base, "of age"),
-            tt = paste("% of LHD executives were", tolower(base), "old")
+            legend_label = paste(category, "years"),
+            one = paste(y),
+            two = paste("% of LHD executives were", tolower(legend_label), "old")
           )
 
         combined$legend_label <- factor(combined$legend_label,
-                                        levels = c("Under 40 years of age", "40-49 years of age",
-                                                   "50-59 years of age", "60-69 years of age",
-                                                   "70+ years of age"))
+                                        levels = c("Under 40 years", "40-49 years",
+                                                   "50-59 years", "60-69 years",
+                                                   "70+ years"))
 
         combined <- combined %>%
           arrange(legend_label)
-      } else if(topic == "c4q29"){
+
+      } else if(option == "c4q29"){
 ##Top executive gender -------
 
           ###historical data-----------
@@ -154,7 +161,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
 
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic)%>%
+        current_data <- return_survey_weighted_counts(option)%>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(
             category =dplyr::case_when(
@@ -178,13 +185,14 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
                               )) %>%
           arrange(year, category) %>%
           dplyr::mutate(
-            legend_label = paste(category, "identifying"),
-            tt = paste("% of top LHD executives identified as", tolower(category)),
+            legend_label = paste(category),
+            one = paste(y),
+            two = paste("% of top LHD executives identified as", tolower(category)),
           )%>%
           dplyr::filter(category %in% c("Male", "Female"))
 
 
-      } else if (topic == "race") {
+      } else if (option == "race") {
   ##Top exec race------------
         ###historical data-----------
         hist_data <- lines_data %>%
@@ -203,7 +211,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
 
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic) %>%
+        current_data <- return_survey_weighted_counts(option) %>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(category =dplyr::case_when(
             category == "American Indian Or Alaska Native" ~ "American Indian or Alaska Native",
@@ -228,10 +236,11 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           dplyr::filter(category != "Na") %>%
           dplyr::mutate(
             legend_label = paste(category),
-            tt = paste("% of top LHD executives identified as", category),
+            one = paste(y),
+            two = paste("% of top LHD executives identified as", category),
           )
 
-      } else if (topic == "tenure"){
+      } else if (option == "tenure"){
 ##Top exec tenure--------
        ###historical data-----------
         hist_data <- lines_data %>%
@@ -262,10 +271,11 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(category),
-            tt = paste(" years was the average tenure of top LHD executives"))
+            one = paste(y),
+            two = paste(" years was the average tenure of top LHD executives"))
 
         ##Top exec field of study --------
-      } else if (topic == "field"){
+      } else if (option == "field"){
         ###create other 2016 rows
         other_2016 <- lines_data %>%
           dplyr::filter(topic == "field",
@@ -322,9 +332,10 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
               category %in% c("Public Health", "Nursing") ~ paste("in the field of", category),
               TRUE ~ paste("in the", category, "field")
             ),
-            tt = paste("% of LHD top executives studied", tt_base)
+            one = paste(y),
+            two = paste("% of LHD top executives studied", tt_base)
           )
-      } else if (topic == "c4q34"){
+      } else if (option == "c4q34"){
 ##Top executive highest degree earned----------
         ###historical data-----------
         hist_data <- lines_data %>%
@@ -356,7 +367,8 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(category),
-            tt =dplyr::case_when(
+            one = paste(y),
+            two =dplyr::case_when(
               category == "Associates" ~ paste("% of LHD top executives' highest
                                                degree earned was an",
                                                category, "degree"),
@@ -367,6 +379,93 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
               TRUE ~  paste("% of LHD top executives' highest degree earned was a",
                             category))
           )
+      } else if (option %in% c("c5q36", "c5q37")){
+
+        ###2022 data-----
+        current_data <- nacchoProfile::return_survey_weighted_statistics(option)%>%
+          dplyr::select(Question, category, group, y) %>%
+          dplyr::mutate(year = 2022,
+                        filter = "All LHDs",
+                        category = "Mean",
+                        y = as.numeric(y))
+
+        ###historical-----
+        hist_data <- lines_data%>%
+          dplyr::filter(topic == option,
+                        filter == "All LHDs",
+                        category == "Mean")%>%
+          dplyr::mutate(y = round(as.numeric(y), digits = 0))
+
+        if (option == "c5q37"){
+
+        ###combine
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::mutate(y = as.numeric(y),
+                        legend_label = paste(category),
+                        one = paste("the average number of FTEs across all LHDs was "),
+                        two = paste(y)) %>%
+          dplyr::arrange(year)
+        } else {
+          combined <- dplyr::full_join(current_data, hist_data,
+                                       by = c("Question" = "topic",
+                                              "group" = "group",
+                                              "filter" = "filter",
+                                              "y" = "y",
+                                              "year" = "year",
+                                              "category" = "category"
+                                       )) %>%
+            dplyr::mutate(y = as.numeric(y),
+                          legend_label = paste(group),
+                          one = paste("the average number of total employees across LHDs was"),
+                          two = paste(" ", y)) %>%
+            dplyr::arrange(year)
+        }
+      } else if (option == "b"){
+
+        current_vars <-  paste0("new", classifications)
+        hist_vars <- paste0("new", classifications, "b")
+        selected_data <- get(paste0("classification_data_b"))
+
+
+        current_data <- classification_data_b %>%
+          dplyr::filter(Question %in% current_vars,
+                        filter == "All LHDs")%>%
+          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
+                        group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs",
+                                                 TRUE ~ group),
+                        year = 2022,
+                        y = round(as.numeric(y), digits = 0))%>%
+          dplyr::select(Question, category, y, filter, group, year)
+
+
+
+        hist_data <- lines_data %>%
+          dplyr::filter(topic %in% hist_vars) %>%
+          dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(topic)]),
+                        y = round(as.numeric(y), digits = 0))
+
+
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::mutate(y = as.numeric(y) ,
+                        legend_label = paste("Total", category, "FTEs"),
+                        one = paste("LHDs had a total of "),
+                        two = paste(scales::label_comma()(y), tolower(category), "FTEs")) %>%
+          dplyr::arrange(year)
+
 
       } else { message("ERROR: No input identified")}
 
@@ -374,7 +473,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
     } else {
 #NON ALL LHD CASES-------------
       ## Local Board of Health ----------
-      if (topic %in% c("lboh")){
+      if (option %in% c("lboh")){
         ###historical data-----------
         hist_data <- lines_data %>%
           dplyr::filter(topic == "lboh",
@@ -385,7 +484,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
         View(hist_data)
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+        current_data <- return_survey_weighted_counts(option, filtering) %>%
           dplyr::select(Question, y, category, group, Group)%>%
           dplyr::group_by(category, group, Group, Question) %>%
           dplyr::mutate(category =dplyr::case_when(
@@ -412,7 +511,8 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
                               )) %>%
           arrange(year, group) %>%
           dplyr::mutate(
-            tt =dplyr::case_when(
+            one = paste(y),
+            two =dplyr::case_when(
               category == "Yes" ~ paste("% of", tolower(group), "LHDs had a Local Board of Health"),
               category == "No" ~  paste("% of", tolower(group), "LHDs did not have a Local Board of Health"),
               FALSE ~ category  # Handle any other cases
@@ -424,11 +524,11 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
               TRUE ~ category  # Handle any other cases
             )
           )%>%
-          arrange(year, group, legend_label)
+          arrange(year, group, one)
 
 
         ##Executive age-------------
-      } else if (topic == "age_cat"){
+      } else if (option == "age_cat"){
 
         ###historical data-----------
         hist_data <- lines_data %>%
@@ -442,7 +542,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
 
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+        current_data <- return_survey_weighted_counts(option, filtering) %>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(category =dplyr::case_when(
             category == "40-49 Years" ~ "40-49",
@@ -465,9 +565,9 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
                               )) %>%
           arrange(year, group) %>%
           dplyr::mutate(
-            base = paste(category, "years"),
-            legend_label = paste(group, "LHD executives", tolower(base), "of age"),
-            tt = paste("% of", tolower(group), "LHD executives were", tolower(base), "old"),
+            legend_label = paste(category, "years"),
+            one = paste(y),
+            two = paste("% of", tolower(group), "LHD executives were", tolower(legend_label), "old"),
           )
 
         combined$legend_label <- factor(combined$legend_label, levels =
@@ -487,7 +587,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           arrange(legend_label)
 
 ##Top executive gender---------
-      } else if (topic == "c4q29"){
+      } else if (option == "c4q29"){
         ###historical data-----------
         hist_data <- lines_data %>%
           dplyr::filter(topic == "c4q29",
@@ -507,7 +607,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
 
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic, filtering)%>%
+        current_data <- return_survey_weighted_counts(option, filtering)%>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(
             category =dplyr::case_when(
@@ -533,11 +633,12 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           arrange(year, category) %>%
           dplyr::mutate(
             legend_label = paste(category, "identifying top", tolower(group), "executives"),
-            tt = paste("% of top executives from", tolower(group), "LHDs identified as", tolower(category)),
+            one = paste(y),
+            two = paste("% of top executives from", tolower(group), "LHDs identified as", tolower(category)),
           )%>%
           dplyr::filter(category %in% c("Male", "Female"))
 
-      } else if (topic == "race"){
+      } else if (option == "race"){
 ##Top executive race ----------
        ###historical data-----------
         hist_data <- lines_data %>%
@@ -556,7 +657,7 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
 
 
         ### 2022 data-------------
-        current_data <- return_survey_weighted_counts(topic, filtering) %>%
+        current_data <- return_survey_weighted_counts(option, filtering) %>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(category =dplyr::case_when(
             category == "American Indian Or Alaska Native" ~ "American Indian or Alaska Native",
@@ -582,9 +683,10 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           dplyr::filter(category != "Na") %>%
           dplyr::mutate(
             legend_label = paste(group, "--", category),
-            tt = paste("% of top executives from", tolower(group), "LHDs identified as", category)
+            one = paste(y),
+            two = paste("% of top executives from", tolower(group), "LHDs identified as", category)
           )
-      } else if (topic == "tenure") {
+      } else if (option == "tenure") {
 
         ##Top exec tenure--------
         ###historical data-----------
@@ -617,11 +719,12 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(group),
-            tt = paste(" years was the average tenure of top executives at",
+            one = paste(y),
+            two = paste(" years was the average tenure of top executives at",
                        tolower(group), "LHDs"))
 
         ##Top exec field of study --------
-      } else if (topic == "field"){
+      } else if (option == "field"){
           ###create other 2016 rows
         other_2016 <- lines_data %>%
           dplyr::filter(topic == "field",
@@ -677,10 +780,11 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
               category %in% c("Public Health", "Nursing") ~ paste("in the field of", category),
               TRUE ~ paste("in the", category, "field")
             ),
-            tt = paste("% of top executives from", tolower(group), "LHDs studied", tt_base)
+            two = paste("% of top executives from", tolower(group), "LHDs studied", tt_base),
+            one = paste(y)
           )
 
-      } else if (topic == "c4q34"){
+      } else if (option == "c4q34"){
   ##Top exec highest degree earned-------
         ###historical data-----------
         hist_data <- lines_data %>%
@@ -709,13 +813,67 @@ process_line_data <- function(topic, filtering, classifications = NULL) {
           dplyr::mutate(y = as.numeric(y)) %>%
           arrange(year) %>%
           dplyr::mutate(
-            legend_label = paste(group, "--", category),
-            tt =dplyr::case_when(
+            one = paste(group, "--", category),
+            two =dplyr::case_when(
               category == "Associates" ~ paste("% of", tolower(group), "LHD top executives' highest degree obtained was an", category, "degree"),
               category %in% c("Bachelors", "Masters") ~  paste("% of", tolower(group), "LHD top executives' highest degree obtained was a", category, "degree"),
               TRUE ~  paste("% of", tolower(group), "LHD top executives' highest degree obtained was a", category))
           )
+      } else if(option %in% c("c5q36", "c5q37")){
+
+        ###current-----
+        current_data <- nacchoProfile::return_survey_weighted_statistics(topic, filtering)%>%
+          dplyr::select(Question, Group, category, y) %>%
+          dplyr::mutate(year = 2022,
+                        category = "Mean",
+                        group = Group,
+                        y = round(as.numeric(y), digits = 0),
+                        filter = filtering)%>%
+          dplyr::select(Question, group, filter, y, year, category)
+
+        ###historical-----
+        hist_data <- lines_data%>%
+          dplyr::filter(topic == option,
+                        filter == filtering,
+                        category == "Mean") %>%
+          dplyr::mutate(y = round(as.numeric(y), digits = 0))
+
+        if (topic == "c5q37"){
+        ###combine
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::mutate(y = as.numeric(y),
+                        legend_label = paste(group),
+                        one = paste(y),
+                        two = paste(" FTEs was the average for", tolower(group), "LHDs")) %>%
+          dplyr::arrange(year)
+        } else {
+          ###combine
+          combined <- dplyr::full_join(current_data, hist_data,
+                                       by = c("Question" = "topic",
+                                              "group" = "group",
+                                              "filter" = "filter",
+                                              "y" = "y",
+                                              "year" = "year",
+                                              "category" = "category"
+                                       )) %>%
+            dplyr::mutate(y = as.numeric(y),
+                          legend_label = paste(group),
+                          one = paste(tolower(group),"LHDs had an average of "),
+                          two = paste(y, "employees")) %>%
+            dplyr::arrange(year)
+        }
+      } else if (option == ""){
+
       }
 
     }
+
+  return(combined)
 }

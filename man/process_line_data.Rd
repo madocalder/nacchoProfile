@@ -4,17 +4,17 @@
 \alias{process_line_data}
 \title{Process Line Data for Various Topics and Filters}
 \usage{
-process_line_data(topic, filtering, classifications = NULL)
+process_line_data(option, filtering, classifications = NULL)
 }
 \arguments{
-\item{topic}{A character string specifying the topic to process. Supported topics include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).}
+\item{option}{A character string specifying the topic to process. Supported options include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).}
 
 \item{filtering}{A character string indicating the filter to apply. Common filters include "All LHDs" or specific regional or demographic filters.}
 
 \item{classifications}{Optional; A character string or list for additional classifications to use during data processing. Default is NULL.}
 }
 \value{
-A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `topic` input.
+A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `option` input.
 }
 \description{
 This function processes line data based on different topics and filtering options for local health departments (LHDs).
@@ -22,7 +22,7 @@ It supports topics related to local boards of health, executive age, gender, rac
 The function merges historical data and current survey data, performs necessary transformations, and prepares descriptive labels for visualization.
 }
 \details{
-The function performs the following steps based on the specified topic:
+The function performs the following steps based on the specified option:
 
 - **"lboh"**: Processes data related to the existence of local boards of health at LDHs.
 - **"age_cat"**: Processes data related to LHD top executives' age categories.

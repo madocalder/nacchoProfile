@@ -190,6 +190,8 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
+
+
     # update inputs based on selections ---------------------------------------
     observe({
       if (input$topic %in% c("c2q501", "work")) {
@@ -457,8 +459,8 @@ mod_landscape_server <- function(id){
     output$line <- highcharter::renderHighchart({
       req(input$view == "Line Graph")
 
-      #add topic value for function
-      topic <- input$topic
+      #add option value for function
+      option <- input$topic
 
       filtering <- input$filter
 
@@ -471,8 +473,8 @@ mod_landscape_server <- function(id){
       #debug
       message("input$topic =")
       print(input$topic)
-      message("topic variable =")
-      print(topic)
+      message("option variable =")
+      print(option)
 
       message("view selected =")
       print(input$view)
@@ -483,7 +485,7 @@ mod_landscape_server <- function(id){
       message("filtering variable =")
       print(filtering)
 
-      data <- process_line_data(topic, filtering)
+      data <- process_line_data(option, filtering)
 
       View(data)
 
@@ -496,7 +498,7 @@ mod_landscape_server <- function(id){
         x_label = "Year",
         select_theme = naccho.viz::minimal,
         title = filter_meta()$title,
-        tooltip = "In {point.year}, {point.y}{point.tt}."
+        tooltip = "In {point.year}, {point.one}{point.two}."
       )
 
 
