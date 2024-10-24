@@ -5,6 +5,7 @@ landscape_topics <- list(
 
   "Executive Characteristics" = list("Age" = "age_cat",
                                      "Race" = "race",
+                                     "Ethnicity" = "ethnicity",
                                      "Gender" = "c4q29",
                                      "Tenure" = "tenure",
                                      "Highest Degree" = "c4q34",

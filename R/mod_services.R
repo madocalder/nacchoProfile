@@ -51,10 +51,9 @@ mod_services_ui <- function(id){
               "",
               choiceNames = list(
                 HTML('<i class="fas fa-chart-simple"></i>'),
-                HTML('<i class="fas fa-chart-line"></i>'),
                 HTML('<i class="fas fa-table"></i>')
               ),
-              choiceValues = c("Bar Graph", "Line Graph", "Table")
+              choiceValues = c("Bar Graph", "Table")
             )
           ),
 
@@ -72,11 +71,11 @@ mod_services_ui <- function(id){
             ),
 
 
-            # display when Service Provision and Line Graph are selected
-            conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Line Graph'"),
-              # highcharter::highchartOutput(ns("figure_line"), height = 575)
-            ),
+            # # display when Service Provision and Line Graph are selected
+            # conditionalPanel(
+            #   condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Line Graph'"),
+            #   # highcharter::highchartOutput(ns("figure_line"), height = 575)
+            # ),
 
             # display when Service Changes and Scatter Plot are selected
             conditionalPanel(
@@ -232,10 +231,9 @@ mod_services_server <- function(id){
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-chart-line"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+                                              choiceValues = c("Bar Graph", "Table"))
 
 
       } else {
