@@ -506,7 +506,7 @@ label:not(.material-switch label) {
 /* -------------------------------------------------- highcharter breadcrumbs */
 .highcharts-drillup-button {
     stroke: #80A14E !important;
-    font-family: Jost, sans-serif !important;
+    font-family: Heebo, sans-serif !important;
     color: #80A14E !important;
 }
 

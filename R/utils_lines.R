@@ -891,7 +891,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
       } else if(option %in% c("c5q36", "c5q37")){
 
         ###current-----
-        current_data <- nacchoProfile::return_survey_weighted_statistics(topic, filtering)%>%
+        current_data <- nacchoProfile::return_survey_weighted_statistics(option, filtering)%>%
           dplyr::select(Question, Group, category, y) %>%
           dplyr::mutate(year = 2022,
                         category = "Mean",
@@ -907,7 +907,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         category == "Mean") %>%
           dplyr::mutate(y = round(as.numeric(y), digits = 0))
 
-        if (topic == "c5q37"){
+        if (option == "c5q37"){
         ###combine
         combined <- dplyr::full_join(current_data, hist_data,
                                      by = c("Question" = "topic",
@@ -919,8 +919,8 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      )) %>%
           dplyr::mutate(y = as.numeric(y),
                         legend_label = paste(group),
-                        one = paste(y),
-                        two = paste(" FTEs was the average for", tolower(group), "LHDs")) %>%
+                        one = paste(tolower(group), "LHDs had an average of "),
+                        two = paste(y, " FTEs")) %>%
           dplyr::arrange(year)
         } else {
           ###combine
@@ -935,7 +935,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             dplyr::mutate(y = as.numeric(y),
                           legend_label = paste(group),
                           one = paste(tolower(group),"LHDs had an average of "),
-                          two = paste(y, "employees")) %>%
+                          two = paste(y, " employees")) %>%
             dplyr::arrange(year)
         }
       } else if (option == ""){
