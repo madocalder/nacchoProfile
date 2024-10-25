@@ -63,23 +63,25 @@ mod_landscape_ui <- function(id){
           div(
             class = "viz-content",
 
-            # display when map is selected
+            # display when Map is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
               div(
-              highcharter::highchartOutput(ns("map"), height = "100%"),
-              style = "height: 65vh; width: 50vw;")
+                highcharter::highchartOutput(ns("map"), height = "100%"),
+                style = "height: 65vh; width: 50vw;"
+              )
             ),
 
-            # display when map is not selected
+            # display when Bar is selected and not Map, Table, or Line
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\''),
+              condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\' && input[\'', ns('view'), "\'] != \'Line Graph\'"),
               div(
                 highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 65vh; width: 50vw;"
+              )
             ),
 
-            # adding table
+            # display when Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
@@ -87,10 +89,18 @@ mod_landscape_ui <- function(id){
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
-                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+         <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+                style = "height: 65vh; width: 50vw;"
+              )
+            ),
 
-                style = "height: 65vh; width: 50vw;")
-
+            # view output Line
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
+              div(
+                highcharter::highchartOutput(ns("line")),
+                style = "height: 65vh; width: 50vw;"
+              )
             )
           )
         ),
@@ -180,7 +190,27 @@ mod_landscape_server <- function(id){
     ns <- session$ns
 
 
+    # update inputs based on selections ---------------------------------------
+    observe({
+      if (input$topic %in% c("c2q501", "work")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
 
+
+      } else {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+      }
+    })
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
@@ -202,9 +232,12 @@ mod_landscape_server <- function(id){
     })
 
 
-    # figure output -----------------------------------------------------------
-    # used for bar and line graphs
+    # Bar figure output -----------------------------------------------------------
+    # used for bar graphs
     output$figure <- highcharter::renderHighchart({
+
+      req(input$view == "Bar Graph")
+
       data <- return_survey_weighted_counts("c2q501")
 
       set_column(data) %>%
@@ -415,6 +448,57 @@ mod_landscape_server <- function(id){
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
+
+    })
+
+
+    # Line Output-------------------
+
+    output$line <- highcharter::renderHighchart({
+      req(input$view == "Line Graph")
+
+      #add option value for function
+      option <- input$topic
+
+      filtering <- input$filter
+
+      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
+        input$classifications
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("option variable =")
+      print(option)
+
+      message("view selected =")
+      print(input$view)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+      data <- process_line_data(option, filtering)
+
+      View(data)
+
+      naccho.viz::create_grouped_line(
+        data = data,
+        x_variable = "year",
+        x_group = "legend_label",
+        y_variable = "y",
+        y_label = filter_meta()$y_label,
+        x_label = "Year",
+        select_theme = naccho.viz::minimal,
+        title = filter_meta()$title,
+        tooltip = "In {point.year}, {point.one}{point.two}."
+      )
+
 
     })
 

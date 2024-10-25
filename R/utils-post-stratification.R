@@ -326,7 +326,8 @@ create_hist <- function(input, x_label) {
     category = midpoints,
     # category = paste(head(bins, -1), " - ", tail(bins, -1)),
     x = 1:length(midpoints) -1,
-    subtitle = "Click and span a range on the figure to zoom.",
+    subtitle = "Click and span to zoom into a specific range on the chart.
+    Hold the Shift key and drag to pan horizontally.",
     x_label = x_label,
     group = "All LHDs"
   )

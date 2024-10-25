@@ -91,6 +91,15 @@ mod_workforce_ui <- function(id){
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
+            ),
+
+            # view output Line
+            conditionalPanel(
+              condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
+              div(
+                highcharter::highchartOutput(ns("line")),
+                style = "height: 65vh; width: 50vw;"
+              )
             )
           )
         ),
@@ -205,12 +214,24 @@ mod_workforce_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("FTE_numcat", "employee_numcat", "a", "b")) {
+      if (input$topic %in% c("FTE_numcat", "employee_numcat", "a", "b") &
+          input$view != "Line Graph") {
+
         updateSelectInput(session, "filter",
                           choices = landscape_filters)
+
+      } else if (input$topic == "b" & input$view == "Line Graph") {
+
+        updateSelectInput(session, "filter",
+                          choices = "All LHDs")
+
+      } else if (input$topic %in% c("c5q37", "c5q36") &
+                 input$view %in% c("Line Graph", "Table")) {
+
+        updateSelectInput(session, "filter",
+                          choices = c(landscape_filters[1], landscape_filters[4]))
 
       } else if (input$topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
         updateSelectInput(session, "filter",
@@ -222,6 +243,27 @@ mod_workforce_server <- function(id){
       }
     })
 
+    # update inputs based on selections ---------------------------------------
+    observe({
+      if (input$topic %in% c("b", "c5q36", "c5q37")) {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-chart-line"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+
+
+      } else {
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-simple"></i>'),
+                                                HTML('<i class="fas fa-table"></i>')
+                                              ),
+                                              choiceValues = c("Bar Graph", "Table"))
+      }
+    })
 
     # main content ============================================================
 
@@ -646,6 +688,61 @@ mod_workforce_server <- function(id){
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
+    })
+
+    #Line graph output-----------
+    output$line <- highcharter::renderHighchart({
+      req(input$view == "Line Graph")
+
+      #add option value for function
+      option <- input$topic
+
+      filtering <- input$filter
+
+      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
+        input$classifications
+      } else {
+        NULL  # If input$classifications does not exist, set it to NULL
+      }
+
+      #debug
+      message("input$topic =")
+      print(input$topic)
+      message("option variable =")
+      print(option)
+
+      message("view selected =")
+      print(input$view)
+
+      #debug
+      message("input$filter =")
+      print(input$filter)
+      message("filtering variable =")
+      print(filtering)
+
+      #debug
+      message("input$classifications =")
+      print(input$classifications)
+      message("classifications =")
+      print(classifications)
+
+      data <- process_line_data(option, filtering, classifications)
+
+      View(data)
+
+      naccho.viz::create_grouped_line(
+        data = data,
+        x_variable = "year",
+        x_group = "legend_label",
+        y_variable = "y",
+        y_label = filter_meta()$y_label,
+        x_label = "Year",
+        select_theme = naccho.viz::minimal,
+        title = filter_meta()$title,
+        tooltip = "In {point.year}, {point.one}{point.two}."
+      )
+
+
     })
 
 
