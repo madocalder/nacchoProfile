@@ -178,8 +178,8 @@ mod_overview_server <- function(id){
       # THIS NEEDS TO BE UPDATED WITH CORRECT DATA
       data <- master_data %>%
         haven::as_factor() %>%
-        dplyr::mutate(fig_filter = c0govcat) %>%
-        dplyr::distinct(fips, .keep_all = TRUE) %>%
+        dplyr::mutate(fig_filter = stringr::str_to_title(c0govcat)) %>%
+        # dplyr::distinct(fips, .keep_all = TRUE) %>%
         dplyr::select(fips, state_name, fig_filter)
 
       # uses a function from the naccho.viz package
@@ -243,7 +243,7 @@ mod_overview_server <- function(id){
           color = "#fff",
           style = list(
             color = naccho.viz::grey,
-            fontFamily = "Jost",
+            fontFamily = "Heebo",
             fontWeight = "500",
             fontSize = "14px",
             textShadow = "none"
