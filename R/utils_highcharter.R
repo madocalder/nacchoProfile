@@ -375,7 +375,7 @@ set_column <- function(data,
       padding = 2,
       style = list(
         color = naccho.viz::grey,
-        fontFamily = "Jost",
+        fontFamily = "Heebo",
         fontWeight = "500",
         fontSize = "14px"
       )
@@ -430,7 +430,7 @@ set_simple_bar <- function(data,
       padding = 2,
       style = list(
         color = naccho.viz::grey,
-        fontFamily = "Jost",
+        fontFamily = "Heebo",
         fontWeight = "500",
         fontSize = "14px"
       )
@@ -729,7 +729,80 @@ set_hist <- function(data,
     highcharter::hcaes(x = x, y = y)
   ) %>%
     highcharter::hc_chart(
+      panType = "x",
+      panning = TRUE,  # Enable panning
+      panKey = "shift",
       zoomType = "x",
+      events = list(
+        load = highcharter::JS(
+          "function() {
+    const chart = this;
+
+    // Save initial extremes for resetting pan
+    chart.initialExtremes = chart.xAxis[0].getExtremes();
+
+    // Create the 'Reset Pan' button, initially hidden
+    chart.resetPanButton = chart.renderer.button(
+      'Reset Pan',
+      window.innerWidth * 0.4,  // Initial x position at 10vw
+      window.innerHeight * 0.1, // Initial y position at 12vh
+      function() {
+        chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
+        chart.resetPanButton.hide();
+      },
+      {
+        fill: 'white',
+        stroke: '#80A14E',
+        style: {
+          color: '#80A14E',
+          fontWeight: 'bold',
+          fontFamily: 'Heebo',
+          lineHeight: '25px'
+        },
+        r: 20,
+        padding: 10
+      }
+    )
+    .attr({ zIndex: 1000 })  // Ensure button is above chart elements
+    .add()
+    .hide();  // Start hidden
+
+    // Function to dynamically position 'Reset Pan' button using vw and vh units
+    function positionResetPanButton() {
+      chart.resetPanButton.attr({
+        x: window.innerWidth * 0.4,   // Position at 90% of viewport width
+        y: window.innerHeight * 0.1  // Position at 5% of viewport height
+      });
+    }
+
+    // Initial positioning of 'Reset Pan' button
+    positionResetPanButton();
+
+    // Update button position on chart redraw (e.g., resize)
+    chart.update({
+      chart: {
+        events: {
+          redraw: positionResetPanButton  // Bind positioning function to redraw event
+        }
+      }
+    });
+
+    // Ensure button repositions on window resize
+    window.addEventListener('resize', positionResetPanButton);
+  }"
+        ),
+        redraw = highcharter::JS(
+          "function() {
+            const chart = this;
+            const currentExtremes = chart.xAxis[0].getExtremes();
+
+            // Show the 'Reset Pan' button if panning has moved from the initial extremes
+            if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
+              chart.resetPanButton.show();
+            }
+          }"
+        )
+      ),
       resetZoomButton = list(
         theme = list(
           fill = "white",
@@ -737,7 +810,7 @@ set_hist <- function(data,
           style = list(
             color = "#80A14E",
             fontWeight = "bold",
-            fontFamily = "Jost",
+            fontFamily = "Heebo",
             lineHeight = "25px" # positions text correctly inside button
           ),
           r = 20,  # border radius
@@ -755,25 +828,27 @@ set_hist <- function(data,
       ),
       events = list(
         selection = highcharter::JS(
-          "function(event) {
-         if (event.resetSelection) {
-           this.update({
-             xAxis: {
-               labels: {
-                 step: 20
-               }
-             }
-           });
-         } else if (event.xAxis) {
-           this.update({
-             xAxis: {
-               labels: {
-                 step: 5
-               }
-             }
-           });
-         }
-       }"
+          "function() {
+            const chart = this;
+            function updateStep() {
+              const width = chart.chartWidth;
+              let stepSize;
+              if (width > 1200) {
+                stepSize = 10;
+              } else if (width > 600) {
+                stepSize = 25;
+              } else {
+                stepSize = 50;
+              }
+              chart.xAxis[0].update({
+                labels: {
+                  step: stepSize
+                }
+              });
+            }
+            updateStep(); // Initial call
+            window.addEventListener('resize', updateStep); // Call on resize
+          }"
         )
       )
     ) %>%
@@ -783,13 +858,17 @@ set_hist <- function(data,
       labels = list(
         step = 20,
         format = "{value:,.0f}"
-      )
+      ),
+      max = 20,
+      min = 0
     ) %>%
     highcharter::hc_yAxis(
       title = list(
         text =  "# of LHDs"
       ), # y-axis label
       min = 0,
+      minRange = 1,
+      allowDecimals = FALSE,
       labels = list(
         format = "{value:,.0f}"
       )
@@ -1051,7 +1130,7 @@ proxy_hist_to_single <- function(hc,
           padding = 2,
           style = list(
             color = naccho.viz::grey,
-            fontFamily = "Jost",
+            fontFamily = "Heebo",
             fontWeight = "500",
             fontSize = "14px"
           )
@@ -1153,7 +1232,7 @@ proxy_hist_to_group <- function(hc,
             padding = 2,
             style = list(
               color = naccho.viz::grey,
-              fontFamily = "Jost",
+              fontFamily = "Heebo",
               fontWeight = "500",
               fontSize = "14px"
             )
@@ -1232,7 +1311,7 @@ proxy_hist_to_group <- function(hc,
             padding = 2,
             style = list(
               color = naccho.viz::grey,
-              fontFamily = "Jost",
+              fontFamily = "Heebo",
               fontWeight = "500",
               fontSize = "14px"
             )
@@ -1504,7 +1583,7 @@ scatter_plot <- function(data, colors) {
           style = list(
             color = "#80A14E",
             fontWeight = "bold",
-            fontFamily = "Jost",
+            fontFamily = "Heebo",
             lineHeight = "25px" # positions text correctly inside button
           ),
           r = 20,  # border radius
@@ -1538,7 +1617,7 @@ scatter_plot <- function(data, colors) {
         "),
           style = list(
             textOutline = "none",
-            fontFamily = "Jost",
+            fontFamily = "Heebo",
             fontSize = "11px",
             fontWeight = "bold"
           )
