@@ -704,179 +704,6 @@ set_bar <- function(data,
 
 
 
-
-
-
-#' Set First Highcharter Histogram
-#'
-#' @description Create the first highcharter visualizations from which proxies will redraw.
-#'
-#' @param data dataframe; A dataframe with x, y, group, and category columns.
-#' @param x_label character string; Label for the X Axis.
-#'
-#' @export
-#'
-#' @return histogram
-set_hist <- function(data,
-                     x_label = "Total FTEs") {
-
-
-  highcharter::hchart(
-    data,
-    type = "column",
-    id = "All",
-    name = "Denominator of LHDs",
-    highcharter::hcaes(x = x, y = y)
-  ) %>%
-    highcharter::hc_chart(
-      panType = "x",
-      panning = TRUE,  # Enable panning
-      panKey = "shift",
-      zoomType = "x",
-      events = list(
-        load = highcharter::JS(
-          "function() {
-    const chart = this;
-
-    // Save initial extremes for resetting pan
-    chart.initialExtremes = chart.xAxis[0].getExtremes();
-
-    // Create the 'Reset Pan' button, initially hidden
-    chart.resetPanButton = chart.renderer.button(
-      'Reset Pan',
-      window.innerWidth * 0.4,  // Initial x position at 10vw
-      window.innerHeight * 0.1, // Initial y position at 12vh
-      function() {
-        chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
-        chart.resetPanButton.hide();
-      },
-      {
-        fill: 'white',
-        stroke: '#80A14E',
-        style: {
-          color: '#80A14E',
-          fontWeight: 'bold',
-          fontFamily: 'Heebo',
-          lineHeight: '25px'
-        },
-        r: 20,
-        padding: 10
-      }
-    )
-    .attr({ zIndex: 1000 })  // Ensure button is above chart elements
-    .add()
-    .hide();  // Start hidden
-
-    // Function to dynamically position 'Reset Pan' button using vw and vh units
-    function positionResetPanButton() {
-      chart.resetPanButton.attr({
-        x: window.innerWidth * 0.4,   // Position at 90% of viewport width
-        y: window.innerHeight * 0.1  // Position at 5% of viewport height
-      });
-    }
-
-    // Initial positioning of 'Reset Pan' button
-    positionResetPanButton();
-
-    // Update button position on chart redraw (e.g., resize)
-    chart.update({
-      chart: {
-        events: {
-          redraw: positionResetPanButton  // Bind positioning function to redraw event
-        }
-      }
-    });
-
-    // Ensure button repositions on window resize
-    window.addEventListener('resize', positionResetPanButton);
-  }"
-        ),
-        redraw = highcharter::JS(
-          "function() {
-            const chart = this;
-            const currentExtremes = chart.xAxis[0].getExtremes();
-
-            // Show the 'Reset Pan' button if panning has moved from the initial extremes
-            if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
-              chart.resetPanButton.show();
-            }
-          }"
-        )
-      ),
-      resetZoomButton = list(
-        theme = list(
-          fill = "white",
-          stroke = "#80A14E",
-          style = list(
-            color = "#80A14E",
-            fontWeight = "bold",
-            fontFamily = "Heebo",
-            lineHeight = "25px" # positions text correctly inside button
-          ),
-          r = 20,  # border radius
-          padding = 10,
-          states = list(
-            hover = list(
-              fill = "#80A14E",
-              stroke = "white",
-              style = list(
-                color = "white"  # hover text color
-              )
-            )
-          )
-        )
-      ),
-      events = list(
-        selection = highcharter::JS(
-          "function() {
-            const chart = this;
-            function updateStep() {
-              const width = chart.chartWidth;
-              let stepSize;
-              if (width > 1200) {
-                stepSize = 10;
-              } else if (width > 600) {
-                stepSize = 25;
-              } else {
-                stepSize = 50;
-              }
-              chart.xAxis[0].update({
-                labels: {
-                  step: stepSize
-                }
-              });
-            }
-            updateStep(); // Initial call
-            window.addEventListener('resize', updateStep); // Call on resize
-          }"
-        )
-      )
-    ) %>%
-    highcharter::hc_xAxis(
-      title = list(text = x_label), # x-axis label
-      categories = data$category,
-      labels = list(
-        step = 20,
-        format = "{value:,.0f}"
-      ),
-      max = 20,
-      min = 0
-    ) %>%
-    highcharter::hc_yAxis(
-      title = list(
-        text =  "# of LHDs"
-      ), # y-axis label
-      min = 0,
-      minRange = 1,
-      allowDecimals = FALSE,
-      labels = list(
-        format = "{value:,.0f}"
-      )
-    )
-}
-
-
-
 #' Set First Boxplot Histogram
 #'
 #' @description Create the first highcharter boxplot visualizations from which proxies will redraw.
@@ -924,6 +751,170 @@ set_box <- function(data) {
     )
 }
 
+
+
+
+#' Set First Highcharter Histogram
+#'
+#' @description Create the first highcharter visualizations from which proxies will redraw.
+#'
+#' @param data dataframe; A dataframe with x, y, group, and category columns.
+#' @param x_label character string; Label for the X Axis.
+#'
+#' @export
+#'
+#' @return histogram
+
+set_hist <- function(data, x_label = "Total FTEs") {
+  highcharter::hchart(
+    data,
+    type = "column",
+    id = "All",
+    name = "Denominator of LHDs",
+    highcharter::hcaes(x = x, y = y)
+  ) %>%
+    highcharter::hc_chart(
+      panType = "x",
+      panning = TRUE,
+      panKey = "shift",
+      zoomType = "x",
+      events = list(
+        load = highcharter::JS(
+          "function() {
+            const chart = this;
+            chart.initialExtremes = chart.xAxis[0].getExtremes();
+            chart.resetPanButton = chart.renderer.button(
+              'Reset Pan',
+              window.innerWidth * 0.4,
+              window.innerHeight * 0.1,
+              function() {
+                chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
+                chart.resetPanButton.hide();
+              },
+              {
+                fill: 'white',
+                stroke: '#80A14E',
+                style: {
+                  color: '#80A14E',
+                  fontWeight: 'bold',
+                  fontFamily: 'Heebo',
+                  lineHeight: '25px'
+                },
+                r: 20,
+                padding: 10
+              }
+            ).attr({ zIndex: 1000 }).add().hide();
+
+            function positionResetPanButton() {
+              chart.resetPanButton.attr({
+                x: window.innerWidth * 0.4,
+                y: window.innerHeight * 0.1
+              });
+            }
+
+            positionResetPanButton();
+            chart.update({
+              chart: {
+                events: {
+                  redraw: positionResetPanButton
+                }
+              }
+            });
+            window.addEventListener('resize', positionResetPanButton);
+          }"
+        ),
+        redraw = highcharter::JS(
+          "function() {
+            const chart = this;
+            const currentExtremes = chart.xAxis[0].getExtremes();
+
+            // Show the 'Reset Pan' button if panning has moved from the initial extremes
+            if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
+              chart.resetPanButton.show();
+            }
+          }"
+        )
+      ),
+      resetZoomButton = list(
+        theme = list(
+          fill = "white",
+          stroke = "#80A14E",
+          style = list(
+            color = "#80A14E",
+            fontWeight = "bold",
+            fontFamily = "Heebo",
+            lineHeight = "25px" # positions text correctly inside button
+          ),
+          r = 20,  # border radius
+          padding = 10,
+          states = list(
+            hover = list(
+              fill = "#80A14E",
+              stroke = "white",
+              style = list(
+                color = "white"  # hover text color
+              )
+            )
+          )
+        )
+      ),
+      events = list(
+        selection = highcharter::JS(
+          "function() {
+            const chart = this;
+            function updateStep() {
+              const width = chart.chartWidth;
+              let stepSize;
+              if (width > 1200) {
+                stepSize = 10;
+              } else if (width > 600) {
+                stepSize = 30;
+              } else {
+                stepSize = 50;
+              }
+              chart.xAxis[0].update({
+                labels: {
+                  step: stepSize
+                }
+              });
+            }
+            updateStep(); // Initial call
+            window.addEventListener('resize', updateStep); // Call on resize
+          }"
+        )
+      )
+    ) %>%
+    highcharter::hc_plotOptions(
+      series = list(
+        visible = TRUE,
+        groupPadding = 0,
+        dataLabels = list(
+          enabled = FALSE
+        )
+      ),
+      column = list(
+        type = "column"
+      )
+    ) %>%
+    highcharter::hc_xAxis(
+      title = list(text = x_label),
+      categories = data$category,
+      labels = list(
+        format = "{value:,.0f}"
+      ),
+      max = 75,
+      min = 0
+    ) %>%
+    highcharter::hc_yAxis(
+      title = list(text = "# of LHDs"),
+      min = 0,
+      minRange = 1,
+      allowDecimals = FALSE,
+      labels = list(
+        format = "{value:,.0f}"
+      )
+    )
+}
 
 
 #' Histogram Bar Proxy Redraw Total FTEs
@@ -985,6 +976,8 @@ proxy_to_hist_total <- function(hc,
         ),
         labels = list(
           step = 20,
+          max = 75,
+          min = 0,
           format = "{value:,.0f}",
           style = list(
             fontSize = "2.3vmin",
@@ -998,6 +991,32 @@ proxy_to_hist_total <- function(hc,
       legend = list(
         enabled = FALSE
       )
+      # ,
+      # events = list(
+      #   selection = highcharter::JS(
+      #     "function() {
+      #       const chart = this;
+      #       function updateStep() {
+      #         const width = chart.chartWidth;
+      #         let stepSize;
+      #         if (width > 1200) {
+      #           stepSize = 10;
+      #         } else if (width > 600) {
+      #           stepSize = 30;
+      #         } else {
+      #           stepSize = 50;
+      #         }
+      #         chart.xAxis[0].update({
+      #           labels: {
+      #             step: stepSize
+      #           }
+      #         });
+      #       }
+      #       updateStep();
+      #       window.addEventListener('resize', updateStep);
+      #     }"
+      #   )
+      # )
     )
 }
 

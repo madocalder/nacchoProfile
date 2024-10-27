@@ -798,7 +798,7 @@
     },
     "gert": {
       "Package": "gert",
-      "Version": "2.1.1",
+      "Version": "2.1.4",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -809,7 +809,7 @@
         "sys",
         "zip"
       ],
-      "Hash": "ab2ca7d6bd706ed218d096b7b16d7233"
+      "Hash": "ae855ad6d7be20dd7b05d43d25700398"
     },
     "gh": {
       "Package": "gh",
@@ -1284,20 +1284,20 @@
       "Package": "naccho.viz",
       "Version": "0.0.0.9000",
       "Source": "GitHub",
+      "Remotes": "lindsayjorgenson/custom.map",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "3d07c310e6848033a7f5c31e29ffc3967b9516d2",
+      "RemoteSha": "2feb44f4c85af4205005d0beb276621347d49d4d",
       "Requirements": [
         "R",
         "highcharter",
         "htmlwidgets",
-        "magrittr",
-        "rsvg"
+        "magrittr"
       ],
-      "Hash": "14dabbc8dde3c20bbf49041deb3fa68c"
+      "Hash": "adaab847df39fcc9702ffb32cf4ba2aa"
     },
     "nacchoProfile": {
       "Package": "nacchoProfile",
@@ -1351,13 +1351,13 @@
     },
     "openssl": {
       "Package": "openssl",
-      "Version": "2.2.1",
+      "Version": "2.2.2",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "askpass"
       ],
-      "Hash": "c62edf62de70cadf40553e10c739049d"
+      "Hash": "d413e0fef796c9401a4419485f709ca1"
     },
     "packrat": {
       "Package": "packrat",
@@ -1601,14 +1601,14 @@
     },
     "ragg": {
       "Package": "ragg",
-      "Version": "1.3.2",
+      "Version": "1.3.3",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "systemfonts",
         "textshaping"
       ],
-      "Hash": "e3087db406e079a8a2fd87f413918ed3"
+      "Hash": "0595fe5e47357111f29ad19101c7d271"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -1903,13 +1903,6 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "96710351d642b70e8f02ddeb237c46a7"
-    },
-    "rsvg": {
-      "Package": "rsvg",
-      "Version": "2.6.1",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Hash": "7772252f515fb6ab21cf1c08b07a9abd"
     },
     "rversions": {
       "Package": "rversions",

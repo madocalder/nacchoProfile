@@ -9,7 +9,7 @@ proxy_hist_to_single(
   data,
   meta,
   rotate = 0,
-  size = "17px",
+  size = "2.7vmin",
   overflow = "none",
   responses = sum(data$Responses),
   ...
