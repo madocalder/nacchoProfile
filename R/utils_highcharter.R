@@ -104,7 +104,7 @@ viz_options <- function(hc,
       style = list(
         fontWeight = 400,
         textAlign = tooltip_align,
-        fontSize = "13px",
+        fontSize = "2.2vmin",
         color = "black"
       ),
       backgroundColor = "#EEEAE5",
@@ -377,7 +377,7 @@ set_column <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "14px"
+        fontSize = "2.3vmin"
       )
     )
   ) %>%
@@ -432,7 +432,7 @@ set_simple_bar <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "14px"
+        fontSize = "2.3vmin"
       )
     )
   ) %>%
@@ -987,7 +987,7 @@ proxy_to_hist_total <- function(hc,
           step = 20,
           format = "{value:,.0f}",
           style = list(
-            fontSize = "14px",
+            fontSize = "2.3vmin",
             textOverflow = "none"
           )
         )
@@ -1064,7 +1064,7 @@ proxy_to_hist_pc <- function(hc,
           step = 20,
           format = "{value:,.0f}",
           style = list(
-            fontSize = "14px",
+            fontSize = "2.3vmin",
             textOverflow = "none"
           )
         )
@@ -1132,7 +1132,7 @@ proxy_hist_to_single <- function(hc,
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "14px"
+            fontSize = "2.3vmin"
           )
         )
       ),
@@ -1234,7 +1234,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "14px"
+              fontSize = "2.3vmin"
             )
           )
         ),
@@ -1313,7 +1313,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "14px"
+              fontSize = "2.3vmin"
             )
           )
         ),
@@ -1722,7 +1722,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "14px",
+    #           fontSize = "2.3vmin",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -1739,7 +1739,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "14px",
+    #           fontSize = "2.3vmin",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -1756,7 +1756,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "14px",
+    #           fontSize = "2.3vmin",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -1773,7 +1773,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "14px",
+    #           fontSize = "2.3vmin",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -1791,7 +1791,7 @@ scatter_plot <- function(data, colors) {
       text = "Click and span a range on the figure to zoom."
     ) %>%
     highcharter::hc_caption(
-      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 14px; color: black;\'>
+      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 2.3vmin; color: black;\'>
                   In the top left quadrant, services are <span style=\'color: #008A96; font-weight: bold;\'>growing</span>.
                   In the top right quadrant, services show a <span style=\'color: #666; font-weight: bold;\'>mixed trend</span>.
                   In the bottom left quadrant, services are <span style=\'color: #B8B3AE; font-weight: bold;\'>stable</span>.

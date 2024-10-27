@@ -285,7 +285,7 @@ mod_services_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -454,10 +454,10 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "13px"
+          size = "2.2vmin"
           overflow = "ellipsis"
         } else {
-          size = "17px"
+          size = "2.7vmin"
           overflow = "none"
         }
 
@@ -498,10 +498,10 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "13px"
+          size = "2.2vmin"
           overflow = "ellipsis"
         } else {
-          size = "17px"
+          size = "2.7vmin"
           overflow = "none"
         }
 

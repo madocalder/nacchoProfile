@@ -46,11 +46,11 @@ mod_overview_ui <- function(id) {
                     class = "row",
                     div(
                       class = "col-sm-3 color-carousel",
-                      HTML("<span style = 'font-size: 18px; font-weight: 600; color: #212F5B; line-height: 25px;'>
+                      HTML("<span style = 'font-size: 2.8vmin; font-weight: 600; color: #212F5B; line-height: 25px;'>
                           Although only 6% of all LHDs were
                           classified as large, they served more
                           than half of the U.S. population. </span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 2vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
@@ -74,7 +74,7 @@ mod_overview_ui <- function(id) {
                     class = "row",
                     div(
                       class = "col-sm-3 color-carousel-2",
-                      HTML("<span style = 'font-size: 16px; font-weight: 600; color: #212F5B; line-height: 20px;'>
+                      HTML("<span style = 'font-size: 2.6vmin; font-weight: 600; color: #212F5B; line-height: 20px;'>
                           Of the 2,512 LHDs included in the 2022
                           Profile study population, 1,928 were
                           locally governed, 467 were units of the
@@ -85,7 +85,7 @@ mod_overview_ui <- function(id) {
                           most parts of the state, while a small
                           number of large metropolitan areas
                           have locally governed LHDs.</span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 2vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
@@ -109,7 +109,7 @@ mod_overview_ui <- function(id) {
                     class = "row",
                     div(
                       class = "col-sm-3 color-carousel",
-                      HTML("<span style = 'font-size: 18px; font-weight: 600; color: #212F5B; line-height: 25px;'>
+                      HTML("<span style = 'font-size: 2.8vmin; font-weight: 600; color: #212F5B; line-height: 25px;'>
                           Approximately two-thirds of LHDs
                           were county-based and an additional
                           8% serve multiple counties. One-fifth of
@@ -118,7 +118,7 @@ mod_overview_ui <- function(id) {
                           cities or towns but were more likely
                           to serve multiple counties than
                           small LHDs. </span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 2vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
@@ -245,7 +245,7 @@ mod_overview_server <- function(id){
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "14px",
+            fontSize = "2.3vmin",
             textShadow = "none"
           )
         )

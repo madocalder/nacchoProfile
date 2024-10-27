@@ -69,7 +69,7 @@ mod_workforce_ui <- function(id){
               condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               div(
                 highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 70vh; width: 50vw;")
             ),
 
             # Display bar graph when the topic is jobs_standard or jobs_total and view is Bar Graph
@@ -77,7 +77,7 @@ mod_workforce_ui <- function(id){
               condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               div(
                 highcharter::highchartOutput(ns("figure_jobs"), height = "100%"),
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 67vh; width: 50vw;")
             ),
 
             # Adding the new table view
@@ -98,7 +98,7 @@ mod_workforce_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
                 highcharter::highchartOutput(ns("line")),
-                style = "height: 65vh; width: 50vw;"
+                style = "height: 80vh; width: 50vw;"
               )
             )
           )
@@ -306,7 +306,7 @@ mod_workforce_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
     # figure output -----------------------------------------------------------
@@ -578,13 +578,13 @@ mod_workforce_server <- function(id){
           summarise(Responses = sum(Responses))
 
         # nested
-        if (length(data$x) >= 8) {
+        if (length(data$x) >= 6) {
           rotate = -45
-          size = "13px"
+          size = "2.2vmin"
           overflow = "ellipsis"
         } else {
           rotate = 0
-          size = "17px"
+          size = "2.7vmin"
           overflow = "none"
         }
 

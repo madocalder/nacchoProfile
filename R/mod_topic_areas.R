@@ -229,7 +229,7 @@ mod_topic_areas_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
     # main content ============================================================

@@ -441,7 +441,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "13px",
+                  fontSize = "2.2vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"
@@ -515,7 +515,7 @@ mod_finance_server <- function(id){
                   align = 'left',
                   verticalAlign = 'top',
                   style = list(
-                    fontSize = '15px',
+                    fontSize = '2.5vmin',
                     fontWeight = 'bold'
                   )
                 )
@@ -536,7 +536,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "13px",
+                  fontSize = "2.2vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"
