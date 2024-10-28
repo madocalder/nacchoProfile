@@ -91,7 +91,7 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("map"),
-                                                   width = "60vmin",
+                                                   # width = "60vmin",
                                                    height = "57vmin")
                     )
                   )
@@ -126,7 +126,8 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("cities"),
-                                                   width = "65vmin", height = "55vmin")
+                                                   # width = "65vmin",
+                                                   height = "55vmin")
                     )
                   )
                 )
@@ -158,19 +159,19 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("Percent of all LHDs", "Percent of all LHDs", "Percent of all LHDs",
-                  "Percent of population served by LHDs", "Percent of population served by LHDs", "Percent of population served by LHDs")
+        group = c("% of all LHDs", "% of all LHDs", "% of all LHDs",
+                  "% of population served by LHDs", "% of population served by LHDs", "% of population served by LHDs")
       )
 
       set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
-          tooltip = "{point.y:.0f} {point.group} are served by {point.category}",
+          tooltip = "{point.y}% {point.group} are served by {point.category} LHDs",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%
-        viz_export()
+        viz_export
     })
 
 
@@ -178,30 +179,51 @@ mod_overview_server <- function(id){
     # used for the map only, displayed in the UI using a conditional panel
     output$map <- highcharter::renderHighchart({
 
-      # THIS NEEDS TO BE UPDATED WITH CORRECT DATA
+      # data
+      join <- data.frame(
+        fips = c(33, 10, 44, 02, 11),
+        state_name = c("New Hampshire", "Deleware", "Rhode Island",
+                       "Alaska", "District of Columbia"),
+        cat = c("Local", "State", "State", "Local", "Mixed")
+      )
+
       data <- master_data %>%
         haven::as_factor() %>%
-        dplyr::mutate(fig_filter = stringr::str_to_title(c0govcat)) %>%
-        # dplyr::distinct(fips, .keep_all = TRUE) %>%
-        dplyr::select(fips, state_name, fig_filter)
+        dplyr::distinct(fips, .keep_all = TRUE) %>%
+        dplyr::mutate(cat = c0govcatn) %>%
+        dplyr::select(fips, state_name, cat)%>%
+        dplyr::mutate(cat = dplyr::case_when(
+          state_name %in% c("Wyoming", "Louisiana",
+                            "Oklahoma", "Tennessee", "Texas", "Alabama",
+                            "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
+          state_name == "Delaware" ~ "Shared",
+          cat == "shared" ~ "Shared",
+          cat == "local" ~ "Local",
+          cat == "state" ~ "State",
+          cat == "mixed" ~ "Mixed",
+          TRUE ~ cat))
 
+      data <-  dplyr::bind_rows(data, join)
+
+      View(data)
       # uses a function from the naccho.viz package
       naccho.viz::create_cat_map(
         data = data,
         fips_column = "fips",
-        selected_value = "fig_filter",
+        selected_value = "cat",
         title_text = "Governance of LHDs",
         subtitle_text = "",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.cat}.",
         caption_text = "",
         accessible_desc = ""
       ) %>%
         highcharter::hc_chart(
-          marginBottom = 20,
-          spacingTop = 10,
+          marginBottom = 50,
+          spacingTop = 0,
           spacingBottom = 0
         ) %>%
         highcharter::hc_legend(
-          margin = 20
+          margin = "2.5vmin"
         )
     })
 

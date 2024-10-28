@@ -48,7 +48,9 @@ other_topics <- list(
                              "New or Revised Ordinances" = "Newc12q502"),
 
   "Planning & QI" = list("CHA and CHIP" = "chachip",
-                         "CHIP Activities" = "m9q240")
+                         "CHIP Activities" = "m9q240"),
+
+  "Partnerships" = list("Formal & Informal" = "work")
 )
 
 # Save the other_topics dataset

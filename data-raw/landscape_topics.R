@@ -10,8 +10,8 @@ landscape_topics <- list(
                                      "Tenure" = "tenure",
                                      "Highest Degree" = "c4q34",
                                      "Specialization" = "field"
-                                     ),
-  "Partnerships" = list("Formal & Informal" = "work")
-)
+                                     )
+ )
+
 
 usethis::use_data(landscape_topics, overwrite = TRUE)
