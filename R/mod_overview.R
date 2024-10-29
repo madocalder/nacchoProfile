@@ -91,8 +91,10 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("map"),
-                                                   # width = "60vmin",
-                                                   height = "57vmin")
+                                                   width = "auto",
+                                                   height = "80%"),
+                      style = "margin-left: auto !important;
+                              margin-right: auto !important;"
                     )
                   )
                 )
@@ -159,18 +161,26 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("% of all LHDs", "% of all LHDs", "% of all LHDs",
-                  "% of population served by LHDs", "% of population served by LHDs", "% of population served by LHDs")
+        group = c("all LHDs", "all LHDs", "all LHDs",
+                  "population served by LHDs", "population served by LHDs", "population served by LHDs")
       )
+
+      data <- data %>%
+        dplyr::mutate(tooltip = paste(y, group, "are served by", category, "LHDs"))
+
 
       set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
-          tooltip = "{point.y}% {point.group} are served by {point.category} LHDs",
           viz_subtitle = "",
-          legend_align = "center"
+          tooltip =  '{point.y:.0f}% {point.group} are served by {point.category} LHDs.',
+          legend_align = "center",
+          legend_title = "% of"
         ) %>%
+        # highcharter::hc_tooltip(
+        #   pointFormat = "{point.y:.0f}% {point.group} are served by {point.category} LHDs.") %>%
+
         viz_export
     })
 
@@ -184,47 +194,49 @@ mod_overview_server <- function(id){
         fips = c(33, 10, 44, 02, 11),
         state_name = c("New Hampshire", "Deleware", "Rhode Island",
                        "Alaska", "District of Columbia"),
-        cat = c("Local", "State", "State", "Local", "Mixed")
+        grouping = c("Local", "State", "State", "Local", "Mixed")
       )
 
       data <- master_data %>%
         haven::as_factor() %>%
         dplyr::distinct(fips, .keep_all = TRUE) %>%
-        dplyr::mutate(cat = c0govcatn) %>%
-        dplyr::select(fips, state_name, cat)%>%
-        dplyr::mutate(cat = dplyr::case_when(
+        dplyr::mutate(grouping = c0govcatn) %>%
+        dplyr::select(fips, state_name, grouping) %>%
+        dplyr::mutate(grouping = dplyr::case_when(
           state_name %in% c("Wyoming", "Louisiana",
                             "Oklahoma", "Tennessee", "Texas", "Alabama",
                             "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
           state_name == "Delaware" ~ "Shared",
-          cat == "shared" ~ "Shared",
-          cat == "local" ~ "Local",
-          cat == "state" ~ "State",
-          cat == "mixed" ~ "Mixed",
-          TRUE ~ cat))
+          grouping == "shared" ~ "Shared",
+          grouping == "local" ~ "Local",
+          grouping == "state" ~ "State",
+          grouping == "mixed" ~ "Mixed",
+          TRUE ~ grouping))
 
-      data <-  dplyr::bind_rows(data, join)
+      # data <-  dplyr::bind_rows(data, join)%>%
+      #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
 
       View(data)
       # uses a function from the naccho.viz package
       naccho.viz::create_cat_map(
         data = data,
         fips_column = "fips",
-        selected_value = "cat",
+        selected_value = "grouping",
         title_text = "Governance of LHDs",
         subtitle_text = "",
-        tooltip = "In 2022, {point.state_name}'s governance structure was {point.cat}.",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.grouping}.",
         caption_text = "",
         accessible_desc = ""
-      ) %>%
-        highcharter::hc_chart(
-          marginBottom = 50,
-          spacingTop = 0,
-          spacingBottom = 0
-        ) %>%
-        highcharter::hc_legend(
-          margin = "2.5vmin"
-        )
+      )
+
+      # %>%
+      #   highcharter::hc_chart(
+      #     spacing = "1vmin 1vmin 1vmin 1vmin"
+      #   )
+      # %>%
+      #   highcharter::hc_legend(
+      #     margin = "2.5vmin"
+      #   )
     })
 
 

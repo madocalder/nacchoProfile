@@ -365,7 +365,8 @@ set_column <- function(data,
     highcharter::hcaes(
       x = x,
       y = y,
-      group = group
+      group = group,
+      category = category
     ),
     dataLabels = list(
       enabled = TRUE,

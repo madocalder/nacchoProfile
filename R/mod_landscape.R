@@ -86,11 +86,12 @@ mod_landscape_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
                 uiOutput(ns("table_title")),
-                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
-                style = "height: 65vh; width: 50vw;"
+                style = "margin-left: auto !important;
+                        margin-right: auto !important;"
               )
             ),
 
