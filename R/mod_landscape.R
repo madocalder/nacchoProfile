@@ -98,8 +98,7 @@ mod_landscape_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line")),
-                style = "height: 65vh; width: 50vw;"
+                highcharter::highchartOutput(ns("line"), height = "65vh")
               )
             )
           )
@@ -485,7 +484,14 @@ mod_landscape_server <- function(id){
 
       data <- process_line_data(option, filtering)
 
-      View(data)
+      y_max_rel <- max(data$y, na.rm = TRUE)
+
+      if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
+        line_title <- data$legend_title[1]  # Get the first value
+      } else {
+        line_title <- filter_meta()$title  # Default value if `legend_title` column is missing
+      }
+
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -493,10 +499,12 @@ mod_landscape_server <- function(id){
         x_group = "legend_label",
         y_variable = "y",
         y_label = filter_meta()$y_label,
+        y_max = y_max_rel,
         x_label = "Year",
         select_theme = naccho.viz::minimal,
-        title = filter_meta()$title,
-        tooltip = "In {point.year}, {point.one}{point.two}."
+        title = line_title,
+        tooltip = "In {point.year}, {point.one}{point.two}.",
+        legend_title = NA
       )
 
 

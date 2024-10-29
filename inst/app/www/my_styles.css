@@ -1188,6 +1188,18 @@ b, strong {
     z-index: 29999;
 }
 
+.highcharts-legend {
+    max-height: 3vmin !important;
+    font-size: 1.5vmin !important;
+    overflow-y: auto !important;
+      }
+
+.highcharts-container {
+  min-width: 30vw!important; /* Minimum width of the chart */
+  min-height: 50vh!important; /* Minimum height of the chart */
+}
+
+
 .carousel-indicators {
     position: absolute;
     bottom: 3vmin; /* Position from the bottom based on viewport size */
