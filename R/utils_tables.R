@@ -342,7 +342,8 @@ process_data <- function(topic, filtering, classifications = NULL) {
           Responses = total_responses
         ) %>%
         dplyr::select(category, group, y, Responses) %>%
-        dplyr::left_join(., add_all_counts_long(topic), by = "category")
+        dplyr::left_join(., add_all_counts_long(topic), by = "category")%>%
+        dplyr::filter(category != "Na")
 
     }
 
@@ -688,7 +689,8 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::left_join(., add_all_counts_long(topic), by = "category") %>%
         dplyr::mutate(
           dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
-        )
+        )%>%
+        dplyr::filter(!category %in% c("Na"))
     }
 
   } #closes not All LHDs filter else

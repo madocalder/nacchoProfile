@@ -484,13 +484,20 @@ mod_landscape_server <- function(id){
 
       data <- process_line_data(option, filtering)
 
-      y_max_rel <- max(data$y, na.rm = TRUE)
+      y_max_rel <- max(data$y, na.rm = TRUE) + 1
 
       if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
         line_title <- data$legend_title[1]  # Get the first value
       } else {
         line_title <- filter_meta()$title  # Default value if `legend_title` column is missing
       }
+
+      if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {
+        subtitle <- data$subtitle[1]  # Get the first value
+      } else {
+        subtitle <- NULL
+      }
+
 
 
       naccho.viz::create_grouped_line(
@@ -503,6 +510,7 @@ mod_landscape_server <- function(id){
         x_label = "Year",
         select_theme = naccho.viz::minimal,
         title = line_title,
+        subtitle = subtitle,
         tooltip = "In {point.year}, {point.one}{point.two}.",
         legend_title = NA
       )

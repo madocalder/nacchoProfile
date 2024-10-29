@@ -29,10 +29,10 @@ lines_data <- utils::read.csv("data-raw/time_data.csv")%>%
     category %in% c("Under 30", "30-39") ~ "Under 40",
     TRUE ~ category),
     subtitle = dplyr::case_when(
-      filter == "c0govcat" ~ "by Governance",
-      filter == "urbanrural2022" ~ "by Rurality",
-      filter == "c0popcat3" ~ "by LHD Size",
-      filter == "censusregion" ~ "by Region",
+      filter == "c0govcat" ~ "By Governance",
+      filter == "urbanrural2022" ~ "By Rurality",
+      filter == "c0popcat3" ~ "By LHD Size",
+      filter == "censusregion" ~ "By Region",
       TRUE ~ ""
     )
   )
