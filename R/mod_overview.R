@@ -92,7 +92,7 @@ mod_overview_ui <- function(id) {
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("map"),
                                                    width = "auto",
-                                                   height = "80%"),
+                                                   height = "90%"),
                       style = "margin-left: auto !important;
                               margin-right: auto !important;"
                     )
@@ -166,7 +166,7 @@ mod_overview_server <- function(id){
       )
 
       data <- data %>%
-        dplyr::mutate(tooltip = paste(y, group, "are served by", category, "LHDs"))
+        dplyr::mutate(tooltip = paste(y, "% of", group, "are served by", category, "LHDs"))
 
 
       set_column(data) %>%
@@ -174,13 +174,12 @@ mod_overview_server <- function(id){
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
           viz_subtitle = "",
-          tooltip =  '{point.y:.0f}% {point.group} are served by {point.category} LHDs.',
+          tooltip = "{point.y:.0f}% of {point.group} are served by {point.category} LHDs.",
           legend_align = "center",
           legend_title = "% of"
         ) %>%
         # highcharter::hc_tooltip(
-        #   pointFormat = "{point.y:.0f}% {point.group} are served by {point.category} LHDs.") %>%
-
+        #   pointFormat =  "{point.y:.0f}% of {point.group} are served by {point.category} LHDs.") %>%
         viz_export
     })
 
@@ -213,7 +212,8 @@ mod_overview_server <- function(id){
           grouping == "mixed" ~ "Mixed",
           TRUE ~ grouping))
 
-      # data <-  dplyr::bind_rows(data, join)%>%
+      data <-  dplyr::bind_rows(data, join)
+      #%>%
       #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
 
       View(data)
@@ -224,7 +224,7 @@ mod_overview_server <- function(id){
         selected_value = "grouping",
         title_text = "Governance of LHDs",
         subtitle_text = "",
-        tooltip = "In 2022, {point.state_name}'s governance structure was {point.grouping}.",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
         caption_text = "",
         accessible_desc = ""
       )
