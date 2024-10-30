@@ -423,18 +423,30 @@ process_line_data <- function(option, filtering, classifications = NULL) {
       } else if (option %in% c("c5q36", "c5q37")){
 
         ###2022 data-----
-        current_data <- nacchoProfile::return_survey_weighted_statistics(option)%>%
-          dplyr::select(Question, category, group, y) %>%
+        current_data_1 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+          dplyr::select(Question, category, group, y )%>%
           dplyr::mutate(year = 2022,
                         filter = "All LHDs",
                         category = "Mean",
                         y = as.numeric(y))
 
+        current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+          dplyr::select(Question, category, group, Quantile_q50 )%>%
+          dplyr::mutate(year = 2022,
+                        filter = "All LHDs",
+                        category = "Median",
+                        y = as.numeric(Quantile_q50))%>%
+          dplyr::select(Question, category, group, y, filter, year )
+
+
+        current_data <- dplyr::full_join(current_data_1, current_data_2)
+
+
         ###historical-----
         hist_data <- lines_data%>%
           dplyr::filter(topic == option,
                         filter == "All LHDs",
-                        category == "Mean")%>%
+                        category %in% c("Mean", "Median"))%>%
           dplyr::mutate(y = round(as.numeric(y), digits = 0))
 
         if (option == "c5q37"){
@@ -450,7 +462,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      )) %>%
           dplyr::mutate(y = as.numeric(y),
                         legend_label = paste(category),
-                        one = paste("the average number of FTEs across all LHDs was "),
+                        one = paste("the", tolower(category),  "number of FTEs across all LHDs was "),
                         two = paste(y)) %>%
           dplyr::arrange(year)
         } else {
@@ -464,7 +476,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                        )) %>%
             dplyr::mutate(y = as.numeric(y),
                           legend_label = paste(group),
-                          one = paste("the average number of total employees across LHDs was"),
+                          one = paste("the", tolower(category), "number of total employees across LHDs was"),
                           two = paste(" ", y)) %>%
             dplyr::arrange(year)
         }
@@ -522,7 +534,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         category == "Yes")%>%
           dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
 
-        # View(hist_data)
+        View(hist_data)
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts(option, filtering) %>%
@@ -540,7 +552,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         current_data$year <- 2022
         current_data$filter <- filtering
 
-        # View(current_data)
+        View(current_data)
 
         ### Combine data and create more descriptive legend labels
         combined <- full_join(current_data, hist_data,
@@ -979,6 +991,30 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         # View(combined)
 
       } else if(option %in% c("c5q36", "c5q37")){
+# # option <- "c5q36"
+# # filtering <- "c0popcat3"
+#         ###2022 data-----
+#         current_data_1 <- nacchoProfile::return_survey_weighted_statistics(option, filtering) %>%
+#           dplyr::select(Question, category, Group, y )%>%
+#           dplyr::mutate(year = 2022,
+#                         filter = filtering,
+#                         category = "Mean",
+#                         y = as.numeric(y),
+#                         group = Group)%>%
+#           dplyr::select(Question, category, group, y, filter, year )
+#
+#         current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option, filtering) %>%
+#           dplyr::select(Question, category, Group, Quantile_q50 )%>%
+#           dplyr::mutate(year = 2022,
+#                         filter = filtering,
+#                         category = "Median",
+#                         y = as.numeric(Quantile_q50),
+#                         group = Group)%>%
+#           dplyr::select(Question, category, group, y, filter, year )
+#
+#
+#         current_data <- dplyr::full_join(current_data_1, current_data_2)
+
 
         ###current-----
         current_data <- nacchoProfile::return_survey_weighted_statistics(option, filtering)%>%
@@ -1013,7 +1049,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                           TRUE ~ group
                         ),
                         legend_label = paste(group),
-                        one = paste(tolower(group_mod), "LHDs had an average of "),
+                        one = paste(tolower(group_mod), "LHDs had a", tolower(category), "of "),
                         two = paste(y, " FTEs")) %>%
           dplyr::arrange(year)
         } else {

@@ -161,8 +161,15 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
     } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
 
-      data <- process_weighted_stats("c5q37") %>%
+      data <- return_survey_weighted_statistics(topic) %>%
+        dplyr::select(Responses, y, group, Quantile_q50)%>%
+        dplyr::rename(Median = Quantile_q50,
+                      Mean = y)%>%
+        tidyr::pivot_longer(cols = c("Mean", "Median"),
+                            names_to = "category",
+                            values_to = "y")%>%
         pivot_data_group()
+
 
     } else if (topic == "jobs_total") {
       data <- process_jobs_data(jobs_data)
@@ -361,15 +368,53 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
 
     } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
-      data <- process_weighted_stats(topic, filtering) %>%
-        pivot_data_cat()
 
-      stat_data_all <- process_weighted_stats(topic) %>%
-        pivot_data_cat()
+      # topic <- "c5q36"
+      # filtering <- "c0popcat3"
 
-      data <- process_weighted_stats(topic, filtering) %>%
-        pivot_data_cat() %>%
-        add_all_ldh_count(data_all = stat_data_all)
+      data_1 <- nacchoProfile::return_survey_weighted_statistics(topic, filtering) %>%
+        dplyr::select(Question, category, Group, y, Responses) %>%
+        dplyr::mutate(year = 2022,
+                      filter = filtering,
+                      category = "Mean",
+                      y = as.numeric(y),
+                      group = Group) %>%
+        dplyr::select(Question, category, group, y, filter, year, Responses)
+
+      data_2 <- nacchoProfile::return_survey_weighted_statistics(topic, filtering) %>%
+        dplyr::select(Question, category, Group, Quantile_q50, Responses) %>%
+        dplyr::mutate(year = 2022,
+                      filter = filtering,
+                      category = "Median",
+                      y = as.numeric(Quantile_q50),
+                      group = Group) %>%
+        dplyr::select(Question, category, group, y, filter, year, Responses)
+
+
+      data <- dplyr::full_join(data_1, data_2) %>%
+        pivot_data_group()
+
+      all_data <- return_survey_weighted_statistics(topic) %>%
+        dplyr::select(Responses, y, group, Quantile_q50)%>%
+        dplyr::rename(Median = Quantile_q50,
+                      Mean = y)%>%
+        tidyr::pivot_longer(cols = c("Mean", "Median"),
+                            names_to = "category",
+                            values_to = "y")%>%
+        pivot_data_group()
+
+      data <- dplyr::left_join(data, all_data)
+
+
+      # data <- process_weighted_stats(topic, filtering) %>%
+      #   pivot_data_cat()
+      #
+      # stat_data_all <- process_weighted_stats(topic) %>%
+      #   pivot_data_cat()
+      #
+      # data <- process_weighted_stats(topic, filtering) %>%
+      #   pivot_data_cat() %>%
+      #   add_all_ldh_count(data_all = stat_data_all)
 
 
     } else if (topic == "a") {
@@ -742,13 +787,13 @@ data <- data %>%
     } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
     } else if (topic == "fte_bypop") {
-      paste0(rounded_value, " FTE per capita (mean)")
+      paste0(rounded_value, " FTE per capita")
     } else if (topic == "c5q37") {
-      paste0(rounded_value, " Total FTE (mean)")
+      paste0(rounded_value, " FTE")
     } else if (topic == "employee_bypop") {
-      paste0(rounded_value, " Employees per capita (mean)")
+      paste0(rounded_value, " Employees per capita")
     } else if (topic == "c5q36") {
-      paste0(rounded_value, " Total Employees (mean)")
+      paste0(rounded_value, " Total Employees")
     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
       scales::label_currency()(rounded_value)
     } else {

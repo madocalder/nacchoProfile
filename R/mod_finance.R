@@ -412,7 +412,7 @@ mod_finance_server <- function(id){
           dplyr::rename(name = revenue_type) %>%
           dplyr::mutate(id = paste(name, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(all_of(id, name, value))
+          dplyr::select(id, name, value)
 
         add_info <- data.frame(
           color = naccho.viz::green
@@ -422,10 +422,10 @@ mod_finance_server <- function(id){
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%
-          hc_add_series(
+          highcharter::hc_add_series(
             type = "treemap",
             layoutAlgorithm = "squarified",
-            data = list_parse(data),
+            data = highcharter::list_parse(data),
             allowDrillToNode = TRUE, # enables drill down
             borderColor = "#FFFFFF",
             borderWidth = 2
@@ -441,7 +441,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "2.2vmin",
+                  fontSize = "1.8vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"
@@ -499,10 +499,10 @@ mod_finance_server <- function(id){
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%
-          hc_add_series(
+          highcharter::hc_add_series(
             type = "treemap",
             layoutAlgorithm = "squarified",
-            data = list_parse(data),
+            data = highcharter::list_parse(data),
             allowDrillToNode = TRUE, # enables drill down
             borderColor = "#FFFFFF",
             borderWidth = 2,

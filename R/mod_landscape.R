@@ -99,7 +99,10 @@ mod_landscape_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line"), height = "65vh")
+                highcharter::highchartOutput(ns("line"), height = "65vh"),
+                br(),
+                # HTML('<div style="font-size: 2vmin;">', source_line,'</div>'),
+                style = "height: 65vh; width: 50vw;"
               )
             )
           )
@@ -244,7 +247,7 @@ mod_landscape_server <- function(id){
         viz_options(
           viz_title = "LHDs Combined with HHSA",
           viz_caption = paste("<b> N: </b>938 <br>", source_line),
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}"
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}."
           ) %>%
         viz_export()
     })
@@ -323,8 +326,10 @@ mod_landscape_server <- function(id){
               data = data,
               meta = filter_meta(),
               id = series_id,
-              colors = colors() # comes from earlier reactive and needs to match length of field input
-            )
+              colors = colors(), # comes from earlier reactive and needs to match length of field input
+              tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of
+              {point.group} LHDs are {point.category}."
+              )
 
 
       # Topic: Specialization
@@ -485,7 +490,12 @@ mod_landscape_server <- function(id){
 
       data <- process_line_data(option, filtering)
 
-      y_max_rel <- max(data$y, na.rm = TRUE) + 1
+
+      if(max(data$y, na.rm = TRUE) == 100) {
+       y_max_rel <- max(data$y, na.rm = TRUE)
+      } else {
+        y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
+      }
 
       if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
         line_title <- data$legend_title[1]  # Get the first value
@@ -499,7 +509,8 @@ mod_landscape_server <- function(id){
         subtitle <- NULL
       }
 
-
+# data$responses <- sum(data$Responses)
+# print(data)
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -512,6 +523,7 @@ mod_landscape_server <- function(id){
         select_theme = naccho.viz::minimal,
         title = line_title,
         subtitle = subtitle,
+        # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
         tooltip = "In {point.year}, {point.one}{point.two}.",
         legend_title = NA
       )
@@ -531,10 +543,12 @@ mod_landscape_server <- function(id){
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
 
+
+
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        # view == input$view, # fix
+                        view == input$view, # fix
                         filter == input$filter)
 
         p(htmltools::HTML(

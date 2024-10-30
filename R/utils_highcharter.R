@@ -767,6 +767,9 @@ set_box <- function(data) {
 #' @return histogram
 
 set_hist <- function(data, x_label = "Total FTEs") {
+
+  x_max <- max(data$x)
+
   highcharter::hchart(
     data,
     type = "column",
@@ -779,63 +782,63 @@ set_hist <- function(data, x_label = "Total FTEs") {
       panning = TRUE,
       panKey = "shift",
       zoomType = "x",
-      events = list(
-        load = highcharter::JS(
-          "function() {
-            const chart = this;
-            chart.initialExtremes = chart.xAxis[0].getExtremes();
-            chart.resetPanButton = chart.renderer.button(
-              'Reset Pan',
-              window.innerWidth * 0.4,
-              window.innerHeight * 0.1,
-              function() {
-                chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
-                chart.resetPanButton.hide();
-              },
-              {
-                fill: 'white',
-                stroke: '#80A14E',
-                style: {
-                  color: '#80A14E',
-                  fontWeight: 'bold',
-                  fontFamily: 'Heebo',
-                  lineHeight: '25px'
-                },
-                r: 20,
-                padding: 10
-              }
-            ).attr({ zIndex: 1000 }).add().hide();
-
-            function positionResetPanButton() {
-              chart.resetPanButton.attr({
-                x: window.innerWidth * 0.4,
-                y: window.innerHeight * 0.1
-              });
-            }
-
-            positionResetPanButton();
-            chart.update({
-              chart: {
-                events: {
-                  redraw: positionResetPanButton
-                }
-              }
-            });
-            window.addEventListener('resize', positionResetPanButton);
-          }"
-        ),
-        redraw = highcharter::JS(
-          "function() {
-            const chart = this;
-            const currentExtremes = chart.xAxis[0].getExtremes();
-
-            // Show the 'Reset Pan' button if panning has moved from the initial extremes
-            if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
-              chart.resetPanButton.show();
-            }
-          }"
-        )
-      ),
+      # events = list(
+      #   load = highcharter::JS(
+      #     "function() {
+      #       const chart = this;
+      #       chart.initialExtremes = chart.xAxis[0].getExtremes();
+      #       chart.resetPanButton = chart.renderer.button(
+      #         'Reset Pan',
+      #         window.innerWidth * 0.4,
+      #         window.innerHeight * 0.1,
+      #         function() {
+      #           chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
+      #           chart.resetPanButton.hide();
+      #         },
+      #         {
+      #           fill: 'white',
+      #           stroke: '#80A14E',
+      #           style: {
+      #             color: '#80A14E',
+      #             fontWeight: 'bold',
+      #             fontFamily: 'Heebo',
+      #             lineHeight: '25px'
+      #           },
+      #           r: 20,
+      #           padding: 10
+      #         }
+      #       ).attr({ zIndex: 1000 }).add().hide();
+      #
+      #       function positionResetPanButton() {
+      #         chart.resetPanButton.attr({
+      #           x: window.innerWidth * 0.4,
+      #           y: window.innerHeight * 0.1
+      #         });
+      #       }
+      #
+      #       positionResetPanButton();
+      #       chart.update({
+      #         chart: {
+      #           events: {
+      #             redraw: positionResetPanButton
+      #           }
+      #         }
+      #       });
+      #       window.addEventListener('resize', positionResetPanButton);
+      #     }"
+      #   ),
+      #   redraw = highcharter::JS(
+      #     "function() {
+      #       const chart = this;
+      #       const currentExtremes = chart.xAxis[0].getExtremes();
+      #
+      #       // Show the 'Reset Pan' button if panning has moved from the initial extremes
+      #       if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
+      #         chart.resetPanButton.show();
+      #       }
+      #     }"
+      #   )
+      # ),
       resetZoomButton = list(
         theme = list(
           fill = "white",
@@ -901,13 +904,13 @@ set_hist <- function(data, x_label = "Total FTEs") {
       title = list(text = x_label),
       categories = data$category,
       labels = list(
-        format = "{value:,.0f}"
+        format = "{value:,.0f%}"
       ),
-      max = 75,
+      max = x_max,
       min = 0
     ) %>%
     highcharter::hc_yAxis(
-      title = list(text = "# of LHDs"),
+      title = list(text = "% of LHDs"),
       min = 0,
       minRange = 1,
       allowDecimals = FALSE,
@@ -934,6 +937,8 @@ proxy_to_hist_total <- function(hc,
                                 meta,
                                 responses = sum(data$Responses),
                                 ...) {
+
+  x_max <- max(data$x)
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -972,13 +977,13 @@ proxy_to_hist_total <- function(hc,
       ),
       xAxis = list(
         categories = data$category,
+        max = x_max,
+        min = 0,
         title = list(
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 20,
-          max = 75,
-          min = 0,
+          step = (x_max/20),
           format = "{value:,.0f}",
           style = list(
             fontSize = "2.3vmin",
@@ -1114,34 +1119,40 @@ proxy_hist_to_single <- function(hc,
                                  data,
                                  meta,
                                  rotate = 0,
-                                 size = "17px",
+                                 size = "2.7vmin",
                                  overflow = "none",
                                  responses = sum(data$Responses),
+                                 theme = naccho.viz::minimal,
                                  ...) {
 
+  x_max <- max(data$x)
+
   hc %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Urban", "Rural")
+    # Attempt to remove all possible series by specifying their IDs
+    highcharter::hcpxy_remove_series(id = c("Urban", "Rural", "Small (<50,000)",
+                                            "Medium (50,000-499,999)", "Large (500,000+)",
+                                            "State", "Local", "Shared",
+                                            "Midwest", "South", "West", "Northeast",
+                                            "All LHDs", "HistogramSeries", "CategoricalSeries")) %>%
+
+    highcharter::hcpxy_update(
+      chart = list(
+        events = list()  # Clear all events
+      )
     ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("State", "Local", "Shared")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Midwest", "South", "West", "Northeast")
-    ) %>%
+
+    # Set new data directly as a replacement, not as an additional series
     highcharter::hcpxy_set_data(
       "column",
-      data = data,
-      highcharter::hcaes(x, y)
+      data = data %>% dplyr::mutate(x = as.character(x)),  # Ensure x is categorical
+      highcharter::hcaes(x = x, y = y)
     ) %>%
+
     highcharter::hcpxy_update(
       series = list(
         visible = TRUE,
         groupPadding = .2,
-        type = "column",
+        type = "column",  # Enforce column type
         dataLabels = list(
           enabled = TRUE,
           format = meta$data_label,
@@ -1165,8 +1176,15 @@ proxy_hist_to_single <- function(hc,
       caption = list(
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
+
+      # xAxis settings for categorical interpretation
       xAxis = list(
-        categories = as.list(unique(data$category)),
+        type = "category",  # Set x-axis type to categorical
+        categories = as.list(data$category), # Provide categories explicitly
+        # label =
+        tickInterval = 1,  # Ensure labels are spaced as intended
+        min = 0,
+        max = x_max,
         title = list(
           text = unique(data$x_label)
         ),
@@ -1179,15 +1197,21 @@ proxy_hist_to_single <- function(hc,
           )
         )
       ),
+
       tooltip = list(
         pointFormat = meta$tooltip
       ),
       legend = list(
         enabled = FALSE
-      )
+      ),
+      theme = theme
     )
 
+    View(data)
+    # Force a redraw to apply all changes
+    # highcharter::hcpxy_redraw()
 }
+
 
 
 
@@ -1210,7 +1234,7 @@ proxy_hist_to_group <- function(hc,
                                 id,
                                 colors,
                                 rotate = 0,
-                                size = "17px",
+                                size = "2.5vmin",
                                 overflow = "none",
                                 responses = sum(data$Responses),
                                 theme = naccho.viz::histogram, ...) {
@@ -1638,7 +1662,7 @@ scatter_plot <- function(data, colors) {
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
-            fontSize = "11px",
+            fontSize = "1.8vmin",
             fontWeight = "bold"
           )
         ),

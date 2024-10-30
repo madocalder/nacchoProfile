@@ -97,8 +97,8 @@ mod_workforce_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line")),
-                style = "height: 80vh; width: 50vw;"
+                highcharter::highchartOutput(ns("line"), height = "65vh"),
+                style = "height: 65vh; width: 50vw;"
               )
             )
           )
@@ -315,6 +315,7 @@ mod_workforce_server <- function(id){
       data <- create_hist(input = "c5q37",
                           x_label = "Total FTEs")
 
+
       set_hist(data) %>%
         viz_options(
           legend_enable = FALSE,
@@ -412,7 +413,7 @@ mod_workforce_server <- function(id){
           dplyr::mutate(x_label = NA)
 
         proxy %>%
-          proxy_hist_to_single(data,
+          proxy_hist_to_single(data = data,
                                meta = filter_meta(),
                                theme = naccho.viz::basic)
 
@@ -425,6 +426,8 @@ mod_workforce_server <- function(id){
           dplyr::mutate(x_label = NA)
 
         series_id <- unique(data$group) # provide ID for proxy
+
+        print(series_id)
 
         proxy %>%
           proxy_hist_to_group(data = data,
