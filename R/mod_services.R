@@ -100,7 +100,7 @@ mod_services_ui <- function(id){
                 uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-              HTML('<div style="font-size: 2vmin;">', source_line,'
+              HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
             style = "height: 65vh; width: 50vw;")
@@ -454,10 +454,10 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "2.2vmin"
+          size = "2vmin"
           overflow = "ellipsis"
         } else {
-          size = "2.7vmin"
+          size = "2vmin"
           overflow = "none"
         }
 
@@ -498,10 +498,10 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "2.2vmin"
+          size = "2vmin"
           overflow = "ellipsis"
         } else {
-          size = "2.7vmin"
+          size = "2vmin"
           overflow = "none"
         }
 

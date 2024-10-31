@@ -1180,9 +1180,9 @@ b, strong {
 /* -------------------------------------------------------  Highcharter Things */
 .highcharts-tooltip span {
     height: auto;
-    min-width: 200px;
+    min-width: 4vmin;
     max-width: 50vmin;
-    line-height: 1.4em;
+    line-height: 1.8vmin;
     overflow: hidden;
     white-space: normal !important;
     z-index: 29999;

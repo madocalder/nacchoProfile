@@ -77,7 +77,7 @@ mod_workforce_ui <- function(id){
               condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               div(
                 highcharter::highchartOutput(ns("figure_jobs"), height = "100%"),
-                style = "height: 67vh; width: 50vw;")
+                style = "height: 68vh; width: 50vw;")
             ),
 
             # Adding the new table view
@@ -87,7 +87,7 @@ mod_workforce_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
+                HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
@@ -332,7 +332,6 @@ mod_workforce_server <- function(id){
     output$figure_jobs <- highcharter::renderHighchart({
 
       data <- filtered_butterfly()
-
       set_bar(data) %>%
         viz_options(
           colors = c(naccho.viz::terracotta, naccho.viz::green),
@@ -340,28 +339,38 @@ mod_workforce_server <- function(id){
           viz_title = "Jobs Lost and Added - Estimated Total",
           viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
-          tooltip = "<b> {series.name}: </b>
-              {point.y:.0f} <br>",
+          tooltip = "<b> {series.name}: </b>{point.y:.0f} <br>",
           theme = naccho.viz::butterfly
         ) %>%
-        viz_export() %>%
-        highcharter::hc_tooltip(
-          backgroundColor = "transparent",
-          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-          style = list(
-            textAlign = "left"
-          ),
-          hideDelay = 2000,
-          shadow = FALSE,
-          positioner = highcharter::JS("
-          function (labelWidth, labelHeight, point) {
-            return {
-              x: 0,
-              y: 10
-            };
-          }
-        ")
-        )
+        viz_export()
+  #     %>%
+  #       highcharter::hc_tooltip(
+  #         backgroundColor = "white",
+  #         headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
+  #         style = list(
+  #           textAlign = "left",
+  #           fontSize = "1.5vmin",
+  #           lineHeight = "1.6vmin",# Responsive font size for readability
+  #           # color = "#333333"  ,
+  #           width = "auto",                               # Auto width to adapt to content
+  #           maxWidth = "15vw",                           # Set maximum width for tooltip box
+  #           whiteSpace = "normal" # Darker text color for contrast
+  #         ),
+  #         hideDelay = 2000,
+  #         shadow = FALSE,
+  #         outside = FALSE,                    # Keep tooltip within chart area
+  #         positioner = highcharter::JS("
+  #   function (labelWidth, labelHeight) {
+  #     const chart = this.chart;
+  #     // Position tooltip at the bottom-right corner of the chart
+  #     const x = chart.plotRight + chart.plotWidth - labelWidth - 20;
+  #     const y = chart.plotTop + chart.plotHeight - labelHeight - 20;
+  #     return { x: x, y: y };
+  #   }
+  # ")
+  #       )
+
+
     })
 
 
@@ -583,11 +592,11 @@ mod_workforce_server <- function(id){
         # nested
         if (length(data$x) >= 6) {
           rotate = -45
-          size = "2.2vmin"
+          size = "2vmin"
           overflow = "ellipsis"
         } else {
           rotate = 0
-          size = "2.7vmin"
+          size = "2vmin"
           overflow = "none"
         }
 

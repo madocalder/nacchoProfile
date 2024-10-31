@@ -283,7 +283,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             ),
             list(
@@ -303,7 +303,7 @@ mod_key_findings_server <- function(id){
                 color = "#000",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             ),
             list(
@@ -324,7 +324,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             ),
             list(
@@ -345,7 +345,7 @@ mod_key_findings_server <- function(id){
                 color = "#9A639F",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             )
           )
@@ -402,7 +402,7 @@ mod_key_findings_server <- function(id){
                 color = naccho.viz::terracotta,
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             )
           )
@@ -461,7 +461,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2.3vmin"
+                fontSize = "2vmin"
               )
             )
           )
@@ -721,7 +721,7 @@ mod_key_findings_server <- function(id){
             format = '{point.name}',
             align = 'center',
             verticalAlign = 'bottom',
-            style = list(fontSize = "2.3vmin")
+            style = list(fontSize = "2vmin")
           ),
           enableMouseTracking = FALSE,
           showInLegend = FALSE

@@ -1290,14 +1290,14 @@
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "2feb44f4c85af4205005d0beb276621347d49d4d",
+      "RemoteSha": "a5f005df53ddc55dd84371b8dac7cad0753647a7",
       "Requirements": [
         "R",
         "highcharter",
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "adaab847df39fcc9702ffb32cf4ba2aa"
+      "Hash": "32e850e5d397184ce67fbce8e998ed83"
     },
     "nacchoProfile": {
       "Package": "nacchoProfile",

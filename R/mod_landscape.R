@@ -88,7 +88,7 @@ mod_landscape_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
+                HTML('<div style="font-size: 1.8vmin;">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
@@ -307,7 +307,7 @@ mod_landscape_server <- function(id){
           dplyr::mutate(category = "Average Tenure")
 
         proxy %>%
-          proxy_hist_to_single(data = data,
+          proxy_to_single(data = data,
                           meta = filter_meta())
 
         # Topic: Tenure
@@ -322,7 +322,7 @@ mod_landscape_server <- function(id){
           series_id <- unique(data$group)
 
           proxy %>%
-            proxy_hist_to_group(
+            proxy_to_group(
               data = data,
               meta = filter_meta(),
               id = series_id,
@@ -339,7 +339,7 @@ mod_landscape_server <- function(id){
         data <- spec_data_all
 
           proxy %>%
-            proxy_hist_to_single(data = data,
+            proxy_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -351,7 +351,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_hist_to_group(
+          proxy_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,
@@ -370,7 +370,7 @@ mod_landscape_server <- function(id){
         }
 
           proxy %>%
-            proxy_hist_to_single(data = data,
+            proxy_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -389,7 +389,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_hist_to_group(
+          proxy_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,

@@ -515,7 +515,7 @@ mod_finance_server <- function(id){
                   align = 'left',
                   verticalAlign = 'top',
                   style = list(
-                    fontSize = '2.5vmin',
+                    fontSize = '2vmin',
                     fontWeight = 'bold'
                   )
                 )
@@ -536,7 +536,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "2.2vmin",
+                  fontSize = "2vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"

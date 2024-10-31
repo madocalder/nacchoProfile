@@ -93,7 +93,7 @@ viz_options <- function(hc,
     highcharter::hc_caption(
       text = viz_caption, # source and data notes
       useHTML = TRUE,
-      margin = 60,
+      # margin = 60,
       align = caption_align
     ) %>%
     highcharter::hc_tooltip(
@@ -104,7 +104,7 @@ viz_options <- function(hc,
       style = list(
         fontWeight = 400,
         textAlign = tooltip_align,
-        fontSize = "2.2vmin",
+        fontSize = "2vmin",
         color = "black"
       ),
       backgroundColor = "#EEEAE5",
@@ -378,7 +378,7 @@ set_column <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2.3vmin"
+        fontSize = "2vmin"
       )
     )
   ) %>%
@@ -433,13 +433,16 @@ set_simple_bar <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2.3vmin"
+        fontSize = "2vmin"
       )
     )
   ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
-      categories = unique(data$category)
+      categories = unique(data$category),
+      labels = list(
+        fontSize = "2vmin"
+      )
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -473,235 +476,102 @@ set_bar <- function(data,
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
-      type = "bar"
-      # margin = list(90, 0, 180, 0)
+      type = "bar",
+      spacingLeft = 10,
+      spacingRight = 10
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
       layout = "horizontal",
       align = "center",
-      verticalAlign = "bottom"
+      verticalAlign = "bottom",
+      itemStyle = list(fontSize = "2vmin"),
+      y = -20
     ) %>%
     highcharter::hc_tooltip(
       shared = TRUE,
       crosshairs = TRUE
     ) %>%
-    highcharter::hc_xAxis(
-      categories = unique(data$group),
-      labels = list(
-        enabled = FALSE
-      ),
-      plotBands = list(
-        list(
-          from = -0.5,
-          to = 0.5,
-          color = "transparent",
-          label = list(
-            text = "Rural",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 0.5,
-          to = 1.5,
-          color = "transparent",
-          label = list(
-            text = "Urban",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 1.5,
-          to = 2.5,
-          color = "transparent",
-          label = list(
-            text = "Local",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 2.5,
-          to = 3.5,
-          color = "transparent",
-          label = list(
-            text = "Shared",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 3.5,
-          to = 4.5,
-          color = "transparent",
-          label = list(
-            text = "State",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 4.5,
-          to = 5.5,
-          color = "transparent",
-          label = list(
-            text = "Small",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 5.5,
-          to = 6.5,
-          color = "transparent",
-          label = list(
-            text = "Medium",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 6.5,
-          to = 7.5,
-          color = "transparent",
-          label = list(
-            text = "Large",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 7.5,
-          to = 8.5,
-          color = "transparent",
-          label = list(
-            text = "Midwest",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 8.5,
-          to = 9.5,
-          color = "transparent",
-          label = list(
-            text = "Northeast",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 9.5,
-          to = 10.5,
-          color = "transparent",
-          label = list(
-            text = "South",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 10.5,
-          to = 11.5,
-          color = "transparent",
-          label = list(
-            text = "West",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 11.5,
-          to = 12.5,
-          color = "#EEEAE4",
-          label = list(
-            text = "All LHDs",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo",
-              fontWeight = 700
-            )
-          )
-        )
-      )
-    ) %>%
+highcharter::hc_xAxis(
+  categories = unique(data$group),
+  labels = list(
+    enabled = TRUE,
+    style = list(fontSize = "2vmin"),
+    y = 5,
+    # align = "center",
+    verticalAlign = "middle",
+    step = 1,                # Ensures all labels are displayed
+    rotation = 0,            # Adjust rotation as needed (e.g., 45 for diagonal)
+    autoRotation = c(0, -45) # Allow rotation if space is limited
+  ),
+  tickInterval = 1            # Makes sure all labels are rendered
+)%>%
+      # ,
+      # plotBands = lapply(0:12, function(i) {
+      #   list(
+      #     from = i - 0.5,
+      #     to = i + 0.5,
+      #     color = ifelse(i == 12, "#EEEAE4", "transparent"),
+      #     label = list(
+      #       text = c("Rural", "Urban", "Local", "Shared", "State",
+      #                "Small", "Medium", "Large", "Midwest",
+      #                "Northeast", "South", "West", "All LHDs")[i + 1],
+      #       align = "center",
+      #       x = -1,
+      #       style = list(fontFamily = "Heebo", fontSize = "12px", fontWeight = ifelse(i == 12, "bold", "normal"))
+      #     )
+      #   )
+      # })
+    # ) %>%
     highcharter::hc_yAxis_multiples(
       list(
         max = set_max,
-        title = list(text = NULL),
-        width = "45%",
+        title = list(text = "",
+                     y = 10),
+        labels = list(format = set_format),
+        width = "50%",
         reversed = TRUE,
-        offset = 0,
-        alignTicks = FALSE,
-        labels = list(
-          format = set_format
-        )
+        offset = 10,
+        alignTicks = FALSE
       ),
       list(
         max = set_max,
-        title = list(text = NULL),
-        offset = 0,
-        left = "55%",
-        width = "45%",
-        offset = 0,
-        alignTicks = FALSE ,
-        labels = list(
-          format = set_format
-        )
+        title = list(text = y_label,
+                     y = 35),
+        labels = list(format = set_format),
+        left = "50%",
+        width = "50%",
+        offset = 10,
+        alignTicks = FALSE
       )
     ) %>%
     highcharter::hc_add_series(
       id = "Left",
       name = name_one,
       data = data$left,
-      yAxis = 0
+      yAxis = 0,
+      dataLabels = list(
+        enabled = TRUE,
+        formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
+        style = list(fontSize = "1.5vmin")
+      )
     ) %>%
     highcharter::hc_add_series(
       id = "Right",
       name = name_two,
       data = data$right,
-      yAxis = 1
+      yAxis = 1,
+      dataLabels = list(
+        enabled = TRUE,
+        formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
+        style = list(fontSize = "1.5vmin")
+      )
+    ) %>%
+    highcharter::hc_caption(
+      margin = -10
     )
 }
+
 
 
 
@@ -986,7 +856,7 @@ proxy_to_hist_total <- function(hc,
           step = (x_max/20),
           format = "{value:,.0f}",
           style = list(
-            fontSize = "2.3vmin",
+            fontSize = "2vmin",
             textOverflow = "none"
           )
         )
@@ -1089,7 +959,7 @@ proxy_to_hist_pc <- function(hc,
           step = 20,
           format = "{value:,.0f}",
           style = list(
-            fontSize = "2.3vmin",
+            fontSize = "2vmin",
             textOverflow = "none"
           )
         )
@@ -1119,7 +989,7 @@ proxy_hist_to_single <- function(hc,
                                  data,
                                  meta,
                                  rotate = 0,
-                                 size = "2.7vmin",
+                                 size = "2vmin",
                                  overflow = "none",
                                  responses = sum(data$Responses),
                                  theme = naccho.viz::minimal,
@@ -1163,7 +1033,7 @@ proxy_hist_to_single <- function(hc,
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "2.3vmin"
+            fontSize = "2vmin"
           )
         )
       ),
@@ -1278,7 +1148,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2.3vmin"
+              fontSize = "2vmin"
             )
           )
         ),
@@ -1357,7 +1227,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2.3vmin"
+              fontSize = "2vmin"
             )
           )
         ),
