@@ -1550,7 +1550,8 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
         fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
-        pointFormat = "<b>Mean:</b> ${point.y:.0f}"
+        pointFormat = "<b>Mean:</b> ${point.y:.0f}",
+        fontSize = "1.5vmin"
       ),
       redraw = TRUE
     ) %>%
@@ -1619,6 +1620,9 @@ scatter_plot <- function(data, colors) {
       highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
     ) %>%
     highcharter::hc_chart(
+      panType = "xy",
+      panning = TRUE,
+      panKey = "shift",
       zoomType = "xy",
       resetZoomButton = list(
         theme = list(
@@ -1644,6 +1648,18 @@ scatter_plot <- function(data, colors) {
         )
       )
     ) %>%
+    highcharter::hc_tooltip(
+      useHTML = TRUE,
+      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      style = list(
+        fontFamily = "Heebo",
+        fontSize = "1.7vmin",
+        # lineHeight = "1.5vmin",
+        padding = 5,
+        textOutline = "none"
+      )
+    )%>%
     highcharter::hc_plotOptions(
       scatter = list(
         events = list(
@@ -1653,16 +1669,17 @@ scatter_plot <- function(data, colors) {
         ),
         dataLabels = list(
           enabled = TRUE,
-          allowOverlap = TRUE,
-          formatter = highcharter::JS("
-          function() {
-            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
-          }
-        "),
+          allowOverlap = FALSE,
+          format = "{point.name}",
+        #   formatter = highcharter::JS("
+        #   function() {
+        #     return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
+        #   }
+        # "),
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
-            fontSize = "1.8vmin",
+            fontSize = "1.4vmin",
             fontWeight = "bold"
           )
         ),
@@ -1672,6 +1689,32 @@ scatter_plot <- function(data, colors) {
         )
       )
     ) %>%
+    # # Add interactive horizontal line
+    # highcharter::hc_add_series(
+    #   name = "Average percent reduced (20%)",
+    #   type = "line",
+    #   data = list(list(x = 0, y = 20), list(x = 35, y = 20)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent reduced: 20%</span>"
+    #   )
+    # ) %>%
+    # # Add interactive vertical line
+    # highcharter::hc_add_series(
+    #   name = "Average percent expanded (27%)",
+    #   type = "line",
+    #   data = list(list(x = 27, y = 0), list(x = 27, y = 100)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent expanded: 27%</span>"
+    #   )
+    # ) %>%
     highcharter::hc_xAxis(
       min = 0,
       max = 35,
@@ -1688,7 +1731,8 @@ scatter_plot <- function(data, colors) {
           label = list(
             text = "Average percent reduced (20%)",
             style = list(
-              fontFamily = "Heebo"
+              fontFamily = "Heebo",
+              fontSize = "1.5vmin"
             )
           )
         )
@@ -1707,6 +1751,7 @@ scatter_plot <- function(data, colors) {
     ) %>%
     highcharter::hc_yAxis(
       min = 0,
+      max = 100,
       title = list(
         text = "Percent of LHDs expanding service"
       ),
@@ -1719,7 +1764,8 @@ scatter_plot <- function(data, colors) {
           label = list(
             text = "Average percent expanded (27%)",
             style = list(
-              fontFamily = "Heebo"
+              fontFamily = "Heebo",
+              fontSize = "1.5vmin"
             )
           )
         )
@@ -1832,24 +1878,34 @@ scatter_plot <- function(data, colors) {
       widthAdjust = -60
     ) %>%
     highcharter::hc_subtitle(
-      text = "Click and span a range on the figure to zoom."
+      text = "Click and span to zoom into a specific area of the chart.
+    Hold the Shift key and drag to pan horizontally when zoomed in."
     ) %>%
     highcharter::hc_caption(
-      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 2.3vmin; color: black;\'>
-                  In the top left quadrant, services are <span style=\'color: #008A96; font-weight: bold;\'>growing</span>.
-                  In the top right quadrant, services show a <span style=\'color: #666; font-weight: bold;\'>mixed trend</span>.
-                  In the bottom left quadrant, services are <span style=\'color: #B8B3AE; font-weight: bold;\'>stable</span>.
-                  In the bottom right quadrant, services are <span style=\'color: #AB6143; font-weight: bold;\'>shrinking</span>.
-                  </span> <br>
-                  <b> N: </b>", min(n), " to ", max(n), "<br>",
-                  source_line),
+      fontSize = "1.6vmin",
+      text = HTML("<b style='font-size: 1.6vmin; line-height: 1vmin;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1.6vmin; line-height: 1.4vmin; color: black;'>",
+                    "In the top left quadrant, services are <span style='color: #008A96; font-weight: bold;'>growing</span>. ",
+                    "In the top right quadrant, services show a <span style='color: #666; font-weight: bold;'>mixed trend</span>. ",
+                    "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
+                    "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
+                    "</span> <br> <b style='font-size: 1.6vmin; line-height: 1vmin;'> N: </b>",
+                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", min(n), " to ", max(n), "</span><br>",
+                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", source_line, "</span>"),
+
       useHTML = TRUE,
-      margin = 30,
+      margin = 20,
       align = "center"
     ) %>%
     highcharter::hc_chart(spacingBottom = 0) %>%
     highcharter::hc_legend(enabled = TRUE,
-                           padding = 0,
+                           align = "right",  # Align legend to the right of the chart
+                           verticalAlign = "middle",
+                           layout = "vertical",
+                           padding = 2,
+                           itemStyle = list(
+                             fontSize = "2vmin"        # Adjust font size for responsiveness            # Set font weight
+                           ),
+                           symbolRadius = 6,
                            itemMarginTop = 0,
                            itemMarginBottom = 0)
 }

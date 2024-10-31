@@ -81,8 +81,8 @@ mod_services_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
               div(
-              highcharter::highchartOutput(ns("figure_scatter"), height = "90%"), #775
-              style = "height: 70vh; width: 50vw;")
+              highcharter::highchartOutput(ns("figure_scatter"), height = "100%"), #775
+              style = "height: 70vh; width: auto;")
             ),
 
             # display when Service Changes and Butterfly Graph are selected
