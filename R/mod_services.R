@@ -380,7 +380,8 @@ mod_services_server <- function(id){
         dplyr::filter(group == "All LHDs")
 
       set_bar(data,
-              set_max = 100,
+              max_one = 100,
+              max_two = 100,
               name_one = "Service Shrunk",
               name_two = "Service Grew",
               set_format = "{value}%") %>%

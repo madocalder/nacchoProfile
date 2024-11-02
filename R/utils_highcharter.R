@@ -246,7 +246,10 @@ proxy_to_group <- function(
       ),
       yAxis = list(
         title = list(
-          text = meta$y_label
+          text = meta$y_label,
+          style = list(
+            fontSize = "2vmin"
+          )
         ),
         max = meta$y_max,
         labels = list(
@@ -471,7 +474,8 @@ set_bar <- function(data,
                     y_label = "% of Population",
                     name_one = "Jobs Lost",
                     name_two = "Jobs Added",
-                    set_max = 15000,
+                    max_one = 5000,
+                    max_two = 15000,
                     set_format = NA) {
 
   highcharter::highchart() %>%
@@ -496,12 +500,14 @@ highcharter::hc_xAxis(
   categories = unique(data$group),
   labels = list(
     enabled = TRUE,
+    allowOverlap = FALSE,
     style = list(fontSize = "2vmin"),
+    minPadding = 2,
     y = 5,
     # align = "center",
     verticalAlign = "middle",
     step = 1,                # Ensures all labels are displayed
-    rotation = 0,            # Adjust rotation as needed (e.g., 45 for diagonal)
+    # rotation = 0,            # Adjust rotation as needed (e.g., 45 for diagonal)
     autoRotation = c(0, -45) # Allow rotation if space is limited
   ),
   tickInterval = 1            # Makes sure all labels are rendered
@@ -525,24 +531,32 @@ highcharter::hc_xAxis(
     # ) %>%
     highcharter::hc_yAxis_multiples(
       list(
-        max = set_max,
+        max = max_one,
         title = list(text = "",
-                     y = 10),
-        labels = list(format = set_format),
-        width = "50%",
+                     y = "1em"),
+        labels = list(format = set_format,
+                      allowOverlap = FALSE,
+                      rotation = 0),
+        width = "30%",
         reversed = TRUE,
         offset = 10,
-        alignTicks = FALSE
+        alignTicks = TRUE
+        # ,
+        # tickAmount = 3
+        # ,
+        # opposite = TRUE
       ),
       list(
-        max = set_max,
+        max = max_two,
         title = list(text = y_label,
-                     y = 35),
-        labels = list(format = set_format),
-        left = "50%",
-        width = "50%",
+                     y = "2vmin"),
+        labels = list(format = set_format, rotation = 0),
+        left = "30%",
+        width = "70%",
         offset = 10,
-        alignTicks = FALSE
+        alignTicks = TRUE
+        # ,
+        # tickAmount = 5
       )
     ) %>%
     highcharter::hc_add_series(
@@ -566,10 +580,11 @@ highcharter::hc_xAxis(
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
         style = list(fontSize = "1.5vmin")
       )
-    ) %>%
-    highcharter::hc_caption(
-      margin = -10
     )
+  # %>%
+  #   highcharter::hc_caption(
+  #     margin = -10
+  #   )
 }
 
 
@@ -1282,7 +1297,8 @@ proxy_hist_to_group <- function(hc,
 #'
 proxy_to_bar <- function(hc,
                          data,
-                         max,
+                         max_one,
+                         max_two,
                          meta,
                          name_one = "Jobs Lost",
                          name_two = "Jobs Added",
@@ -1304,12 +1320,12 @@ proxy_to_bar <- function(hc,
     highcharter::hcpxy_update(
       yAxis = list(
         list(
-          max = max,
+          max = max_one,
           tickWidth = 0,
           lineWidth = .5
         ),
         list(
-          max = max,
+          max = max_two,
           tickWidth = 0,
           lineWidth = .5
         )
@@ -1602,7 +1618,7 @@ scatter_plot <- function(data, colors) {
             text = "Average percent reduced (20%)",
             style = list(
               fontFamily = "Heebo",
-              fontSize = "1.5vmin"
+              fontSize = "1em"
             )
           )
         )
@@ -1635,7 +1651,7 @@ scatter_plot <- function(data, colors) {
             text = "Average percent expanded (27%)",
             style = list(
               fontFamily = "Heebo",
-              fontSize = "1.5vmin"
+              fontSize = "1em"
             )
           )
         )

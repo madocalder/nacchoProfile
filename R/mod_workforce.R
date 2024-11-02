@@ -545,7 +545,8 @@ mod_workforce_server <- function(id){
         proxy_jobs %>%
           proxy_to_bar(data,
                        meta = filter_meta(),
-                       max = 10)
+                       max_one = 5,
+                       max_two = 10)
 
 
 
@@ -559,7 +560,8 @@ mod_workforce_server <- function(id){
         proxy_jobs %>%
           proxy_to_bar(data,
                        meta = filter_meta(),
-                       max = 15000)
+                       max_one = 5000,
+                       max_two = 15000)
       }
     })
 

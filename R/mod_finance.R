@@ -366,7 +366,8 @@ mod_finance_server <- function(id){
         dplyr::summarise(n = left_n + right_n)
 
       set_bar(data,
-              set_max = 100,
+              max_one = 25,
+              max_two = 105,
               name_one = "Cut",
               name_two = "Same or Higher",
               set_format = "{value}%") %>%
@@ -381,24 +382,25 @@ mod_finance_server <- function(id){
               {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
-        viz_export() %>%
-        highcharter::hc_tooltip(
-          backgroundColor = "transparent",
-          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-          style = list(
-            textAlign = "left"
-          ),
-          hideDelay = 2000,
-          shadow = FALSE,
-          positioner = highcharter::JS("
-          function (labelWidth, labelHeight, point) {
-            return {
-              x: 10,
-              y: 10
-            };
-          }
-        ")
-        )
+        viz_export()
+      # %>%
+      #   highcharter::hc_tooltip(
+      #     backgroundColor = "transparent",
+      #     headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
+      #     style = list(
+      #       textAlign = "left"
+      #     ),
+      #     hideDelay = 2000,
+      #     shadow = FALSE,
+      #     positioner = highcharter::JS("
+      #     function (labelWidth, labelHeight, point) {
+      #       return {
+      #         x: 10,
+      #         y: 10
+      #       };
+      #     }
+      #   ")
+      #   )
     })
 
 

@@ -475,7 +475,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                               "category" = "category"
                                        )) %>%
             dplyr::mutate(y = as.numeric(y),
-                          legend_label = paste(group),
+                          legend_label = paste(category),
                           one = paste("the", tolower(category), "number of total employees across LHDs was"),
                           two = paste(" ", y)) %>%
             dplyr::arrange(year)
