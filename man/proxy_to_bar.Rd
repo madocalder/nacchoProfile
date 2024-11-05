@@ -12,6 +12,7 @@ proxy_to_bar(
   meta,
   name_one = "Jobs Lost",
   name_two = "Jobs Added",
+  y_label = NULL,
   ...
 )
 }

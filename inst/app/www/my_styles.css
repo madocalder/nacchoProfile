@@ -1078,6 +1078,8 @@ hr .tt {
   border-top: 1px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .right-hr {
@@ -1182,7 +1184,7 @@ b, strong {
     height: auto;
     min-width: 20vmin !important;
     max-width: 50vmin !important;
-    line-height: 2vmin !important;
+    line-height: 1.8vmin !important;
     overflow: hidden;
     white-space: normal !important;
     z-index: 29999;

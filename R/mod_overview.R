@@ -306,7 +306,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y:.0f}% of {point.category} serve {point.group} areas",
+          tooltip = "{point.y:.0f}% of {this.x} serve {this.group} areas",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

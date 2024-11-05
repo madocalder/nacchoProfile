@@ -332,7 +332,14 @@ mod_workforce_server <- function(id){
     output$figure_jobs <- highcharter::renderHighchart({
 
       data <- filtered_butterfly()
-      set_bar(data) %>%
+
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
+      set_bar(data,
+              max_one = max_one,
+              max_two = max_two,
+              y_label = "# of Jobs") %>%
         viz_options(
           colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
@@ -542,11 +549,15 @@ mod_workforce_server <- function(id){
           dplyr::mutate(left = left_standard,
                         right = right_standard)
 
+        max_one <- max(data$left)
+        max_two <- max(data$right)
+
         proxy_jobs %>%
           proxy_to_bar(data,
+                       y_label = "# of Jobs",
                        meta = filter_meta(),
-                       max_one = 5,
-                       max_two = 10)
+                       max_one = max_one,
+                       max_two = max_two)
 
 
 
@@ -557,11 +568,15 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "jobs_total") {
         data <- filtered_butterfly()
 
+        max_one <- max(data$left)
+        max_two <- max(data$right)
+
         proxy_jobs %>%
           proxy_to_bar(data,
                        meta = filter_meta(),
-                       max_one = 5000,
-                       max_two = 15000)
+                       max_one = max_one,
+                       max_two = max_two,
+                       y_label = "# of Jobs")
       }
     })
 

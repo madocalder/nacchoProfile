@@ -51,8 +51,11 @@ budget_list <- list() # create an empty list
 for (i in 1:length(filters)) {
   args <- list(vars, filters[[i]], wtype = "weights_static")
 
+
+
   data <- pmap_dfr(args, return_survey_weighted_counts) %>%
     rename(filter = all_of(filters[i])) %>%  # Rename the filter column to a common name
+    mutate(filter = filters[i]) %>%  # Set the value of 'filter' column to the old column name
     select(-14)  # Adjust to exclude column 14 if needed
 
   budget_list[[i]] <- data

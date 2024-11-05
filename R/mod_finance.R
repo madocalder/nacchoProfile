@@ -83,7 +83,7 @@ mod_finance_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
               div(
                 highcharter::highchartOutput(ns("figure_budget"), height = "100%"),
-                  style = "height: 65vh; width: 50vw;")
+                  style = "height: 68vh; width: 50vw;")
             ),
 
             # display when Tree Map is selected, non-weighted revenue total is selected, and Table is not selected
@@ -365,9 +365,13 @@ mod_finance_server <- function(id){
         dplyr::filter(group == "All") %>%
         dplyr::summarise(n = left_n + right_n)
 
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
       set_bar(data,
-              max_one = 25,
-              max_two = 105,
+              y_label = NA,
+              max_one = max_one,
+              max_two = max_two,
               name_one = "Cut",
               name_two = "Same or Higher",
               set_format = "{value}%") %>%
@@ -379,28 +383,19 @@ mod_finance_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(responses$n), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y:.0f}% <br>",
-          theme = naccho.viz::butterfly
+              {point.y:.0f}% <br>"
+          # ,
+          # theme = naccho.viz::butterfly
         ) %>%
-        viz_export()
-      # %>%
-      #   highcharter::hc_tooltip(
-      #     backgroundColor = "transparent",
-      #     headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-      #     style = list(
-      #       textAlign = "left"
-      #     ),
-      #     hideDelay = 2000,
-      #     shadow = FALSE,
-      #     positioner = highcharter::JS("
-      #     function (labelWidth, labelHeight, point) {
-      #       return {
-      #         x: 10,
-      #         y: 10
-      #       };
-      #     }
-      #   ")
-      #   )
+        viz_export()%>%
+        highcharter::hc_tooltip(
+          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
+          style = list(
+            textAlign = "left"
+          ),
+          hideDelay = 2000,
+          shadow = FALSE
+        )
     })
 
 

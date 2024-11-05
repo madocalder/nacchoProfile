@@ -431,7 +431,7 @@ set_simple_bar <- function(data,
       format = "{point.y:.0f}%",
       overflow = TRUE,
       distance = 5,
-      padding = 2,
+      padding = 5,
       style = list(
         color = naccho.viz::grey,
         fontFamily = "Heebo",
@@ -474,9 +474,56 @@ set_bar <- function(data,
                     y_label = "% of Population",
                     name_one = "Jobs Lost",
                     name_two = "Jobs Added",
-                    max_one = 5000,
-                    max_two = 15000,
+                    max_one = 1300,
+                    max_two = 5000,
                     set_format = NA) {
+
+
+  max_combined <- sum(max_one, max_two)
+
+  # Define the "pretty" intervals in a vector
+  pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
+
+  # Calculate one-tenth of max_combined
+  rough_interval <- round(max_combined / 10)
+
+  # Find the largest "pretty" interval that is less than or equal to rough_interval
+  interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
+
+  ticks_one <- ceiling(max_one/interval)
+  ticks_two <- ceiling(max_two/interval)
+
+  totalTicks <- sum(ticks_two, ticks_one)
+
+  axis_one <- round((ticks_one/totalTicks), digits = 2)
+
+  axis_two <- round((ticks_two/totalTicks), digits = 2)
+
+  message("TICK, AXIS, INTERVAL CHECKs-----")
+
+  print(paste("max_one =", max_one))
+  print(paste("max_two =", max_two))
+  print(paste("ticks_one =", ticks_one))
+  print(paste("ticks_two =", ticks_two))
+  print(paste("axis_one =", axis_one))
+  print(paste("axis_two =", axis_two))
+  print(paste("interval =", interval))
+
+
+  # Update max_one and max_two to be multiples of interval
+  max_one <- ticks_one * interval
+  max_two <- ticks_two * interval
+
+  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  #
+  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+
+  print(paste("max_one's updated value is:", max_one))
+  print(paste("max_two's updated value is:", max_two))
+
+  # print(paste("updated axis_one =", axis_one))
+  # print(paste("updated axis_two =", axis_two))
+  #
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
@@ -502,7 +549,7 @@ highcharter::hc_xAxis(
     enabled = TRUE,
     allowOverlap = FALSE,
     style = list(fontSize = "2vmin"),
-    minPadding = 2,
+    minPadding = "2em",
     y = 5,
     # align = "center",
     verticalAlign = "middle",
@@ -533,30 +580,33 @@ highcharter::hc_xAxis(
       list(
         max = max_one,
         title = list(text = "",
-                     y = "1em"),
+                     y = 10),
         labels = list(format = set_format,
                       allowOverlap = FALSE,
-                      rotation = 0),
-        width = "30%",
+                      autoRotation = TRUE),
+        width = paste((100*axis_one), "%"),
         reversed = TRUE,
         offset = 10,
-        alignTicks = TRUE
-        # ,
-        # tickAmount = 3
+        alignTicks = FALSE,
+        tickInterval = interval,
+        tickAmount = ticks_one + 1
         # ,
         # opposite = TRUE
       ),
       list(
         max = max_two,
         title = list(text = y_label,
-                     y = "2vmin"),
-        labels = list(format = set_format, rotation = 0),
-        left = "30%",
-        width = "70%",
+                     y = 20
+                     ),
+        labels = list(format = set_format,
+                      allowOverlap = FALSE,
+                      autoRotation = TRUE),
+        left = paste((100*axis_one), "%"),
+        width = paste((100*axis_two), "%"),
         offset = 10,
-        alignTicks = TRUE
-        # ,
-        # tickAmount = 5
+        alignTicks = FALSE,
+        tickInterval = interval,
+        tickAmount = ticks_two + 1
       )
     ) %>%
     highcharter::hc_add_series(
@@ -580,8 +630,8 @@ highcharter::hc_xAxis(
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
         style = list(fontSize = "1.5vmin")
       )
-    )
-  # %>%
+    ) %>%
+    highcharter::hc_add_theme(naccho.viz::butterfly)
   #   highcharter::hc_caption(
   #     margin = -10
   #   )
@@ -1036,7 +1086,7 @@ proxy_hist_to_single <- function(hc,
     highcharter::hcpxy_update(
       series = list(
         visible = TRUE,
-        groupPadding = .2,
+        groupPadding = 2,
         type = "column",  # Enforce column type
         dataLabels = list(
           enabled = TRUE,
@@ -1302,7 +1352,57 @@ proxy_to_bar <- function(hc,
                          meta,
                          name_one = "Jobs Lost",
                          name_two = "Jobs Added",
+                         y_label = NULL,
                          ...) {
+
+
+  max_combined <- sum(max_one, max_two)
+
+  # Define the "pretty" intervals in a vector
+  pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
+
+  # Calculate one-tenth of max_combined
+  rough_interval <- round(max_combined / 10)
+
+  # Find the largest "pretty" interval that is less than or equal to rough_interval
+  interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
+
+  ticks_one <- ceiling(max_one/interval)
+  ticks_two <- ceiling(max_two/interval)
+
+  totalTicks <- sum(ticks_two, ticks_one)
+
+  axis_one <- round((ticks_one/totalTicks), digits = 2)
+
+  axis_two <- round((ticks_two/totalTicks), digits = 2)
+
+  message("TICK, AXIS, INTERVAL CHECKs-----")
+
+  print(paste("max_one =", max_one))
+  print(paste("max_two =", max_two))
+  print(paste("ticks_one =", ticks_one))
+  print(paste("ticks_two =", ticks_two))
+  print(paste("axis_one =", axis_one))
+  print(paste("axis_two =", axis_two))
+  print(paste("interval =", interval))
+
+
+  # Update max_one and max_two to be multiples of interval
+  max_one <- ticks_one * interval
+  max_two <- ticks_two * interval
+
+  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  #
+  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+
+  print(paste("max_one's updated value is:", max_one))
+  print(paste("max_two's updated value is:", max_two))
+
+  # print(paste("updated axis_one =", axis_one))
+  # print(paste("updated axis_two =", axis_two))
+  #
+
+
 
   hc %>%
     highcharter::hcpxy_update_series(
@@ -1320,18 +1420,24 @@ proxy_to_bar <- function(hc,
     highcharter::hcpxy_update(
       yAxis = list(
         list(
+          width = paste((100*axis_one), "%"),
           max = max_one,
           tickWidth = 0,
-          lineWidth = .5
+          lineWidth = .5,
+          tickInterval = interval,
+          tickAmount = ticks_one + 1
         ),
         list(
+          width = paste((100*axis_two), "%"),
+          left = paste((100*axis_one), "%"),
+          title = list(text = y_label,
+                       y = 20),
           max = max_two,
           tickWidth = 0,
-          lineWidth = .5
+          lineWidth = .5,
+          tickInterval = interval,
+          tickAmount = ticks_two + 1
         )
-      ),
-      title = list(
-        text = meta$title
       )
     )
 }
@@ -1556,12 +1662,12 @@ scatter_plot <- function(data, colors) {
         dataLabels = list(
           enabled = TRUE,
           allowOverlap = FALSE,
-          format = "{point.name}",
-        #   formatter = highcharter::JS("
-        #   function() {
-        #     return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
-        #   }
-        # "),
+          # format = "{point.name}",
+          formatter = highcharter::JS("
+          function() {
+            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
+          }
+        "),
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
@@ -1886,12 +1992,25 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
       type = "scatter",
       mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
     ) %>%
+
     highcharter::hcpxy_update(
       chart = list(
         zoomType = "xy"
       ),
       series = list(
         visible = FALSE
+      ),
+      tooltip = list(
+        useHTML = TRUE,
+      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of {point.Group} LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      style = list(
+        fontFamily = "Heebo",
+        fontSize = "1.7vmin",
+        # lineHeight = "1.5vmin",
+        padding = 5,
+        textOutline = "none"
       )
     )
+  )
 }
