@@ -67,7 +67,7 @@ mod_topic_areas_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] != \'Table\'"),
               div(
               highcharter::highchartOutput(ns("figure_bar"), height = "100%"),
-              style = "height: 65vh; width: 50vw;")
+              style = "height: 65vh; width: 55vw;")
               ),
 
             # display when view Table is selected
@@ -220,20 +220,6 @@ mod_topic_areas_server <- function(id){
       }
     })
 
-    #table titles---------------------------------------------------------------
-    output$table_title <- renderUI({
-      # Ensure input$topic exists before using it
-      req(input$topic)
-
-      # Subset based on the reactive input$topic and convert to character
-      title_values <- as.character(subset(meta, field == input$topic)$title)
-
-      # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
-    })
-
-    # main content ============================================================
-
     # inputs for each topic ---------------------------------------------------
     updated_inputs <- reactive({
       input$topic
@@ -241,11 +227,26 @@ mod_topic_areas_server <- function(id){
     }) %>% debounce(100)
 
 
+    #table titles---------------------------------------------------------------
+    output$table_title <- renderUI({
+      # Ensure input$topic exists before using it
+      req(input$topic)
+
+      # Subset based on the reactive input$topic and convert to character
+      title_values <- as.character(filter_meta()$title)
+
+      # Render the HTML
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+    })
+
+    # main content ============================================================
+
+
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      req(!is.null(input$topic))
+      req(input$topic)
       meta %>% dplyr::filter(field == input$topic)
     })
 
@@ -253,26 +254,44 @@ mod_topic_areas_server <- function(id){
     # figure output -----------------------------------------------------------
     # used for bar graph
     output$figure_bar <- highcharter::renderHighchart({
-      data <- tech_use_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% c("Implemented")) %>%
-        dplyr::mutate(category = tech_type) %>%
-        dplyr::group_by(group) %>%
-        dplyr::mutate(x = 1:length(tech_type)-1)
+      req(input$view == "Bar Graph")
+      req(input$topic)
 
-      responses <- tech_use_data %>%
-        dplyr::filter(filter == "All LHDs") %>%
-        dplyr::mutate(category = tech_type) %>%
-        dplyr::group_by(category) %>%
-        dplyr::summarise(n = sum(Responses))
+      topic = input$topic
+      filtering = input$filter
 
+      if (input$filter == "All LHDS"){
+        data <- get_bar_data(topic = topic)
+      } else {
+        data <- get_bar_data(topic = topic, filter = filtering)
+      }
+
+      View(data)
+
+      # Adjust the bar chart settings for long names
       set_simple_bar(data) %>%
+        highcharter::hc_chart(type = "bar") %>%  # Specify bar type explicitly
+        highcharter::hc_xAxis(
+          categories = as.character(data$category),  # Use category column for x-axis labels
+          labels = list(
+            staggerLines = 2,                  # Stagger labels
+            # rotation = -45,
+            autoRotation = TRUE, # Rotate labels for better readability
+            style = list(
+                         textOverflow = "ellipsis",  # Add ellipsis for overflow
+                         width = "175vw"
+                         )      # Set width to manage label length
+          )
+        ) %>%
+        # highcharter::hc_plotOptions(bar = list(
+        #   pointPadding = 0.2,  # Space between bars within a category
+        #   groupPadding = 0.2   # Space between different categories
+        # )) %>%
         viz_options(
-          viz_title = "Percent of LHDs that Have Implemented the Following Informatics Systems",
+          viz_title = "Percent of LHDs that Have Implemented the Following Communication Channels",
           viz_subtitle = unique(data$subtitle),
-          viz_caption = paste0("<b> N: </b>",  min(responses$n), " to ", max(responses$n), "<br>", source_line),
-          tooltip = "",
-          theme = naccho.viz::butterfly,
+          viz_caption = paste0("<b> N: </b>", sum(data$Responses), "<br>", source_line),
+          tooltip = "{point.category}: <br> {point.y}%",
           legend_enable = FALSE,
           colors = colors()
         ) %>%
@@ -281,33 +300,85 @@ mod_topic_areas_server <- function(id){
 
 
 
+    # # update the yAxis title while maintaining the line animation
+    # use_js_proxy <- reactive({
+    #   shinyjs::runjs(paste0("
+    #     var chart = $('#landscape_1-figure').highcharts();
+    #     chart.yAxis[0].update({
+    #       title: {
+    #         text: '", filter_meta()$y_label, "',
+    #         style: { color: '#333333' }
+    #       }
+    #     }, true, { duration: 1000 });
+    # "))
+    # })
+
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
-    proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
+    # proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
 
 
 
-    # update proxy ------------------------------------------------------------
-    # observeEvent(updated_inputs(), {
-    #
-    #   if (input$topic == "tech_use") {
-    #     data <- tech_use_data %>%
-    #       dplyr::filter(filter == input$filter,
-    #                     category %in% c("Implemented")) %>%
-    #       dplyr::mutate(category = tech_type) %>%
-    #       dplyr::group_by(group) %>%
-    #       dplyr::mutate(x = 1:length(tech_type)-1)
-    #
-    #     responses <- tech_use_data %>%
-    #       dplyr::filter(filter == input&filter) %>%
-    #       dplyr::mutate(category = tech_type) %>%
-    #       dplyr::group_by(category) %>%
-    #       dplyr::summarise(n = sum(Responses))
-    #
-    #
-    #
-    #   }
-    # })
+    # this observe is needed to redraw the figure based on the input selected
+
+    # observe({
+    #   req(input$topic)
+    #   updated_inputs()
+
+    #   shinyjs::runjs(paste0("
+    #     var chart = $('#landscape_1-figure').highcharts();
+    #     chart.yAxis[0].update({
+    #       title: {
+    #         text: '", filter_meta()$y_label, "',
+    #         style: { color: '#333333' }
+    #       }
+    #     }, true, { duration: 1000 });
+    # "))
+
+      # Topic: Tenure
+      # View: Bar Graph
+      # Filters: Rurality, Governance, LHD Size, Region
+      # if (input$topic == "comm_channels" & input$filter == "All LHDs") {
+      #
+      #   data <- comms_use_data %>%
+      #     dplyr::filter(filter == "All LHDs",
+      #                   category %in% "Checked")%>%
+      #     dplyr::mutate(category = comms_type) %>%
+      #     dplyr::group_by(group) %>%
+      #     dplyr::mutate(x = 1:length(comms_type)-1)
+      #   responses <- tech_use_data %>%
+      #     dplyr::filter(filter == "All LHDs") %>%
+      #     dplyr::group_by(category) %>%
+      #     dplyr::summarise(n = sum(Responses))
+      #
+      #
+      #   set_simple_bar(data)
+
+        # proxy_bar %>%
+        #   highcharter::hcpxy_remove_series(
+        #     id = c("Urban", "Rural")
+        #   ) %>%
+        #   highcharter::hcpxy_remove_series(
+        #     id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+        #   ) %>%
+        #   highcharter::hcpxy_remove_series(
+        #     id = c("State", "Local", "Shared")
+        #   ) %>%
+        #   highcharter::hcpxy_remove_series(
+        #     id = c("Midwest", "South", "West", "Northeast")
+        #   ) %>%
+        #   # proxy_to_single(data = data,
+        #   #                 meta = filter_meta())%>%
+        #   highcharter::hcpxy_set_data(
+        #     data = data,
+        #     type = "bar",
+        #     mapping = highcharter::hcaes(x = x, y = y, group = Group, name = category)
+        #   )
+
+#
+#       }
+
+      # })
 
 
     # for Tables -------

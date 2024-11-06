@@ -69,7 +69,7 @@ mod_workforce_ui <- function(id){
               condition = paste0("input['", ns('topic'), "'] != 'jobs_standard' && input['", ns('topic'), "'] != 'jobs_total' && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               div(
                 highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 70vh; width: 50vw;")
+                style = "height: 65vh; width: 50vw;")
             ),
 
             # Display bar graph when the topic is jobs_standard or jobs_total and view is Bar Graph

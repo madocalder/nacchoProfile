@@ -164,7 +164,7 @@ proxy_to_single <- function(
     highcharter::hcpxy_set_data(
       "column",
       data = data,
-      highcharter::hcaes(x, y)
+      highcharter::hcaes(x, y, group = Group, names = category)
     ) %>%
     highcharter::hcpxy_update(
       yAxis = list(
@@ -424,7 +424,8 @@ set_simple_bar <- function(data,
     highcharter::hcaes(
       x = x,
       y = y,
-      group = group
+      group = group,
+      name = category
     ),
     dataLabels = list(
       enabled = TRUE,
@@ -444,12 +445,16 @@ set_simple_bar <- function(data,
       title = list(text = ""), # x-axis label
       categories = unique(data$category),
       labels = list(
-        fontSize = "2vmin"
+        padding = "1vmin",
+        fontSize = "1.8vmin",
+        fontWeight = 300,
+        step = 1
       )
     ) %>%
     highcharter::hc_yAxis(
       title = list(
-        text = y_label
+        text = y_label,
+        y = "2vmin"
       ), # y-axis label
       min = 0,
       labels = list(
@@ -2013,4 +2018,175 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
       )
     )
   )
+}
+
+#'helper for other topics bar data
+
+get_bar_data <- function(topic, filtering = NA){
+
+  if (filtering == "All LHDs") {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts("chachip")
+
+      # Calculate total responses and 'y_All LHDs'
+      total_responses <- sum(data$Responses, na.rm = TRUE)
+      data <- data %>%
+        dplyr::mutate(
+          y = 100 * (Responses / total_responses),
+          Responses = total_responses
+        ) %>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+      data <- chip_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+
+  } else {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+
+      data <- chip_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+  }
+
+  return(data)
+
 }

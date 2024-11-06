@@ -351,7 +351,8 @@ mod_finance_server <- function(id){
           viz_subtitle = "Estimated Across All LHDs",
           tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
                     {point.y:.0f}% of LHDs had per capita expenditures between
-                    {point.category}."
+                    {point.category}.",
+          theme = naccho.viz::basic
         ) %>%
         viz_export()
     })
@@ -613,7 +614,7 @@ mod_finance_server <- function(id){
 
 
 
-      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs" & input$view == "Bar Graph") {
         data <- return_survey_weighted_counts(input$topic) %>%
           dplyr::mutate(x_label = NA)
 
@@ -624,7 +625,7 @@ mod_finance_server <- function(id){
 
 
 
-      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs" & input$view == "Bar Graph") {
         data <- return_survey_weighted_counts(input$topic, input$filter) %>%
           dplyr::mutate(x_label = NA)
 

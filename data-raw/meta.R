@@ -10,7 +10,7 @@ meta <- data.frame(
             "rev_total_numcat", "rev_percap_numcat",
             "non_weighted_revenue_total", "non_weighted_revenue_percap",
             "LHD (Directly)", "LHD (By Contract)", "Other Entity",
-            "Not Available in Community"),
+            "Not Available in Community", ""),
   title = c("Percent of U.S. Population Served by LHDs",
             "Geographic Jurisdictions Served by LHDs,",
             "Governance of LHDs",

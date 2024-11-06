@@ -67,7 +67,7 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 70vh; width: 48vw;")
+              style = "height: 65vh; width: 48vw;")
             ),
 
 
@@ -340,7 +340,7 @@ mod_services_server <- function(id){
           viz_subtitle = "Immunization Services", # unique(data$service_category)
           viz_caption = paste0("<b> N: </b>",  min(data$demoninator), "-", max(data$demoninator), "<br>", source_line),
           tooltip = "",
-          theme = naccho.viz::butterfly,
+          theme = naccho.viz::basic ,
           legend_enable = FALSE,
           colors = naccho.viz::green
         ) %>%
