@@ -104,7 +104,7 @@ viz_options <- function(hc,
       style = list(
         fontWeight = 400,
         textAlign = tooltip_align,
-        fontSize = "2vmin",
+        fontSize = "1.8vmin",
         color = "black"
       ),
       backgroundColor = "#EEEAE5",
@@ -251,7 +251,7 @@ proxy_to_group <- function(
         title = list(
           text = meta$y_label,
           style = list(
-            fontSize = "2vmin"
+            fontSize = "1.8vmin"
           )
         ),
         max = meta$y_max,
@@ -384,7 +384,7 @@ set_column <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2vmin"
+        fontSize = "1.8vmin"
       )
     )
   ) %>%
@@ -440,7 +440,7 @@ set_simple_bar <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2vmin"
+        fontSize = "1.8vmin"
       )
     )
   ) %>%
@@ -457,7 +457,7 @@ set_simple_bar <- function(data,
     highcharter::hc_yAxis(
       title = list(
         text = y_label,
-        y = "2vmin"
+        y = "1.8vmin"
       ), # y-axis label
       min = 0,
       labels = list(
@@ -544,7 +544,7 @@ set_bar <- function(data,
       layout = "horizontal",
       align = "center",
       verticalAlign = "bottom",
-      itemStyle = list(fontSize = "2vmin"),
+      itemStyle = list(fontSize = "1.8vmin"),
       y = -20
     ) %>%
     highcharter::hc_tooltip(
@@ -556,7 +556,7 @@ highcharter::hc_xAxis(
   labels = list(
     enabled = TRUE,
     allowOverlap = FALSE,
-    style = list(fontSize = "2vmin"),
+    style = list(fontSize = "1.8vmin"),
     minPadding = "2em",
     y = 5,
     # align = "center",
@@ -854,6 +854,7 @@ proxy_to_hist_total <- function(hc,
       series = list(
         visible = TRUE,
         groupPadding = 0,
+        pointPadding = 0,
         list(type = "column"),
         dataLabels = list(
           enabled = FALSE
@@ -880,7 +881,7 @@ proxy_to_hist_total <- function(hc,
         #   step = 1,
         #   format = "{value:,.0f}",
         #   style = list(
-        #     fontSize = "2vmin",
+        #     fontSize = "1.8vmin",
         #     textOverflow = "none"
         #   )
         # )
@@ -968,6 +969,7 @@ proxy_to_hist_pc <- function(hc,
       series = list(
         visible = TRUE,
         groupPadding = 0,
+        pointPadding = 0,
         list(type = "column"),
         dataLabels = list(
           enabled = FALSE
@@ -993,7 +995,7 @@ proxy_to_hist_pc <- function(hc,
         #   step = 20,
         #   format = "{value:,.0f}",
         #   style = list(
-        #     fontSize = "2vmin",
+        #     fontSize = "1.8vmin",
         #     textOverflow = "none"
         #   )
         # )
@@ -1023,7 +1025,7 @@ proxy_hist_to_single <- function(hc,
                                  data,
                                  meta,
                                  rotate = 0,
-                                 size = "2vmin",
+                                 size = "1.8vmin",
                                  overflow = "none",
                                  responses = sum(data$Responses),
                                  theme = naccho.viz::minimal,
@@ -1070,7 +1072,7 @@ proxy_hist_to_single <- function(hc,
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "2vmin"
+            fontSize = "1.8vmin"
           )
         )
       ),
@@ -1186,7 +1188,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2vmin"
+              fontSize = "1.8vmin"
             )
           )
         ),
@@ -1265,7 +1267,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2vmin"
+              fontSize = "1.8vmin"
             )
           )
         ),
@@ -1868,7 +1870,7 @@ scatter_plot <- function(data, colors) {
                            layout = "vertical",
                            padding = 2,
                            itemStyle = list(
-                             fontSize = "2vmin"        # Adjust font size for responsiveness            # Set font weight
+                             fontSize = "1.8vmin"        # Adjust font size for responsiveness            # Set font weight
                            ),
                            symbolRadius = 6,
                            itemMarginTop = 0,

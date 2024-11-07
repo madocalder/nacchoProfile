@@ -315,8 +315,18 @@ mod_workforce_server <- function(id){
       data <- create_hist(input = "c5q37",
                           x_label = "Total FTEs")
 
+      data2 <- nacchoProfile::return_survey_weighted_statistics("c5q37")
 
-      set_hist(data) %>%
+      x_mean <- data2$Mean
+
+      mean_bin <- data %>%
+        dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+        dplyr::select(x) %>%
+        dplyr::pull()
+
+      x_max <- mean_bin*10
+
+      set_hist(data, x_max = x_max) %>%
         viz_options(
           legend_enable = FALSE,
           viz_title = "The Distribution of Total FTEs Across LHDs",
@@ -430,6 +440,7 @@ mod_workforce_server <- function(id){
 
         proxy %>%
           proxy_hist_to_single(data = data,
+                               x_max = x_max,
                                meta = filter_meta(),
                                theme = naccho.viz::basic)
 
@@ -462,8 +473,21 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
-        proxy %>%
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("fte_bypop")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
+         proxy %>%
           proxy_to_hist_pc(data,
+                           x_max = x_max,
                            meta = filter_meta(),
                            responses = sum(data$y))
 
@@ -475,8 +499,20 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("c5q37")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*10
         proxy %>%
           proxy_to_hist_total(data,
+                              x_max = x_max,
                               meta = filter_meta(),
                               responses = sum(data$y))
 
@@ -488,8 +524,21 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q36") {
         data <- create_hist(input = "c5q36",
                             x_label = "Total Employees")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("c5q36")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
         proxy %>%
           proxy_to_hist_total(data,
+                              x_max = x_max,
                               meta = filter_meta(),
                               responses = sum(data$y))
 
@@ -501,8 +550,22 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "employee_bypop") {
         data <- create_hist(input = "employee_bypop",
                             x_label = "Per Capita FTEs")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("employee_bypop")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
+
         proxy %>%
           proxy_to_hist_pc(data,
+                           x_max = x_max,
                            meta = filter_meta(),
                            responses = sum(data$y))
 
