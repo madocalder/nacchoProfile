@@ -577,7 +577,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               FALSE ~ category  # Handle any other cases
             ),
             legend_label = paste(group),
-            legend_title = paste("LHDs with a Local Board of Health")
+            legend_title = paste("LHDs with a Local Board of Health Over Time")
             )%>%
           arrange(year, group, one)
 
@@ -636,7 +636,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               category == "40 and over" ~ "40+",
               TRUE ~ category
             ),
-            legend_title = paste("Top LHD Executives Under 40"),
+            legend_title = paste("Top LHD Executives Under 40 Over Time"),
             legend_label = paste(group),
             one = paste(y),
             two = paste("% of", tolower(group_mod), "LHD executives were", tolower(cat_base), " years old"),
@@ -693,7 +693,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               filtering == "censusregion" ~ paste0(group, "ern"),
               TRUE ~ group
             ),
-            legend_title = paste(category, "Top LHD Executives"),
+            legend_title = paste(category, "Top LHD Executives Over Time"),
             legend_label = paste(group),
             one = paste(y),
             two = paste("% of top executives from", tolower(group_mod), "LHDs identified as", tolower(category)),
@@ -752,7 +752,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               filtering == "censusregion" ~ paste0(group, "ern"),
               TRUE ~ group
             ),
-            legend_title = paste("Non-white Top LHD Executives"),
+            legend_title = paste("Non-white Top LHD Executives Over Time"),
             legend_label = paste(group),
             one = paste(y),
             two =
@@ -820,7 +820,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               filtering == "censusregion" ~ paste0(group, "ern"),
               TRUE ~ group
             ),
-            legend_title = paste(category, "Top LHD Executives"),
+            legend_title = paste(category, "Top LHD Executives Over Time"),
             legend_label = paste(group),
             one = paste(y),
             two = paste("% of top LHD executives from", tolower(group_mod), "LHDs were Hispanic and/or Latino")
@@ -935,7 +935,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               TRUE ~ group
             ),
             legend_label = paste(group),
-            legend_title = "Top LHD Executives with Specialized Degrees",
+            legend_title = "Top LHD Executives with Specialized Degrees Over Time",
             two = paste("% of top executives from", tolower(group_mod), "LHDs had a Medical, Public Health, or Nursing degree"),
             one = paste(y)
           )
@@ -983,7 +983,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::group_by(category, group, filter, year, subtitle, group_mod)%>%
           dplyr::summarise(y = sum(y))%>%
           dplyr::mutate(legend_label = paste(group),
-                        legend_title = paste("LHD Top Executives with Graduate Degrees"),
+                        legend_title = paste("LHD Top Executives with Graduate Degrees Over Time"),
                         one = paste(y),
                         two = paste("% of top executives from", tolower(group_mod),
                                     "LHDs had at least one graduate degree"))

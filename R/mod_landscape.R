@@ -500,7 +500,7 @@ mod_landscape_server <- function(id){
       if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
         line_title <- data$legend_title[1]  # Get the first value
       } else {
-        line_title <- filter_meta()$title  # Default value if `legend_title` column is missing
+        line_title <- paste(filter_meta()$title, "Over Time")  # Default value if `legend_title` column is missing
       }
 
       if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {

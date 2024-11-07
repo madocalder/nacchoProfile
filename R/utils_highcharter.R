@@ -187,7 +187,10 @@ proxy_to_single <- function(
       ),
       xAxis = list(
         categories = as.list(unique(data$category)),
-        offset = 0
+        offset = 0,
+        labels = list(
+          pointPadding = .2
+        )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -658,25 +661,25 @@ set_box <- function(data) {
   highcharter::highchart() %>%
     highcharter::hc_add_series(
       id = "All Box",
-      type = "boxplot",
+      type = "scatter",
       data = data,
-      name = data[[1]]$name,
-      fillColor = "#EEEAE4",
-      lineWidth = 2,
-      medianWidth = 3,
-      stemWidth = 2,
-      whiskerWidth = 3
+      name = data[[1]]$name
+      # fillColor = "#EEEAE4",
+      # lineWidth = 2,
+      # medianWidth = 3,
+      # stemWidth = 2,
+      # whiskerWidth = 3
     ) %>%
     highcharter::hc_add_series(
       id = "Mean",
       data = highcharter::list_parse(data[[1]]$mean),
-      type = "scatter",
+      type = "line",
       name = "Mean",
-      marker = list(
-        symbol = "circle",
-        radius = 5,
-        fillColor = naccho.viz::terracotta
-      ),
+      # marker = list(
+      #   symbol = "circle",
+      #   radius = 5,
+      #   fillColor = naccho.viz::terracotta
+      # ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y:.0f}"
       )
@@ -706,9 +709,9 @@ set_box <- function(data) {
 #'
 #' @return histogram
 
-set_hist <- function(data, x_label = "Total FTEs") {
+set_hist <- function(data, x_label = "Total FTEs", y_label = "% of LHDs" , x_max =  max(data$x) ) {
 
-  x_max <- max(data$x)
+
 
   highcharter::hchart(
     data,
@@ -722,63 +725,6 @@ set_hist <- function(data, x_label = "Total FTEs") {
       panning = TRUE,
       panKey = "shift",
       zoomType = "x",
-      # events = list(
-      #   load = highcharter::JS(
-      #     "function() {
-      #       const chart = this;
-      #       chart.initialExtremes = chart.xAxis[0].getExtremes();
-      #       chart.resetPanButton = chart.renderer.button(
-      #         'Reset Pan',
-      #         window.innerWidth * 0.4,
-      #         window.innerHeight * 0.1,
-      #         function() {
-      #           chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
-      #           chart.resetPanButton.hide();
-      #         },
-      #         {
-      #           fill: 'white',
-      #           stroke: '#80A14E',
-      #           style: {
-      #             color: '#80A14E',
-      #             fontWeight: 'bold',
-      #             fontFamily: 'Heebo',
-      #             lineHeight: '25px'
-      #           },
-      #           r: 20,
-      #           padding: 10
-      #         }
-      #       ).attr({ zIndex: 1000 }).add().hide();
-      #
-      #       function positionResetPanButton() {
-      #         chart.resetPanButton.attr({
-      #           x: window.innerWidth * 0.4,
-      #           y: window.innerHeight * 0.1
-      #         });
-      #       }
-      #
-      #       positionResetPanButton();
-      #       chart.update({
-      #         chart: {
-      #           events: {
-      #             redraw: positionResetPanButton
-      #           }
-      #         }
-      #       });
-      #       window.addEventListener('resize', positionResetPanButton);
-      #     }"
-      #   ),
-      #   redraw = highcharter::JS(
-      #     "function() {
-      #       const chart = this;
-      #       const currentExtremes = chart.xAxis[0].getExtremes();
-      #
-      #       // Show the 'Reset Pan' button if panning has moved from the initial extremes
-      #       if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
-      #         chart.resetPanButton.show();
-      #       }
-      #     }"
-      #   )
-      # ),
       resetZoomButton = list(
         theme = list(
           fill = "white",
@@ -843,14 +789,14 @@ set_hist <- function(data, x_label = "Total FTEs") {
     highcharter::hc_xAxis(
       title = list(text = x_label),
       categories = data$category,
-      labels = list(
-        format = "{value:,.0f%}"
-      ),
+      # labels = list(
+      #   format = "{value:,.0f%}"
+      # ),
       max = x_max,
       min = 0
     ) %>%
     highcharter::hc_yAxis(
-      title = list(text = "% of LHDs"),
+      title = list(text = y_label),
       min = 0,
       minRange = 1,
       allowDecimals = FALSE,
@@ -876,9 +822,12 @@ proxy_to_hist_total <- function(hc,
                                 data,
                                 meta,
                                 responses = sum(data$Responses),
+                                x_max = NULL,
                                 ...) {
 
-  x_max <- max(data$x)
+  if (is.null(x_max )){
+    x_max <- max(data$x)}
+
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -898,6 +847,10 @@ proxy_to_hist_total <- function(hc,
       data = data,
     ) %>%
     highcharter::hcpxy_update(
+      chart = list(
+        panning = TRUE,
+        zoomType = "x"
+      ),
       series = list(
         visible = TRUE,
         groupPadding = 0,
@@ -921,15 +874,16 @@ proxy_to_hist_total <- function(hc,
         min = 0,
         title = list(
           text = unique(data$x_label)
-        ),
-        labels = list(
-          step = (x_max/20),
-          format = "{value:,.0f}",
-          style = list(
-            fontSize = "2vmin",
-            textOverflow = "none"
-          )
         )
+        # ,
+        # labels = list(
+        #   step = 1,
+        #   format = "{value:,.0f}",
+        #   style = list(
+        #     fontSize = "2vmin",
+        #     textOverflow = "none"
+        #   )
+        # )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -983,7 +937,11 @@ proxy_to_hist_pc <- function(hc,
                              data,
                              meta,
                              responses = sum(data$Responses),
+                             x_max = NULL,
                              ...) {
+
+  if (is.null(x_max )){
+    x_max <- max(data$x)}
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -1003,6 +961,10 @@ proxy_to_hist_pc <- function(hc,
       data = data
     ) %>%
     highcharter::hcpxy_update(
+      chart = list(
+        panning = TRUE,
+        zoomType = "x"
+      ),
       series = list(
         visible = TRUE,
         groupPadding = 0,
@@ -1021,18 +983,20 @@ proxy_to_hist_pc <- function(hc,
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
+        max = x_max,
         categories = data$category,
         title = list(
           text = unique(data$x_label)
-        ),
-        labels = list(
-          step = 20,
-          format = "{value:,.0f}",
-          style = list(
-            fontSize = "2vmin",
-            textOverflow = "none"
-          )
         )
+        # ,
+        # labels = list(
+        #   step = 20,
+        #   format = "{value:,.0f}",
+        #   style = list(
+        #     fontSize = "2vmin",
+        #     textOverflow = "none"
+        #   )
+        # )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -1065,7 +1029,9 @@ proxy_hist_to_single <- function(hc,
                                  theme = naccho.viz::minimal,
                                  ...) {
 
-  x_max <- max(data$x)
+
+    x_max <- max(data$x)
+
 
   hc %>%
     # Attempt to remove all possible series by specifying their IDs
@@ -1077,7 +1043,8 @@ proxy_hist_to_single <- function(hc,
 
     highcharter::hcpxy_update(
       chart = list(
-        events = list()  # Clear all events
+        panning = FALSE,
+        zoomType = ""
       )
     ) %>%
 
@@ -1091,7 +1058,7 @@ proxy_hist_to_single <- function(hc,
     highcharter::hcpxy_update(
       series = list(
         visible = TRUE,
-        groupPadding = 2,
+        pointPadding = .2,
         type = "column",  # Enforce column type
         dataLabels = list(
           enabled = TRUE,
@@ -1129,8 +1096,9 @@ proxy_hist_to_single <- function(hc,
           text = unique(data$x_label)
         ),
         labels = list(
-          step = 1,
-          rotate = rotate,
+          pointPadding = .2,
+          # step = 1,
+          # rotate = rotate,
           style = list(
             fontSize = size,
             textOverflow = overflow
@@ -2103,6 +2071,11 @@ get_bar_data <- function(topic, filtering = NA){
                       category %in% "Checked") %>%
         dplyr::select(-category)%>%
         dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }   else if (topic == "work") {
+
+      data <- partnerships %>%
+        dplyr::filter(year == "2022")%>%
         dplyr::mutate(x = dplyr::dense_rank(category))
     }
 

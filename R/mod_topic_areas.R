@@ -67,7 +67,7 @@ mod_topic_areas_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] != \'Table\'"),
               div(
               highcharter::highchartOutput(ns("figure_bar"), height = "100%"),
-              style = "height: 65vh; width: 55vw;")
+              style = "height: 65vh; width: 52vw;")
               ),
 
             # display when view Table is selected
