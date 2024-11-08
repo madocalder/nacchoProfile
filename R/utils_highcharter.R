@@ -70,7 +70,7 @@ viz_options <- function(hc,
                         caption_align = "center",
                         colors = naccho.viz::colors,
                         theme = naccho.viz::basic,
-                        tooltip,
+                        tooltip = "{point.value}",
                         tooltip_align = "center",
                         legend_enable = TRUE,
                         legend_title = "",
@@ -93,7 +93,7 @@ viz_options <- function(hc,
     highcharter::hc_caption(
       text = viz_caption, # source and data notes
       useHTML = TRUE,
-      margin = 60,
+      # margin = 60,
       align = caption_align
     ) %>%
     highcharter::hc_tooltip(
@@ -104,7 +104,7 @@ viz_options <- function(hc,
       style = list(
         fontWeight = 400,
         textAlign = tooltip_align,
-        fontSize = "13px",
+        fontSize = "1.8vmin",
         color = "black"
       ),
       backgroundColor = "#EEEAE5",
@@ -164,7 +164,7 @@ proxy_to_single <- function(
     highcharter::hcpxy_set_data(
       "column",
       data = data,
-      highcharter::hcaes(x, y)
+      highcharter::hcaes(x, y, group = Group, names = category)
     ) %>%
     highcharter::hcpxy_update(
       yAxis = list(
@@ -187,7 +187,10 @@ proxy_to_single <- function(
       ),
       xAxis = list(
         categories = as.list(unique(data$category)),
-        offset = 0
+        offset = 0,
+        labels = list(
+          pointPadding = .2
+        )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -246,7 +249,10 @@ proxy_to_group <- function(
       ),
       yAxis = list(
         title = list(
-          text = meta$y_label
+          text = meta$y_label,
+          style = list(
+            fontSize = "1.8vmin"
+          )
         ),
         max = meta$y_max,
         labels = list(
@@ -365,7 +371,8 @@ set_column <- function(data,
     highcharter::hcaes(
       x = x,
       y = y,
-      group = group
+      group = group,
+      category = category
     ),
     dataLabels = list(
       enabled = TRUE,
@@ -377,7 +384,7 @@ set_column <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2.3vmin"
+        fontSize = "1.8vmin"
       )
     )
   ) %>%
@@ -420,29 +427,37 @@ set_simple_bar <- function(data,
     highcharter::hcaes(
       x = x,
       y = y,
-      group = group
+      group = group,
+      name = category
     ),
     dataLabels = list(
       enabled = TRUE,
       format = "{point.y:.0f}%",
       overflow = TRUE,
       distance = 5,
-      padding = 2,
+      padding = 5,
       style = list(
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "2.3vmin"
+        fontSize = "1.8vmin"
       )
     )
   ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
-      categories = unique(data$category)
+      categories = unique(data$category),
+      labels = list(
+        padding = "1vmin",
+        fontSize = "1.8vmin",
+        fontWeight = 300,
+        step = 1
+      )
     ) %>%
     highcharter::hc_yAxis(
       title = list(
-        text = y_label
+        text = y_label,
+        y = "1.8vmin"
       ), # y-axis label
       min = 0,
       labels = list(
@@ -467,240 +482,169 @@ set_bar <- function(data,
                     y_label = "% of Population",
                     name_one = "Jobs Lost",
                     name_two = "Jobs Added",
-                    set_max = 15000,
+                    max_one = 1300,
+                    max_two = 5000,
                     set_format = NA) {
+
+
+  max_combined <- sum(max_one, max_two)
+
+  # Define the "pretty" intervals in a vector
+  pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
+
+  # Calculate one-tenth of max_combined
+  rough_interval <- round(max_combined / 10)
+
+  # Find the largest "pretty" interval that is less than or equal to rough_interval
+  interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
+
+  ticks_one <- ceiling(max_one/interval)
+  ticks_two <- ceiling(max_two/interval)
+
+  totalTicks <- sum(ticks_two, ticks_one)
+
+  axis_one <- round((ticks_one/totalTicks), digits = 2)
+
+  axis_two <- round((ticks_two/totalTicks), digits = 2)
+
+  message("TICK, AXIS, INTERVAL CHECKs-----")
+
+  print(paste("max_one =", max_one))
+  print(paste("max_two =", max_two))
+  print(paste("ticks_one =", ticks_one))
+  print(paste("ticks_two =", ticks_two))
+  print(paste("axis_one =", axis_one))
+  print(paste("axis_two =", axis_two))
+  print(paste("interval =", interval))
+
+
+  # Update max_one and max_two to be multiples of interval
+  max_one <- ticks_one * interval
+  max_two <- ticks_two * interval
+
+  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  #
+  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+
+  print(paste("max_one's updated value is:", max_one))
+  print(paste("max_two's updated value is:", max_two))
+
+  # print(paste("updated axis_one =", axis_one))
+  # print(paste("updated axis_two =", axis_two))
+  #
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
-      type = "bar"
-      # margin = list(90, 0, 180, 0)
+      type = "bar",
+      spacingLeft = 10,
+      spacingRight = 10
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
       layout = "horizontal",
       align = "center",
-      verticalAlign = "bottom"
+      verticalAlign = "bottom",
+      itemStyle = list(fontSize = "1.8vmin"),
+      y = -20
     ) %>%
     highcharter::hc_tooltip(
       shared = TRUE,
       crosshairs = TRUE
     ) %>%
-    highcharter::hc_xAxis(
-      categories = unique(data$group),
-      labels = list(
-        enabled = FALSE
-      ),
-      plotBands = list(
-        list(
-          from = -0.5,
-          to = 0.5,
-          color = "transparent",
-          label = list(
-            text = "Rural",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 0.5,
-          to = 1.5,
-          color = "transparent",
-          label = list(
-            text = "Urban",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 1.5,
-          to = 2.5,
-          color = "transparent",
-          label = list(
-            text = "Local",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 2.5,
-          to = 3.5,
-          color = "transparent",
-          label = list(
-            text = "Shared",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 3.5,
-          to = 4.5,
-          color = "transparent",
-          label = list(
-            text = "State",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 4.5,
-          to = 5.5,
-          color = "transparent",
-          label = list(
-            text = "Small",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 5.5,
-          to = 6.5,
-          color = "transparent",
-          label = list(
-            text = "Medium",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 6.5,
-          to = 7.5,
-          color = "transparent",
-          label = list(
-            text = "Large",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 7.5,
-          to = 8.5,
-          color = "transparent",
-          label = list(
-            text = "Midwest",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 8.5,
-          to = 9.5,
-          color = "transparent",
-          label = list(
-            text = "Northeast",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 9.5,
-          to = 10.5,
-          color = "transparent",
-          label = list(
-            text = "South",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 10.5,
-          to = 11.5,
-          color = "transparent",
-          label = list(
-            text = "West",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo"
-            )
-          )
-        ),
-        list(
-          from = 11.5,
-          to = 12.5,
-          color = "#EEEAE4",
-          label = list(
-            text = "All LHDs",
-            align = "center",
-            x = -1,
-            style = list(
-              fontFamily = "Heebo",
-              fontWeight = 700
-            )
-          )
-        )
-      )
-    ) %>%
+highcharter::hc_xAxis(
+  categories = unique(data$group),
+  labels = list(
+    enabled = TRUE,
+    allowOverlap = FALSE,
+    style = list(fontSize = "1.8vmin"),
+    minPadding = "2em",
+    y = 5,
+    # align = "center",
+    verticalAlign = "middle",
+    step = 1,                # Ensures all labels are displayed
+    # rotation = 0,            # Adjust rotation as needed (e.g., 45 for diagonal)
+    autoRotation = c(0, -45) # Allow rotation if space is limited
+  ),
+  tickInterval = 1            # Makes sure all labels are rendered
+)%>%
+      # ,
+      # plotBands = lapply(0:12, function(i) {
+      #   list(
+      #     from = i - 0.5,
+      #     to = i + 0.5,
+      #     color = ifelse(i == 12, "#EEEAE4", "transparent"),
+      #     label = list(
+      #       text = c("Rural", "Urban", "Local", "Shared", "State",
+      #                "Small", "Medium", "Large", "Midwest",
+      #                "Northeast", "South", "West", "All LHDs")[i + 1],
+      #       align = "center",
+      #       x = -1,
+      #       style = list(fontFamily = "Heebo", fontSize = "12px", fontWeight = ifelse(i == 12, "bold", "normal"))
+      #     )
+      #   )
+      # })
+    # ) %>%
     highcharter::hc_yAxis_multiples(
       list(
-        max = set_max,
-        title = list(text = NULL),
-        width = "45%",
+        max = max_one,
+        title = list(text = "",
+                     y = 10),
+        labels = list(format = set_format,
+                      allowOverlap = FALSE,
+                      autoRotation = TRUE),
+        width = paste((100*axis_one), "%"),
         reversed = TRUE,
-        offset = 0,
+        offset = 10,
         alignTicks = FALSE,
-        labels = list(
-          format = set_format
-        )
+        tickInterval = interval,
+        tickAmount = ticks_one + 1
+        # ,
+        # opposite = TRUE
       ),
       list(
-        max = set_max,
-        title = list(text = NULL),
-        offset = 0,
-        left = "55%",
-        width = "45%",
-        offset = 0,
-        alignTicks = FALSE ,
-        labels = list(
-          format = set_format
-        )
+        max = max_two,
+        title = list(text = y_label,
+                     y = 20
+                     ),
+        labels = list(format = set_format,
+                      allowOverlap = FALSE,
+                      autoRotation = TRUE),
+        left = paste((100*axis_one), "%"),
+        width = paste((100*axis_two), "%"),
+        offset = 10,
+        alignTicks = FALSE,
+        tickInterval = interval,
+        tickAmount = ticks_two + 1
       )
     ) %>%
     highcharter::hc_add_series(
       id = "Left",
       name = name_one,
       data = data$left,
-      yAxis = 0
+      yAxis = 0,
+      dataLabels = list(
+        enabled = TRUE,
+        formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
+        style = list(fontSize = "1.5vmin")
+      )
     ) %>%
     highcharter::hc_add_series(
       id = "Right",
       name = name_two,
       data = data$right,
-      yAxis = 1
-    )
+      yAxis = 1,
+      dataLabels = list(
+        enabled = TRUE,
+        formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
+        style = list(fontSize = "1.5vmin")
+      )
+    ) %>%
+    highcharter::hc_add_theme(naccho.viz::butterfly)
+  #   highcharter::hc_caption(
+  #     margin = -10
+  #   )
 }
+
 
 
 
@@ -717,25 +661,25 @@ set_box <- function(data) {
   highcharter::highchart() %>%
     highcharter::hc_add_series(
       id = "All Box",
-      type = "boxplot",
+      type = "scatter",
       data = data,
-      name = data[[1]]$name,
-      fillColor = "#EEEAE4",
-      lineWidth = 2,
-      medianWidth = 3,
-      stemWidth = 2,
-      whiskerWidth = 3
+      name = data[[1]]$name
+      # fillColor = "#EEEAE4",
+      # lineWidth = 2,
+      # medianWidth = 3,
+      # stemWidth = 2,
+      # whiskerWidth = 3
     ) %>%
     highcharter::hc_add_series(
       id = "Mean",
       data = highcharter::list_parse(data[[1]]$mean),
-      type = "scatter",
+      type = "line",
       name = "Mean",
-      marker = list(
-        symbol = "circle",
-        radius = 5,
-        fillColor = naccho.viz::terracotta
-      ),
+      # marker = list(
+      #   symbol = "circle",
+      #   radius = 5,
+      #   fillColor = naccho.viz::terracotta
+      # ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y:.0f}"
       )
@@ -765,7 +709,10 @@ set_box <- function(data) {
 #'
 #' @return histogram
 
-set_hist <- function(data, x_label = "Total FTEs") {
+set_hist <- function(data, x_label = "Total FTEs", y_label = "% of LHDs" , x_max =  max(data$x) ) {
+
+
+
   highcharter::hchart(
     data,
     type = "column",
@@ -778,61 +725,6 @@ set_hist <- function(data, x_label = "Total FTEs") {
       panning = TRUE,
       panKey = "shift",
       zoomType = "x",
-      events = list(
-        load = highcharter::JS(
-          "function() {
-            const chart = this;
-            chart.initialExtremes = chart.xAxis[0].getExtremes();
-            chart.resetPanButton = chart.renderer.button(
-              'Reset Pan',
-              window.innerWidth * 0.4,
-              window.innerHeight * 0.1,
-              function() {
-                chart.xAxis[0].setExtremes(chart.initialExtremes.min, chart.initialExtremes.max);
-                chart.resetPanButton.hide();
-              },
-              {
-                fill: 'white',
-                stroke: '#80A14E',
-                style: {
-                  color: '#80A14E',
-                  fontWeight: 'bold',
-                  fontFamily: 'Heebo',
-                  lineHeight: '25px'
-                },
-                r: 20,
-                padding: 10
-              }
-            ).attr({ zIndex: 1000 }).add().hide();
-
-            function positionResetPanButton() {
-              chart.resetPanButton.attr({
-                x: window.innerWidth * 0.4,
-                y: window.innerHeight * 0.1
-              });
-            }
-
-            positionResetPanButton();
-            chart.update({
-              chart: {
-                events: {
-                  redraw: positionResetPanButton
-                }
-              }
-            });
-            window.addEventListener('resize', positionResetPanButton);
-          }"
-        ),
-        redraw = highcharter::JS(
-          "function() {
-            const chart = this;
-            const currentExtremes = chart.xAxis[0].getExtremes();
-            if (currentExtremes.min !== chart.initialExtremes.min || currentExtremes.max !== chart.initialExtremes.max) {
-              chart.resetPanButton.show();
-            }
-          }"
-        )
-      ),
       resetZoomButton = list(
         theme = list(
           fill = "white",
@@ -857,7 +749,6 @@ set_hist <- function(data, x_label = "Total FTEs") {
         )
       ),
       events = list(
-
         selection = highcharter::JS(
           "function() {
             const chart = this;
@@ -877,8 +768,8 @@ set_hist <- function(data, x_label = "Total FTEs") {
                 }
               });
             }
-            updateStep();
-            window.addEventListener('resize', updateStep);
+            updateStep(); // Initial call
+            window.addEventListener('resize', updateStep); // Call on resize
           }"
         )
       )
@@ -898,14 +789,14 @@ set_hist <- function(data, x_label = "Total FTEs") {
     highcharter::hc_xAxis(
       title = list(text = x_label),
       categories = data$category,
-      labels = list(
-        format = "{value:,.0f}"
-      ),
-      max = 75,
+      # labels = list(
+      #   format = "{value:,.0f%}"
+      # ),
+      max = x_max,
       min = 0
     ) %>%
     highcharter::hc_yAxis(
-      title = list(text = "# of LHDs"),
+      title = list(text = y_label),
       min = 0,
       minRange = 1,
       allowDecimals = FALSE,
@@ -931,7 +822,12 @@ proxy_to_hist_total <- function(hc,
                                 data,
                                 meta,
                                 responses = sum(data$Responses),
+                                x_max = NULL,
                                 ...) {
+
+  if (is.null(x_max )){
+    x_max <- max(data$x)}
+
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -951,9 +847,14 @@ proxy_to_hist_total <- function(hc,
       data = data,
     ) %>%
     highcharter::hcpxy_update(
+      chart = list(
+        panning = TRUE,
+        zoomType = "x"
+      ),
       series = list(
         visible = TRUE,
         groupPadding = 0,
+        pointPadding = 0,
         list(type = "column"),
         dataLabels = list(
           enabled = FALSE
@@ -970,19 +871,20 @@ proxy_to_hist_total <- function(hc,
       ),
       xAxis = list(
         categories = data$category,
+        max = x_max,
+        min = 0,
         title = list(
           text = unique(data$x_label)
-        ),
-        labels = list(
-          step = 20,
-          max = 75,
-          min = 0,
-          format = "{value:,.0f}",
-          style = list(
-            fontSize = "2.3vmin",
-            textOverflow = "none"
-          )
         )
+        # ,
+        # labels = list(
+        #   step = 1,
+        #   format = "{value:,.0f}",
+        #   style = list(
+        #     fontSize = "1.8vmin",
+        #     textOverflow = "none"
+        #   )
+        # )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -1036,7 +938,11 @@ proxy_to_hist_pc <- function(hc,
                              data,
                              meta,
                              responses = sum(data$Responses),
+                             x_max = NULL,
                              ...) {
+
+  if (is.null(x_max )){
+    x_max <- max(data$x)}
 
   hc %>%
     highcharter::hcpxy_remove_series(
@@ -1056,9 +962,14 @@ proxy_to_hist_pc <- function(hc,
       data = data
     ) %>%
     highcharter::hcpxy_update(
+      chart = list(
+        panning = TRUE,
+        zoomType = "x"
+      ),
       series = list(
         visible = TRUE,
         groupPadding = 0,
+        pointPadding = 0,
         list(type = "column"),
         dataLabels = list(
           enabled = FALSE
@@ -1074,18 +985,20 @@ proxy_to_hist_pc <- function(hc,
         text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
       ),
       xAxis = list(
+        max = x_max,
         categories = data$category,
         title = list(
           text = unique(data$x_label)
-        ),
-        labels = list(
-          step = 20,
-          format = "{value:,.0f}",
-          style = list(
-            fontSize = "2.3vmin",
-            textOverflow = "none"
-          )
         )
+        # ,
+        # labels = list(
+        #   step = 20,
+        #   format = "{value:,.0f}",
+        #   style = list(
+        #     fontSize = "1.8vmin",
+        #     textOverflow = "none"
+        #   )
+        # )
       ),
       tooltip = list(
         pointFormat = meta$tooltip
@@ -1108,24 +1021,105 @@ proxy_to_hist_pc <- function(hc,
 #'
 #'
 #' @export
-proxy_hist_to_single <- function(hc, data, meta, rotate = 0, size = "2.7vmin", overflow = "none", responses = sum(data$Responses), ...) {
+proxy_hist_to_single <- function(hc,
+                                 data,
+                                 meta,
+                                 rotate = 0,
+                                 size = "1.8vmin",
+                                 overflow = "none",
+                                 responses = sum(data$Responses),
+                                 theme = naccho.viz::minimal,
+                                 ...) {
+
+
+    x_max <- max(data$x)
+
+
   hc %>%
-    highcharter::hcpxy_remove_series(id = c("Urban", "Rural")) %>%
-    highcharter::hcpxy_set_data("column", data = data, highcharter::hcaes(x, y)) %>%
+    # Attempt to remove all possible series by specifying their IDs
+    highcharter::hcpxy_remove_series(id = c("Urban", "Rural", "Small (<50,000)",
+                                            "Medium (50,000-499,999)", "Large (500,000+)",
+                                            "State", "Local", "Shared",
+                                            "Midwest", "South", "West", "Northeast",
+                                            "All LHDs", "HistogramSeries", "CategoricalSeries")) %>%
+
     highcharter::hcpxy_update(
-      series = list(visible = TRUE, type = "column"),
-      xAxis = list(
-        type = "category",
-        categories = unique(data$category),
-        title = list(text = unique(data$x_label)),
-        labels = list(rotation = rotate, style = list(fontSize = size, textOverflow = overflow))
-      ),
-      events = list(
-        load = highcharter::JS("function() {}"),
-        redraw = highcharter::JS("function() {}"),
-        selection = highcharter::JS("function() {}")
+      chart = list(
+        panning = FALSE,
+        zoomType = ""
       )
+    ) %>%
+
+    # Set new data directly as a replacement, not as an additional series
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data %>% dplyr::mutate(x = as.character(x)),  # Ensure x is categorical
+      highcharter::hcaes(x = x, y = y)
+    ) %>%
+
+    highcharter::hcpxy_update(
+      series = list(
+        visible = TRUE,
+        pointPadding = .2,
+        type = "column",  # Enforce column type
+        dataLabels = list(
+          enabled = TRUE,
+          format = meta$data_label,
+          overflow = TRUE,
+          distance = 5,
+          padding = 2,
+          style = list(
+            color = naccho.viz::grey,
+            fontFamily = "Heebo",
+            fontWeight = "500",
+            fontSize = "1.8vmin"
+          )
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = paste0("<b> N: </b>", responses, "<br>", meta$caption)
+      ),
+
+      # xAxis settings for categorical interpretation
+      xAxis = list(
+        type = "category",  # Set x-axis type to categorical
+        categories = as.list(data$category), # Provide categories explicitly
+        # label =
+        tickInterval = 1,  # Ensure labels are spaced as intended
+        min = 0,
+        max = x_max,
+        title = list(
+          text = unique(data$x_label)
+        ),
+        labels = list(
+          pointPadding = .2,
+          # step = 1,
+          # rotate = rotate,
+          style = list(
+            fontSize = size,
+            textOverflow = overflow
+          )
+        )
+      ),
+
+      tooltip = list(
+        pointFormat = meta$tooltip
+      ),
+      legend = list(
+        enabled = FALSE
+      ),
+      theme = theme
     )
+
+    View(data)
+    # Force a redraw to apply all changes
+    # highcharter::hcpxy_redraw()
 }
 
 
@@ -1150,7 +1144,7 @@ proxy_hist_to_group <- function(hc,
                                 id,
                                 colors,
                                 rotate = 0,
-                                size = "17px",
+                                size = "2.5vmin",
                                 overflow = "none",
                                 responses = sum(data$Responses),
                                 theme = naccho.viz::histogram, ...) {
@@ -1194,7 +1188,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2.3vmin"
+              fontSize = "1.8vmin"
             )
           )
         ),
@@ -1273,7 +1267,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "2.3vmin"
+              fontSize = "1.8vmin"
             )
           )
         ),
@@ -1328,11 +1322,62 @@ proxy_hist_to_group <- function(hc,
 #'
 proxy_to_bar <- function(hc,
                          data,
-                         max,
+                         max_one,
+                         max_two,
                          meta,
                          name_one = "Jobs Lost",
                          name_two = "Jobs Added",
+                         y_label = NULL,
                          ...) {
+
+
+  max_combined <- sum(max_one, max_two)
+
+  # Define the "pretty" intervals in a vector
+  pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
+
+  # Calculate one-tenth of max_combined
+  rough_interval <- round(max_combined / 10)
+
+  # Find the largest "pretty" interval that is less than or equal to rough_interval
+  interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
+
+  ticks_one <- ceiling(max_one/interval)
+  ticks_two <- ceiling(max_two/interval)
+
+  totalTicks <- sum(ticks_two, ticks_one)
+
+  axis_one <- round((ticks_one/totalTicks), digits = 2)
+
+  axis_two <- round((ticks_two/totalTicks), digits = 2)
+
+  message("TICK, AXIS, INTERVAL CHECKs-----")
+
+  print(paste("max_one =", max_one))
+  print(paste("max_two =", max_two))
+  print(paste("ticks_one =", ticks_one))
+  print(paste("ticks_two =", ticks_two))
+  print(paste("axis_one =", axis_one))
+  print(paste("axis_two =", axis_two))
+  print(paste("interval =", interval))
+
+
+  # Update max_one and max_two to be multiples of interval
+  max_one <- ticks_one * interval
+  max_two <- ticks_two * interval
+
+  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  #
+  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+
+  print(paste("max_one's updated value is:", max_one))
+  print(paste("max_two's updated value is:", max_two))
+
+  # print(paste("updated axis_one =", axis_one))
+  # print(paste("updated axis_two =", axis_two))
+  #
+
+
 
   hc %>%
     highcharter::hcpxy_update_series(
@@ -1350,18 +1395,24 @@ proxy_to_bar <- function(hc,
     highcharter::hcpxy_update(
       yAxis = list(
         list(
-          max = max,
+          width = paste((100*axis_one), "%"),
+          max = max_one,
           tickWidth = 0,
-          lineWidth = .5
+          lineWidth = .5,
+          tickInterval = interval,
+          tickAmount = ticks_one + 1
         ),
         list(
-          max = max,
+          width = paste((100*axis_two), "%"),
+          left = paste((100*axis_one), "%"),
+          title = list(text = y_label,
+                       y = 20),
+          max = max_two,
           tickWidth = 0,
-          lineWidth = .5
+          lineWidth = .5,
+          tickInterval = interval,
+          tickAmount = ticks_two + 1
         )
-      ),
-      title = list(
-        text = meta$title
       )
     )
 }
@@ -1466,7 +1517,8 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
         fillColor = naccho.viz::terracotta
       ),
       tooltip = list(
-        pointFormat = "<b>Mean:</b> ${point.y:.0f}"
+        pointFormat = "<b>Mean:</b> ${point.y:.0f}",
+        fontSize = "1.5vmin"
       ),
       redraw = TRUE
     ) %>%
@@ -1535,6 +1587,9 @@ scatter_plot <- function(data, colors) {
       highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
     ) %>%
     highcharter::hc_chart(
+      panType = "xy",
+      panning = TRUE,
+      panKey = "shift",
       zoomType = "xy",
       resetZoomButton = list(
         theme = list(
@@ -1560,6 +1615,18 @@ scatter_plot <- function(data, colors) {
         )
       )
     ) %>%
+    highcharter::hc_tooltip(
+      useHTML = TRUE,
+      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      style = list(
+        fontFamily = "Heebo",
+        fontSize = "1.7vmin",
+        # lineHeight = "1.5vmin",
+        padding = 5,
+        textOutline = "none"
+      )
+    )%>%
     highcharter::hc_plotOptions(
       scatter = list(
         events = list(
@@ -1569,7 +1636,8 @@ scatter_plot <- function(data, colors) {
         ),
         dataLabels = list(
           enabled = TRUE,
-          allowOverlap = TRUE,
+          allowOverlap = FALSE,
+          # format = "{point.name}",
           formatter = highcharter::JS("
           function() {
             return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
@@ -1578,7 +1646,7 @@ scatter_plot <- function(data, colors) {
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
-            fontSize = "11px",
+            fontSize = "1.4vmin",
             fontWeight = "bold"
           )
         ),
@@ -1588,6 +1656,32 @@ scatter_plot <- function(data, colors) {
         )
       )
     ) %>%
+    # # Add interactive horizontal line
+    # highcharter::hc_add_series(
+    #   name = "Average percent reduced (20%)",
+    #   type = "line",
+    #   data = list(list(x = 0, y = 20), list(x = 35, y = 20)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent reduced: 20%</span>"
+    #   )
+    # ) %>%
+    # # Add interactive vertical line
+    # highcharter::hc_add_series(
+    #   name = "Average percent expanded (27%)",
+    #   type = "line",
+    #   data = list(list(x = 27, y = 0), list(x = 27, y = 100)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent expanded: 27%</span>"
+    #   )
+    # ) %>%
     highcharter::hc_xAxis(
       min = 0,
       max = 35,
@@ -1604,7 +1698,8 @@ scatter_plot <- function(data, colors) {
           label = list(
             text = "Average percent reduced (20%)",
             style = list(
-              fontFamily = "Heebo"
+              fontFamily = "Heebo",
+              fontSize = "1em"
             )
           )
         )
@@ -1623,6 +1718,7 @@ scatter_plot <- function(data, colors) {
     ) %>%
     highcharter::hc_yAxis(
       min = 0,
+      max = 100,
       title = list(
         text = "Percent of LHDs expanding service"
       ),
@@ -1635,7 +1731,8 @@ scatter_plot <- function(data, colors) {
           label = list(
             text = "Average percent expanded (27%)",
             style = list(
-              fontFamily = "Heebo"
+              fontFamily = "Heebo",
+              fontSize = "1em"
             )
           )
         )
@@ -1748,24 +1845,34 @@ scatter_plot <- function(data, colors) {
       widthAdjust = -60
     ) %>%
     highcharter::hc_subtitle(
-      text = "Click and span a range on the figure to zoom."
+      text = "Click and span to zoom into a specific area of the chart.
+    Hold the Shift key and drag to pan horizontally when zoomed in."
     ) %>%
     highcharter::hc_caption(
-      text = HTML("<b> About the Quadrants:</b> <span style=\'font-family: Heebo; font-size: 2.3vmin; color: black;\'>
-                  In the top left quadrant, services are <span style=\'color: #008A96; font-weight: bold;\'>growing</span>.
-                  In the top right quadrant, services show a <span style=\'color: #666; font-weight: bold;\'>mixed trend</span>.
-                  In the bottom left quadrant, services are <span style=\'color: #B8B3AE; font-weight: bold;\'>stable</span>.
-                  In the bottom right quadrant, services are <span style=\'color: #AB6143; font-weight: bold;\'>shrinking</span>.
-                  </span> <br>
-                  <b> N: </b>", min(n), " to ", max(n), "<br>",
-                  source_line),
+      fontSize = "1.6vmin",
+      text = HTML("<b style='font-size: 1.6vmin; line-height: 1vmin;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1.6vmin; line-height: 1.4vmin; color: black;'>",
+                    "In the top left quadrant, services are <span style='color: #008A96; font-weight: bold;'>growing</span>. ",
+                    "In the top right quadrant, services show a <span style='color: #666; font-weight: bold;'>mixed trend</span>. ",
+                    "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
+                    "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
+                    "</span> <br> <b style='font-size: 1.6vmin; line-height: 1vmin;'> N: </b>",
+                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", min(n), " to ", max(n), "</span><br>",
+                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", source_line, "</span>"),
+
       useHTML = TRUE,
-      margin = 30,
+      margin = 20,
       align = "center"
     ) %>%
     highcharter::hc_chart(spacingBottom = 0) %>%
     highcharter::hc_legend(enabled = TRUE,
-                           padding = 0,
+                           align = "right",  # Align legend to the right of the chart
+                           verticalAlign = "middle",
+                           layout = "vertical",
+                           padding = 2,
+                           itemStyle = list(
+                             fontSize = "1.8vmin"        # Adjust font size for responsiveness            # Set font weight
+                           ),
+                           symbolRadius = 6,
                            itemMarginTop = 0,
                            itemMarginBottom = 0)
 }
@@ -1860,12 +1967,201 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
       type = "scatter",
       mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
     ) %>%
+
     highcharter::hcpxy_update(
       chart = list(
         zoomType = "xy"
       ),
       series = list(
         visible = FALSE
+      ),
+      tooltip = list(
+        useHTML = TRUE,
+      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of {point.Group} LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      style = list(
+        fontFamily = "Heebo",
+        fontSize = "1.7vmin",
+        # lineHeight = "1.5vmin",
+        padding = 5,
+        textOutline = "none"
       )
     )
+  )
+}
+
+#'helper for other topics bar data
+
+get_bar_data <- function(topic, filtering = NA){
+
+  if (filtering == "All LHDs") {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts("chachip")
+
+      # Calculate total responses and 'y_All LHDs'
+      total_responses <- sum(data$Responses, na.rm = TRUE)
+      data <- data %>%
+        dplyr::mutate(
+          y = 100 * (Responses / total_responses),
+          Responses = total_responses
+        ) %>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+      data <- chip_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }   else if (topic == "work") {
+
+      data <- partnerships %>%
+        dplyr::filter(year == "2022")%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+
+  } else {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+
+      data <- chip_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+  }
+
+  return(data)
+
 }

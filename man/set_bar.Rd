@@ -9,7 +9,8 @@ set_bar(
   y_label = "\% of Population",
   name_one = "Jobs Lost",
   name_two = "Jobs Added",
-  set_max = 15000,
+  max_one = 1300,
+  max_two = 5000,
   set_format = NA
 )
 }

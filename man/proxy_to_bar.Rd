@@ -7,10 +7,12 @@
 proxy_to_bar(
   hc,
   data,
-  max,
+  max_one,
+  max_two,
   meta,
   name_one = "Jobs Lost",
   name_two = "Jobs Added",
+  y_label = NULL,
   ...
 )
 }
@@ -19,11 +21,11 @@ proxy_to_bar(
 
 \item{data}{Dataframe; data object to feed the figure.}
 
-\item{max}{value, max value for the y axis.}
-
 \item{meta}{Dataframe; data object to set options (e.g., title, subtitle, etc).}
 
 \item{...}{Other arguments}
+
+\item{max}{value, max value for the y axis.}
 }
 \value{
 A redrawn figure.

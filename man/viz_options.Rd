@@ -12,7 +12,7 @@ viz_options(
   caption_align = "center",
   colors = naccho.viz::colors,
   theme = naccho.viz::basic,
-  tooltip,
+  tooltip = "{point.value}",
   tooltip_align = "center",
   legend_enable = TRUE,
   legend_title = "",

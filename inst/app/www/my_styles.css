@@ -556,7 +556,7 @@ label:not(.material-switch label) {
 }
 
 .carousel-dark:not(.alt-2) {
-  height: 400px !important;
+  height: 80vh !important;
 }
 
 .home-content-carousel {
@@ -565,15 +565,15 @@ label:not(.material-switch label) {
 }
 
 .color-carousel {
-    padding-right: 20px;
-    padding-top: 50px;
-    line-height: 15px;
+    padding-right: 3vmin;
+    padding-top: 5vmin;
+    line-height: 2.5vmin;
 }
 
 .color-carousel-2 {
     padding-right: 0px;
-    padding-top: 50px;
-    line-height: 15px;
+    padding-top: 5vmin;
+    line-height: 2.5vmin;
 }
 
 /* ----------------------------------------------------- key findings content */
@@ -581,6 +581,7 @@ label:not(.material-switch label) {
   background-color: #fff !important;
   margin-top: 0px;
   padding: 0px;
+  overflow: visible;
 }
 
 .key-findings-cards .card-header {
@@ -605,18 +606,19 @@ label:not(.material-switch label) {
   border: 0px solid !important;
   padding-right: 3em;
   padding-left: 3em;
+  overflow: visible;
 }
 
 .key-findings-head {
-  padding-top: 2em;
-  padding-left: 5em;
-  padding-right: 3em;
+  padding-top: 2vmin;
+  padding-left: 5vmin;
+  padding-right: 3vmin;
 }
 
 .key-findings-content {
-  padding-top: 4em;
-  padding-left: 5em;
-  padding-right: 7em;
+  padding-top: 2vmin;
+  padding-left: 10vmin;
+  padding-right: 10vmin;
 }
 
 .carousel-control-prev {
@@ -631,26 +633,28 @@ label:not(.material-switch label) {
 
 @media (max-width: 1300px) {
   .key-findings-head {
-    padding-top: 2em;
-    padding-left: 1.5em;
-    padding-right: .5em;
+    padding-top: 3vmin;
+    padding-left: 2.5vmin;
+    padding-right: 1.5vmin;
   }
 
   .key-findings-content {
-    padding-top: 4em;
-    padding-left: .5em;
-    padding-right: .5em;
+    padding-top: 2vmin;
+    padding-left: 1.5vmin;
+    padding-right: 1.5vmin;
   }
 
 .carousel-control-prev {
     justify-content: left !important;
-    margin-left: 0em !important;
+    margin-left: 1vmin !important;
+    margin-right: 1vmin !important;
 
   }
 
   .carousel-control-next {
     justify-content: right !important;
-    margin-right: 0em !important;
+    margin-right: 1vmin !important;
+    margin-left: 1vmin !important;
   }
 }
 
@@ -661,7 +665,7 @@ label:not(.material-switch label) {
 }
 
 .carousel-dark:not(.alt) {
-  height: 700px !important;
+  height: auto !important;
 }
 
 
@@ -676,8 +680,8 @@ label:not(.material-switch label) {
 }
 
 .carousel-control-prev-icon, .carousel-control-next-icon {
-  height: 3em !important;
-  width: 3em !important;
+  height: 5vmin !important;
+  width: 5vmin !important;
 }
 
 .carousel-control-next-icon {
@@ -1074,6 +1078,8 @@ hr .tt {
   border-top: 1px solid !important;
   color: #008A96 !important;
   opacity: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .right-hr {
@@ -1176,10 +1182,30 @@ b, strong {
 /* -------------------------------------------------------  Highcharter Things */
 .highcharts-tooltip span {
     height: auto;
-    min-width: 200px;
-    max-width: 200px;
-    line-height: 1.4em;
-    overflow: auto;
+    min-width: 20vmin !important;
+    max-width: 50vmin !important;
+    line-height: 1.8vmin !important;
+    overflow: hidden;
     white-space: normal !important;
-    z-index: 9999;
+    z-index: 29999;
+}
+
+.highcharts-legend {
+    max-height: 3vmin !important;
+    font-size: 1.5vmin !important;
+    overflow-y: auto !important;
+      }
+
+.highcharts-container {
+  min-width: 30vw!important; /* Minimum width of the chart */
+  min-height: 50vh!important; /* Minimum height of the chart */
+}
+
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 3vmin; /* Position from the bottom based on viewport size */
+
+    display: flex;
+    justify-content: center;
 }

@@ -86,11 +86,12 @@ mod_landscape_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
                 uiOutput(ns("table_title")),
-                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
+                HTML('<div style="font-size: 1.8vmin;">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
-                style = "height: 65vh; width: 50vw;"
+                style = "margin-left: auto !important;
+                        margin-right: auto !important;"
               )
             ),
 
@@ -98,7 +99,9 @@ mod_landscape_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line")),
+                highcharter::highchartOutput(ns("line"), height = "65vh"),
+                br(),
+                # HTML('<div style="font-size: 2vmin;">', source_line,'</div>'),
                 style = "height: 65vh; width: 50vw;"
               )
             )
@@ -244,7 +247,7 @@ mod_landscape_server <- function(id){
         viz_options(
           viz_title = "LHDs Combined with HHSA",
           viz_caption = paste("<b> N: </b>938 <br>", source_line),
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}"
+          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs are {point.category}."
           ) %>%
         viz_export()
     })
@@ -304,7 +307,7 @@ mod_landscape_server <- function(id){
           dplyr::mutate(category = "Average Tenure")
 
         proxy %>%
-          proxy_hist_to_single(data = data,
+          proxy_to_single(data = data,
                           meta = filter_meta())
 
         # Topic: Tenure
@@ -319,12 +322,14 @@ mod_landscape_server <- function(id){
           series_id <- unique(data$group)
 
           proxy %>%
-            proxy_hist_to_group(
+            proxy_to_group(
               data = data,
               meta = filter_meta(),
               id = series_id,
-              colors = colors() # comes from earlier reactive and needs to match length of field input
-            )
+              colors = colors(), # comes from earlier reactive and needs to match length of field input
+              tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of
+              {point.group} LHDs are {point.category}."
+              )
 
 
       # Topic: Specialization
@@ -334,7 +339,7 @@ mod_landscape_server <- function(id){
         data <- spec_data_all
 
           proxy %>%
-            proxy_hist_to_single(data = data,
+            proxy_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -346,7 +351,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_hist_to_group(
+          proxy_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,
@@ -365,7 +370,7 @@ mod_landscape_server <- function(id){
         }
 
           proxy %>%
-            proxy_hist_to_single(data = data,
+            proxy_to_single(data = data,
                             meta = filter_meta())
 
 
@@ -384,7 +389,7 @@ mod_landscape_server <- function(id){
         series_id <- unique(data$group)
 
         proxy %>%
-          proxy_hist_to_group(
+          proxy_to_group(
             data = data,
             meta = filter_meta(),
             id = series_id,
@@ -485,7 +490,27 @@ mod_landscape_server <- function(id){
 
       data <- process_line_data(option, filtering)
 
-      View(data)
+
+      if(max(data$y, na.rm = TRUE) == 100) {
+       y_max_rel <- max(data$y, na.rm = TRUE)
+      } else {
+        y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
+      }
+
+      if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
+        line_title <- data$legend_title[1]  # Get the first value
+      } else {
+        line_title <- paste(filter_meta()$title, "Over Time")  # Default value if `legend_title` column is missing
+      }
+
+      if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {
+        subtitle <- data$subtitle[1]  # Get the first value
+      } else {
+        subtitle <- NULL
+      }
+
+# data$responses <- sum(data$Responses)
+# print(data)
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -493,10 +518,14 @@ mod_landscape_server <- function(id){
         x_group = "legend_label",
         y_variable = "y",
         y_label = filter_meta()$y_label,
+        y_max = y_max_rel,
         x_label = "Year",
         select_theme = naccho.viz::minimal,
-        title = filter_meta()$title,
-        tooltip = "In {point.year}, {point.one}{point.two}."
+        title = line_title,
+        subtitle = subtitle,
+        # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
+        tooltip = "In {point.year}, {point.one}{point.two}.",
+        legend_title = NA
       )
 
 
@@ -514,10 +543,12 @@ mod_landscape_server <- function(id){
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
 
+
+
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        # view == input$view, # fix
+                        view == input$view, # fix
                         filter == input$filter)
 
         p(htmltools::HTML(

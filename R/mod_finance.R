@@ -50,10 +50,10 @@ mod_finance_ui <- function(id){
               ns("view"),
               "",
               choiceNames = list(
-                HTML('<i class="fas fa-chart-candlestick"></i>'), # Chart icon
+                HTML('<i class="fas fa-chart-column"></i>'), # Chart icon
                 HTML('<i class="fas fa-table"></i>') # Map icon
               ),
-              choiceValues = c("Box Plot", "Table")
+              choiceValues = c("Histogram", "Table")
             )
           ),
 
@@ -62,11 +62,11 @@ mod_finance_ui <- function(id){
           div(
             class = "viz-content",
 
-            # display when Box Plot is selected and Table is not selected
+            # display when Bar Graph is selected and Table is not selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('view'), "\'] == \'Box Plot\' && input[\'", ns('view'), "\'] != \'Table\'"),
+              condition = paste0('input[\'', ns('view'), "\'] == \'Histogram\' && input[\'", ns('view'), "\'] != \'Table\'"),
               div(
-                highcharter::highchartOutput(ns("figure_box"), height = "100%"),
+                highcharter::highchartOutput(ns("figure_hist"), height = "100%"),
                 style = "height: 65vh; width: 50vw;")
             ),
 
@@ -83,7 +83,7 @@ mod_finance_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] == \'budget_changes\' && input[\'", ns('view'), "\'] != \'Table\'"),
               div(
                 highcharter::highchartOutput(ns("figure_budget"), height = "100%"),
-                  style = "height: 65vh; width: 50vw;")
+                  style = "height: 68vh; width: 50vw;")
             ),
 
             # display when Tree Map is selected, non-weighted revenue total is selected, and Table is not selected
@@ -208,6 +208,13 @@ mod_finance_server <- function(id){
     ns <- session$ns
 
 
+    # inputs for each topic ---------------------------------------------------
+    updated_inputs <- reactive({
+      input$topic
+      input$filter
+    }) %>% debounce(100)
+
+
     #table titles--------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
@@ -221,12 +228,6 @@ mod_finance_server <- function(id){
     })
 
 
-    # inputs for each topic ---------------------------------------------------
-    updated_inputs <- reactive({
-      input$topic
-      input$filter
-    }) %>% debounce(100)
-
 
 
     # update inputs based on selections ---------------------------------------
@@ -235,19 +236,19 @@ mod_finance_server <- function(id){
       if (input$topic == "non_weighted_revenue_total") {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
-                                                HTML('<i class="fas fa-chart-candlestick"></i>'),
+                                                HTML('<i class="fas fa-chart-column"></i>'),
                                                 HTML('<i class="fas fa-chart-tree-map"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Box Plot", "Tree Map", "Table"))
+                                              choiceValues = c("Histogram", "Tree Map", "Table"))
 
       } else if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
-                                                HTML('<i class="fas fa-chart-candlestick"></i>'),
+                                                HTML('<i class="fas fa-chart-column"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Box Plot", "Table"))
+                                              choiceValues = c("Histogram", "Table"))
 
 
       } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat")) {
@@ -263,7 +264,7 @@ mod_finance_server <- function(id){
     observe({
       if (input$topic == "budget_changes") {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters)
+                          choices = "All LHDs")
 
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
@@ -272,7 +273,15 @@ mod_finance_server <- function(id){
                                               ),
                                               choiceValues = c("Bar Graph", "Table"))
 
-      } else {
+      } else if (input$topic %in% c("c3q15", "totexp_percap",
+                                    "non_weighted_revenue_percap",
+                                    "non_weighted_revenue_total") &
+                 input$view == "Histogram") {
+
+        updateSelectInput(session, "filter",
+                          choices = "All LHDs")
+
+     } else {
         updateSelectInput(session, "filter",
                           choices = landscape_filters)
       }
@@ -313,30 +322,71 @@ mod_finance_server <- function(id){
 
 
     # figure output -----------------------------------------------------------
-    # used for boxplot
-    output$figure_box <- highcharter::renderHighchart({
-      data <- boxplot_list[["boxplot_data_c3q15_all"]]
 
-      # Create the boxplot
-      set_box(data) %>%
+    output$figure_hist <- highcharter::renderHighchart({
+
+      data <- create_hist(input = "c3q15",
+                          x_label = "Total Expenditures $")
+
+      data2 <- nacchoProfile::return_survey_weighted_statistics("c3q15")
+
+      x_max <- mean_bin*5
+
+      x_mean <- data2$Mean
+
+      mean_bin <- data %>%
+        dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+        dplyr::select(x) %>%
+        dplyr::pull()
+
+
+      set_hist(data, x_label = unique(data$x_label), y_label = "# of LHDs", x_max = x_max) %>%
         viz_options(
           legend_enable = FALSE,
-          viz_title = "Estimated Total Expenditures: Mean, Median, and Quartiles",
-          viz_caption = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
-                               "<b> Note: </b> There were ", data[[1]]$total_outliers,
-                               " observations above the upper limit ranging from ",
-                               scales::dollar(data[[1]]$min_outlier)," to ",
-                               scales::dollar(data[[1]]$max_outlier), ". <br>",
-                               source_line),
-          viz_subtitle = "",
-          tooltip = "<b> Upper Limit: </b> ${point.high:.0f} <br>
-                     <b> 75th Percentile: </b> ${point.q3:.0f} <br>
-                     <b> Median: </b> ${point.median:.0f} <br>
-                     <b> 25th Percentile: </b> ${point.q1:.0f} <br>
-                     <b> Lower Limit: </b> ${point.low:.0f} <br>",
-          tooltip_align = "left"
+          viz_title = "The Distribution of Estimated Total Expenditures Across LHDs",
+          viz_caption = paste0("<b> N: </b>", sum(data$y), "<br>", source_line),
+          viz_subtitle = unique(data$subtitle),
+          tooltip = "{point.y:.0f} LHDs spent between ${point.low_bin} and ${point.high_bin} in the last fiscal year reported."
         ) %>%
+        highcharter::hc_xAxis(
+          plotLines = list(
+            list(
+              width = 2,
+              color = naccho.viz::terracotta,
+              value = mean_bin,  # Position of the line at the mean
+              label = list(
+                text = paste0("Mean Total Expenditures: <br>", scales::label_currency(prefix = "$")(x_mean)),     # Label for the line,
+                rotation = 0,
+                align = "left",   # Label alignment
+                style = list(
+                  fontWeight = "bold"
+                )))
+          )) %>%
         viz_export()
+      # data <- boxplot_list[["boxplot_data_c3q15_all"]]
+      #
+      #
+      #
+      # # Create the boxplot
+      # set_box(data) %>%
+      #   viz_options(
+      #     legend_enable = FALSE,
+      #     viz_title = "Estimated Total Expenditures: Mean, Median, and Quartiles",
+      #     viz_caption = paste0("<b> N: </b>", sum(data[[1]]$responses), "<br>",
+      #                          "<b> Note: </b> There were ", data[[1]]$total_outliers,
+      #                          " observations above the upper limit ranging from ",
+      #                          scales::dollar(data[[1]]$min_outlier)," to ",
+      #                          scales::dollar(data[[1]]$max_outlier), ". <br>",
+      #                          source_line),
+      #     viz_subtitle = "",
+      #     tooltip = "<b> Upper Limit: </b> ${point.high:.0f} <br>
+      #                <b> 75th Percentile: </b> ${point.q3:.0f} <br>
+      #                <b> Median: </b> ${point.median:.0f} <br>
+      #                <b> 25th Percentile: </b> ${point.q1:.0f} <br>
+      #                <b> Lower Limit: </b> ${point.low:.0f} <br>",
+      #     tooltip_align = "left"
+      #   ) %>%
+      #   viz_export()
     })
 
 
@@ -351,7 +401,8 @@ mod_finance_server <- function(id){
           viz_subtitle = "Estimated Across All LHDs",
           tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
                     {point.y:.0f}% of LHDs had per capita expenditures between
-                    {point.category}."
+                    {point.category}.",
+          theme = naccho.viz::basic
         ) %>%
         viz_export()
     })
@@ -365,8 +416,13 @@ mod_finance_server <- function(id){
         dplyr::filter(group == "All") %>%
         dplyr::summarise(n = left_n + right_n)
 
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
       set_bar(data,
-              set_max = 100,
+              y_label = NA,
+              max_one = max_one,
+              max_two = max_two,
               name_one = "Cut",
               name_two = "Same or Higher",
               set_format = "{value}%") %>%
@@ -378,26 +434,18 @@ mod_finance_server <- function(id){
           viz_caption = paste0("<b> N: </b>", unique(responses$n), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
           tooltip = "<b> {series.name}: </b>
-              {point.y:.0f}% <br>",
-          theme = naccho.viz::butterfly
+              {point.y:.0f}% <br>"
+          # ,
+          # theme = naccho.viz::butterfly
         ) %>%
-        viz_export() %>%
+        viz_export()%>%
         highcharter::hc_tooltip(
-          backgroundColor = "transparent",
           headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
           hideDelay = 2000,
-          shadow = FALSE,
-          positioner = highcharter::JS("
-          function (labelWidth, labelHeight, point) {
-            return {
-              x: 10,
-              y: 10
-            };
-          }
-        ")
+          shadow = FALSE
         )
     })
 
@@ -412,7 +460,7 @@ mod_finance_server <- function(id){
           dplyr::rename(name = revenue_type) %>%
           dplyr::mutate(id = paste(name, sep = " "),
                         value = round(percentage*100,1)) %>%
-          dplyr::select(all_of(id, name, value))
+          dplyr::select(id, name, value)
 
         add_info <- data.frame(
           color = naccho.viz::green
@@ -422,10 +470,10 @@ mod_finance_server <- function(id){
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%
-          hc_add_series(
+          highcharter::hc_add_series(
             type = "treemap",
             layoutAlgorithm = "squarified",
-            data = list_parse(data),
+            data = highcharter::list_parse(data),
             allowDrillToNode = TRUE, # enables drill down
             borderColor = "#FFFFFF",
             borderWidth = 2
@@ -441,7 +489,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "13px",
+                  fontSize = "1.8vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"
@@ -499,10 +547,10 @@ mod_finance_server <- function(id){
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%
-          hc_add_series(
+          highcharter::hc_add_series(
             type = "treemap",
             layoutAlgorithm = "squarified",
-            data = list_parse(data),
+            data = highcharter::list_parse(data),
             allowDrillToNode = TRUE, # enables drill down
             borderColor = "#FFFFFF",
             borderWidth = 2,
@@ -515,7 +563,7 @@ mod_finance_server <- function(id){
                   align = 'left',
                   verticalAlign = 'top',
                   style = list(
-                    fontSize = '15px',
+                    fontSize = '2vmin',
                     fontWeight = 'bold'
                   )
                 )
@@ -536,7 +584,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "13px",
+                  fontSize = "2vmin",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"
@@ -567,7 +615,7 @@ mod_finance_server <- function(id){
 
     # proxy -------------------------------------------------------------------
     # save the figure as a proxy to redraw
-    proxy_box <- highcharter::highchartProxy(ns("figure_box"))
+    proxy_hist <- highcharter::highchartProxy(ns("figure_hist"))
     proxy_bar <- highcharter::highchartProxy(ns("figure"))
 
 
@@ -591,32 +639,66 @@ mod_finance_server <- function(id){
     observeEvent(updated_inputs(), {
       use_js_proxy()
 
-      if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter == "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$topic, "_all")
-        data <- boxplot_list[get_boxplot_list]
+      if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter == "All LHDs" & input$view == "Histogram") {
 
-        names(data) <- NULL
-        data[[1]] <- data[[1]][[1]]
+        data <- create_hist(input = input$topic,
+                            x_label = "$")
 
-        proxy_box %>%
-          proxy_to_box(data,
-                       meta = filter_meta())
+        data2 <- nacchoProfile::return_survey_weighted_statistics(input$topic)
 
 
-      } else if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter != "All LHDs" & input$view == "Box Plot") {
-        get_boxplot_list <- paste0("boxplot_data_", input$topic, "_", input$filter)
-        data <- boxplot_list[get_boxplot_list]
-
-        names(data) <- NULL
-        data <- data[[1]]
-
-        proxy_box %>%
-          proxy_to_group_box(data,
-                       meta = filter_meta())
+        x_mean <- data2$Mean
 
 
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
 
-      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs") {
+        if (input$topic %in% c("c3q15", "non_weighted_revenue_total")) {
+          x_max <- mean_bin*5
+        } else {
+        x_max <- mean_bin*8
+        }
+
+        proxy_hist %>%
+          proxy_to_hist_total(data,
+                       x_max = x_max,
+                       meta = filter_meta())%>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+              # max = x_max,
+              # label = list(autoRotation = TRUE),
+              plotLines = list(
+                list(
+                  width = 2,
+                  color = naccho.viz::terracotta,
+                  value = mean_bin,  # Position of the line at the mean
+                  label = list(
+                    text = paste0("Mean Total Expenditures: <br>", scales::label_currency(prefix = "$")(x_mean)),     # Label for the line,
+                    rotation = 0,
+                    align = "left",   # Label alignment
+                    style = list(
+                      fontWeight = "bold"
+                    )))
+              ))
+          )
+
+#
+#       } else if (input$topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_total", "non_weighted_revenue_percap") & input$filter != "All LHDs" & input$view == "Histogram") {
+#         get_boxplot_list <- paste0("boxplot_data_", input$topic, "_", input$filter)
+#         data <- boxplot_list[get_boxplot_list]
+#
+#         names(data) <- NULL
+#         data <- data[[1]]
+#
+#         proxy_hist %>%
+#           proxy_to_group_box(data,
+#                        meta = filter_meta())
+#
+
+
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter == "All LHDs" & input$view == "Bar Graph") {
         data <- return_survey_weighted_counts(input$topic) %>%
           dplyr::mutate(x_label = NA)
 
@@ -627,7 +709,7 @@ mod_finance_server <- function(id){
 
 
 
-      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs") {
+      } else if (input$topic %in% c("exp_total_numcat", "exp_percap_numcat", "rev_total_numcat", "rev_percap_numcat") & input$filter != "All LHDs" & input$view == "Bar Graph") {
         data <- return_survey_weighted_counts(input$topic, input$filter) %>%
           dplyr::mutate(x_label = NA)
 

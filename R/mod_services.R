@@ -67,7 +67,7 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 70vh; width: 48vw;")
+              style = "height: 65vh; width: 48vw;")
             ),
 
 
@@ -81,8 +81,8 @@ mod_services_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
               div(
-              highcharter::highchartOutput(ns("figure_scatter"), height = "90%"), #775
-              style = "height: 70vh; width: 50vw;")
+              highcharter::highchartOutput(ns("figure_scatter"), height = "100%"), #775
+              style = "height: 70vh; width: auto;")
             ),
 
             # display when Service Changes and Butterfly Graph are selected
@@ -100,7 +100,7 @@ mod_services_ui <- function(id){
                 uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto"),
               br(),
-              HTML('<div style="font-size: 2vmin;">', source_line,'
+              HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
             style = "height: 65vh; width: 50vw;")
@@ -285,7 +285,7 @@ mod_services_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -340,7 +340,7 @@ mod_services_server <- function(id){
           viz_subtitle = "Immunization Services", # unique(data$service_category)
           viz_caption = paste0("<b> N: </b>",  min(data$demoninator), "-", max(data$demoninator), "<br>", source_line),
           tooltip = "",
-          theme = naccho.viz::butterfly,
+          theme = naccho.viz::basic ,
           legend_enable = FALSE,
           colors = naccho.viz::green
         ) %>%
@@ -379,8 +379,13 @@ mod_services_server <- function(id){
       data_n <- data %>%
         dplyr::filter(group == "All LHDs")
 
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
       set_bar(data,
-              set_max = 100,
+              y_label = "% of LHDs",
+              max_one = max_one,
+              max_two = max_two,
               name_one = "Service Shrunk",
               name_two = "Service Grew",
               set_format = "{value}%") %>%
@@ -396,27 +401,54 @@ mod_services_server <- function(id){
         ) %>%
         viz_export() %>%
         highcharter::hc_tooltip(
-          backgroundColor = "transparent",
+          backgroundColor = "white",
           headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
           style = list(
             textAlign = "left"
           ),
           hideDelay = 2000,
-          shadow = FALSE,
-          positioner = highcharter::JS("
-          function (labelWidth, labelHeight, point) {
-            return {
-              x: 0,
-              y: 10
-            };
-          }
-        ")
+          shadow = FALSE
+        # ,
+        #   positioner = highcharter::JS("
+        #   function (labelWidth, labelHeight, point) {
+        #     return {
+        #       x: 0,
+        #       y: 10
+        #     };
+        #   }
+        # ")
         ) %>%
         highcharter::hc_legend(enabled = TRUE,
                                padding = 0,
                                itemMarginTop = 0,
                                itemMarginBottom = 0)%>%
         highcharter::hc_caption(margin = 20)
+
+      # %>%
+      #   highcharter::hc_yAxis_multiples(
+      #     list(
+      #     max = max_one,
+      #     title = list(text = "",
+      #                  y = 10),
+      #     width = "50%",
+      #     reversed = TRUE,
+      #     offset = 10,
+      #     alignTicks = FALSE,
+      #     tickInterval = interval,
+      #     tickAmount = ticks
+      #     # ,
+      #     # opposite = TRUE
+      #   ),
+      #   list(
+      #     max = max_two,
+      #     left = "50%",
+      #     width = "50%",
+      #     offset = 10,
+      #     alignTicks = FALSE,
+      #     tickInterval = interval,
+      #     tickAmount = ticks
+      #   )
+      #   )
     })
 
 
@@ -454,15 +486,15 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "13px"
+          size = "2vmin"
           overflow = "ellipsis"
         } else {
-          size = "17px"
+          size = "2vmin"
           overflow = "none"
         }
 
         proxy_bar %>%
-          proxy_hist_to_single(data,
+          proxy_to_single(data,
                           meta = filter_meta(),
                           size = size,
                           overflow = overflow,
@@ -498,10 +530,10 @@ mod_services_server <- function(id){
 
         # nested
         if (length(data$x) >= 8) {
-          size = "13px"
+          size = "1.8vmin"
           overflow = "ellipsis"
         } else {
-          size = "17px"
+          size = "2vmin"
           overflow = "none"
         }
 
@@ -572,19 +604,42 @@ mod_services_server <- function(id){
         data_n <- data %>%
           dplyr::filter(group == "All LHDs")
 
+        max_one <- max(data$left)
+        max_two <-max(data$right)
+
         proxy_butterfly %>%
-          highcharter::hcpxy_update(
-            series = list(
-              list(id = "Left", data = data$left),  # Update Left series data
-              list(id = "Right", data = data$right) # Update Right series data
-            ),
-            subtitle = list(
-              text = paste(unique(data$service_type))
-            ),
-            caption = list(
-              text = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line)
-            )
-          )
+          proxy_to_bar(data, max_one, max_two,
+                       meta,name_one = "Services shrunk",
+                                   name_two = "JServices grew",
+                                   y_label = "% of LHDs")
+          # highcharter::hcpxy_update(
+          #   series = list(
+          #     list(id = "Left", data = data$left),  # Update Left series data
+          #     list(id = "Right", data = data$right) # Update Right series data
+          #   ),
+          #   subtitle = list(
+          #     text = paste(unique(data$service_type))
+          #   ),
+          #   caption = list(
+          #     text = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line)
+          #   )
+          # ) %>%
+          # highcharter::hcpxy_update(
+          #   yAxis = list(
+          #     list(
+          #       max = max_one
+          #       # ,
+          #       # tickInterval = interval,
+          #       # tickAmount = ticks_one
+          #     ),
+          #     list(
+          #       max = max_two
+          #       # ,
+          #       # tickInterval = interval,
+          #       # tickAmount = ticks_two
+          #     )
+          #   )
+          # )
       }
     })
 

@@ -31,12 +31,12 @@ mod_overview_ui <- function(id) {
 
           # carousel
           bsutils::carousel(
-            indicators = FALSE,
+            indicators = TRUE,
             controls = TRUE,
             class = "carousel-dark alt-2",
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "70vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -46,16 +46,16 @@ mod_overview_ui <- function(id) {
                     class = "row",
                     div(
                       class = "col-sm-3 color-carousel",
-                      HTML("<span style = 'font-size: 18px; font-weight: 600; color: #212F5B; line-height: 25px;'>
+                      HTML("<span style = 'font-size: 2.6vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
                           Although only 6% of all LHDs were
                           classified as large, they served more
                           than half of the U.S. population. </span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 1.8vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
                       class = "col-sm-9",
-                      highcharter::highchartOutput(ns("population"), height = 500)
+                      highcharter::highchartOutput(ns("population"), height = "55vmin")
                     )
                   )
                 )
@@ -64,7 +64,7 @@ mod_overview_ui <- function(id) {
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 700,
+                height = "70vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -73,8 +73,8 @@ mod_overview_ui <- function(id) {
                   div(
                     class = "row",
                     div(
-                      class = "col-sm-3 color-carousel-2",
-                      HTML("<span style = 'font-size: 16px; font-weight: 600; color: #212F5B; line-height: 20px;'>
+                      class = "col-sm-4 color-carousel-2",
+                      HTML("<span style = 'font-size: 2.4vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
                           Of the 2,512 LHDs included in the 2022
                           Profile study population, 1,928 were
                           locally governed, 467 were units of the
@@ -85,12 +85,16 @@ mod_overview_ui <- function(id) {
                           most parts of the state, while a small
                           number of large metropolitan areas
                           have locally governed LHDs.</span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 1.8vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
-                      class = "col-sm-9",
-                      highcharter::highchartOutput(ns("map"), height = 500)
+                      class = "col-sm-8",
+                      highcharter::highchartOutput(ns("map"),
+                                                   width = "auto",
+                                                   height = "90%"),
+                      style = "margin-left: auto !important;
+                              margin-right: auto !important;"
                     )
                   )
                 )
@@ -99,7 +103,7 @@ mod_overview_ui <- function(id) {
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 700,
+                height = "70vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -108,8 +112,8 @@ mod_overview_ui <- function(id) {
                   div(
                     class = "row",
                     div(
-                      class = "col-sm-3 color-carousel",
-                      HTML("<span style = 'font-size: 18px; font-weight: 600; color: #212F5B; line-height: 25px;'>
+                      class = "col-sm-4 color-carousel",
+                      HTML("<span style = 'font-size: 2.6vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
                           Approximately two-thirds of LHDs
                           were county-based and an additional
                           8% serve multiple counties. One-fifth of
@@ -118,12 +122,14 @@ mod_overview_ui <- function(id) {
                           cities or towns but were more likely
                           to serve multiple counties than
                           small LHDs. </span> <br> <br>
-                          <span style = 'font-size: 12px;'>
+                          <span style = 'font-size: 1.8vmin;'>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
-                      class = "col-sm-9",
-                      highcharter::highchartOutput(ns("cities"), height = 500)
+                      class = "col-sm-8",
+                      highcharter::highchartOutput(ns("cities"),
+                                                   # width = "65vmin",
+                                                   height = "55vmin")
                     )
                   )
                 )
@@ -155,19 +161,26 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("Percent of all LHDs", "Percent of all LHDs", "Percent of all LHDs",
-                  "Percent of population served by LHDs", "Percent of population served by LHDs", "Percent of population served by LHDs")
+        group = c("all LHDs", "all LHDs", "all LHDs",
+                  "population served by LHDs", "population served by LHDs", "population served by LHDs")
       )
+
+      data <- data %>%
+        dplyr::mutate(tooltip = paste(y, "% of", group, "are served by", category, "LHDs"))
+
 
       set_column(data) %>%
         viz_options(
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
-          tooltip = "{point.y:.0f} {point.group} are served by {point.category}",
           viz_subtitle = "",
-          legend_align = "center"
+          tooltip = "{point.y:.0f}% of {point.group} are served by {point.category} LHDs.",
+          legend_align = "center",
+          legend_title = "% of"
         ) %>%
-        viz_export()
+        # highcharter::hc_tooltip(
+        #   pointFormat =  "{point.y:.0f}% of {point.group} are served by {point.category} LHDs.") %>%
+        viz_export
     })
 
 
@@ -175,31 +188,55 @@ mod_overview_server <- function(id){
     # used for the map only, displayed in the UI using a conditional panel
     output$map <- highcharter::renderHighchart({
 
-      # THIS NEEDS TO BE UPDATED WITH CORRECT DATA
+      # data
+      join <- data.frame(
+        fips = c(33, 10, 44, 02, 11),
+        state_name = c("New Hampshire", "Deleware", "Rhode Island",
+                       "Alaska", "District of Columbia"),
+        grouping = c("Local", "State", "State", "Local", "Mixed")
+      )
+
       data <- master_data %>%
         haven::as_factor() %>%
-        dplyr::mutate(fig_filter = stringr::str_to_title(c0govcat)) %>%
-        # dplyr::distinct(fips, .keep_all = TRUE) %>%
-        dplyr::select(fips, state_name, fig_filter)
+        dplyr::distinct(fips, .keep_all = TRUE) %>%
+        dplyr::mutate(grouping = c0govcatn) %>%
+        dplyr::select(fips, state_name, grouping) %>%
+        dplyr::mutate(grouping = dplyr::case_when(
+          state_name %in% c("Wyoming", "Louisiana",
+                            "Oklahoma", "Tennessee", "Texas", "Alabama",
+                            "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
+          state_name == "Delaware" ~ "Shared",
+          grouping == "shared" ~ "Shared",
+          grouping == "local" ~ "Local",
+          grouping == "state" ~ "State",
+          grouping == "mixed" ~ "Mixed",
+          TRUE ~ grouping))
 
+      data <-  dplyr::bind_rows(data, join)
+      #%>%
+      #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
+
+      View(data)
       # uses a function from the naccho.viz package
       naccho.viz::create_cat_map(
         data = data,
         fips_column = "fips",
-        selected_value = "fig_filter",
+        selected_value = "grouping",
         title_text = "Governance of LHDs",
         subtitle_text = "",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
         caption_text = "",
         accessible_desc = ""
-      ) %>%
-        highcharter::hc_chart(
-          marginBottom = 120,
-          spacingTop = 10,
-          spacingBottom = 0
-        ) %>%
-        highcharter::hc_legend(
-          margin = 60
-        )
+      )
+
+      # %>%
+      #   highcharter::hc_chart(
+      #     spacing = "1vmin 1vmin 1vmin 1vmin"
+      #   )
+      # %>%
+      #   highcharter::hc_legend(
+      #     margin = "2.5vmin"
+      #   )
     })
 
 
@@ -245,7 +282,7 @@ mod_overview_server <- function(id){
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "14px",
+            fontSize = "2vmin",
             textShadow = "none"
           )
         )
@@ -269,7 +306,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y:.0f}% of {point.category} serve {point.group} areas",
+          tooltip = "{point.y:.0f}% of {this.x} serve {this.group} areas",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

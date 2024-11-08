@@ -77,7 +77,7 @@ mod_workforce_ui <- function(id){
               condition = paste0("(input['", ns('topic'), "'] == 'jobs_standard' || input['", ns('topic'), "'] == 'jobs_total') && input['", ns('view'), "'] == 'Bar Graph'", sep = ""),
               div(
                 highcharter::highchartOutput(ns("figure_jobs"), height = "100%"),
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 68vh; width: 50vw;")
             ),
 
             # Adding the new table view
@@ -87,7 +87,7 @@ mod_workforce_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
+                HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "height: 65vh; width: 50vw;")
@@ -97,7 +97,7 @@ mod_workforce_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line")),
+                highcharter::highchartOutput(ns("line"), height = "65vh"),
                 style = "height: 65vh; width: 50vw;"
               )
             )
@@ -306,7 +306,7 @@ mod_workforce_server <- function(id){
       title_values <- as.character(subset(meta, field == input$topic)$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 20px; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
     # figure output -----------------------------------------------------------
@@ -315,7 +315,18 @@ mod_workforce_server <- function(id){
       data <- create_hist(input = "c5q37",
                           x_label = "Total FTEs")
 
-      set_hist(data) %>%
+      data2 <- nacchoProfile::return_survey_weighted_statistics("c5q37")
+
+      x_mean <- data2$Mean
+
+      mean_bin <- data %>%
+        dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+        dplyr::select(x) %>%
+        dplyr::pull()
+
+      x_max <- mean_bin*10
+
+      set_hist(data, x_max = x_max) %>%
         viz_options(
           legend_enable = FALSE,
           viz_title = "The Distribution of Total FTEs Across LHDs",
@@ -332,35 +343,51 @@ mod_workforce_server <- function(id){
 
       data <- filtered_butterfly()
 
-      set_bar(data) %>%
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
+      set_bar(data,
+              max_one = max_one,
+              max_two = max_two,
+              y_label = "# of Jobs") %>%
         viz_options(
           colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
           viz_title = "Jobs Lost and Added - Estimated Total",
           viz_caption = paste0("<b> N: </b>", unique(jobs_responses()$responses), "<br>", source_line),
           viz_subtitle = "All and Subsetted LHDs",
-          tooltip = "<b> {series.name}: </b>
-              {point.y:.0f} <br>",
+          tooltip = "<b> {series.name}: </b>{point.y:.0f} <br>",
           theme = naccho.viz::butterfly
         ) %>%
-        viz_export() %>%
-        highcharter::hc_tooltip(
-          backgroundColor = "transparent",
-          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-          style = list(
-            textAlign = "left"
-          ),
-          hideDelay = 2000,
-          shadow = FALSE,
-          positioner = highcharter::JS("
-          function (labelWidth, labelHeight, point) {
-            return {
-              x: 0,
-              y: 10
-            };
-          }
-        ")
-        )
+        viz_export()
+  #     %>%
+  #       highcharter::hc_tooltip(
+  #         backgroundColor = "white",
+  #         headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
+  #         style = list(
+  #           textAlign = "left",
+  #           fontSize = "1.5vmin",
+  #           lineHeight = "1.6vmin",# Responsive font size for readability
+  #           # color = "#333333"  ,
+  #           width = "auto",                               # Auto width to adapt to content
+  #           maxWidth = "15vw",                           # Set maximum width for tooltip box
+  #           whiteSpace = "normal" # Darker text color for contrast
+  #         ),
+  #         hideDelay = 2000,
+  #         shadow = FALSE,
+  #         outside = FALSE,                    # Keep tooltip within chart area
+  #         positioner = highcharter::JS("
+  #   function (labelWidth, labelHeight) {
+  #     const chart = this.chart;
+  #     // Position tooltip at the bottom-right corner of the chart
+  #     const x = chart.plotRight + chart.plotWidth - labelWidth - 20;
+  #     const y = chart.plotTop + chart.plotHeight - labelHeight - 20;
+  #     return { x: x, y: y };
+  #   }
+  # ")
+  #       )
+
+
     })
 
 
@@ -412,7 +439,8 @@ mod_workforce_server <- function(id){
           dplyr::mutate(x_label = NA)
 
         proxy %>%
-          proxy_hist_to_single(data,
+          proxy_hist_to_single(data = data,
+                               x_max = x_max,
                                meta = filter_meta(),
                                theme = naccho.viz::basic)
 
@@ -425,6 +453,8 @@ mod_workforce_server <- function(id){
           dplyr::mutate(x_label = NA)
 
         series_id <- unique(data$group) # provide ID for proxy
+
+        print(series_id)
 
         proxy %>%
           proxy_hist_to_group(data = data,
@@ -443,8 +473,21 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
                             x_label = "Per Capita FTEs")
-        proxy %>%
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("fte_bypop")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
+         proxy %>%
           proxy_to_hist_pc(data,
+                           x_max = x_max,
                            meta = filter_meta(),
                            responses = sum(data$y))
 
@@ -456,8 +499,20 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q37") {
         data <- create_hist(input = "c5q37",
                             x_label = "Total FTEs")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("c5q37")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*10
         proxy %>%
           proxy_to_hist_total(data,
+                              x_max = x_max,
                               meta = filter_meta(),
                               responses = sum(data$y))
 
@@ -469,8 +524,21 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "c5q36") {
         data <- create_hist(input = "c5q36",
                             x_label = "Total Employees")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("c5q36")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
         proxy %>%
           proxy_to_hist_total(data,
+                              x_max = x_max,
                               meta = filter_meta(),
                               responses = sum(data$y))
 
@@ -482,8 +550,22 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "employee_bypop") {
         data <- create_hist(input = "employee_bypop",
                             x_label = "Per Capita FTEs")
+
+        data2 <- nacchoProfile::return_survey_weighted_statistics("employee_bypop")
+
+        x_mean <- data2$Mean
+
+        mean_bin <- data %>%
+          dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
+          dplyr::select(x) %>%
+          dplyr::pull()
+
+        x_max <- mean_bin*5
+
+
         proxy %>%
           proxy_to_hist_pc(data,
+                           x_max = x_max,
                            meta = filter_meta(),
                            responses = sum(data$y))
 
@@ -530,10 +612,15 @@ mod_workforce_server <- function(id){
           dplyr::mutate(left = left_standard,
                         right = right_standard)
 
+        max_one <- max(data$left)
+        max_two <- max(data$right)
+
         proxy_jobs %>%
           proxy_to_bar(data,
+                       y_label = "# of Jobs",
                        meta = filter_meta(),
-                       max = 10)
+                       max_one = max_one,
+                       max_two = max_two)
 
 
 
@@ -544,10 +631,15 @@ mod_workforce_server <- function(id){
       } else if (input$topic == "jobs_total") {
         data <- filtered_butterfly()
 
+        max_one <- max(data$left)
+        max_two <- max(data$right)
+
         proxy_jobs %>%
           proxy_to_bar(data,
                        meta = filter_meta(),
-                       max = 15000)
+                       max_one = max_one,
+                       max_two = max_two,
+                       y_label = "# of Jobs")
       }
     })
 
@@ -578,13 +670,13 @@ mod_workforce_server <- function(id){
           summarise(Responses = sum(Responses))
 
         # nested
-        if (length(data$x) >= 8) {
+        if (length(data$x) >= 6) {
           rotate = -45
-          size = "13px"
+          size = "2vmin"
           overflow = "ellipsis"
         } else {
           rotate = 0
-          size = "17px"
+          size = "2vmin"
           overflow = "none"
         }
 
