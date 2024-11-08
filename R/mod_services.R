@@ -464,8 +464,8 @@ mod_services_server <- function(id){
     # update proxy ------------------------------------------------------------
     observeEvent(updated_inputs(), {
 
-      message("input$services =")
-      print(input$services)
+      # message("input$services =")
+      # print(input$services)
 
       if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter == "All LHDs") {
         req(length(input$services) >= 1) # prevents error
@@ -663,26 +663,26 @@ mod_services_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("topic variable =")
-      print(topic)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
-
-      #debug
-      message("input$services =")
-      print(input$services)
-      message("input$service_changes =")
-      print(input$service_changes)
-
-      message("classifications variable =")
-      print(classifications)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("topic variable =")
+      # print(topic)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
+      #
+      # #debug
+      # message("input$services =")
+      # print(input$services)
+      # message("input$service_changes =")
+      # print(input$service_changes)
+      #
+      # message("classifications variable =")
+      # print(classifications)
 
 
 
@@ -707,7 +707,7 @@ mod_services_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      print(data)
+      # print(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)

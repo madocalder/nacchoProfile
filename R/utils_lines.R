@@ -534,7 +534,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         category == "Yes")%>%
           dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
 
-        View(hist_data)
+        # View(hist_data)
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts(option, filtering) %>%
@@ -552,7 +552,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         current_data$year <- 2022
         current_data$filter <- filtering
 
-        View(current_data)
+        # View(current_data)
 
         ### Combine data and create more descriptive legend labels
         combined <- full_join(current_data, hist_data,

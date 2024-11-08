@@ -15,20 +15,32 @@ BugReports: https://github.com/lindsayjorgenson/nacchoProfile/issues
 Depends: 
     R (>= 2.10)
 Imports: 
+    attachment,
     bslib,
     bsutils,
     config (>= 0.3.2),
+    covrpage,
+    desc,
+    devtools,
     dplyr,
     flexlayout,
     golem (>= 0.4.1),
     haven,
     highcharter,
     htmltools,
+    httpuv,
+    knitr,
     magrittr,
     naccho.viz,
+    pkgload,
     purrr,
     reactable,
     reactablefmtr,
+    readxl,
+    renv,
+    rmarkdown,
+    rsconnect,
+    rstudioapi,
     scales,
     shiny (>= 1.8.1.1),
     shinyjs,
@@ -37,14 +49,17 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyselect,
     tippy,
+    usethis,
+    usmap,
+    utils,
     waiter
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
 Remotes:
     lindsayjorgenson/naccho.viz,
-    lindsayjorgenson/nacchoProfile,
     the-y-company/bsutils,
     the-y-company/flexlayout,
     lindsayjorgenson/custom.map

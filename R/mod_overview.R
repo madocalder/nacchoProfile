@@ -216,7 +216,7 @@ mod_overview_server <- function(id){
       #%>%
       #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
 
-      View(data)
+      # View(data)
       # uses a function from the naccho.viz package
       naccho.viz::create_cat_map(
         data = data,

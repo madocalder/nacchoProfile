@@ -120,7 +120,7 @@ clean_class_data <- function(topic, classifications, filtering) {
                     group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
       pivot_data_group()
 
-    print.data.frame(data_all_class)
+    # print.data.frame(data_all_class)
 
     if (filtering == "All LHDs") {
       return(data_all_class)

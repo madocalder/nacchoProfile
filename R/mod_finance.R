@@ -100,7 +100,12 @@ mod_finance_ui <- function(id){
 
               div(
                 uiOutput(ns("table_title")),
-                reactable::reactableOutput(ns("data_table"), height = "auto"),
+                shinycssloaders::withSpinner(
+                  reactable::reactableOutput("data_table", height = "auto"),
+                  type = 8,          # Customize the spinner type (choose 1–8)
+                  color = naccho.viz::green, # Customize the spinner color
+                  size = 2           # Customize the spinner size
+                ),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
@@ -744,17 +749,17 @@ mod_finance_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("topic variable =")
-      print(topic)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("topic variable =")
+      # print(topic)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
 
 
 
@@ -779,7 +784,7 @@ mod_finance_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      print(data)
+      # print(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)

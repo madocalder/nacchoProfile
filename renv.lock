@@ -989,9 +989,9 @@
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
-      "Version": "1.6.4",
+      "Version": "1.6.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "grDevices",
         "htmltools",
@@ -1000,7 +1000,7 @@
         "rmarkdown",
         "yaml"
       ],
-      "Hash": "04291cc45198225444a397606810ac37"
+      "Hash": "a865aa85bcb2697f47505bfd70422471"
     },
     "httpuv": {
       "Package": "httpuv",
@@ -1298,46 +1298,6 @@
         "magrittr"
       ],
       "Hash": "3e7f591659c85e0a5dc89599e59a7017"
-    },
-    "nacchoProfile": {
-      "Package": "nacchoProfile",
-      "Version": "0.0.0.9000",
-      "Source": "GitHub",
-      "Remotes": "lindsayjorgenson/naccho.viz, the-y-company/bsutils, the-y-company/flexlayout, lindsayjorgenson/custom.map",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "nacchoProfile",
-      "RemoteUsername": "lindsayjorgenson",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "c430c26be531ecb9d3c14005ebec67c6eada6237",
-      "Requirements": [
-        "R",
-        "bslib",
-        "bsutils",
-        "config",
-        "dplyr",
-        "flexlayout",
-        "golem",
-        "haven",
-        "highcharter",
-        "htmltools",
-        "magrittr",
-        "naccho.viz",
-        "purrr",
-        "reactable",
-        "reactablefmtr",
-        "scales",
-        "shiny",
-        "shinyWidgets",
-        "shinyjs",
-        "srvyr",
-        "stringr",
-        "tibble",
-        "tidyr",
-        "tippy",
-        "waiter"
-      ],
-      "Hash": "39121a0628221c6511f7eacb673abde0"
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -1644,13 +1604,13 @@
     },
     "reactR": {
       "Package": "reactR",
-      "Version": "0.6.0",
+      "Version": "0.4.4",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "htmltools"
       ],
-      "Hash": "10f4d661c235181648a5958c02c0382a"
+      "Hash": "75389c8091eb14ee21c6bc87a88b3809"
     },
     "reactable": {
       "Package": "reactable",
@@ -2048,6 +2008,21 @@
         "shiny"
       ],
       "Hash": "bc918b6911c4e928e24a9928295de834"
+    },
+    "shinycssloaders": {
+      "Package": "shinycssloaders",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "digest",
+        "glue",
+        "grDevices",
+        "htmltools",
+        "shiny"
+      ],
+      "Hash": "2b45a467a30d6a88a1892a738c0900cf"
     },
     "shinyjs": {
       "Package": "shinyjs",

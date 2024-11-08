@@ -454,7 +454,7 @@ mod_workforce_server <- function(id){
 
         series_id <- unique(data$group) # provide ID for proxy
 
-        print(series_id)
+        # print(series_id)
 
         proxy %>%
           proxy_hist_to_group(data = data,
@@ -736,20 +736,20 @@ mod_workforce_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("input$filter =")
-      print(input$filter)
-      message("input$classifications =")
-      print(input$classifications)
-      #debug
-      message("topic =")
-      print(topic)
-      message("filtering =")
-      print(filtering)
-      message("classifications")
-      print(classifications)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("input$filter =")
+      # print(input$filter)
+      # message("input$classifications =")
+      # print(input$classifications)
+      # #debug
+      # message("topic =")
+      # print(topic)
+      # message("filtering =")
+      # print(filtering)
+      # message("classifications")
+      # print(classifications)
 
       data <- process_data(topic, filtering, classifications)
 
@@ -775,7 +775,7 @@ mod_workforce_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      print(data)
+      # print(data)
 
 
       # Call the table creation function with the appropriate data and parameters
@@ -797,30 +797,30 @@ mod_workforce_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("option variable =")
-      print(option)
-
-      message("view selected =")
-      print(input$view)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
-
-      #debug
-      message("input$classifications =")
-      print(input$classifications)
-      message("classifications =")
-      print(classifications)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("option variable =")
+      # print(option)
+      #
+      # message("view selected =")
+      # print(input$view)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
+      #
+      # #debug
+      # message("input$classifications =")
+      # print(input$classifications)
+      # message("classifications =")
+      # print(classifications)
 
       data <- process_line_data(option, filtering, classifications)
 
-      View(data)
+      # View(data)
 
       naccho.viz::create_grouped_line(
         data = data,

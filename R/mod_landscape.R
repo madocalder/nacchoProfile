@@ -414,17 +414,17 @@ mod_landscape_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("topic variable =")
-      print(topic)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("topic variable =")
+      # print(topic)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
 
 
 
@@ -449,7 +449,7 @@ mod_landscape_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      print(data)
+      # print(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
@@ -473,20 +473,20 @@ mod_landscape_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("option variable =")
-      print(option)
-
-      message("view selected =")
-      print(input$view)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("option variable =")
+      # print(option)
+      #
+      # message("view selected =")
+      # print(input$view)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
 
       data <- process_line_data(option, filtering)
 

@@ -266,7 +266,7 @@ mod_topic_areas_server <- function(id){
         data <- get_bar_data(topic = topic, filter = filtering)
       }
 
-      View(data)
+      # View(data)
 
       # Adjust the bar chart settings for long names
       set_simple_bar(data) %>%
@@ -401,26 +401,26 @@ mod_topic_areas_server <- function(id){
         NULL  # If input$classifications does not exist, set it to NULL
       }
 
-      #debug
-      message("input$topic =")
-      print(input$topic)
-      message("topic variable =")
-      print(topic)
-
-      #debug
-      message("input$filter =")
-      print(input$filter)
-      message("filtering variable =")
-      print(filtering)
-
-      #debug
-      message("input$services =")
-      print(input$services)
-      message("input$service_changes =")
-      print(input$service_changes)
-
-      message("classifications variable =")
-      print(classifications)
+      # #debug
+      # message("input$topic =")
+      # print(input$topic)
+      # message("topic variable =")
+      # print(topic)
+      #
+      # #debug
+      # message("input$filter =")
+      # print(input$filter)
+      # message("filtering variable =")
+      # print(filtering)
+      #
+      # #debug
+      # message("input$services =")
+      # print(input$services)
+      # message("input$service_changes =")
+      # print(input$service_changes)
+      #
+      # message("classifications variable =")
+      # print(classifications)
 
 
 
@@ -445,7 +445,7 @@ mod_topic_areas_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      print(data)
+      # print(data)
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)

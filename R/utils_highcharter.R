@@ -507,15 +507,15 @@ set_bar <- function(data,
 
   axis_two <- round((ticks_two/totalTicks), digits = 2)
 
-  message("TICK, AXIS, INTERVAL CHECKs-----")
-
-  print(paste("max_one =", max_one))
-  print(paste("max_two =", max_two))
-  print(paste("ticks_one =", ticks_one))
-  print(paste("ticks_two =", ticks_two))
-  print(paste("axis_one =", axis_one))
-  print(paste("axis_two =", axis_two))
-  print(paste("interval =", interval))
+  # message("TICK, AXIS, INTERVAL CHECKs-----")
+  #
+  # print(paste("max_one =", max_one))
+  # print(paste("max_two =", max_two))
+  # print(paste("ticks_one =", ticks_one))
+  # print(paste("ticks_two =", ticks_two))
+  # print(paste("axis_one =", axis_one))
+  # print(paste("axis_two =", axis_two))
+  # print(paste("interval =", interval))
 
 
   # Update max_one and max_two to be multiples of interval
@@ -526,8 +526,8 @@ set_bar <- function(data,
   #
   # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
 
-  print(paste("max_one's updated value is:", max_one))
-  print(paste("max_two's updated value is:", max_two))
+  # print(paste("max_one's updated value is:", max_one))
+  # print(paste("max_two's updated value is:", max_two))
 
   # print(paste("updated axis_one =", axis_one))
   # print(paste("updated axis_two =", axis_two))
@@ -1117,7 +1117,7 @@ proxy_hist_to_single <- function(hc,
       theme = theme
     )
 
-    View(data)
+    # View(data)
     # Force a redraw to apply all changes
     # highcharter::hcpxy_redraw()
 }
@@ -1351,15 +1351,15 @@ proxy_to_bar <- function(hc,
 
   axis_two <- round((ticks_two/totalTicks), digits = 2)
 
-  message("TICK, AXIS, INTERVAL CHECKs-----")
-
-  print(paste("max_one =", max_one))
-  print(paste("max_two =", max_two))
-  print(paste("ticks_one =", ticks_one))
-  print(paste("ticks_two =", ticks_two))
-  print(paste("axis_one =", axis_one))
-  print(paste("axis_two =", axis_two))
-  print(paste("interval =", interval))
+  # message("TICK, AXIS, INTERVAL CHECKs-----")
+  #
+  # print(paste("max_one =", max_one))
+  # print(paste("max_two =", max_two))
+  # print(paste("ticks_one =", ticks_one))
+  # print(paste("ticks_two =", ticks_two))
+  # print(paste("axis_one =", axis_one))
+  # print(paste("axis_two =", axis_two))
+  # print(paste("interval =", interval))
 
 
   # Update max_one and max_two to be multiples of interval
@@ -1369,9 +1369,9 @@ proxy_to_bar <- function(hc,
   # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
   #
   # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
-
-  print(paste("max_one's updated value is:", max_one))
-  print(paste("max_two's updated value is:", max_two))
+#
+#   print(paste("max_one's updated value is:", max_one))
+#   print(paste("max_two's updated value is:", max_two))
 
   # print(paste("updated axis_one =", axis_one))
   # print(paste("updated axis_two =", axis_two))

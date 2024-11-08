@@ -61,7 +61,7 @@ take_inputs <- function(selected_inputs) {
     for(i in 1:length(selected_inputs)) {
       selected_inputs <- list(input[[i]])
     }
-      print(selected_inputs)
+      # print(selected_inputs)
   }) %>% debounce(debounce_time)
 }
 

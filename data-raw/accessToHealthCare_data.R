@@ -54,7 +54,7 @@ for (i in 1:length(filters)) {
 medical_with_filters <- do.call(rbind, medical_list)
 
 # View the data
-View(medical_with_filters)
+# View(medical_with_filters)
 
 # Create data with no filter
 med_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
@@ -67,8 +67,8 @@ med_data <- rbind(medical_with_filters, med_no_filter) %>%
     .data$category == 1 ~ "Medical Services Provided",
     .data$Answer == 0 ~ "Medical Services Not Provided"
   ))
-
-View(med_data)
+#
+# View(med_data)
 
 # Save the med_data
 usethis::use_data(med_data, overwrite = TRUE)
@@ -95,7 +95,7 @@ for (i in 1:length(filters)) {
 dental_with_filters <- do.call(rbind, dental_list)
 
 # View the data
-View(dental_with_filters)
+# View(dental_with_filters)
 
 # Create data with no filter
 dental_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
@@ -110,7 +110,7 @@ dental_data <- rbind(dental_with_filters, dental_no_filter) %>%
   ))
 
 # View and save the dental_data
-View(dental_data)
+# View(dental_data)
 usethis::use_data(dental_data, overwrite = TRUE)
 
 # Behavioral services ------
@@ -134,8 +134,8 @@ for (i in 1:length(filters)) {
 # Bind the data generated in loop
 behav_with_filters <- do.call(rbind, behav_list)
 
-# View the data
-View(behav_with_filters)
+# # View the data
+# View(behav_with_filters)
 
 # Create data with no filter
 behav_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
@@ -149,6 +149,6 @@ behav_data <- rbind(behav_with_filters, behav_no_filter) %>%
     .data$Answer == 0 ~ "Behavioral Services Not Provided"
   ))
 
-# View and save the behav_data
-View(behav_data)
+# # View and save the behav_data
+# View(behav_data)
 usethis::use_data(behav_data, overwrite = TRUE)
