@@ -189,7 +189,7 @@ proxy_to_single <- function(
         categories = as.list(unique(data$category)),
         offset = 0,
         labels = list(
-          pointPadding = .4
+          pointPadding = .25
         )
       ),
       tooltip = list(
@@ -1060,7 +1060,7 @@ proxy_hist_to_single <- function(hc,
     highcharter::hcpxy_update(
       series = list(
         visible = TRUE,
-        pointPadding = .4,
+        pointPadding = .25,
         type = "column",  # Enforce column type
         dataLabels = list(
           enabled = TRUE,
@@ -1098,7 +1098,7 @@ proxy_hist_to_single <- function(hc,
           text = unique(data$x_label)
         ),
         labels = list(
-          pointPadding = .4,
+          pointPadding = .25,
           # step = 1,
           # rotate = rotate,
           style = list(

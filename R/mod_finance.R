@@ -330,14 +330,14 @@ mod_finance_server <- function(id){
 
       data2 <- nacchoProfile::return_survey_weighted_statistics("c3q15")
 
-      x_max <- mean_bin*5
-
       x_mean <- data2$Mean
 
       mean_bin <- data %>%
         dplyr::filter(low_bin <= x_mean & high_bin >= x_mean) %>%
         dplyr::select(x) %>%
         dplyr::pull()
+
+      x_max <- mean_bin*5
 
 
       set_hist(data, x_label = unique(data$x_label), y_label = "# of LHDs", x_max = x_max) %>%

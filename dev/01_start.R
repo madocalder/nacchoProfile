@@ -22,10 +22,10 @@ golem::fill_desc(
   pkg_name = "nacchoProfile", # The Name of the package containing the App
   pkg_title = "NACCHO Profile Study Dashboard", # The Title of the package containing the App
   pkg_description = "A Shiny application that visualizes findings from NACCHO's National Profile of Local Health Departments.", # The Description of the package containing the App
-  author_first_name = "Lindsay", # Your First Name
-  author_last_name = "Jorgenson", # Your Last Name
-  author_email = "ljorgenson@astho.org", # Your Email
-  repo_url = NULL, # The URL of the GitHub Repo (optional),
+  author_first_name = "Madoc", # Your First Name
+  author_last_name = "Alder", # Your Last Name
+  author_email = "mmarshall@astho.org", # Your Email
+  repo_url =" https://github.com/lindsayjorgenson/nacchoProfile", # The URL of the GitHub Repo (optional),
   pkg_version = "0.0.0.9000" # The Version of the package containing the App
 )
 
