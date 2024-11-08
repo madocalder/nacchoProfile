@@ -4,7 +4,14 @@
 \alias{proxy_to_hist_total}
 \title{Histogram Bar Proxy Redraw Total FTEs}
 \usage{
-proxy_to_hist_total(hc, data, meta, responses = sum(data$Responses), ...)
+proxy_to_hist_total(
+  hc,
+  data,
+  meta,
+  responses = sum(data$Responses),
+  x_max = NULL,
+  ...
+)
 }
 \arguments{
 \item{hc}{A `highchart` `htmlwidget` object.}

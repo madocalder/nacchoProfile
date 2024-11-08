@@ -119,5 +119,7 @@ meta <- data.frame(
               "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of LHDs reported that {point.category} is not available within their community.")
 )
 
+write.csv(meta, "meta.csv", row.names = FALSE)
+
 usethis::use_data(meta, overwrite = TRUE)
 devtools::document()

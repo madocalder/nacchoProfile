@@ -221,7 +221,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
 #' @param q_label The question label in the data set
 #' @param wtype The type of weights to use: "weights" or "weights_static"
 #' @param grps A value from the master_data file to use for grouping statistics.
-#' @param popcat The stata by which to weight, either c0popcat3 or c0popcat7.
+#' @param popcat The strata by which to weight, either c0popcat3 or c0popcat7.
 #'
 #' @export
 #' @importFrom haven as_factor
