@@ -100,12 +100,7 @@ mod_finance_ui <- function(id){
 
               div(
                 uiOutput(ns("table_title")),
-                shinycssloaders::withSpinner(
                   reactable::reactableOutput("data_table", height = "auto"),
-                  type = 8,          # Customize the spinner type (choose 1–8)
-                  color = naccho.viz::green, # Customize the spinner color
-                  size = 2           # Customize the spinner size
-                ),
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),

@@ -1290,14 +1290,14 @@
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "59d8013a170bb6e7fbf7ee422653d3543097dd20",
+      "RemoteSha": "3a759a8515c85777fa88c8403399f9866ed8845c",
       "Requirements": [
         "R",
         "highcharter",
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "3e7f591659c85e0a5dc89599e59a7017"
+      "Hash": "21df848be1c381c74d3764680dc32312"
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -2008,21 +2008,6 @@
         "shiny"
       ],
       "Hash": "bc918b6911c4e928e24a9928295de834"
-    },
-    "shinycssloaders": {
-      "Package": "shinycssloaders",
-      "Version": "1.1.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "digest",
-        "glue",
-        "grDevices",
-        "htmltools",
-        "shiny"
-      ],
-      "Hash": "2b45a467a30d6a88a1892a738c0900cf"
     },
     "shinyjs": {
       "Package": "shinyjs",

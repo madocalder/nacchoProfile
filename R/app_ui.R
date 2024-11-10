@@ -69,7 +69,7 @@ app_ui <- function(request) {
               img(
                 src = "www/logo.png",
                 alt = "NACCHO logo, Home page",
-                height = "120vmin",
+                height = "120vh",
                 style = "position: absolute; left: 47px; top: 0; ")
             ),
             value = "home_tab",

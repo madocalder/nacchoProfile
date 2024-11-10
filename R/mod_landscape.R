@@ -304,11 +304,16 @@ mod_landscape_server <- function(id){
       # Filters: Rurality, Governance, LHD Size, Region
       if (input$topic == "tenure" & input$filter == "All LHDs") {
         data <- return_survey_weighted_statistics("tenure") %>%
-          dplyr::mutate(category = "Average Tenure")
+          dplyr::mutate(category = "Average Tenure",
+                        x = 0,
+                        x_label = "Average Tenure")
+
+        filter_meta <- filter_meta()%>%
+          dplyr::mutate(x_label = "Average Tenure")
 
         proxy %>%
           proxy_to_single(data = data,
-                          meta = filter_meta())
+                          meta = filter_meta)
 
         # Topic: Tenure
         # View: Bar Graph
@@ -317,19 +322,26 @@ mod_landscape_server <- function(id){
           data <- return_survey_weighted_statistics("tenure", input$filter) %>%
             dplyr::mutate(group = stringr::str_to_title(Group),
                           x = 0,
-                          category = "Average Tenure")
+                          category = "Average Tenure",
+                          x_label = "Average Tenure")
+
 
           series_id <- unique(data$group)
+
+          filter_meta <- filter_meta()%>%
+            dplyr::mutate(x_label = "Average Tenure")
 
           proxy %>%
             proxy_to_group(
               data = data,
-              meta = filter_meta(),
+              meta = filter_meta,
               id = series_id,
               colors = colors(), # comes from earlier reactive and needs to match length of field input
               tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of
               {point.group} LHDs are {point.category}."
               )
+
+
 
 
       # Topic: Specialization
@@ -363,7 +375,9 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: All LHDs
       } else if (input$filter == "All LHDs") {
-        data <- return_survey_weighted_counts(input$topic)
+        data <- return_survey_weighted_counts(input$topic)%>%
+          dplyr::filter(category != "Na")%>%
+          dplyr::mutate( x = as.numeric(as.factor(Answer)) -1)
 
         if (input$topic == "c4q29") {
           data$x[3] <- 2 # this may need to be hand-edited in 2025
@@ -378,7 +392,10 @@ mod_landscape_server <- function(id){
       # View: Bar Graph
       # Filters: Rurality, Governance, LHD Size, Region
       } else {
-        data <- return_survey_weighted_counts(input$topic, input$filter)
+        data <- return_survey_weighted_counts(input$topic, input$filter)%>%
+          dplyr::filter(category != "Na")%>%
+          dplyr::mutate( x = as.numeric(as.factor(Answer)) -1)
+
 
         if (input$topic == "c4q29") {
           data <- data %>%
@@ -520,7 +537,7 @@ mod_landscape_server <- function(id){
         y_label = filter_meta()$y_label,
         y_max = y_max_rel,
         x_label = "Year",
-        select_theme = naccho.viz::minimal,
+        select_theme = naccho.viz::basic,
         title = line_title,
         subtitle = subtitle,
         # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),

@@ -391,36 +391,38 @@ label:not(.material-switch label) {
   justify-content: center !important;
   align-content: center !important;
   display: block!important;
-  height: 100vh !important;
-  margin-top: -50px;
+  height: 80vh !important;
+  margin-top: calc(20px + 1vh);
 }
 
 @media (max-height: 700px) {
-  .nav-tabs {
-    margin-top: 0 !important;
-  }
+
   .nav {
-    font-size: 13px !important;
+    font-size: calc(10px + 1vmin) !important;
     margin-top: 0 !important;
   }
   .nav-tabs .nav-link, .nav-tabs :where(ul.nav.navbar-nav > li)>a, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs .nav-link:focus {
-    padding-top: 2vh !important;
+    padding-top: calc(5px + .5vh) !important;
     transform: transition .5s ease;
   }
   .nav-item:nth-child(9) {
-    padding-top: 30% !important;
+    padding-top: 20% !important;
+    padding-bottom: 10% !important;
   }
 }
 
-@media (max-height: 500px) {
-  .nav-item:nth-child(9) {
-    padding-top: 10% !important;
-  }
-}
 
 .nav:not(.nav-hidden):not(.nav-stacked):not(.flex-column) {
   border: none !important;
 }
+
+@media (max-height: 250px) {
+
+  .nav-tabs {
+    margin-top: 30%;
+  }
+}
+
 
 .sidebar>.sidebar-content {
   display: flex;
@@ -433,12 +435,13 @@ label:not(.material-switch label) {
 }
 
 .nav {
-  font-size: 1.0em;
+  font-size:calc(8px + 1vmin);
 }
 
 .nav-item:nth-child(9) {
-  padding-top: 50%;
+  padding-top: 10%;
   margin-left: -8%;
+  padding-bottom: 10%;
 }
 
 .nav-item:nth-child(9) .nav-link {
@@ -468,11 +471,11 @@ label:not(.material-switch label) {
   text-align: center;
 }
 
-/* this is for the data playground button */
+/* this is for the key findings button */
 .pill-button {
   border: 2px solid #80A14E;
   border-radius: 50px; /* Make it pill-shaped */
-  padding: 10px 15px;
+  padding: 1vmin 1.5vmin;
   background-color: #80A14E;
   color: white;
   cursor: pointer;
@@ -483,7 +486,7 @@ label:not(.material-switch label) {
   letter-spacing: 1px;
 }
 
-/* this is for the data playground button */
+/* this is for the key findings button */
 .pill-button:hover, .pill-button:focus {
   background-color: white !important;
   color: #212F5B !important;
@@ -1039,7 +1042,7 @@ label:not(.material-switch label) {
 }
 
 .home-content {
-  padding-top: 7em;
+  padding-top: 5em;
   padding-left: 6em;
   padding-right: 6em;
   padding-bottom: 4em;
@@ -1204,7 +1207,7 @@ b, strong {
 
 .carousel-indicators {
     position: absolute;
-    bottom: 3vmin; /* Position from the bottom based on viewport size */
+    bottom: 1.5vmin; /* Position from the bottom based on viewport size */
 
     display: flex;
     justify-content: center;

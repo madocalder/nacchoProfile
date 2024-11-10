@@ -386,3 +386,30 @@
 #' @source National Association of City and County Health Officials (NACCHO)
 "tech_use_data"
 
+#' Historical NACCHO National Profile Data for Line Viz
+#'
+#' @author Madoc Alder
+#' @references \email{mmarshall@@astho.org}
+#'
+#' @format data.frame
+#'
+#' A data frame with 835 observations and 10 variables.
+#' Contains data profile data over time.
+#'
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"lines_data"
+
+#' LDH Partnerships Data for NACCHO's 2022 National Profile
+#'
+#' @author Madoc Alder
+#' @references \email{mmarshall@@astho.org}
+#'
+#' @format data.frame
+#'
+#' A data frame with 88 observations and 4 variables.
+#' Contains data profile data over time.
+#'
+#'
+#' @source National Association of City and County Health Officials (NACCHO)
+"partnerships"

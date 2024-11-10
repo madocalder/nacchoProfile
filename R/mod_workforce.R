@@ -829,7 +829,7 @@ mod_workforce_server <- function(id){
         y_variable = "y",
         y_label = filter_meta()$y_label,
         x_label = "Year",
-        select_theme = naccho.viz::minimal,
+        select_theme = naccho.viz::basic,
         title = filter_meta()$title,
         tooltip = "In {point.year}, {point.one}{point.two}."
       )

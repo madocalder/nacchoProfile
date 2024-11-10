@@ -1,0 +1,103 @@
+field,title,alt,caption,y_label,y_max,y_format,x_label,data_label,tooltip
+totpop,Percent of U.S. Population Served by LHDs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Population,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of the U.S. population is served by {point.category} LHDs"
+geography,"Geographic Jurisdictions Served by LHDs,",NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs are {point.category}"
+c0govcatn,Governance of LHDs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs are {point.category}"
+c2q501,LHDs Combined with HHSA,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs are {point.category}"
+lboh,LHDs with a Local Board of Health,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs have the following Local Board of Health: {point.category}"
+age_cat,Age Category of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHD Top Executives are {point.category} "
+race,Racial Identity of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHD Top Executives identify as {point.category}"
+ethnicity,Ethnicity of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of {point.group} LHD Top Executives were {point.category}"
+tenure,Average Length of Tenure of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",Number of Years,10,{value},NA,{point.y:.0f} Years,"<span style=""color:{point.color}"">●</span> LHD Top Executives at {point.group} agencies have been in their position an average of {point.y:.0f} years"
+c4q34,Highest Degree Obtained by LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHD Top Executives have the following highest degree: {point.category} "
+field,Educational Specializations of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHD Top Executives have a degree in {point.category}"
+c4q29,Gender of LHD Top Executives,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of Top Executives,100,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHD Top Executives identify as {point.category}"
+FTE_numcat,Percent of LHDs within FTE Size Groupings,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs employ {point.category} FTEs at their agency."
+c5q37,The Distribution of Total FTEs Across LHDs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",# of LHDs,NA,# of LHDs,Total FTEs,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} total FTEs"
+fte_bypop,"The Distribution of FTEs Per 10,000 Population Across LHDs",NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",# of LHDs,NA,# of LHDs,"FTEs per 10,000",{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} FTEs per 10,000 population"
+a,Percent of LHDs that Employ Select Occupational Classifications,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs have FTEs classified as {point.category} at their agency"
+b,Total FTEs in Select Occupational Classifications Estimated Across All LHDs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",Total FTEs,NA,Total FTEs,NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> There are {point.y:.0f} FTEs classified as {point.category} at LHDs in the U.S."
+c5q36,The Distribution of Total Employees Across LHDs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",# of LHDs,NA,# of LHDs,Total Employees,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} total employees"
+employee_bypop,"The Distribution of Employees Per 10,000 Population Across LHDs",NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",# of LHDs,NA,# of LHDs,"Employees per 10,000",{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} employees per 10,000 population"
+employee_numcat,Percent of LHDs within Employee Size Groupings,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs employ {point.category} employees at their agency."
+jobs_total,Jobs Lost and Added - Estimated Total,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",Total Jobs,NA,{value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> <b> {series.name}: </b> {point.y:.0f} <br>"
+jobs_standard,Jobs Lost and Added - Per 100 Total Jobs,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",Jobs per 100 Total Jobs,NA,{value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> <b> {series.name}: </b> {point.y:.0f} <br>"
+c3q15,Estimated Total Expenditures,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",USD,NA,${value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} total FTEs"
+totexp_percap,Estimated Per Capita Expenditures,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",USD,NA,${value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita."
+exp_total_numcat,Percent of LHDs by Grouped Total Expenditures,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs had total expenditures between {point.category}."
+exp_percap_numcat,Percent of LHDs by Grouped Per Capita Expenditures,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs had per capita expenditures that were {point.category}."
+rev_total_numcat,Percent of LHDs by Grouped Total Revenues,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs had total revenues that were {point.category}."
+rev_percap_numcat,Percent of LHDs by Grouped Per Capita Revenues,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,100,% of LHDs,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs had per capita revenues of {point.category}."
+non_weighted_revenue_total,Estimated Total Revenues,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",USD,NA,${value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f}."
+non_weighted_revenue_percap,Estimated Per Capita Revenues,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",USD,NA,${value},NA,{point.y:.0f},"<span style=""color:{point.color}"">●</span> {point.y:.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita."
+LHD (Directly),Percent of LHDs that Directly Provide Selected Services,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,NA,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs provide {point.category} in their community."
+LHD (By Contract),Percent of LHDs that Contract Out of the Provision Selected Services,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,NA,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs contract out of the provision of {point.category} in their community."
+Other Entity,Percent of LHDs Reporting that Selected Services are Provided by Another Entity,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,NA,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs reported that another entity within their community provides {point.category}."
+Not Available in Community,Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,NA,"<b> Source: </b> 2022 National Profile of Local Health
+          Departments. National Association of County and City Health Officials.
+          Washington, DC. (2024).",% of LHDs,NA,{value}%,NA,{point.y:.0f}%,"<span style=""color:{point.color}"">●</span> {point.y:.0f}% of LHDs reported that {point.category} is not available within their community."

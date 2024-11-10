@@ -1028,7 +1028,7 @@ proxy_hist_to_single <- function(hc,
                                  size = "1.8vmin",
                                  overflow = "none",
                                  responses = sum(data$Responses),
-                                 theme = naccho.viz::minimal,
+                                 theme = naccho.viz::basic,
                                  ...) {
 
 
@@ -1990,7 +1990,37 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
   )
 }
 
-#'helper for other topics bar data
+#' Generate Bar Chart Data for Specific Topics
+#'
+#' Retrieves filtered data to be used in bar chart visualizations for various topics.
+#' Data is processed differently depending on the specified topic and filtering parameter.
+#'
+#' @param topic Character string; specifies the topic for which data is needed. Options include:
+#'   - `"tech_use"`: Technology use data.
+#'   - `"comm_channels"`: Communication channels data.
+#'   - `"medical"`: Medical service data.
+#'   - `"dental"`: Dental service data.
+#'   - `"behavioral"`: Behavioral service data.
+#'   - `"chachip"`: Community Health Assessment and Community Health Improvement data.
+#'   - `"c12q260"`: Advocacy data for specified groups.
+#'   - `"Newc12q502"`: New advocacy data.
+#'   - `"m9q240"`: CHIP data.
+#'   - `"work"`: Partnerships data from the specified year.
+#' @param filtering Character string; specifies the filter criteria, such as `"All LHDs"`. Defaults to `NA`.
+#'
+#' @details
+#' This function dynamically prepares data for bar charts based on the `topic` and `filtering` values.
+#' When `filtering` is `"All LHDs"`, it selects data for all Local Health Departments (LHDs), while other filtering values
+#' narrow the data accordingly. Each topic undergoes specific data manipulation to ensure it is formatted for visualization.
+#'
+#' @return A processed data frame containing `x`, `y`, `group`, and `category` columns, ready for bar chart visualization.
+#'
+#' @export
+#'
+#' @examples
+#' # Retrieve data for technology use across all LHDs
+#' tech_data <- get_bar_data("tech_use", filtering = "All LHDs")
+#'
 
 get_bar_data <- function(topic, filtering = NA){
 

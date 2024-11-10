@@ -1,39 +1,50 @@
-#' Process Line Data for Various Topics and Filters
+#' Process Line Data for Local Health Departments (LHDs) Topics and Filters
 #'
-#' This function processes line data based on different topics and filtering options for local health departments (LHDs).
-#' It supports topics related to local boards of health, executive age, gender, race, tenure, field of study, and highest degree earned.
-#' The function merges historical data and current survey data, performs necessary transformations, and prepares descriptive labels for visualization.
+#' This function processes historical and current survey data on Local Health Departments (LHDs) for a variety of demographic and organizational topics.
+#' It merges historical data with 2022 survey data, performs transformations on specified topic areas, and generates descriptive labels for visualization.
 #'
-#' @param option A character string specifying the topic to process. Supported options include: "lboh", "age_cat", "c4q29" (gender), "race", "tenure", "field", and "c4q34" (degree).
-#' @param filtering A character string indicating the filter to apply. Common filters include "All LHDs" or specific regional or demographic filters.
-#' @param classifications Optional; A character string or list for additional classifications to use during data processing. Default is NULL.
+#' @param option A character string specifying the topic to process. Supported options include:
+#'   - "lboh" for local boards of health,
+#'   - "age_cat" for executive age categories,
+#'   - "c4q29" for executive gender identification,
+#'   - "race" for executive race,
+#'   - "ethnicity" for executive ethnicity,
+#'   - "tenure" for mean executive tenure,
+#'   - "field" for executive field of study,
+#'   - "c4q34" for the highest degree earned by top executives.
+#' @param filtering A character string representing the filter to apply, either "All LHDs" or specific regional or demographic filters such as "censusregion" or "urbanrural2022".
+#' @param classifications Optional; a character string or list of additional classifications for data processing. Defaults to NULL.
 #'
-#' @return A data frame combining historical and current data, with descriptive labels for visualization. The exact structure of the output varies based on the `option` input.
+#' @return A processed data frame that combines historical and current data for the specified `option` topic. The returned data frame includes:
+#'   - Descriptive labels in columns such as `legend_label` and `legend_title` for easy integration in visualizations.
+#'   - Values for the current year as well as historical data, when applicable.
+#'   - Aggregated and summarized percentages or counts based on the specified filter and topic.
+#'
 #' @details
-#' The function performs the following steps based on the specified option:
+#' This function performs topic-specific data processing steps, including:
+#' - **Merging Historical and Current Data**: Combines historical `lines_data` with 2022 survey data.
+#' - **Transformations**: Recalculates and recodes variables like age, race, gender, and field of study for consistency.
+#' - **Labeling**: Generates descriptive labels to facilitate visualization, such as for percentage summaries.
 #'
-#' - **"lboh"**: Processes data related to the existence of local boards of health at LDHs.
-#' - **"age_cat"**: Processes data related to LHD top executives' age categories.
-#' - **"c4q29"**: Processes data related to LHD top executives' gender identification.
-#' - **"race"**: Processes data related to LHD top executives' race.
-#' - **"tenure"**: Processes data related to LHD top executives' mean tenure.
-#' - **"field"**: Processes data related to LHD top executives' field of study.
-#' - **"c4q34"**: Processes data related to the highest degree earned by top executives.
-#'
-#' The function handles both historical data from the `lines_data` dataset and current survey data retrieved via custom functions like `return_survey_weighted_counts` and `return_survey_weighted_statistics`.
-#' It performs data transformations such as recoding categories, calculating percentages, and creating descriptive labels for use in visualizations.
+#' ## Supported Topics
+#' - **Local Board of Health (lboh)**: Examines whether LHDs have a local board of health.
+#' - **Executive Age (age_cat)**: Analyzes age categories of LHD top executives.
+#' - **Gender (c4q29)**: Analyzes gender identification of top LHD executives.
+#' - **Race and Ethnicity (race, ethnicity)**: Tracks race and ethnicity information for top LHD executives.
+#' - **Tenure (tenure)**: Analyzes average tenure of top LHD executives.
+#' - **Field of Study (field)**: Tracks the field of study for top LHD executives.
+#' - **Highest Degree Earned (c4q34)**: Shows the highest academic degree earned by top LHD executives.
 #'
 #' @examples
-#' # Example usage for processing data on local boards of health for all LHDs
+#' # Example usage for processing data on local boards of health across all LHDs
 #' data <- process_line_data("lboh", "All LHDs")
 #'
-#' # Example usage for processing executive age data with a specific filter
-#' data <- process_line_data("age_cat", "urbanrurall2022")
+#' # Example for analyzing executive age data filtered by urban-rural classifications
+#' data <- process_line_data("age_cat", "urbanrural2022")
 #'
+#' @import dplyr
 #' @export
 
-
-#data helper for lines ----
 
 process_line_data <- function(option, filtering, classifications = NULL) {
 #All LHD CASES------------

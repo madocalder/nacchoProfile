@@ -21,7 +21,7 @@ mod_overview_ui <- function(id) {
             div(
               class = "col-sm-8",
               align = "left",
-              h1(HTML("About the Study Population: <br> Local Health Departments in the U.S.")),
+              h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
               hr(class = "header-hr")
             )
           )
