@@ -541,6 +541,21 @@
       ],
       "Hash": "d91263322a58af798f6cf3b13fd56dde"
     },
+    "custom.map": {
+      "Package": "custom.map",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "custom.map",
+      "RemoteUsername": "lindsayjorgenson",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "9b73b83528788f190551bf1ef0af167038636b16",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "48194380729f9b80cfffb3de7a10281e"
+    },
     "data.table": {
       "Package": "data.table",
       "Version": "1.16.0",
@@ -1053,18 +1068,6 @@
       ],
       "Hash": "10d93e97faad6b629301bb3a2fd23378"
     },
-    "hunspell": {
-      "Package": "hunspell",
-      "Version": "3.0.4",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "digest"
-      ],
-      "Hash": "f543163714aba1ff9e8cfe76d8d15381"
-    },
     "igraph": {
       "Package": "igraph",
       "Version": "2.0.3",
@@ -1290,14 +1293,15 @@
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "lindsayjorgenson",
       "RemoteRef": "HEAD",
-      "RemoteSha": "3a759a8515c85777fa88c8403399f9866ed8845c",
+      "RemoteSha": "0d5ceefffb593f13cbdb488cebcd4a892ae54493",
       "Requirements": [
         "R",
+        "custom.map",
         "highcharter",
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "21df848be1c381c74d3764680dc32312"
+      "Hash": "ba20e8792b78c1309a1d4caf8c6fe32e"
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -2031,19 +2035,6 @@
         "R"
       ],
       "Hash": "5f5a7629f956619d519205ec475fe647"
-    },
-    "spelling": {
-      "Package": "spelling",
-      "Version": "2.3.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "commonmark",
-        "hunspell",
-        "knitr",
-        "xml2"
-      ],
-      "Hash": "632e9e83d3dc774d361b9415b15642bb"
     },
     "srvyr": {
       "Package": "srvyr",
