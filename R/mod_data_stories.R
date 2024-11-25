@@ -44,15 +44,15 @@ mod_data_stories_ui <- function(id){
             uiOutput(ns("cards_output"))
           ),
           div(
-            style = "padding-top: 10%",
+            # style = "padding-top: 10%",
             uiOutput(ns("full_page_content"))
           )
         )
-      # ),
-      #
-      # right = div(),
-      # right_width = 0
-    )
+        # ),
+        #
+        # right = div(),
+        # right_width = 0
+      )
     )
   )
 }
@@ -63,16 +63,28 @@ mod_data_stories_ui <- function(id){
 mod_data_stories_server <- function(id){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
+    #
+    #     workforce_path <- system.file("app/www/workforce_story/workforce_story.html", package = "nacchoProfile")
+
+    shiny::addResourcePath("www", system.file("app/www", package = "nacchoProfile"))
+
 
     ############################## CARD SCRIPTS HERE ###############################
 
     # card list ---------------------------------------------------------------
     card_data <- list(
-      "story_one" = list(
+      "workforce_story" = list(
         content =
           div(
-            p("this is the content") # add module here
-          )
+            style = "position: relative; width: 100%; height: 75vh; display: flex; align-items: center; justify-content: center;",
+            tags$iframe(
+              src = "https://madocalder.quarto.pub/naccho-workforce-story/workforce_story.html#/",
+              width = "90%", # Adjust percentage for width
+              height = "90%", # Adjust percentage for height
+              style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"
+            )
+          ) #end of workforce_story content
+
       )
     )
 
@@ -89,14 +101,14 @@ mod_data_stories_server <- function(id){
     }
 
     # back button scroll to top -----------------------------------------------
-    observeEvent(input$back_btn, {
-      shinyjs::runjs("window.scrollTo(0, 0)")
-    })
+    # observeEvent(input$back_btn, {
+    #   shinyjs::runjs("window.scrollTo(0, 0)")
+    # })
 
     ############################# ADD NEW CARDS HERE ###############################
 
     # events to "open" the card -----------------------------------------------
-    observeEvent(input$story_link, selected_card("story_one"))
+    observeEvent(input$story_link, selected_card("workforce_story"))
 
     # when you want to add a new card, you need to add the line of code above,
     # which causes the card to open when the link is selected
@@ -108,31 +120,29 @@ mod_data_stories_server <- function(id){
             image = "www/small_town.jpeg",
             date = "08/01/2024"
           ),
-          title = actionLink(ns("story_link"), strong("This is the title of the first story", style = "font-size: 3vmin;")),
+          title = actionLink(ns("story_link"), strong("A Workforce on the Rise:", style = "font-size: 3vmin;")),
           description =
             div(
-              "This is an amazing story, you have to check it out! It is about rural health.",
+              "How Pandemic-Era Support Shaped the Local Health Department Workforce",
               style = "font-size: 2vmin;"  # Define the font size for the description here
             ),
           tags = list(
-            actionButton(ns("tag"), "rural health", class = "my-button"),
-            actionButton(ns("tag"), "finance", class = "my-button"),
-            actionButton(ns("tag"), "trends", class = "my-button")
+            actionButton(ns("tag"), "workforce", class = "my-button")
           )
         ),
         list(
           thumbnail = card_thumbnail(
             image = "www/small_town.jpeg",
-            date = "08/01/2024"
+            date = "12/15/2024"
           ),
-          title = actionLink(ns("story_link"), strong("This is the title of the second story", style = "font-size: 3vmin;")),
+          title = actionLink(ns("story_link"), strong("On the Front Lines:", style = "font-size: 3vmin;")),
           description = div(
-            "Wow, such interesting information in this story about
-            urban health versus rural health in local agencies.",
+            "The Threat of Harassment on Local Public Health During the COVID-19 Pandemic.",
             style = "font-size: 2vmin;"),
           tags = list(
-            actionButton(ns("tag"), "urban health", class = "my-button"),
-            actionButton(ns("tag"), "rural health", class = "my-button")
+            actionButton(ns("tag"), "harassment", class = "my-button"),
+            actionButton(ns("tag"), "COVID-19", class = "my-button"),
+            actionButton(ns("tag"), "workforce", class = "my-button")
           )
         ),
         list(
@@ -217,16 +227,18 @@ mod_data_stories_server <- function(id){
             ),
             id = "top_fixed_button"
           ),
-          p(card_content()),
-          div(
-            actionButton( # this sends you back to the top
-              ns("back_btn"),
-              "Top",
-              icon = icon("arrow-up"),
-              class = "side_button"
-            ),
-            id = "fixed_button"
-          )
+          p
+
+          # ,
+          # div(
+          #   actionButton( # this sends you back to the top
+          #     ns("back_btn"),
+          #     "Top",
+          #     icon = icon("arrow-up"),
+          #     class = "side_button"
+          #   ),
+          #   id = "fixed_button"
+          # )
         )
       }
     })

@@ -710,8 +710,8 @@ label:not(.material-switch label) {
 
 .data-stories-content {
   padding-top: 1em;
-  padding-left: 8em;
-  padding-right: 1em;
+  padding-left: 4em;
+  padding-right: 4em;
 }
 
 
@@ -724,7 +724,7 @@ label:not(.material-switch label) {
   .data-stories-content {
     padding-top: 1em;
     padding-left: 2em;
-    padding-right: 1em;
+    padding-right: 2em;
   }
 }
 
@@ -779,7 +779,7 @@ label:not(.material-switch label) {
 #top_fixed_button {
     position: fixed;
     top: 0%;
-    left: 20%;
+    left: 40%;
     font-weight: 400;
 }
 
