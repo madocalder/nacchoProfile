@@ -705,7 +705,7 @@ label:not(.material-switch label) {
 /* ----------------------------------------------------- data stories content */
 .data-stories-head {
   padding-top: 2em;
-  padding-left: 5em;
+  padding-left: 6em;
 }
 
 .data-stories-content {
@@ -718,7 +718,7 @@ label:not(.material-switch label) {
 @media (max-width: 1400px) {
 .data-stories-head {
     padding-top: 1em;
-    padding-left: 1em;
+    padding-left: 6em;
   }
 
   .data-stories-content {

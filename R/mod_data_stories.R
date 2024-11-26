@@ -78,14 +78,36 @@ mod_data_stories_server <- function(id){
           div(
             style = "position: relative; width: 100%; height: 75vh; display: flex; align-items: center; justify-content: center;",
             tags$iframe(
-              src = "https://madocalder.quarto.pub/naccho-workforce-story/workforce_story.html#/",
-              width = "90%", # Adjust percentage for width
-              height = "90%", # Adjust percentage for height
-              style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"
+              src = "https://naccho.quarto.pub/workforce_story/",
+              width = "90%",
+              height = "90%",
+              style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+              max-width: 800px; max-height: 900px;"
             )
-          ) #end of workforce_story content
+          )
+      ) , # end of workforce_story list
+      # (if you add additional stories below, remember to move this comma back before the #)
 
+      "harassment_story" = list(
+  content =
+    div(
+      style = "position: relative; width: 100%; height: 75vh; display: flex; align-items: center; justify-content: center;",
+      tags$iframe(
+        src = "https://naccho.quarto.pub/harassment_story/",
+        width = "90%",
+        height = "90%",
+        style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+              max-width: 800px; max-height: 900px;"
       )
+    )
+) # , end of list
+
+
+
+      # add other stories here
+      # be sure to put the comma back before the # for the above line when you add a
+
+
     )
 
     ########################### END EDITING CARD SCRIPTS ###########################
@@ -109,16 +131,19 @@ mod_data_stories_server <- function(id){
 
     # events to "open" the card -----------------------------------------------
     observeEvent(input$story_link, selected_card("workforce_story"))
+    observeEvent(input$story_link, selected_card("harassment_story"))
 
     # when you want to add a new card, you need to add the line of code above,
     # which causes the card to open when the link is selected
 
     cards_displayed <- reactive({
       list(
+
+        #Workforce Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/small_town.jpeg",
-            date = "08/01/2024"
+            image = "www/workforce_story.png",
+            date = "12/15/2024"
           ),
           title = actionLink(ns("story_link"), strong("A Workforce on the Rise:", style = "font-size: 3vmin;")),
           description =
@@ -130,9 +155,11 @@ mod_data_stories_server <- function(id){
             actionButton(ns("tag"), "workforce", class = "my-button")
           )
         ),
+
+        #Harassment Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/small_town.jpeg",
+            image = "www/harassment_story.png",
             date = "12/15/2024"
           ),
           title = actionLink(ns("story_link"), strong("On the Front Lines:", style = "font-size: 3vmin;")),
@@ -144,20 +171,21 @@ mod_data_stories_server <- function(id){
             actionButton(ns("tag"), "COVID-19", class = "my-button"),
             actionButton(ns("tag"), "workforce", class = "my-button")
           )
-        ),
-        list(
-          thumbnail = card_thumbnail(
-            image = "www/small_town.jpeg",
-            date = "08/01/2024"
-          ),
-          title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 3vmin;")),
-          description = div(
-            "Oh boy, this is a really good story about some things and
-            you should read it.", style = "font-size: 2vmin;"),
-          tags = list(
-            actionButton(ns("tag"), "workforce", class = "my-button")
-          )
         )
+        # ,
+        # list(
+        #   thumbnail = card_thumbnail(
+        #     image = "www/small_town.jpeg",
+        #     date = "08/01/2024"
+        #   ),
+        #   title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 3vmin;")),
+        #   description = div(
+        #     "Oh boy, this is a really good story about some things and
+        #     you should read it.", style = "font-size: 2vmin;"),
+        #   tags = list(
+        #     actionButton(ns("tag"), "workforce", class = "my-button")
+        #   )
+        # )
       )
     })
 
@@ -227,7 +255,7 @@ mod_data_stories_server <- function(id){
             ),
             id = "top_fixed_button"
           ),
-          p
+          p(card_content())
 
           # ,
           # div(
