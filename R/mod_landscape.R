@@ -179,7 +179,9 @@ mod_landscape_ui <- function(id){
           div(
             class = "row color-block-footer"
           )
-        )
+        ),
+
+        right_button = right_button
       )
     )
   )
@@ -554,6 +556,7 @@ mod_landscape_server <- function(id){
     # right content ===========================================================
 
     # takeaway ----------------------------------------------------------------
+    # takeaway ----------------------------------------------------------------
     observeEvent(input$takeaway, {
 
       shinyjs::show("toggle_takeaway")
@@ -661,6 +664,9 @@ mod_landscape_server <- function(id){
         })
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
+
+# side right --------------------------------------------------------------
+
 
           if (length(links) == 0) {
             paste("No relevant definitions.")

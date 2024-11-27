@@ -209,7 +209,9 @@ mod_services_ui <- function(id){
           div(
             class = "row color-block-footer"
           )
-        )
+        ),
+
+        right_button = right_button
       )
     )
   )

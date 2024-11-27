@@ -82,3 +82,53 @@ custom_str_to_title <- function(text) {
     return(stringr::str_to_title(text))  # Apply str_to_title to other text
   }
 }
+
+
+#' Reusable Right Button for Collapsible Pane
+#'
+#' @description A predefined button for toggling the right pane in a `flexlayout` structure.
+#' This button is styled with a Font Awesome "info" icon and can be used across multiple Shiny modules.
+#'
+#' @details The `right_button` is a pre-configured `flexlayout::offcanvas_button` component
+#' that displays a Font Awesome "info" icon (`fa-circle-info`). It is styled with a font size of 2em
+#' and a custom color (`#3C8A97`). This variable can be sourced and reused wherever a collapsible
+#' right pane toggle is required in a Shiny app.
+#'
+#' @format An `offcanvas_button` object created using the `flexlayout` package.
+#'
+#' @usage
+#' # To use the predefined right_button:
+#' flexlayout(
+#'   left = NULL,
+#'   center,
+#'   right = NULL,
+#'   right_button = right_button,
+#'   left_width = 22,
+#'   center_width = 56,
+#'   right_width = 22
+#' )
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage in a flexlayout structure
+#' library(flexlayout)
+#' ui <- fluidPage(
+#'   flexlayout(
+#'     center = div("Main content"),
+#'     right_button = right_button
+#'   )
+#' )
+#'
+#' server <- function(input, output, session) {}
+#' shinyApp(ui, server)
+#' }
+#'
+#' @seealso [flexlayout::offcanvas_button]
+#'
+#' @export
+right_button <- flexlayout::offcanvas_button(
+  tags$i(
+    class = "fa-solid fa-info", # Font Awesome info icon
+    style = "font-size: 3em; color: #3C8A97;"
+  )
+)
