@@ -81,8 +81,8 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_cat() %>%
-      dplyr::mutate(`y_Jobs Added (Standardized)` = round((`y_Jobs Added` / total_employees) * 100, 1),
-                    `y_Jobs Lost (Standardized)` = round((`y_Jobs Lost` / total_employees) * 100, 1),
+      dplyr::mutate(`y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100),
+                    `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100),
                     `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
                     `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`) %>%
       dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
@@ -465,7 +465,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
         dplyr::group_by(category)%>%
         dplyr::summarise(Responses = n(),
                          fig_value = sum(fig_value))%>%
-        dplyr::mutate(y = round(fig_value/sum(fig_value)*100,1),
+        dplyr::mutate(y = round_up(fig_value/sum(fig_value)*100),
                       subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(group = "All LHDs") %>%
@@ -475,7 +475,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
       overall_totals <- master_data %>%
         dplyr::summarise('Responses_All LHDs' = n(),
                          fig_value_All_LHDs = sum(get("totpop"))) %>%
-        dplyr::mutate('y_All LHDs' = round(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100, 1))
+        dplyr::mutate('y_All LHDs' = round_up(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100))
 
       # Add the calculated columns to your data
       data <- data %>%
@@ -777,7 +777,7 @@ data <- data %>%
 
 #number formatting------------------
  num_format <- function(x) {
-    rounded_value <- round(x, 0)  # no decimals
+    rounded_value <- round_up(x, 0)  # no decimals
 
 
     if (topic == "tenure") {

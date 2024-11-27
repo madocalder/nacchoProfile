@@ -461,7 +461,7 @@ mod_finance_server <- function(id){
         data <- revenue_percentages %>%
           dplyr::rename(name = revenue_type) %>%
           dplyr::mutate(id = paste(name, sep = " "),
-                        value = round(percentage*100,1)) %>%
+                        value = round_up(percentage*100)) %>%
           dplyr::select(id, name, value)
 
         add_info <- data.frame(
@@ -513,7 +513,7 @@ mod_finance_server <- function(id){
           dplyr::rename(name = revenue_type,
                         parent = category) %>%
           dplyr::mutate(id = paste(name, parent, sep = " "),
-                        value = round(percentage*100,1)) %>%
+                        value = round_up(percentage*100)) %>%
           dplyr::select(all_off(id, name, parent, value, subtitle))
 
         id_values <- unique(data$parent)

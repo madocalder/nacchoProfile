@@ -121,7 +121,7 @@ services_change_data <- services_change_data %>%
 
 # Round percentages
 services_change_data <- services_change_data %>%
-  dplyr::mutate(y = round(y, 1))
+  dplyr::mutate(y = round_up(y))
 
 # Save the data
 usethis::use_data(services_change_data, overwrite = TRUE)

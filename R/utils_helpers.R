@@ -132,3 +132,41 @@ right_button <- flexlayout::offcanvas_button(
     style = "font-size: 3em; color: #3C8A97;"
   )
 )
+
+
+#' Custom Rounding Function: Round .5 Up
+#'
+#' This function rounds numeric values to the specified number of decimal places.
+#' Unlike the default `round` function in R, this function ensures that numbers
+#' with a fractional part of exactly 0.5 are always rounded up.
+#'
+#' @param x A numeric vector to be rounded.
+#' @param digits An integer specifying the number of decimal places to round to.
+#'   Defaults to 0. Negative values are allowed, which round to powers of ten.
+#'
+#' @return A numeric vector with values rounded to the specified number of decimal places.
+#'
+#' @examples
+#' # Default rounding behavior
+#' x <- c(-2.5, -1.5, -0.5, 0.5, 1.5, 2.5)
+#' round(x)        # Default R rounding: -2 -2  0  0  2  2
+#' round_up(x)     # Custom rounding: -2 -1  0  1  2  3
+#'
+#' # Rounding with decimal places
+#' y <- c(1.45, 1.55, 1.65)
+#' round(y, 1)     # Default R rounding: 1.4 1.6 1.6
+#' round_up(y, 1)  # Custom rounding: 1.5 1.6 1.7
+#'
+#' # Rounding with negative digits (to powers of ten)
+#' z <- c(135, 145, 155)
+#' round(z, -1)    # Default R rounding: 140 140 160
+#' round_up(z, -1) # Custom rounding: 140 150 160
+#'
+#' @export
+
+round_up <- function(x, digits = 0) {
+  multiplier <- 10^digits
+  adjusted <- x * multiplier
+  rounded <- ifelse(adjusted %% 1 == 0.5, ceiling(adjusted), round(adjusted))
+  rounded / multiplier
+}

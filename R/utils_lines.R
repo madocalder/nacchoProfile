@@ -56,7 +56,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         dplyr::filter(topic == "lboh",
                       filter == "All LHDs",
                       category %in% c("Yes", "No"))%>%
-        dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+        dplyr::mutate(y = round_up((100*as.numeric(y))))
 
       # View(hist_data)
 
@@ -108,7 +108,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "age_cat",
                         filter == "All LHDs")%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0)
+            y = round_up((100*as.numeric(y)))
           ) %>%
           dplyr::group_by(category, group, year, filter, topic) %>%
           dplyr::summarize(y = sum(y))
@@ -159,7 +159,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = (round((100*as.numeric(y)), digits = 0)),
+            y = (round_up((100*as.numeric(y)))),
             category =dplyr::case_when(
               category == "Prefer not to answer" ~ "Not specified",
               category == "Other" ~ "Not specified",
@@ -211,7 +211,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0),
+            y = round_up((100*as.numeric(y))),
             category =dplyr::case_when(
               category %in% c("Some other race", "American Indian/Alaska Native",
                               "Black/African American", "Native Hawaiian/Other Pacific Islander",
@@ -265,13 +265,13 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0))
+            y = round_up((100*as.numeric(y))))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("ethnicity") %>%
           dplyr::select(Question, y, category, group) %>%
           dplyr::mutate(
-            y = round(as.numeric(y), digits = 0),
+            y = round_up(as.numeric(y)),
             year = 2022,
             filter = "All LHDs"
           )
@@ -319,7 +319,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "year" = "year",
                                      "category" = "category"
                               )) %>%
-          dplyr::mutate(y = as.numeric(y))%>%
+          dplyr::mutate(y = round_up(as.numeric(y)))%>%
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(category),
@@ -337,7 +337,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::summarise(
             y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
           dplyr::mutate(
-            y = round((100*as.numeric(1 - y_sum)), digits = 0),  # Subtract the sum of 'y' from 100
+            y = round_up((100*as.numeric(1 - y_sum))),  # Subtract the sum of 'y' from 100
             category = "Other Field"  # Create the "Other Field" category
           ) %>%
           dplyr::select(year, category, group, filter, topic, y)  # Select relevant columns
@@ -347,7 +347,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "field",
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
-          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0),
+          dplyr::mutate(y = round_up((100*as.numeric(y))),
                         category =dplyr::case_when(
                           category == "None of the above" ~ "Other Field",
                           TRUE ~ category
@@ -364,7 +364,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             filter = filtering,
             year = 2022,
             Question = "field",
-            y = as.numeric(y))
+            y = round_up(as.numeric(y)))
 
 
         # Combine data and create more descriptive legend labels
@@ -394,7 +394,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "c4q34",
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
-          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+          dplyr::mutate(y = round_up((100*as.numeric(y))))
 
 
         ### 2022 data-------------
@@ -403,7 +403,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::mutate(
             year = 2022,
             filter = "All LHDs",
-            y = as.numeric(y))
+            y = round_up(as.numeric(y)))
 
 
         # Combine data and create more descriptive legend labels
@@ -415,7 +415,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "year" = "year",
                                      "category" = "category"
                               )) %>%
-          dplyr::mutate(y = as.numeric(y)) %>%
+          dplyr::mutate(y = round_up(as.numeric(y))) %>%
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(category),
@@ -439,14 +439,14 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::mutate(year = 2022,
                         filter = "All LHDs",
                         category = "Mean",
-                        y = as.numeric(y))
+                        y = round_up(as.numeric(y)))
 
         current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
           dplyr::select(Question, category, group, Quantile_q50 )%>%
           dplyr::mutate(year = 2022,
                         filter = "All LHDs",
                         category = "Median",
-                        y = as.numeric(Quantile_q50))%>%
+                        y = round_up(as.numeric(Quantile_q50))) %>%
           dplyr::select(Question, category, group, y, filter, year )
 
 
@@ -458,7 +458,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == option,
                         filter == "All LHDs",
                         category %in% c("Mean", "Median"))%>%
-          dplyr::mutate(y = round(as.numeric(y), digits = 0))
+          dplyr::mutate(y = round_up(as.numeric(y)))
 
         if (option == "c5q37"){
 
@@ -471,7 +471,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                             "year" = "year",
                                             "category" = "category"
                                      )) %>%
-          dplyr::mutate(y = as.numeric(y),
+          dplyr::mutate(y = round_up(as.numeric(y)),
                         legend_label = paste(category),
                         one = paste("the", tolower(category),  "number of FTEs across all LHDs was "),
                         two = paste(y)) %>%
@@ -485,7 +485,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                               "year" = "year",
                                               "category" = "category"
                                        )) %>%
-            dplyr::mutate(y = as.numeric(y),
+            dplyr::mutate(y = round_up(as.numeric(y)),
                           legend_label = paste(category),
                           one = paste("the", tolower(category), "number of total employees across LHDs was"),
                           two = paste(" ", y)) %>%
@@ -505,7 +505,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs",
                                                  TRUE ~ group),
                         year = 2022,
-                        y = round(as.numeric(y), digits = 0))%>%
+                        y = round_up(as.numeric(y)))%>%
           dplyr::select(Question, category, y, filter, group, year)
 
 
@@ -513,7 +513,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         hist_data <- lines_data %>%
           dplyr::filter(topic %in% hist_vars) %>%
           dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(topic)]),
-                        y = round(as.numeric(y), digits = 0))
+                        y = round_up(as.numeric(y)))
 
 
         combined <- dplyr::full_join(current_data, hist_data,
@@ -524,7 +524,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                             "year" = "year",
                                             "category" = "category"
                                      )) %>%
-          dplyr::mutate(y = as.numeric(y) ,
+          dplyr::mutate(y = round_up(as.numeric(y)) ,
                         legend_label = paste("Total", category, "FTEs"),
                         one = paste("LHDs had a total of "),
                         two = paste(scales::label_comma()(y), tolower(category), "FTEs")) %>%
@@ -543,7 +543,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "lboh",
                         filter == filtering,
                         category == "Yes")%>%
-          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+          dplyr::mutate(y = round_up((100*as.numeric(y))))
 
         # View(hist_data)
 
@@ -601,7 +601,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "age_cat",
                         filter == filtering)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0)
+            y = round_up((100*as.numeric(y)))
           ) %>%
           dplyr::group_by(category, group, year, filter, topic, subtitle) %>%
           dplyr::summarize(y = sum(y))
@@ -662,7 +662,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0),
+            y = round_up((100*as.numeric(y))),
             category =dplyr::case_when(
               category == "Prefer not to answer" ~ "Not specified",
               category == "Other" ~ "Not specified",
@@ -719,7 +719,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0),
+            y = round_up((100*as.numeric(y))),
           category = dplyr::case_when(
               category %in% c("American Indian Or Alaska Native",
                               "Black Or African American",
@@ -785,13 +785,13 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round((100*as.numeric(y)), digits = 0))
+            y = round_up((100*as.numeric(y))))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("ethnicity", filtering) %>%
           dplyr::select(Question, y, category, group, subtitle) %>%
           dplyr::mutate(
-            y = round(as.numeric(y), digits = 0),
+            y = round_up(as.numeric(y)),
             year = 2022,
             filter = filtering
           )
@@ -869,7 +869,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "category" = "category",
                                      "subtitle" = "subtitle"
                               )) %>%
-          dplyr::mutate(y = as.numeric(y))%>%
+          dplyr::mutate(y = round_up(as.numeric(y)))%>%
           arrange(year) %>%
           dplyr::mutate(
           group_mod = dplyr::case_when(
@@ -890,9 +890,9 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%  # Only for 2016
           dplyr::group_by(year, group, filter, topic, subtitle) %>%
           dplyr::summarise(
-            y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
+            y_sum = round_up(sum(as.numeric(y), na.rm = TRUE))) %>%
           dplyr::mutate(
-            y = round((100*as.numeric(1 - y_sum)), digits = 0),  # Subtract the sum of 'y' from 100
+            y = round_up((100*as.numeric(1 - y_sum))),  # Subtract the sum of 'y' from 100
             category = "Other Field"  # Create the "Other Field" category
           ) %>%
           dplyr::select(year, category, group, filter, topic, y, subtitle)  # Select relevant columns
@@ -902,7 +902,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "field",
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
-          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0),
+          dplyr::mutate(y = round_up((100*as.numeric(y))),
                         category =dplyr::case_when(
                           category == "None of the above" ~ "Other Field",
                           TRUE ~ category
@@ -918,7 +918,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::mutate(
             year = 2022,
             Question = "field",
-            y = as.numeric(y))
+            y = round_up(as.numeric(y)))
 
 
         # Combine data and create more descriptive legend labels
@@ -958,7 +958,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "c4q34",
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
-          dplyr::mutate(y = round((100*as.numeric(y)), digits = 0))
+          dplyr::mutate(y = round_up((100*as.numeric(y))))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("c4q34", filtering) %>%
@@ -966,7 +966,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::mutate(
             year = 2022,
             filter = filtering,
-            y = as.numeric(y))
+            y = round_up(as.numeric(y)))
 
         # Combine data and create more descriptive legend labels
         combined <- full_join(current_data, hist_data,
@@ -978,7 +978,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "category" = "category",
                                      "subtitle" = "subtitle"
                               )) %>%
-          dplyr::mutate(y = as.numeric(y)) %>%
+          dplyr::mutate(y = round_up(as.numeric(y))) %>%
           arrange(year) %>%
           dplyr::mutate(
             group_mod = dplyr::case_when(
@@ -1033,7 +1033,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::mutate(year = 2022,
                         category = "Mean",
                         group = Group,
-                        y = round(as.numeric(y), digits = 0),
+                        y = round_up(as.numeric(y)),
                         filter = filtering)%>%
           dplyr::select(Question, group, filter, y, year, category)
 
@@ -1042,7 +1042,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == option,
                         filter == filtering,
                         category == "Mean") %>%
-          dplyr::mutate(y = round(as.numeric(y), digits = 0))
+          dplyr::mutate(y = round_up(as.numeric(y)))
 
         if (option == "c5q37"){
         ###combine
@@ -1054,7 +1054,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                             "year" = "year",
                                             "category" = "category"
                                      )) %>%
-          dplyr::mutate(y = as.numeric(y),
+          dplyr::mutate(y = round_up(as.numeric(y)),
                         group_mod = dplyr::case_when(
                           filtering == "censusregion" ~ paste0(group, "ern"),
                           TRUE ~ group
@@ -1073,7 +1073,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                               "year" = "year",
                                               "category" = "category"
                                        )) %>%
-            dplyr::mutate(y = as.numeric(y),
+            dplyr::mutate(y = round_up(as.numeric(y)),
                           group_mod = dplyr::case_when(
                             filtering == "censusregion" ~ paste0(group, "ern"),
                             TRUE ~ group

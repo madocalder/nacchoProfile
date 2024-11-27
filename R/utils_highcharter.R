@@ -493,7 +493,7 @@ set_bar <- function(data,
   pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
 
   # Calculate one-tenth of max_combined
-  rough_interval <- round(max_combined / 10)
+  rough_interval <- round_up(max_combined / 10)
 
   # Find the largest "pretty" interval that is less than or equal to rough_interval
   interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
@@ -503,9 +503,9 @@ set_bar <- function(data,
 
   totalTicks <- sum(ticks_two, ticks_one)
 
-  axis_one <- round((ticks_one/totalTicks), digits = 2)
+  axis_one <- round_up((ticks_one/totalTicks), digits = 2)
 
-  axis_two <- round((ticks_two/totalTicks), digits = 2)
+  axis_two <- round_up((ticks_two/totalTicks), digits = 2)
 
   # message("TICK, AXIS, INTERVAL CHECKs-----")
   #
@@ -522,9 +522,9 @@ set_bar <- function(data,
   max_one <- ticks_one * interval
   max_two <- ticks_two * interval
 
-  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  # axis_one <- round_up((max_one/(max_one + max_two)), 2)
   #
-  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+  # axis_two <- 1 - round_up((max_one/(max_one + max_two)), 2)
 
   # print(paste("max_one's updated value is:", max_one))
   # print(paste("max_two's updated value is:", max_two))
@@ -1337,7 +1337,7 @@ proxy_to_bar <- function(hc,
   pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
 
   # Calculate one-tenth of max_combined
-  rough_interval <- round(max_combined / 10)
+  rough_interval <- round_up(max_combined / 10)
 
   # Find the largest "pretty" interval that is less than or equal to rough_interval
   interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
@@ -1347,9 +1347,9 @@ proxy_to_bar <- function(hc,
 
   totalTicks <- sum(ticks_two, ticks_one)
 
-  axis_one <- round((ticks_one/totalTicks), digits = 2)
+  axis_one <- round_up((ticks_one/totalTicks), 2)
 
-  axis_two <- round((ticks_two/totalTicks), digits = 2)
+  axis_two <- round_up((ticks_two/totalTicks), 2)
 
   # message("TICK, AXIS, INTERVAL CHECKs-----")
   #
@@ -1366,9 +1366,9 @@ proxy_to_bar <- function(hc,
   max_one <- ticks_one * interval
   max_two <- ticks_two * interval
 
-  # axis_one <- round((max_one/(max_one + max_two)), digits = 2)
+  # axis_one <- round_up((max_one/(max_one + max_two)), digits = 2)
   #
-  # axis_two <- 1 - round((max_one/(max_one + max_two)), digits = 2)
+  # axis_two <- 1 - round_up((max_one/(max_one + max_two)), digits = 2)
 #
 #   print(paste("max_one's updated value is:", max_one))
 #   print(paste("max_two's updated value is:", max_two))

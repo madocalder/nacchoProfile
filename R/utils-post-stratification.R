@@ -88,7 +88,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
           mutate(
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
-            y = round(Percentage,0),
+            y = round_up(Percentage),
             category = sapply(Answer, custom_str_to_title),
             group = Group,
             subtitle = paste0("Denominator of LHDs"),
@@ -132,7 +132,7 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
           mutate(
             Answer = .data$Answer,
             x = as.numeric(as.factor(Answer)) -1,
-            y = round(Percentage,0),
+            y = round_up(Percentage),
             category = sapply(Answer, custom_str_to_title),
             group = sapply(Group, custom_str_to_title),
             subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
@@ -194,7 +194,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
     rename_all(~new_names) %>%
     select(all_of(c("Group", "Percentage", "Answer"))) %>%
     mutate(
-      y = round(Percentage,0),
+      y = round_up(Percentage),
       category = sapply(Answer, custom_str_to_title),
       group = Group,
       subtitle = paste0("Denominator of LHDs")
@@ -253,7 +253,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
       mutate(Group = "All LHDs") %>%
       select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", ci_low = "Total_low", ci_upp = "Total_upp", .data$Mean, all_of(starts_with("Quantile_"))) %>%
       mutate(
-        y = round(Mean, 1),
+        y = round_up(Mean, 1),
         x = as.numeric(as.factor(Group)) - 1,
         category = sapply(Group, custom_str_to_title),
         group = "All LHDs",
@@ -280,7 +280,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
         rename(Group = grps) %>%
         select(.data$Question, .data$Group, .data$N, .data$Responses, .data$Total, Total_SE = "Total_se", ci_low = "Total_low", ci_upp = "Total_upp", .data$Mean, all_of(starts_with("Quantile_"))) %>%
         mutate(
-          y = round(Mean, 1),
+          y = round_up(Mean, 1),
           x = as.numeric(as.factor(Group)) - 1,
           category = sapply(Group, custom_str_to_title),
           group = "All LHDs",
@@ -333,7 +333,7 @@ create_hist <- function(input, x_label) {
   )
   # %>%
   #   dplyr::mutate(y = (y/sum(y))*100,
-  #                 y = round(y, 1)) # this would make the y a %
+  #                 y = round_up(y, 1)) # this would make the y a %
 }
 
 
@@ -412,8 +412,8 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
       tidyr::pivot_wider(names_from = Question, values_from = y) %>%
       dplyr::rename(left = jobsgone,
                     right = jobsgain) %>%
-      dplyr::mutate(left_standard = round((left/total_employees)*100,1),
-                    right_standard = round((right/total_employees)*100,1),
+      dplyr::mutate(left_standard = round_up((left/total_employees)*100),
+                    right_standard = round_up((right/total_employees)*100),
                     difference = right - left) %>%
       dplyr::mutate(group = sub(" .*", "", group)) %>% # shorten labels
       dplyr::mutate_if(is.numeric, round, 1)
