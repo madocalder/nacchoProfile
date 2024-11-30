@@ -23,7 +23,18 @@ mod_overview_ui <- function(id) {
               align = "left",
               h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
               hr(class = "header-hr")
+            ),
+            div(
+              class = "col-sm-4",
+              align = "right",
+              actionButton(
+                ns("info_button"),
+                label = NULL,
+                icon = icon("info-circle", class = "fa-solid"),
+                style = "font-size: 3em; color: #3C8A97; background: none; border: none;"
+              )
             )
+          )
           )
         ),
         div(
@@ -46,7 +57,7 @@ mod_overview_ui <- function(id) {
                     class = "row",
                     div(
                       class = "col-sm-3 color-carousel",
-                      HTML("<span style = 'font-size: 2.6vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
+                      HTML("<span style = 'font-size: 2.5vmin; font-weight: 600; color: #212F5B; line-height: 2.5vmin;'>
                           Although only 6% of all LHDs were
                           classified as large, they served more
                           than half of the U.S. population. </span> <br> <br>
@@ -55,9 +66,10 @@ mod_overview_ui <- function(id) {
                     ),
                     div(
                       class = "col-sm-9",
-                      highcharter::highchartOutput(ns("population"), height = "55vmin")
+                      highcharter::highchartOutput(ns("population"), height = "50vh")
                     )
                   )
+
                 )
               ),
               interval = 60000L
@@ -91,8 +103,8 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("map"),
-                                                   width = "auto",
-                                                   height = "90%"),
+                                                   # width = "auto",
+                                                   height = "50vh"),
                       style = "margin-left: auto !important;
                               margin-right: auto !important;"
                     )
@@ -123,13 +135,15 @@ mod_overview_ui <- function(id) {
                           to serve multiple counties than
                           small LHDs. </span> <br> <br>
                           <span style = 'font-size: 1.8vmin;'>
+                          *Other includes LHDs serving multiple cities or towns.
+                          <br>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
                       class = "col-sm-8",
                       highcharter::highchartOutput(ns("cities"),
                                                    # width = "65vmin",
-                                                   height = "55vmin")
+                                                   height = "50vh")
                     )
                   )
                 )
@@ -137,10 +151,11 @@ mod_overview_ui <- function(id) {
               interval = 60000L
             )
           )
+
         )
       )
     )
-  )
+
 }
 
 #' overview Server Functions
@@ -193,7 +208,7 @@ mod_overview_server <- function(id){
         fips = c(33, 10, 44, 02, 11),
         state_name = c("New Hampshire", "Deleware", "Rhode Island",
                        "Alaska", "District of Columbia"),
-        grouping = c("Local", "State", "State", "Local", "Mixed")
+        grouping = c("Local", "State", "State", "Local", "State")
       )
 
       data <- master_data %>%
@@ -312,6 +327,28 @@ mod_overview_server <- function(id){
         ) %>%
         viz_export()
     })
+
+
+
+    # Reuse existing button functionality to show the modal on click
+    observeEvent(input$info_button, {
+      showModal(modalDialog(
+        title = "About the Denominator of LHDs",
+        HTML("<p>For the purposes of surveying and developing national estimates of
+              the LHD landscape, NACCHO designed and utilizes a methodology to account
+              for the most unique individuals in the U.S. population without \"double counting.\"
+              Therefore, the denominator of LHDs used for surveying and national
+              estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
+              while still covering all local jurisdictions uniquely.
+              NACCHO is in frequent contact and consultation with state and local
+              officials to update the denominator. There were 2,512 LHDs included
+              in the 2022 Profile study population.</p>"),
+        easyClose = TRUE,
+        footer = modalButton("Close")
+      ))
+    })
+
+
   })
 }
 

@@ -1,6 +1,16 @@
+# globals.R
+# This script defines global variables and mapping vectors used throughout the package.
+# - `globalVariables`: Suppresses R CMD check warnings for variables defined dynamically.
+# - `label_remap`: Standardizes labels for consistent usage across analyses and reports.
+# - `q_remap`: Provides human-readable mappings for questionnaire codes.
+
+# Suppress R CMD check warnings for these global variables
 
 globalVariables(
   c(".data", "master_data"))
+
+# Mapping for standardized labels
+# These labels are used for displaying consistent text in reports and visualizations.
 
 label_remap <- c(
   "Under 40" = "Younger than 40",
@@ -40,6 +50,8 @@ label_remap <- c(
   "greater than the previous year's budget" = "Percent of LHDs reporting a higher budget in the current fiscal year"
 )
 
+# Mapping for questionnaire codes to human-readable labels
+# These codes correspond to questions in survey data.
 
 q_remap <- c(
     "c4q26" = "Work-Status",

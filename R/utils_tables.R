@@ -12,6 +12,9 @@
 pivot_data_group <- function(data) {
   data %>%
     dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees", "filter"))) %>%
+    # dplyr::mutate(
+    #   Responses = ifelse(category %in% c("Mean", "Median"), Responses / 2, Responses)
+    # ) %>%
     tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 }
 
@@ -29,6 +32,9 @@ pivot_data_group <- function(data) {
 pivot_data_cat <- function(data) {
   data %>%
     dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
+    # dplyr::mutate(
+    #   Responses = ifelse(category %in% c("Mean", "Median"), Responses / 2, Responses)
+    # ) %>%
     tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
     dplyr::rename(category = group)
 }
@@ -229,21 +235,21 @@ process_data <- function(topic, filtering, classifications = NULL) {
                             "Other Entity", "Not Available in Community")) {
 
        data <- services_data %>%
-         dplyr::filter(service_category %in% classifications,
+         dplyr::filter(service_classifications %in% classifications,
                        filter == "All LHDs",
-                       service_provision == topic) %>%
+                       category == topic) %>%
          dplyr::mutate(group = filter,
                        category = service_type)%>%
          pivot_data_group()
 
      } else if (topic == "Reduced/Expanded Services") {
-
+classifications <- "Immunization"
        data <- services_change_data%>%
          dplyr::filter(filter == "All LHDs",
                        service_type %in% classifications) %>%
          dplyr::group_by(category) %>%
          dplyr::reframe(
-           y = mean(y, na.rm = TRUE),
+           y = round_up(mean(y, na.rm = TRUE)),
            Responses = sum(Responses, na.rm = TRUE),
            group = unique(group),
            category = unique(category)
@@ -436,7 +442,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
       overall_data <- spec_data %>%
         dplyr::filter(filter == filtering) %>%
         dplyr::group_by(category) %>%
-        dplyr::summarize(
+        dplyr::summarise(
           'y_All LHDs' = sum(y * Responses, na.rm = TRUE) / sum(Responses, na.rm = TRUE),
           'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
         )
@@ -448,7 +454,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
     } else if (topic == "tenure") {
       data <- return_survey_weighted_statistics("tenure", filtering) %>%
         dplyr::mutate(
-          'y_All LHDs' = mean(y, na.rm = TRUE),  # Adjust calculation as needed
+          'y_All LHDs' = round_up(y = mean(y, na.rm = TRUE)),  # Adjust calculation as needed
           'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
         )  %>%
         dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
@@ -538,10 +544,11 @@ process_data <- function(topic, filtering, classifications = NULL) {
     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                            "Other Entity", "Not Available in Community")) {
 
+
       services_data_all <- services_data %>%
-        dplyr::filter(service_category %in% classifications,
+        dplyr::filter(service_classifications %in% classifications,
                       filter == "All LHDs",
-                      service_provision == topic) %>%
+                      category == topic) %>%
         dplyr::mutate(group = filter,
                       category = service_type)%>%
         pivot_data_group()
@@ -549,9 +556,9 @@ process_data <- function(topic, filtering, classifications = NULL) {
 
 
       data <- services_data %>%
-        dplyr::filter(service_category %in% classifications,
+        dplyr::filter(service_classifications %in% classifications,
                       filter == filtering,
-                      service_provision == topic) %>%
+                      category == topic) %>%
         dplyr::mutate(category = service_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
@@ -563,7 +570,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
                       service_type %in% classifications) %>%
         dplyr::group_by(category) %>%
         dplyr::reframe(
-          y = mean(y, na.rm = TRUE),
+          y = round_up(y = mean(y, na.rm = TRUE)),
           Responses = sum(Responses, na.rm = TRUE),
           group = unique(group),
           category = unique(category)
@@ -577,7 +584,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
                       service_type %in% classifications)%>%
         dplyr::group_by(group, category) %>%
         dplyr::reframe(
-          y = mean(y, na.rm = TRUE),
+          y = round_up(y = mean(y, na.rm = TRUE)),
           Responses = sum(Responses, na.rm = TRUE),
           group = unique(group)
         ) %>%
@@ -787,11 +794,11 @@ data <- data %>%
     } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
     } else if (topic == "fte_bypop") {
-      paste0(rounded_value, " FTE per capita")
+      paste0(rounded_value, "FTEs per 10,000 people")
     } else if (topic == "c5q37") {
       paste0(rounded_value, " FTE")
     } else if (topic == "employee_bypop") {
-      paste0(rounded_value, " Employees per capita")
+      paste0(rounded_value, " Employees per 10,000")
     } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees")
     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
@@ -864,7 +871,9 @@ data <- data %>%
     all_lhds_col <- reactable::colDef(
       name = "All LHDs",
       align = "center",
-      header = with_tooltip("All LHDs", paste0("n = ", sum(data['Responses_All LHDs']))),
+      header = with_tooltip("All LHDs",
+              paste0("n = ", table_n_count(data, topic, 'Responses_All LHDs'))),
+
       cell = reactablefmtr::data_bars(data,
                        text_position = "outside-end",
                        max_value = ifelse(topic == "tenure", 8,
@@ -1003,7 +1012,7 @@ data <- data %>%
             align = "center",
             header = with_tooltip(
               col_name,
-              paste0("n = ", sum(data[[paste0("Responses_", col_name)]]))
+              paste0("n = ", table_n_count(data, topic, paste0("Responses_", col_name)))
             ),
             cell = reactablefmtr::data_bars(data,
                              text_position = "outside-end",
@@ -1081,3 +1090,70 @@ with_tooltip <- function(value, tooltip, ...) {
 }
 
 
+#' Calculate Summary Counts for Table Display
+#'
+#' This helper function computes the summary `n` count for a dataset based on a specified topic.
+#' It dynamically handles different use cases, including returning a range of values (via `show_n`)
+#' for certain topics or the total sum for others. The function is designed to be integrated into
+#' table generation logic.
+#'
+#' @param data A data frame containing the data for which the `n` count is to be calculated.
+#' @param topic A string specifying the topic, used to determine the calculation logic for the `n` count.
+#' @param col_name An optional string specifying the column name for `Responses`. If not provided, defaults to `"Responses"`.
+#' @return A numeric value or a string:
+#' - If the topic requires a range (`"LHD (Directly)"`, `"Reduced/Expanded Services"`, etc.), uses `show_n` to return a string in the format `"min to max"`.
+#' - Otherwise, returns the total sum of the `Responses` column as a numeric value.
+#' @details
+#' For topics requiring a range, the function relies on the `show_n` function, which calculates
+#' and returns either a range (`"min to max"`) or a single value (if all values are the same).
+#'
+#' Topics that require a range:
+#' - `"LHD (Directly)"`
+#' - `"LHD (By Contract)"`
+#' - `"Other Entity"`
+#' - `"Not Available in Community"`
+#' - `"c5q37"`
+#' - `"fte_bypop"`
+#' - `"c5q36"`
+#' - `"employee_bypop"`
+#' - `"Reduced/Expanded Services"`
+#'
+#' @examples
+#' # Example data
+#' data <- data.frame(Responses = c(10, 20, 30, 40))
+#'
+#' # Default sum for a generic topic
+#' table_n_count(data, topic = "generic_topic")
+#' #> 100
+#'
+#' # Range for specific topics
+#' table_n_count(data, topic = "LHD (Directly)")
+#' #> "10 to 40"
+#'
+#' # Using a custom column name
+#' data <- data.frame(Responses_Custom = c(15, 25, 35, 45))
+#' table_n_count(data, topic = "LHD (By Contract)", col_name = "Responses_Custom")
+#' #> "15 to 45"
+#'
+#' @seealso [show_n()] for calculating ranges or single values dynamically.
+#' @export
+table_n_count <- function(data, topic, col_name = NULL) {
+  # Check if col_name is provided, if not default to a generic Responses column
+  if (is.null(col_name)) {
+    col_name <- "Responses_All LHDs"
+  }
+
+  # Handle specific topics with variability
+  if (topic %in% c(
+    "LHD (Directly)", "LHD (By Contract)",
+    "Other Entity", "Not Available in Community",
+    "c5q37", "fte_bypop", "c5q36", "employee_bypop",
+    "Reduced/Expanded Services"
+  )) {
+    # Use `show_n` to calculate range or single value
+    show_n(data[[paste0(col_name)]])
+  } else {
+    # Default behavior: sum the Responses column
+    sum(data[[paste0(col_name)]], na.rm = TRUE)
+  }
+}

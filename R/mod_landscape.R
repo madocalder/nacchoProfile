@@ -596,19 +596,7 @@ mod_landscape_server <- function(id){
             "<b>Survey Question(s)</b>: <br>",
             notes$survey_question,
             "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response,
-            "<br> <br> <b> Notes: </b>",
-            "There were more than 3,300 LHDs in the U.S.,
-            but not every unit was included in the Profile study.
-            For the purposes of surveying and developing national estimates of
-            the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without \"double counting.\"
-            Therefore, the denominator of LHDs used for surveying and national
-            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
-            while still covering all local jurisdictions uniquely.
-            NACCHO is in frequent contact and consultation with state and local
-            officials to update the denominator. There were 2,512 LHDs included
-            in the 2022 Profile study population."))
+            notes$survey_response))
 
         } else {
           p(htmltools::HTML(
@@ -617,18 +605,8 @@ mod_landscape_server <- function(id){
             "<br> <br> <b> Survey Response Options: </b>",
             notes$survey_response,
             "<br> <br> <b> Notes: </b>",
-            notes$notes,
-            "<br> There were more than 3,300 LHDs in the U.S.,
-            but not every unit was included in the Profile study.
-            For the purposes of surveying and developing national estimates of
-            the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without \"double counting.\"
-            Therefore, the denominator of LHDs used for surveying and national
-            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
-            while still covering all local jurisdictions uniquely.
-            NACCHO is in frequent contact and consultation with state and local
-            officials to update the denominator. There were 2,512 LHDs included
-            in the 2022 Profile study population."))
+            notes$notes
+))
         }
       })
     })

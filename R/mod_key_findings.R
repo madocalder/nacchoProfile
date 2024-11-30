@@ -153,23 +153,19 @@ mod_key_findings_ui <- function(id){
             id = ns("modal"),
             bsutils::modalHeader(
               bsutils::modalTitle(
-                p("What do you want to download?")
+                p(strong("What do you want to download?"))
               )
             ),
             bsutils::modalBody(
-              p("Some information about how you can use this information
-                  for example you can add more visualizations or use it to
-                  do this and that."),
-              br(),
               br(),
               downloadLink(
                 outputId = ns("download_slides"),
-                label = p("Download our key findings slide deck")
+                label = p("Download a PowerPoint of our Key Findings.")
               ),
               br(),
               downloadLink(
                 outputId = ns("download_pdf"),
-                label = p("Download our key findings brief")
+                label = p("Download a PDF of our Key Findings slide deck.")
               )
             )
           )
@@ -192,23 +188,28 @@ mod_key_findings_server <- function(id){
       bsutils::modal_show(ns("modal"))
     )
 
-    # download slides
-    output$download_slides <-
-      downloadHandler(
-        filename = "key_findings_slides.pdf",
-        content = function(file) {
-          file.copy("", file) # add content www/
-        }
-      )
+    # Download PowerPoint
+    output$download_slides <- downloadHandler(
+      filename = function() {
+        "Profile2022KeyFindings.pptx"
+      },
+      content = function(file) {
+        # Use app_sys to locate the file in the `www` folder
+        file.copy(app_sys("app/www/Profile2022KeyFindings.pptx"), file)
+      }
+    )
 
-    # download pdf
-    output$download_pdf <-
-      downloadHandler(
-        filename = "key_findings_report.pdf",
-        content = function(file) {
-          file.copy("", file) # add content www/
-        }
-      )
+    # Download PDF
+    output$download_pdf <- downloadHandler(
+      filename = function() {
+        "Profile2022KeyFindings.pdf"
+      },
+      content = function(file) {
+        # Use app_sys to locate the file in the `www` folder
+        file.copy(app_sys("app/www/Profile2022KeyFindings.pdf"), file)
+      }
+    )
+
 
     # finding one - workforce
     output$finding_one <- highcharter::renderHighchart({

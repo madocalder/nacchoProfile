@@ -170,3 +170,27 @@ round_up <- function(x, digits = 0) {
   rounded <- ifelse(adjusted %% 1 == 0.5, ceiling(adjusted), round(adjusted))
   rounded / multiplier
 }
+
+
+#' Reorder Factor Levels
+#'
+#' A helper function to reorder the levels of a factor variable in a data frame based on a specified order.
+#'
+#' @param data A data frame or tibble containing the variable to reorder.
+#' @param var_name A string specifying the name of the variable in the data frame whose levels should be reordered.
+#' @param levels_order A character vector specifying the desired order of the factor levels.
+#'
+#' @return A data frame or tibble with the reordered factor levels for the specified variable. If the variable is not found in the data frame, the original data frame is returned unchanged.
+#'
+#' @importFrom dplyr mutate
+#' @importFrom rlang sym .data
+#' @export
+
+# Helper function to reorder factors
+reorder_factor_levels <- function(data, var_name, levels_order) {
+  if (var_name %in% colnames(data)) {
+    data <- data %>%
+      mutate(!!sym(var_name) := factor(.data[[var_name]], levels = levels_order, ordered = TRUE))
+  }
+  return(data)
+}

@@ -474,7 +474,7 @@ mod_workforce_server <- function(id){
         # Filters: All LHDs
       } else if (input$topic == "fte_bypop") {
         data <- create_hist(input = "fte_bypop",
-                            x_label = "Per Capita FTEs")
+                            x_label = "FTEs per 10,000 people")
 
         data2 <- nacchoProfile::return_survey_weighted_statistics("fte_bypop")
 
@@ -551,7 +551,7 @@ mod_workforce_server <- function(id){
         # Filters: All LHDs
       } else if (input$topic == "employee_bypop") {
         data <- create_hist(input = "employee_bypop",
-                            x_label = "Per Capita FTEs")
+                            x_label = "Employees per 10,000 people")
 
         data2 <- nacchoProfile::return_survey_weighted_statistics("employee_bypop")
 

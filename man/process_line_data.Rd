@@ -25,7 +25,7 @@ process_line_data(option, filtering, classifications = NULL)
 A processed data frame that combines historical and current data for the specified `option` topic. The returned data frame includes:
   - Descriptive labels in columns such as `legend_label` and `legend_title` for easy integration in visualizations.
   - Values for the current year as well as historical data, when applicable.
-  - Aggregated and summarized percentages or counts based on the specified filter and topic.
+  - Aggregated and summarised percentages or counts based on the specified filter and topic.
 }
 \description{
 This function processes historical and current survey data on Local Health Departments (LHDs) for a variety of demographic and organizational topics.

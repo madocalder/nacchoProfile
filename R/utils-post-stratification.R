@@ -63,94 +63,99 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
 #' @return tibble
 return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popcat7", wtype = "weights") {
 
-    if (is.null(grps)) {
+  if (is.null(grps)) {
 
-        new_names <- c(
-            "Answer",
-            "NA.RM",
-            "N",
-            "SE",
-            "Percentage",
-            "Question",
-            "Group")
+    new_names <- c(
+      "Answer",
+      "NA.RM",
+      "N",
+      "SE",
+      "Percentage",
+      "Question",
+      "Group")
 
-         data <- master_data %>%
-          as_factor() %>%
-          left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(strata = popcat, weights = wtype) %>%
-          filter(!is.na(.data[[q_label]])) %>%
-          survey_count(.data[[q_label]], na.rm = TRUE) %>%
-          mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
-          mutate(Question = q_label) %>%
-          mutate(Group = "All LHDs") %>%
-          rename_all(~new_names) %>%
-          select(all_of(c("Question", "Group", "Answer", "NA.RM", "N", "SE", "Percentage"))) %>%
-          mutate(
-            Answer = .data$Answer,
-            x = as.numeric(as.factor(Answer)) -1,
-            y = round_up(Percentage),
-            category = sapply(Answer, custom_str_to_title),
-            group = Group,
-            subtitle = paste0("Denominator of LHDs"),
-            x_label = NA
-          )
+    data <- master_data %>%
+      as_factor() %>%
+      left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
+      as_survey_design(strata = popcat, weights = wtype) %>%
+      filter(!is.na(.data[[q_label]])) %>%
+      survey_count(.data[[q_label]], na.rm = TRUE) %>%
+      mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
+      mutate(Question = q_label) %>%
+      mutate(Group = "All LHDs") %>%
+      rename_all(~new_names) %>%
+      select(all_of(c("Question", "Group", "Answer", "NA.RM", "N", "SE", "Percentage"))) %>%
+      mutate(
+        Answer = .data$Answer,
+        x = as.numeric(as.factor(Answer)) -1,
+        y = round_up(Percentage),
+        category = sapply(Answer, custom_str_to_title),
+        group = Group,
+        subtitle = paste0("All LHDs"),
+        x_label = NA
+      )
 
-        add_responses <- master_data %>%
-          as_factor() %>%
-          as_tibble() %>%
-          group_by_at(q_label) %>%
-          summarise(
-            Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
-          mutate(Answer = get(q_label))
+    add_responses <- master_data %>%
+      as_factor() %>%
+      as_tibble() %>%
+      group_by_at(q_label) %>%
+      summarise(
+        Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
+      mutate(Answer = get(q_label))
 
 
-       left_join(data, add_responses, by = "Answer")
+    left_join(data, add_responses, by = "Answer")
 
-    } else {
+  } else {
 
-        new_names <- c(
-            "Group",
-            "Answer",
-            "NA.RM",
-            "N",
-            "SE",
-            "Percentage",
-            "Question")
+    new_names <- c(
+      "Group",
+      "Answer",
+      "NA.RM",
+      "N",
+      "SE",
+      "Percentage",
+      "Question")
 
-        data <- master_data %>%
-          as_factor() %>%
-          left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
-          as_survey_design(strata = popcat, weights = wtype) %>%
-          filter(!is.na(.data[[q_label]])) %>%
-          group_by_at(grps) %>%
-          survey_count(.data[[q_label]], na.rm = TRUE) %>%
-          mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
-          ungroup()%>%
-          mutate(Question = q_label) %>%
-          rename_all(~new_names) %>%
-          select("Question", "Group", "Answer", "NA.RM", "N", "SE", "Percentage") %>%
-          mutate(
-            Answer = .data$Answer,
-            x = as.numeric(as.factor(Answer)) -1,
-            y = round_up(Percentage),
-            category = sapply(Answer, custom_str_to_title),
-            group = sapply(Group, custom_str_to_title),
-            subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
-            x_label = NA
-          )
+    data <- master_data %>%
+      as_factor() %>%
+      left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
+      as_survey_design(strata = popcat, weights = wtype) %>%
+      filter(!is.na(.data[[q_label]])) %>%
+      group_by_at(grps) %>%
+      survey_count(.data[[q_label]], na.rm = TRUE) %>%
+      mutate(Percentage = (n/sum(n, na.rm = TRUE)) * 100) %>%
+      ungroup()%>%
+      mutate(Question = q_label) %>%
+      rename_all(~new_names) %>%
+      select("Question", "Group", "Answer", "NA.RM", "N", "SE", "Percentage") %>%
+      mutate(
+        Answer = .data$Answer,
+        x = as.numeric(as.factor(Answer)) -1,
+        y = round_up(Percentage),
+        category = sapply(Answer, custom_str_to_title),
+        group = sapply(Group, custom_str_to_title),
+        subtitle = paste0("By ", names(landscape_filters[landscape_filters == grps])),
+        x_label = NA
+      )
 
-        add_responses <- master_data %>%
-          as_factor() %>%
-          group_by_at(c(q_label, grps)) %>%
-          summarise(
-            Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
-          mutate(Answer = get(q_label),
-                 Group = get(grps))
+    add_responses <- master_data %>%
+      as_factor() %>%
+      group_by_at(c(q_label, grps)) %>%
+      summarise(
+        Responses = sum(!is.na(.data[[q_label]]), na.rm = TRUE)) %>%
+      mutate(Answer = get(q_label),
+             Group = get(grps))
 
-        left_join(data, add_responses, by = c("Answer", "Group"))
-    }
+    left_join(data, add_responses, by = c("Answer", "Group"))
+
+    answer_levels <- c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+    data <- reorder_factor_levels(data, "Answer", answer_levels)
+
+  }
 
 }
+
 
 
 
@@ -197,7 +202,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
       y = round_up(Percentage),
       category = sapply(Answer, custom_str_to_title),
       group = Group,
-      subtitle = paste0("Denominator of LHDs")
+      subtitle = paste0("All LHDs")
     )
 
   add_responses <- master_data %>%
@@ -543,72 +548,102 @@ boxplot_data <- function(args, grps = NULL) {
 
 
 
-#' Data cleaning for the scatter plots
+#' Data cleaning for scatter plot visualization
 #'
-#' @description Clean and format data for the scatter plot visualization
+#' @description This function cleans and formats data for scatter plot visualization.
+#' It summarizes, pivots, and restructures the data while retaining key contextual
+#' information. It also assigns alignment properties for visualization purposes.
 #'
-#' @param set_filter value from the data, one of the filters
-#' @param set_service value(s) from the data, one of the service_types
+#' @param set_filter A character string. The filter to apply to the data (e.g., "All LHDs").
+#' @param set_service A character string or vector. The service type(s) to include
+#' (e.g., "Blood Lead Screening").
 #'
 #' @export
-#' @return A list of one or more.
+#' @return A tibble containing cleaned and formatted data ready for visualization.
 scatter_data <- function(set_filter = "All LHDs",
                          set_service = "Blood Lead Screening") {
 
-  data <- services_change_data %>%
-    dplyr::select(Group, filter:y)
 
 
-  data_wide <- tidyr::pivot_wider(data, names_from = service_provision, values_from = c(y)) %>%
-    dplyr::mutate(size = 1,
-                  x = `Reduced Service`,
-                  y = `Expanded Service`) %>%
+  # Step 1: Filter and summarize the data
+  data_xy <- services_change_data %>%
+    dplyr::select(service_type, group, service_provision, y, Responses, filter, Question) %>%
     dplyr::filter(filter %in% set_filter,
-                  service_type %in% set_service)
+                  service_type %in% set_service) %>%
+    dplyr::group_by(service_type, filter, group) %>%
+    dplyr::reframe(
+      x = sum(y[service_provision == "Reduced Service"], na.rm = TRUE),
+      y = sum(y[service_provision == "Expanded Service"], na.rm = TRUE),
+      Responses = sum(Responses)
+      # ,
+      # group = group, # Keep Responses as is
+      # .groups = "drop"  # Drop grouping after summarization
+    )
 
 
-  data_clean <- data_wide %>%
-    dplyr::mutate(verticalAlign = dplyr::case_when(service_type == "Blood Lead Screening" ~ "top",
-                                                   service_type == "Chronic Disease" ~ "bottom",
-                                                   service_type == "Communicable Disease Screening or Treatment" ~ "bottom",
-                                                   service_type == "Diabetes Screening" ~ "top",
-                                                   service_type == "Emergency Preparedness" ~ "top",
-                                                   service_type == "Environmental Health Including Food Safety" ~ "top",
-                                                   service_type == "Epidemiology and Surveillance" ~ "bottom",
-                                                   service_type == "High Blood Pressure Screening" ~ "middle",
-                                                   service_type == "Immunization" ~ "bottom",
-                                                   service_type == "Maternal and Child Health Services" ~ "bottom",
-                                                   service_type == "Mental Health" ~ "middle",
-                                                   service_type == "Obesity Prevention" ~ "top",
-                                                   service_type == "Substance Use Prevention" ~ "bottom")) %>%
-    dplyr::mutate(align = dplyr::case_when(service_type == "Blood Lead Screening" ~ "left",
-                                           service_type == "Chronic Disease" ~ "left",
-                                           service_type == "Communicable Disease Screening or Treatment" ~ "center",
-                                           service_type == "Diabetes Screening" ~ "center",
-                                           service_type == "Emergency Preparedness" ~ "center",
-                                           service_type == "Environmental Health Including Food Safety" ~ "center",
-                                           service_type == "Epidemiology and Surveillance" ~ "center",
-                                           service_type == "High Blood Pressure Screening" ~ "left",
-                                           service_type == "Immunization" ~ "center",
-                                           service_type == "Maternal and Child Health Services" ~ "center",
-                                           service_type == "Mental Health" ~ "left",
-                                           service_type == "Obesity Prevention" ~ "center",
-                                           service_type == "Substance Use Prevention" ~ "center")) %>%
-    dplyr::mutate(service_type_short = dplyr::case_when(service_type == "Blood Lead Screening" ~ "Blood Lead",
-                                                  service_type == "Chronic Disease" ~ "Chronic Disease",
-                                                  service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
-                                                  service_type == "Diabetes Screening" ~ "Diabetes Sx",
-                                                  service_type == "Emergency Preparedness" ~ "Emrgy Preparedness",
-                                                  service_type == "Environmental Health Including Food Safety" ~ "Env Health",
-                                                  service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
-                                                  service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
-                                                  service_type == "Immunization" ~ "Immunization",
-                                                  service_type == "Maternal and Child Health Services" ~ "MCH",
-                                                  service_type == "Mental Health" ~ "Mental Health",
-                                                  service_type == "Obesity Prevention" ~ "Obesity Prev.",
-                                                  service_type == "Substance Use Prevention" ~ "Substance Use Prev."))
 
-  data_clean %>%
+
+  # Step 2: Add alignment and short name properties
+  data_clean <- data_xy %>%
+    # Add vertical alignment based on `service_type`
+    dplyr::mutate(
+      verticalAlign = dplyr::case_when(
+        service_type == "Blood Lead Screening" ~ "top",
+        service_type == "Chronic Disease" ~ "bottom",
+        service_type == "Communicable Disease Screening or Treatment" ~ "bottom",
+        service_type == "Diabetes Screening" ~ "top",
+        service_type == "Emergency Preparedness" ~ "top",
+        service_type == "Environmental Health Including Food Safety" ~ "top",
+        service_type == "Epidemiology and Surveillance" ~ "bottom",
+        service_type == "High Blood Pressure Screening" ~ "middle",
+        service_type == "Immunization" ~ "bottom",
+        service_type == "Maternal and Child Health Services" ~ "bottom",
+        service_type == "Mental Health" ~ "middle",
+        service_type == "Obesity Prevention" ~ "top",
+        service_type == "Substance Use Prevention" ~ "bottom"
+      )
+    ) %>%
+
+    # Add horizontal alignment based on `service_type`
+    dplyr::mutate(
+      align = dplyr::case_when(
+        service_type == "Blood Lead Screening" ~ "left",
+        service_type == "Chronic Disease" ~ "left",
+        service_type == "Communicable Disease Screening or Treatment" ~ "center",
+        service_type == "Diabetes Screening" ~ "center",
+        service_type == "Emergency Preparedness" ~ "center",
+        service_type == "Environmental Health Including Food Safety" ~ "center",
+        service_type == "Epidemiology and Surveillance" ~ "center",
+        service_type == "High Blood Pressure Screening" ~ "left",
+        service_type == "Immunization" ~ "center",
+        service_type == "Maternal and Child Health Services" ~ "center",
+        service_type == "Mental Health" ~ "left",
+        service_type == "Obesity Prevention" ~ "center",
+        service_type == "Substance Use Prevention" ~ "center"
+      )
+    ) %>%
+
+    # Create short names for `service_type`
+    dplyr::mutate(
+      service_type_short = dplyr::case_when(
+        service_type == "Blood Lead Screening" ~ "Blood Lead",
+        service_type == "Chronic Disease" ~ "Chronic Disease",
+        service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
+        service_type == "Diabetes Screening" ~ "Diabetes Sx",
+        service_type == "Emergency Preparedness" ~ "Emrgy Preparedness",
+        service_type == "Environmental Health Including Food Safety" ~ "Env Health",
+        service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
+        service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
+        service_type == "Immunization" ~ "Immunization",
+        service_type == "Maternal and Child Health Services" ~ "MCH",
+        service_type == "Mental Health" ~ "Mental Health",
+        service_type == "Obesity Prevention" ~ "Obesity Prev.",
+        service_type == "Substance Use Prevention" ~ "Substance Use Prev."
+      )
+    )
+
+  # Step 3: Add data label configuration for visualization
+  data <- data_clean %>%
     dplyr::mutate(
       dataLabels = purrr::map2(
         verticalAlign, align,
@@ -616,4 +651,8 @@ scatter_data <- function(set_filter = "All LHDs",
       )
     )
 
+View(data)
+
+  # Return the cleaned and formatted dataset
+  return(data)
 }

@@ -2,18 +2,21 @@
 % Please edit documentation in R/utils-post-stratification.R
 \name{scatter_data}
 \alias{scatter_data}
-\title{Data cleaning for the scatter plots}
+\title{Data cleaning for scatter plot visualization}
 \usage{
 scatter_data(set_filter = "All LHDs", set_service = "Blood Lead Screening")
 }
 \arguments{
-\item{set_filter}{value from the data, one of the filters}
+\item{set_filter}{A character string. The filter to apply to the data (e.g., "All LHDs").}
 
-\item{set_service}{value(s) from the data, one of the service_types}
+\item{set_service}{A character string or vector. The service type(s) to include
+(e.g., "Blood Lead Screening").}
 }
 \value{
-A list of one or more.
+A tibble containing cleaned and formatted data ready for visualization.
 }
 \description{
-Clean and format data for the scatter plot visualization
+This function cleans and formats data for scatter plot visualization.
+It summarizes, pivots, and restructures the data while retaining key contextual
+information. It also assigns alignment properties for visualization purposes.
 }

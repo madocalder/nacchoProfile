@@ -18,7 +18,7 @@
 #' @return A processed data frame that combines historical and current data for the specified `option` topic. The returned data frame includes:
 #'   - Descriptive labels in columns such as `legend_label` and `legend_title` for easy integration in visualizations.
 #'   - Values for the current year as well as historical data, when applicable.
-#'   - Aggregated and summarized percentages or counts based on the specified filter and topic.
+#'   - Aggregated and summarised percentages or counts based on the specified filter and topic.
 #'
 #' @details
 #' This function performs topic-specific data processing steps, including:
@@ -69,7 +69,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           FALSE ~ category
         ))%>%
         dplyr::group_by(category, group, Group, Question) %>%
-        dplyr::summarize(y = sum(y))
+        dplyr::summarise(y = sum(y))
 
       current_data$year <- 2022
       # View(current_data)
@@ -111,7 +111,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             y = round_up((100*as.numeric(y)))
           ) %>%
           dplyr::group_by(category, group, year, filter, topic) %>%
-          dplyr::summarize(y = sum(y))
+          dplyr::summarise(y = sum(y))
 
        ### 2022 data-------------
         current_data <- return_survey_weighted_counts(option) %>%
@@ -166,7 +166,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               TRUE ~ category  # Handle any other cases, though we don't expect others
             )
           ) %>%
-          dplyr::summarize(y = sum(y))
+          dplyr::summarise(y = sum(y))
 
         # View(hist_data)
 
@@ -556,7 +556,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             category == "None" ~ "No",
             FALSE ~ category
           ))%>%
-          dplyr::summarize(y = sum(y)) %>%
+          dplyr::summarise(y = sum(y)) %>%
           dplyr::ungroup()%>%
           dplyr::filter(category == "Yes")
 
@@ -604,7 +604,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             y = round_up((100*as.numeric(y)))
           ) %>%
           dplyr::group_by(category, group, year, filter, topic, subtitle) %>%
-          dplyr::summarize(y = sum(y))
+          dplyr::summarise(y = sum(y))
 
 
         ### 2022 data-------------
@@ -669,7 +669,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
               TRUE ~ category  # Handle any other cases, though we don't expect others
             )
           ) %>%
-          dplyr::summarize(y = sum(y))
+          dplyr::summarise(y = sum(y))
 
         # View(hist_data)
 

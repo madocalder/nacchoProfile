@@ -55,9 +55,9 @@ mod_home_ui <- function(id){
                 health departments also received one of the two sets of
                 supplemental questions. NACCHO administered the survey from June
                 through September 2022. Overall, 942 local health departments
-                responded, for a response rate of 38%. For a full description
-                of the methods, read our comprehensive report at",
-            tags$a(href="https://www.naccho.org/profile", "www.naccho.org/profile.",
+                responded, for a response rate of 38%. ",
+            tags$a(href="https://www.naccho.org/uploads/downloadable-resources/NACCHO-2022-Profile-Report.pdf#page=11",
+                   "For a full description of the methods, read our comprehensive report.",
                    style = "text-decoration: underline !important;")
           ),
 

@@ -34,91 +34,232 @@ NULL
 
 # Code to prepare `services_data` dataset ----
 devtools::load_all()
-start_time <- Sys.time() # get start time
+start_time <- Sys.time()  # Get start time
 
-# Get Vars ----------------------------------------------------------------
+
+case_when_text <- "
+stringr::str_detect(Question, \"c6q55\") ~ \"Routine Adult Immunizations\",
+stringr::str_detect(Question, \"c6q56\") ~ \"Routine Childhood Immunizations\",
+stringr::str_detect(Question, \"c6q147\") ~ \"COVID-19 Adult Immunizations\",
+stringr::str_detect(Question, \"c6q148\") ~ \"COVID-19 Child Immunizations\",
+stringr::str_detect(Question, \"c6q142\") ~ \"BMI Screening\",
+stringr::str_detect(Question, \"c6q60\") ~ \"Cancer Screening\",
+stringr::str_detect(Question, \"c6q61\") ~ \"Cardiovascular Disease Screening\",
+stringr::str_detect(Question, \"c6q62\") ~ \"Diabetes Screening\",
+stringr::str_detect(Question, \"c6q63\") ~ \"High Blood Pressure Screening\",
+stringr::str_detect(Question, \"c6q57\") ~ \"HIV/AIDs Screening\",
+stringr::str_detect(Question, \"c6q58\") ~ \"Other STDs Screening\",
+stringr::str_detect(Question, \"c6q59\") ~ \"Tuberculosis Screening\",
+stringr::str_detect(Question, \"c6q65\") ~ \"HIV/AIDs\",
+stringr::str_detect(Question, \"c6q66\") ~ \"Other STDs\",
+stringr::str_detect(Question, \"c6q67\") ~ \"Tuberculosis\",
+stringr::str_detect(Question, \"c6q73\") ~ \"EPSDT\",
+stringr::str_detect(Question, \"c6q69\") ~ \"Prenatal Care\",
+stringr::str_detect(Question, \"c6q74\") ~ \"Well-Child Clinic\",
+stringr::str_detect(Question, \"c6q71\") ~ \"WIC\",
+stringr::str_detect(Question, \"c6q78\") ~ \"Behavioral/Mental Health Services\",
+stringr::str_detect(Question, \"c6q75\") ~ \"Comprehensive Primary Care\",
+stringr::str_detect(Question, \"c6q76\") ~ \"Home Health Care\",
+stringr::str_detect(Question, \"c6q77\") ~ \"Oral Health\",
+stringr::str_detect(Question, \"c6q79\") ~ \"Substance Abuse Services\",
+stringr::str_detect(Question, \"c6q83\") ~ \"Behavioral Risk Factors\",
+stringr::str_detect(Question, \"c6q81\") ~ \"Chronic Disease\",
+stringr::str_detect(Question, \"c6q80\") ~ \"Communicable Infectious Disease\",
+stringr::str_detect(Question, \"c6q82\") ~ \"Injury\",
+stringr::str_detect(Question, \"c6q84\") ~ \"Environmental Health\",
+stringr::str_detect(Question, \"c6q86\") ~ \"Maternal and Child Health\",
+stringr::str_detect(Question, \"c6q85\") ~ \"Syndromic Surveillance\",
+stringr::str_detect(Question, \"c6q89\") ~ \"Chronic Disease Programs\",
+stringr::str_detect(Question, \"c6q87\") ~ \"Injury\",
+stringr::str_detect(Question, \"c6q95\") ~ \"Mental Illness\",
+stringr::str_detect(Question, \"c6q90a\") ~ \"Nutrition\",
+stringr::str_detect(Question, \"c6q145\") ~ \"Opioids\",
+stringr::str_detect(Question, \"c6q91\") ~ \"Physical Activity\",
+stringr::str_detect(Question, \"c6q146\") ~ \"Substance Abuse Other Than Opioids\",
+stringr::str_detect(Question, \"c6q93\") ~ \"Tobacco\",
+stringr::str_detect(Question, \"c6q105\") ~ \"Body Art (Tattoos, Piercings)\",
+stringr::str_detect(Question, \"c6q97\") ~ \"Campgrounds and RVs\",
+stringr::str_detect(Question, \"c6q103\") ~ \"Children's Camps\",
+stringr::str_detect(Question, \"c6q110\") ~ \"Food Processing\",
+stringr::str_detect(Question, \"c6q114\") ~ \"Food Service Establishments\",
+stringr::str_detect(Question, \"c6q115\") ~ \"Health-Related Facilities\",
+stringr::str_detect(Question, \"c6q101\") ~ \"Hotels and Motels\",
+stringr::str_detect(Question, \"c6q116\") ~ \"Housing\",
+stringr::str_detect(Question, \"c6q109\") ~ \"Lead Inspections\",
+stringr::str_detect(Question, \"c6q111\") ~ \"Milk Processing\",
+stringr::str_detect(Question, \"c6q113\") ~ \"Private Drinking Water\",
+stringr::str_detect(Question, \"c6q112\") ~ \"Public Drinking Water\",
+stringr::str_detect(Question, \"c6q143\") ~ \"Recreational Water (Pools, Lakes)\",
+stringr::str_detect(Question, \"c6q102\") ~ \"Schools or Daycares\",
+stringr::str_detect(Question, \"c6q100\") ~ \"Septic Systems\",
+stringr::str_detect(Question, \"c6q107\") ~ \"Tobacco Retailers\",
+stringr::str_detect(Question, \"c6q127\") ~ \"Air Pollution\",
+stringr::str_detect(Question, \"c6q118\") ~ \"Food Safety Education\",
+stringr::str_detect(Question, \"c6q124\") ~ \"Hazmat Response\",
+stringr::str_detect(Question, \"c6q117\") ~ \"Indoor Air Quality\",
+stringr::str_detect(Question, \"c6q121\") ~ \"Land Use Planning\",
+stringr::str_detect(Question, \"c6q128\") ~ \"Noise Pollution\",
+stringr::str_detect(Question, \"c6q144\") ~ \"Public Health Nuisance Abatement\",
+stringr::str_detect(Question, \"c6q119\") ~ \"Radiation Control\",
+stringr::str_detect(Question, \"c6q120\") ~ \"Vector Control\",
+stringr::str_detect(Question, \"c6q131\") ~ \"Animal Control\",
+stringr::str_detect(Question, \"c6q130\") ~ \"Emergency Medical Services\",
+stringr::str_detect(Question, \"c6q134\") ~ \"Laboratory Services\",
+stringr::str_detect(Question, \"c6q137\") ~ \"School Health\",
+stringr::str_detect(Question, \"c6q136\") ~ \"School-Based Clinics\"
+"
+
+# Assuming `case_when_text` contains the full case_when block as a string
+case_when_lines <- stringr::str_split(case_when_text, "\n")[[1]]  # Split into individual lines
+
+# Extract the mappings for base_variable and service_type
+case_when_mappings <- tibble(
+  base_variable = stringr::str_extract(case_when_lines, "c6q\\d+"),  # Extract base variable (e.g., "c6q55")
+  service_type = stringr::str_match(case_when_lines, "~\\s*\"(.*?)\"")[,2]  # Extract the text inside quotes after '~'
+) %>%
+  filter(!is.na(base_variable) & !is.na(service_type))  # Remove rows with NA values
+
+# View(case_when_mappings)
+
+#Get Relevant Columns from master_data
+relevant_columns <- unique(case_when_mappings$base_variable)
 data <- master_data %>%
-  dplyr::select(dplyr::starts_with("c6q"))
+  select(matches(paste0("^(", paste(relevant_columns, collapse = "|"), ")[a-z]?$")))
 
 vars <- colnames(data)
 
-# With Filter -------------------------------------------------------------
+
+# Process Data with Filters --------------------------------------
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
+services_filter_list <- list()
 
-services_filter_list <- list() # create an empty list
+for (filter in filters) {
+  cat("Processing filter:", filter, "\n")
 
-# Loop to create the dataframes with each filter
-for (i in 1:length(filters)) {
-  args <- list(vars, filters[[i]])
+  args <- tibble(
+    q_label = vars,
+    grps = filter
+  )
 
-  filtered_data <- pmap_dfr(args, return_survey_weighted_counts) %>%
-    dplyr::mutate(filter = paste(filters[i])) %>%
-    dplyr::select(-c(13, 14))
+  filtered_data <- purrr::pmap_dfr(
+    .l = args,
+    .f = function(q_label, grps) {
+      cat("Processing q_label:", q_label, "with grps:", grps, "\n")
+      result <- tryCatch(
+        return_survey_weighted_counts(q_label = q_label, grps = grps),
+        error = function(e) {
+          warning(paste("Error in return_survey_weighted_counts for q_label =", q_label, "and grps =", grps, ":", e$message))
+          return(NULL)
+        }
+      )
+      if (is.null(result) || !is.data.frame(result) || nrow(result) == 0) {
+        warning(paste("No data returned for q_label =", q_label, "and grps =", grps))
+        return(tibble())
+      }
+      result %>% mutate(filter = grps)
+    }
+  )
 
-  filtered_data <- data %>%
-    dplyr::select(1:12, filter)
-
-  services_filter_list[[i]] <- filtered_data
+  services_filter_list[[filter]] <- filtered_data
 }
 
-# Bind the data generated in loop
-services_with_filter <- do.call(rbind, services_filter_list) %>%
-  dplyr::select(1:13, 15)
+services_with_filter <- bind_rows(services_filter_list)
 
-# No Filter ----------------------------------------------------------------
-services_no_filter <- pmap_dfr(vars, return_survey_weighted_counts) %>%
-  dplyr::mutate(filter = "All LHDs")
+# Process Data Without Filters -----------------------------------
+services_no_filter <- purrr::map_dfr(vars, function(q_label) {
+  cat("Processing without filters for q_label:", q_label, "\n")
 
-# Join Data ---------------------------------------------------------------
-# Join the two datasets -- with filters and without filters
-services_data <- rbind(services_with_filter, services_no_filter)
+  # Call return_survey_weighted_counts with the current q_label
+  result <- tryCatch(
+    return_survey_weighted_counts(q_label = q_label),
+    error = function(e) {
+      warning(paste("Error in return_survey_weighted_counts for q_label =", q_label, ":", e$message))
+      return(NULL)
+    }
+  )
 
-# Clean -------------------------------------------------------------------
+  # Validate the result
+  if (is.null(result) || !is.data.frame(result) || nrow(result) == 0) {
+    warning(paste("No data returned for q_label =", q_label))
+    return(tibble())
+  }
+
+  # Return the result
+  result
+})
+
+services_no_filter$filter <- "All LHDs"
+
+# Combine Filtered and Unfiltered Data -----------------------------------
+services_data <- bind_rows(services_with_filter, services_no_filter)
+
+#  Assign Service Type and Service Provision ----------------------
 services_data <- services_data %>%
-  dplyr::mutate(service_category = dplyr::case_when(
-    Question %in% c("c6q55a", "c6q55b", "c6q55i", "c6q55f", "c6q55g", "c6q56a", "c6q56b", "c6q56i",
-                    "c6q56f", "c6q56g", "c6q147a", "c6q147b", "c6q147i", "c6q147f", "c6q147g",
-                    "c6q148a", "c6q148b", "c6q148i", "c6q148f", "c6q148g") ~ "Immunization",
-    Question %in% c("c6q142a", "c6q142b", "c6q142i", "c6q142f", "c6q142g",
-                    "c6q60a", "c6q60b", "c6q60i", "c6q60f", "c6q60g",
-                    "c6q61a", "c6q61b", "c6q61i", "c6q61f", "c6q61g",
-                    "c6q62a", "c6q62b", "c6q62i", "c6q62f", "c6q62g",
-                    "c6q63a", "c6q63b", "c6q63i", "c6q63f", "c6q63g",
-                    "c6q57a", "c6q57b", "c6q57i", "c6q57f", "c6q57g",
-                    "c6q58a", "c6q58b", "c6q58i", "c6q58f", "c6q58g",
-                    "c6q59a", "c6q59b", "c6q59i", "c6q59f", "c6q59g") ~ "Disease/Risk Factor Screening",
-    Question %in% c("c6q65a", "c6q65b", "c6q65i", "c6q65f", "c6q65g", "c6q66a", "c6q66b",
-                    "c6q66i", "c6q66f", "c6q66g", "c6q67a", "c6q67b", "c6q67i", "c6q67f",
-                    "c6q67g") ~ "Communicable Disease Treatment",
-    Question %in% c("c6q73a","c6q73b","c6q73i","c6q73f","c6q73g","c6q69a","c6q69b",
-                    "c6q69i","c6q69f","c6q69g","c6q74a","c6q74b","c6q74i","c6q74f",
-                    "c6q74g", "c6q71a", "c6q71b", "c6q71i", "c6q71f", "c6q71g") ~ "Maternal and Child Health",
-    # (Other categories defined similarly)
+  mutate(
+    base_variable = stringr::str_extract(Question, "c6q\\d+"),  # Extract base variable
+    suffix = stringr::str_extract(Question, "[a-z]$")           # Extract suffix
+  ) %>%
+  left_join(case_when_mappings, by = "base_variable") %>%  # Add service_type
+  mutate(
+    service_provision = case_when(
+      suffix == "a" ~ "LHD (Directly)",
+      suffix == "b" ~ "LHD (By Contract)",
+      suffix == "i" ~ "Other Entity",
+      suffix == "f" ~ "Not Available in Community",
+      suffix == "g" ~ "Status Unknown",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Filter and Keep Relevant Columns -------------------------------
+services_data <- services_data %>%
+  dplyr::select(all_of(c("Question", "Group", "Answer", "NA.RM", "N", "SE",
+                         "Percentage", "x", "y", "category", "group", "subtitle",
+                         "x_label", "Responses", "filter", "service_type",
+                         "service_provision"))) %>%
+  dplyr::mutate(service_classification = case_when(
+    # Immunization
+    stringr::str_detect(Question, "c6q55|c6q56|c6q147|c6q148") ~ "Immunization",
+
+    # Disease/Risk Factor Screening
+    stringr::str_detect(Question, "c6q142|c6q60|c6q61|c6q62|c6q63|c6q57|c6q58|c6q59") ~ "Disease/Risk Factor Screening",
+
+    # Communicable Disease Treatment
+    stringr::str_detect(Question, "c6q65|c6q66|c6q67") ~ "Communicable Disease Treatment",
+
+    # Maternal and Child Health
+    stringr::str_detect(Question, "c6q73|c6q69|c6q74|c6q71") ~ "Maternal and Child Health",
+
+    # Other Clinical Services
+    stringr::str_detect(Question, "c6q75|c6q76|c6q77|c6q78|c6q79") ~ "Other Clinical Services",
+
+    # Epidemiology and Surveillance
+    stringr::str_detect(Question, "c6q83|c6q81|c6q80|c6q82|c6q84|c6q86|c6q85") ~ "Epidemiology and Surveillance",
+
+    # Population-Based Prevention
+    stringr::str_detect(Question, "c6q89|c6q87|c6q95|c6q90a|c6q145|c6q91|c6q146|c6q93") ~ "Population-Based Prevention",
+
+    # Regulation, Inspection, Licensing
+    stringr::str_detect(Question, "c6q105|c6q97|c6q103|c6q110|c6q114|c6q115|c6q101|c6q116|c6q109|c6q111|c6q113|c6q112|c6q143|c6q102|c6q100|c6q107") ~ "Regulation, Inspection, Licensing",
+
+    # Other Environmental Health
+    stringr::str_detect(Question, "c6q127|c6q118|c6q124|c6q117|c6q121|c6q128|c6q144|c6q119|c6q120") ~ "Other Environmental Health",
+
+    # Other Population-Based Services
+    stringr::str_detect(Question, "c6q131|c6q130|c6q134|c6q137|c6q136") ~ "Other Population-Based Services",
+
+    # Default category if no match found
+    TRUE ~ "Uncategorized"
   ))
 
-# Further categorize service provision
-services_data <- services_data %>%
-  dplyr::mutate(service_provision = dplyr::case_when(
-    stringr::str_detect(Question, "a") ~ "LHD (Directly)",
-    stringr::str_detect(Question, "b") ~ "LHD (By Contract)",
-    stringr::str_detect(Question, "i") ~ "Other Entity",
-    stringr::str_detect(Question, "f") ~ "Not Available in Community",
-    stringr::str_detect(Question, "g") ~ "Status Unknown"
-  ))
 
-# Summarize total counts for each service and group
-services_data_n <- services_data %>%
-  group_by(Question, group) %>%
-  summarise(denominator = sum(Responses))
+# %>%
+#   filter(category == "Checked")
 
-services_data <- services_data %>%
-  dplyr::filter(Answer == "checked")
-
-services_data <- left_join(services_data, services_data_n, by = c("Question", "group"))
-
-# Print Time --------------------------------------------------------------
-end_time <- Sys.time() - start_time # calculate elapsed time
+# Save and Print Elapsed Time ---------------------------------------------
+end_time <- Sys.time() - start_time  # Calculate elapsed time
 print(end_time)
 
-# Save the data
 usethis::use_data(services_data, overwrite = TRUE)
+
+

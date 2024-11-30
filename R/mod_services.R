@@ -326,21 +326,32 @@ mod_services_server <- function(id){
     # figure output -----------------------------------------------------------
     # used for bar graph
     output$figure_bar <- highcharter::renderHighchart({
+
       data <- services_data %>%
-        dplyr::filter(service_category == "Immunization") %>%
+        dplyr::filter(service_classification == "Immunization") %>%
         dplyr::filter(filter == "All LHDs") %>%
-        dplyr::filter(service_provision == "LHD (Directly)") %>%
+        dplyr::filter(service_provision == "LHD (Directly)")
+
+
+      data_n <- data %>%
+        dplyr::group_by(Question) %>%
+        dplyr::summarise(Responses = sum(Responses))
+
+      data <- data %>%
+        dplyr::filter(Answer == "checked") %>%
         dplyr::mutate(group = filter,
                       category = service_type) %>%
         dplyr::group_by(group) %>%
-        dplyr::mutate(x = (1:length(group))-1) %>%
+        dplyr::mutate(x = seq_along(group) - 1) %>%
         dplyr::ungroup()
+
+
 
       set_simple_bar(data) %>%
         viz_options(
           viz_title = "Percent of LHDs that Directly Provide Selected Services",
-          viz_subtitle = "Immunization Services", # unique(data$service_category)
-          viz_caption = paste0("<b> N: </b>",  min(data$demoninator), "-", max(data$demoninator), "<br>", source_line),
+          viz_subtitle = "Immunization Services", # unique(data$service_classification)
+          viz_caption = paste0("<b> N: </b>",  show_n(data_n$Responses), "<br>", source_line),
           tooltip = "",
           theme = naccho.viz::basic ,
           legend_enable = FALSE,
@@ -353,33 +364,41 @@ mod_services_server <- function(id){
     # used for line graph
     output$figure_line <- highcharter::renderHighchart({
       # data <- services_data %>%
-      #   dplyr::filter(service_category %in% c(input$services)) %>%
-      #   dplyr::filter(service_provision %in% c("Performed Directly by LHD", "Contracted Out by LHD"))
+      #   dplyr::filter(service_classification %in% c(input$services)) %>%
+      #   dplyr::filter(category %in% c("Performed Directly by LHD", "Contracted Out by LHD"))
     })
+
 
 
     # used for scatter plot
     output$figure_scatter <- highcharter::renderHighchart({
+
+      req(input$service_changes)
+
       data <- scatter_data(set_filter = "All LHDs",
-                           set_service = change_classifications) %>%
-        dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+                           set_service = input$service_changes) # %>%
+        #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
       scatter_plot(data, colors = "#6D833A")
     })
 
 
+
     # used for butterfly plot
     output$figure_butterfly <- highcharter::renderHighchart({
+
+      req(input$service_changes)
+
       data <- scatter_data(set_filter = c(landscape_filters),
-                            set_service = "Immunization") %>%
-        dplyr::mutate(group = sapply(Group, custom_str_to_title),
-                      left = `Reduced Service`,
-                      right = `Expanded Service`,
-                      x = (1:length(Group)-1)) %>%
+                            set_service = "Immunization")   %>%
+        dplyr::mutate(
+                      left = x,
+                      right = y,
+                      x = (1:length(group)-1)) %>%
         dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
 
       data_n <- data %>%
-        dplyr::filter(group == "All LHDs")
+        dplyr::filter(filter == "All LHDs")
 
       max_one <- max(data$left)
       max_two <- max(data$right)
@@ -395,7 +414,7 @@ mod_services_server <- function(id){
           colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
           viz_title = "The Percent of LHDs that Shrunk or Grew Selected Service",
-          viz_caption = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line),
+          viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>
               {point.y:.0f}% <br>",
@@ -472,17 +491,22 @@ mod_services_server <- function(id){
       if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter == "All LHDs") {
         req(length(input$services) >= 1) # prevents error
 
-
-
         data <- services_data %>%
-          dplyr::filter(service_category %in% c(input$services),
-                        filter == "All LHDs",
-                        service_provision == input$topic) %>%
-          dplyr::mutate(group = Group,
+          dplyr::filter(service_classification %in% c(input$services)) %>%
+          dplyr::filter(filter == "All LHDs") %>%
+          dplyr::filter(service_provision == input$topic)
+
+
+        data_n <- data %>%
+          dplyr::group_by(Question) %>%
+          dplyr::summarise(Responses = sum(Responses))
+
+        data <- data %>%
+          dplyr::filter(Answer == "checked") %>%
+          dplyr::mutate(group = filter,
                         category = service_type) %>%
           dplyr::group_by(group) %>%
-          dplyr::mutate(x = (1:length(group))-1,
-                        x_label = "") %>%
+          dplyr::mutate(x = seq_along(group) - 1) %>%
           dplyr::ungroup()
 
 
@@ -500,34 +524,38 @@ mod_services_server <- function(id){
                           meta = filter_meta(),
                           size = size,
                           overflow = overflow,
-                          responses = paste0(min(data$demoninator), "-", max(data$demoninator)))
+                          responses = paste0(show_n(data_n$Responses)))
 
 
       } else if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter != "All LHDs") {
         req(length(input$services) >= 1) # prevents error
 
         data <- services_data %>%
-          dplyr::filter(service_category %in% c(input$services),
+          dplyr::filter(service_classification %in% c(input$services),
                         filter == input$filter,
-                        service_provision == input$topic) %>%
-          dplyr::mutate(group = sapply(Group, custom_str_to_title),
-                        category = service_type) %>%
-          dplyr::group_by(group) %>%
-          dplyr::mutate(x = (1:length(group))-1,
-                        x_label = "") %>%
+                        service_provision == input$topic,
+                        Answer == "checked") %>%
+          dplyr::mutate(category = service_type) %>%
+          dplyr::group_by(category) %>%
+          dplyr::mutate(x = seq_along(category) - 1) %>%
           dplyr::ungroup()
 
         data_all <- services_data %>%
-          dplyr::filter(service_category %in% c(input$services),
+          dplyr::filter(service_classification %in% c(input$services),
                         filter == "All LHDs",
-                        service_provision == input$topic) %>%
-          dplyr::mutate(group = Group,
+                        category == input$topic)
+
+        data_all_n <- data_all %>%
+          dplyr::group_by(Question) %>%
+          dplyr::summarise(Responses = sum(Responses))
+
+        data_all <- data_all %>%
+          dplyr::filter(Answer == "checked") %>%
+          dplyr::mutate(group = filter,
                         category = service_type) %>%
           dplyr::group_by(group) %>%
-          dplyr::mutate(x = (1:length(group))-1,
-                        x_label = "") %>%
+          dplyr::mutate(x = seq_along(group) - 1) %>%
           dplyr::ungroup()
-
 
 
         # nested
@@ -549,7 +577,7 @@ mod_services_server <- function(id){
                               id = series_id,
                               size = size,
                               overflow = overflow,
-                              responses = paste0(min(data_all$demoninator), "-", max(data_all$demoninator)))
+                              responses = paste0(show_n(data_all_n$Responses)))
 
 
       } else if (input$topic != "Reduced/Expanded Services" & input$view == "Line Graph") {
@@ -560,17 +588,24 @@ mod_services_server <- function(id){
 
     observeEvent(service_change_inputs(), {
       if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter != "All LHDs") {
-
+        req(input$service_changes)
         data <- scatter_data(set_filter = input$filter,
-                             set_service = input$service_changes) %>%
-          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+                             set_service = input$service_changes)
+        # %>%
+  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
         data_all <- scatter_data(set_filter = "All LHDs",
-                             set_service = input$service_changes) %>%
-          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+                             set_service = input$service_changes)
 
 
-        series_id <- unique(data$Group)
+        # %>%
+  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+
+        View(data)
+        View(data_all)
+
+
+        series_id <- unique(data$group)
 
         proxy_scatter %>%
           proxy_to_scatter_group(data = data,
@@ -583,8 +618,8 @@ mod_services_server <- function(id){
       } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {
         req(input$service_changes)
         data <- scatter_data(set_filter = "All LHDs",
-                                 set_service = input$service_changes) %>%
-          dplyr::mutate(Group = sapply(Group, custom_str_to_title))
+                                 set_service = input$service_changes) # %>%
+  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
         proxy_scatter %>%
           proxy_to_scatter_single(data)
@@ -595,12 +630,17 @@ mod_services_server <- function(id){
 
     observeEvent(service_change_single_inputs(), {
       if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
+
+        req(input$service_changes)
+
         data <- scatter_data(set_filter = c(landscape_filters),
-                             set_service = input$service_changes_single) %>%
-          dplyr::mutate(group = sapply(Group, custom_str_to_title),
-                        left = `Reduced Service`,
-                        right = `Expanded Service`,
-                        x = (1:length(Group)-1)) %>%
+                             set_service = input$service_changes) %>%
+         data <- data %>%
+          dplyr::mutate(
+            # group = sapply(Group, custom_str_to_title),
+                        left = x,
+                        right = y,
+                        x = (1:length(group)-1)) %>%
           dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
 
         data_n <- data %>%
@@ -612,7 +652,7 @@ mod_services_server <- function(id){
         proxy_butterfly %>%
           proxy_to_bar(data, max_one, max_two,
                        meta,name_one = "Services shrunk",
-                                   name_two = "JServices grew",
+                                   name_two = "Services grew",
                                    y_label = "% of LHDs")
           # highcharter::hcpxy_update(
           #   series = list(
@@ -623,7 +663,7 @@ mod_services_server <- function(id){
           #     text = paste(unique(data$service_type))
           #   ),
           #   caption = list(
-          #     text = paste0("<b> N: </b>", data_n$demoninator, "<br>", source_line)
+          #     text = paste0("<b> N: </b>", data_n$denominator, "<br>", source_line)
           #   )
           # ) %>%
           # highcharter::hcpxy_update(

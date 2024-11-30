@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_highcharter.R
 \name{get_bar_data}
 \alias{get_bar_data}
-\title{Generate Bar Chart Data for Specific Topics}
+\title{Generate Bar Chart Data for Other Topics PAge}
 \usage{
 get_bar_data(topic, filtering = NA)
 }

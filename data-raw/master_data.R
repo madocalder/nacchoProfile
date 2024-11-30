@@ -10,7 +10,26 @@ master_data <- haven::read_dta("data-raw/Profile2022_dashboarddataset.dta")
 
 
 # rename factor labels ----------------------------------------------------
-master_data$c0popcat3 <- haven::labelled(master_data$c0popcat3, labels = c("Small (<50,000)" = 1, "Medium (50,000-499,999)" = 2, "Large (500,000+)" = 3), label = "3 level population category, renamed by LJ")
+
+master_data$c0popcat3 <- haven::labelled(
+  master_data$c0popcat3,
+  labels = c("Small (<50,000)" = 1,
+             "Medium (50,000-499,999)" = 2,
+             "Large (500,000+)" = 3),
+  label = "3 level population category, renamed by LJ"
+)
+
+# Convert to factor explicitly and preserve order
+master_data$c0popcat3 <- factor(
+  haven::as_factor(master_data$c0popcat3), # Convert to factor-compatible haven labels
+  levels = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)"),
+  ordered = TRUE
+)
+
+
+
+
+
 master_data$c2q501 <- haven::labelled(master_data$c2q501, labels = c("Combined" = 1, "Independent" = 0, "Don't Know" = 2), label = "Agency structure, renamed by LJ")
 master_data$lboh <- haven::labelled(master_data$lboh, labels = c("None" = 0, "Advisory" = 1, "Governing" = 2), label = "Board of Health, renamed by LJ")
 

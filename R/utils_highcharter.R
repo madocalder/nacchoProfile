@@ -11,8 +11,7 @@ viz_export <- function(hc, enabled = TRUE) {
     highcharter::hc_exporting(
       enabled = enabled,
       accessibility = list(
-        enabled = TRUE
-      ),
+        enabled = TRUE),
       formAttributes = list(
         target = "_blank" # opens in new window
       ),
@@ -130,223 +129,6 @@ viz_options <- function(hc,
 
 
 
-
-#' Single Column Proxy Redraw
-#'
-#' @param hc A `highchart` `htmlwidget` object.
-#' @param data Dataframe; data object to feed the figure.
-#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
-#' @param ... Other arguments
-#'
-#' @return A redrawn figure.
-#' @export
-#'
-proxy_to_single <- function(
-    hc,
-    data,
-    meta,
-    add_n = paste(sum(data$Responses)),
-    ...) {
-
-  hc %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Urban", "Rural")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("State", "Local", "Shared")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Midwest", "South", "West", "Northeast")
-    ) %>%
-    highcharter::hcpxy_set_data(
-      "column",
-      data = data,
-      highcharter::hcaes(x, y, group = Group, names = category)
-    ) %>%
-    highcharter::hcpxy_update(
-      yAxis = list(
-        title = list(
-          text = meta$y_label
-        ),
-        max = meta$y_max,
-        labels = list(
-          format = meta$y_format
-        )
-      ),
-      title = list(
-        text = meta$title
-      ),
-      subtitle = list(
-        text = unique(data$subtitle)
-      ),
-      caption = list(
-        text = paste("<b> N: </b>", add_n, "<br>", source_line)
-      ),
-      xAxis = list(
-        categories = as.list(unique(data$category)),
-        offset = 0,
-        labels = list(
-          pointPadding = .25
-        )
-      ),
-      tooltip = list(
-        pointFormat = meta$tooltip
-      )
-    )
-}
-
-
-
-#' Grouped Column Proxy Redraw
-#'
-#' @param hc A `highchart` `htmlwidget` object.
-#' @param data Dataframe; data object to feed the figure.
-#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
-#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values.
-#' @param ... Other arguments
-#'
-#' @return A redrawn figure.
-#' @export
-#'
-proxy_to_group <- function(
-    hc,
-    data,
-    meta,
-    id,
-    colors,
-    add_n = paste(sum(data$Responses)),
-    ...) {
-
-  hc %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Urban", "Rural")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("State", "Local", "Shared")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Midwest", "South", "West", "Northeast")
-    ) %>%
-    highcharter::hcpxy_add_series(
-      data = data,
-      "column",
-      highcharter::hcaes(x, y, group = group),
-      id = id,
-      color = colors
-    ) %>%
-    highcharter::hcpxy_update(
-      series = list(
-        list(type = "column"),
-        dataLabels = list(
-          format = meta$data_label
-        )
-      ),
-      yAxis = list(
-        title = list(
-          text = meta$y_label,
-          style = list(
-            fontSize = "1.8vmin"
-          )
-        ),
-        max = meta$y_max,
-        labels = list(
-          format = meta$y_format
-        )
-      ),
-      title = list(
-        text = meta$title
-      ),
-      subtitle = list(
-        text = unique(data$subtitle)
-      ),
-      caption = list(
-        text = paste("<b> N: </b>", add_n,"<br>", source_line)
-      ),
-      xAxis = list(
-        categories = unique(data$category),
-        offset = 0
-      ),
-      tooltip = list(
-        tooltip = meta$tooltip
-      )
-    )
-}
-
-
-
-#' Pie Chart Proxy Redraw
-#'
-#' @param hc A `highchart` `htmlwidget` object.
-#' @param data Dataframe; data object to feed the figure.
-#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
-#' @param ... Other arguments
-#'
-#' @return A redrawn figure.
-#' @export
-#'
-proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
-
-  hc %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Urban", "Rural")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("State", "Local", "Shared")
-    ) %>%
-    highcharter::hcpxy_remove_series(
-      id = c("Midwest", "South", "West", "Northeast")
-    ) %>%
-    highcharter::hcpxy_set_data(
-      "pie",
-      data = data,
-      mapping = highcharter::hcaes(x, y, name = category)
-    ) %>%
-    highcharter::hcpxy_update(
-      series = list(
-        type = "pie",
-        innerSize = "70%", # Set the inner size for the donut effect
-        allowPointSelect = TRUE, # Enable point selection on the chart
-        cursor = "pointer", # Set cursor style for selectable points
-        showInLegend = TRUE, # Show legend for the chart
-        dataLabels = list(
-          format = meta$data_label
-        )
-      ),
-      yAxis = list(
-        title = list(
-          text = ""
-        ),
-        max = "",
-        labels = list(
-          format = ""
-        )
-      ),
-      title = list(
-        text = meta$title
-      ),
-      caption = list(
-        text = meta$caption
-      ),
-      xAxis = list(
-        categories = "",
-        lineColor = "#fff",
-        lineWidth = 0,
-        offset = 50
-      ),
-      tooltip = list(
-        tooltip = meta$tooltip
-      )
-    )
-}
 
 
 
@@ -717,7 +499,7 @@ set_hist <- function(data, x_label = "Total FTEs", y_label = "% of LHDs" , x_max
     data,
     type = "column",
     id = "All",
-    name = "Denominator of LHDs",
+    name = "All LHDs",
     highcharter::hcaes(x = x, y = y)
   ) %>%
     highcharter::hc_chart(
@@ -802,6 +584,759 @@ set_hist <- function(data, x_label = "Total FTEs", y_label = "% of LHDs" , x_max
       allowDecimals = FALSE,
       labels = list(
         format = "{value:,.0f}"
+      )
+    )
+}
+
+
+
+#' Scatter Plot
+#'
+#' @param data Dataframe for the viz
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+scatter_plot <- function(data, colors) {
+
+  # data_for_n <- data
+  #
+  # if (sum(stringr::str_detect(data_for_n$filter, "All LHDs")) > 0) {
+  #
+  #   n <- show_n(data$Responses)
+  #
+  # } else {
+  #
+  #   data_for_n <- data_for_n %>%
+  #     dplyr::group_by(service_type, filter) %>%
+  #     dplyr::summarize(n = sum(demoninator))
+  #
+  #   n <- data_for_n$n
+  # }
+  #
+  # req(n)
+
+
+  highcharter::highchart() %>%
+    highcharter::hc_add_series(
+      id = "All",
+      data = data,
+      type = "scatter",
+      mapping = highcharter::hcaes(x = x, y = y, group = filter, name = service_type)
+
+    ) %>%
+    highcharter::hc_chart(
+      panType = "xy",
+      panning = TRUE,
+      panKey = "shift",
+      zoomType = "xy",
+      resetZoomButton = list(
+        theme = list(
+          fill = "white",
+          stroke = "#80A14E",
+          style = list(
+            color = "#80A14E",
+            fontWeight = "bold",
+            fontFamily = "Heebo",
+            lineHeight = "25px" # positions text correctly inside button
+          ),
+          r = 20,  # border radius
+          padding = 10,
+          states = list(
+            hover = list(
+              fill = "#80A14E",
+              stroke = "white",
+              style = list(
+                color = "white"
+              )
+            )
+          )
+        )
+      )
+    ) %>%
+    highcharter::hc_tooltip(
+      useHTML = TRUE,
+      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      style = list(
+        fontFamily = "Heebo",
+        fontSize = "1.7vmin",
+        # lineHeight = "1.5vmin",
+        padding = 5,
+        textOutline = "none"
+      )
+    )%>%
+    highcharter::hc_plotOptions(
+      scatter = list(
+        events = list(
+          click = highcharter::JS("function() {
+                     this.selectionMarker.destroy();
+                     }")
+        ),
+        dataLabels = list(
+          enabled = TRUE,
+          allowOverlap = FALSE,
+          # format = "{point.name}",
+          formatter = highcharter::JS("
+          function() {
+            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
+          }
+        "),
+          style = list(
+            textOutline = "none",
+            fontFamily = "Heebo",
+            fontSize = "1.4vmin",
+            fontWeight = "bold"
+          )
+        ),
+        marker = list(
+          radius = 7,
+          lineWidth = 1
+        )
+      )
+    ) %>%
+    # # Add interactive horizontal line
+    # highcharter::hc_add_series(
+    #   name = "Average percent reduced (20%)",
+    #   type = "line",
+    #   data = list(list(x = 0, y = 20), list(x = 35, y = 20)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent reduced: 20%</span>"
+    #   )
+    # ) %>%
+    # # Add interactive vertical line
+    # highcharter::hc_add_series(
+    #   name = "Average percent expanded (27%)",
+    #   type = "line",
+    #   data = list(list(x = 27, y = 0), list(x = 27, y = 100)),
+    #   color = "gray",
+    #   dashStyle = "ShortDash",
+    #   enableMouseTracking = TRUE,
+    #   marker = list(enabled = FALSE),
+    #   tooltip = list(
+    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent expanded: 27%</span>"
+    #   )
+    # ) %>%
+    highcharter::hc_xAxis(
+      min = 0,
+      max = 35,
+      title = list(
+        text = "Percent of LHDs reducing service",
+        align = "high"
+      ),
+      plotLines = list(
+        list(
+          value = 20,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent reduced (20%)",
+            style = list(
+              fontFamily = "Heebo",
+              fontSize = "1em"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 20,
+          to = 35,
+          color = "rgba(171, 97, 67, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "bottom",
+            align = "right")
+        )
+      )
+    ) %>%
+    highcharter::hc_yAxis(
+      min = 0,
+      max = 100,
+      title = list(
+        text = "Percent of LHDs expanding service"
+      ),
+      plotLines = list(
+        list(
+          value = 27,
+          color = "gray",
+          width = 2,
+          dashStyle = "ShortDash",
+          label = list(
+            text = "Average percent expanded (27%)",
+            style = list(
+              fontFamily = "Heebo",
+              fontSize = "1em"
+            )
+          )
+        )
+      ),
+      plotBands = list(
+        list(
+          from = 0,
+          to = 27,
+          color = "rgba(236, 229, 225, 0.3)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "right")
+        ),
+        list(
+          from = 27,
+          to = 100,
+          color = "rgba(0, 138, 150, 0.2)",
+          label = list(
+            text = "",
+            verticalAlign = "middle",
+            align = "left")
+        )
+      )
+    ) %>%
+    highcharter::hc_add_theme(
+      naccho.viz::scatter
+    ) %>%
+    highcharter::hc_colors(
+      colors = colors
+    ) %>%
+    # highcharter::hc_annotations(
+    #   list(
+    #     draggable = FALSE,
+    #     labels = list(
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Growing'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "2.3vmin",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 1,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Stable'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "2.3vmin",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 34,
+    #           y = 78,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Mixed Trend'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "2.3vmin",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       ),
+    #       list(
+    #         point = list(
+    #           x = 33,
+    #           y = 0,
+    #           xAxis = 0,
+    #           yAxis = 0
+    #         ),
+    #         text = HTML('Services Shrinking'),
+    #         style = list(
+    #           color = "black",
+    #           fontWeight = "bold",
+    #           fontSize = "2.3vmin",
+    #           fontFamily = "Heebo"
+    #         ),
+    #         backgroundColor = "transparent",
+    #         borderColor = "transparent"
+    #       )
+    #     )
+    #   )
+    # ) %>%
+    highcharter::hc_title(
+      text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
+      margin = 10,
+      widthAdjust = -60
+    ) %>%
+    highcharter::hc_subtitle(
+      text = "Click and span to zoom into a specific area of the chart.
+    Hold the Shift key and drag to pan horizontally when zoomed in."
+    ) %>%
+    highcharter::hc_caption(
+      fontSize = "1.6vmin",
+      text = HTML("<b style='font-size: 1.6vmin; line-height: 1vmin;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1.6vmin; line-height: 1.4vmin; color: black;'>",
+                  "In the top left quadrant, services are <span style='color: #008A96; font-weight: bold;'>growing</span>. ",
+                  "In the top right quadrant, services show a <span style='color: #666; font-weight: bold;'>mixed trend</span>. ",
+                  "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
+                  "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
+                  "</span> <br> <b style='font-size: 1.6vmin; line-height: 1vmin;'> N: </b>",
+                  "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", show_n(data$Responses), "</span><br>",
+                  "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", source_line, "</span>"),
+
+      useHTML = TRUE,
+      margin = 20,
+      align = "center"
+    ) %>%
+    highcharter::hc_chart(spacingBottom = 0) %>%
+    highcharter::hc_legend(enabled = TRUE,
+                           align = "right",  # Align legend to the right of the chart
+                           verticalAlign = "middle",
+                           layout = "vertical",
+                           padding = 2,
+                           itemStyle = list(
+                             fontSize = "1.8vmin"        # Adjust font size for responsiveness            # Set font weight
+                           ),
+                           symbolRadius = 6,
+                           itemMarginTop = 0,
+                           itemMarginBottom = 0)
+}
+
+#' Generate Bar Chart Data for Other Topics PAge
+#'
+#' Retrieves filtered data to be used in bar chart visualizations for various topics.
+#' Data is processed differently depending on the specified topic and filtering parameter.
+#'
+#' @param topic Character string; specifies the topic for which data is needed. Options include:
+#'   - `"tech_use"`: Technology use data.
+#'   - `"comm_channels"`: Communication channels data.
+#'   - `"medical"`: Medical service data.
+#'   - `"dental"`: Dental service data.
+#'   - `"behavioral"`: Behavioral service data.
+#'   - `"chachip"`: Community Health Assessment and Community Health Improvement data.
+#'   - `"c12q260"`: Advocacy data for specified groups.
+#'   - `"Newc12q502"`: New advocacy data.
+#'   - `"m9q240"`: CHIP data.
+#'   - `"work"`: Partnerships data from the specified year.
+#' @param filtering Character string; specifies the filter criteria, such as `"All LHDs"`. Defaults to `NA`.
+#'
+#' @details
+#' This function dynamically prepares data for bar charts based on the `topic` and `filtering` values.
+#' When `filtering` is `"All LHDs"`, it selects data for all Local Health Departments (LHDs), while other filtering values
+#' narrow the data accordingly. Each topic undergoes specific data manipulation to ensure it is formatted for visualization.
+#'
+#' @return A processed data frame containing `x`, `y`, `group`, and `category` columns, ready for bar chart visualization.
+#'
+#' @export
+#'
+#' @examples
+#' # Retrieve data for technology use across all LHDs
+#' tech_data <- get_bar_data("tech_use", filtering = "All LHDs")
+#'
+
+get_bar_data <- function(topic, filtering = NA){
+
+  if (filtering == "All LHDs") {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == "All LHDs")%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts("chachip")
+
+      # Calculate total responses and 'y_All LHDs'
+      total_responses <- sum(data$Responses, na.rm = TRUE)
+      data <- data %>%
+        dplyr::mutate(
+          y = 100 * (Responses / total_responses),
+          Responses = total_responses
+        ) %>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+      data <- chip_data %>%
+        dplyr::filter(filter == "All LHDs",
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }   else if (topic == "work") {
+
+      data <- partnerships %>%
+        dplyr::filter(year == "2022")%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+
+  } else {
+
+    if (topic == "tech_use") {
+
+      data <- tech_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% c("Implemented"))%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = tech_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "comm_channels") {
+
+      data <- comms_use_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked")%>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = comms_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+
+    } else if (topic == "medical") {
+
+      data <- med_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+    } else if (topic == "dental") {
+
+      data <- dental_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "behavioral") {
+
+      data <- behav_data %>%
+        dplyr::filter(filter == filtering)%>%
+        dplyr::group_by(category)
+
+
+    } else if (topic == "chachip") {
+
+      data <- return_survey_weighted_counts(topic, filtering) %>%
+        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+        dplyr::mutate(category = dplyr::recode(category,
+                                               "Yes" = "Completed both in past 5 years",
+                                               "No" = " Completed one or none in past 5 years"))
+
+    } else if (topic == "c12q260") {
+
+      data <- advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "Newc12q502") {
+
+
+      data <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = new_advocacy_type)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+
+    } else if (topic == "m9q240") {
+
+
+      data <- chip_data %>%
+        dplyr::filter(filter == filtering,
+                      category %in% "Checked") %>%
+        dplyr::select(-category)%>%
+        dplyr::rename(category = action)%>%
+        dplyr::mutate(x = dplyr::dense_rank(category))
+    }
+  }
+
+  return(data)
+
+}
+
+
+
+#' Single Column Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_single <- function(
+    hc,
+    data,
+    meta,
+    add_n = paste(sum(data$Responses)),
+    ...) {
+
+  hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
+    highcharter::hcpxy_set_data(
+      "column",
+      data = data,
+      mapping = highcharter::hcaes(x, y, group = Group, names = category)
+    ) %>%
+    highcharter::hcpxy_update(
+      yAxis = list(
+        title = list(
+          text = meta$y_label
+        ),
+        max = meta$y_max,
+        labels = list(
+          format = meta$y_format
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = paste("<b> N: </b>", add_n, "<br>", source_line)
+      ),
+      xAxis = list(
+        categories = as.list(unique(data$category)),
+        offset = 0,
+        labels = list(
+          pointPadding = .25
+        )
+      ),
+      tooltip = list(
+        pointFormat = meta$tooltip
+      )
+    )
+}
+
+
+
+#' Grouped Column Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param colors vector or character string; one character or a vector of characters, which must be defined hex values.
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_group <- function(
+    hc,
+    data,
+    meta,
+    id,
+    colors,
+    add_n = paste(sum(data$Responses)),
+    ...) {
+
+  hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
+    highcharter::hcpxy_add_series(
+      data = data,
+      "column",
+      mapping = highcharter::hcaes(x, y, group = group),
+      id = id,
+      color = colors
+    ) %>%
+    highcharter::hcpxy_update(
+      series = list(
+        list(type = "column"),
+        dataLabels = list(
+          format = meta$data_label
+        )
+      ),
+      yAxis = list(
+        title = list(
+          text = meta$y_label,
+          style = list(
+            fontSize = "1.8vmin"
+          )
+        ),
+        max = meta$y_max,
+        labels = list(
+          format = meta$y_format
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      subtitle = list(
+        text = unique(data$subtitle)
+      ),
+      caption = list(
+        text = paste("<b> N: </b>", add_n,"<br>", source_line)
+      ),
+      xAxis = list(
+        categories = unique(data$category),
+        offset = 0
+      ),
+      tooltip = list(
+        tooltip = meta$tooltip
+      )
+    )
+}
+
+
+
+#' Pie Chart Proxy Redraw
+#'
+#' @param hc A `highchart` `htmlwidget` object.
+#' @param data Dataframe; data object to feed the figure.
+#' @param meta Dataframe; data object to set options (e.g., title, subtitle, etc).
+#' @param ... Other arguments
+#'
+#' @return A redrawn figure.
+#' @export
+#'
+proxy_to_pie <- function(hc, data, meta, colors, categories, ...) {
+
+  hc %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Urban", "Rural")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("State", "Local", "Shared")
+    ) %>%
+    highcharter::hcpxy_remove_series(
+      id = c("Midwest", "South", "West", "Northeast")
+    ) %>%
+    highcharter::hcpxy_set_data(
+      "pie",
+      data = data,
+      mapping = highcharter::hcaes(x, y, name = category)
+    ) %>%
+    highcharter::hcpxy_update(
+      series = list(
+        type = "pie",
+        innerSize = "70%", # Set the inner size for the donut effect
+        allowPointSelect = TRUE, # Enable point selection on the chart
+        cursor = "pointer", # Set cursor style for selectable points
+        showInLegend = TRUE, # Show legend for the chart
+        dataLabels = list(
+          format = meta$data_label
+        )
+      ),
+      yAxis = list(
+        title = list(
+          text = ""
+        ),
+        max = "",
+        labels = list(
+          format = ""
+        )
+      ),
+      title = list(
+        text = meta$title
+      ),
+      caption = list(
+        text = meta$caption
+      ),
+      xAxis = list(
+        categories = "",
+        lineColor = "#fff",
+        lineWidth = 0,
+        offset = 50
+      ),
+      tooltip = list(
+        tooltip = meta$tooltip
       )
     )
 }
@@ -1054,7 +1589,7 @@ proxy_hist_to_single <- function(hc,
     highcharter::hcpxy_set_data(
       "column",
       data = data %>% dplyr::mutate(x = as.character(x)),  # Ensure x is categorical
-      highcharter::hcaes(x = x, y = y)
+      mapping = highcharter::hcaes(x = x, y = y)
     ) %>%
 
     highcharter::hcpxy_update(
@@ -1170,7 +1705,7 @@ proxy_hist_to_group <- function(hc,
       highcharter::hcpxy_add_series(
         data = data,
         "column",
-        highcharter::hcaes(x, y, group = group),
+        mapping = highcharter::hcaes(x, y, group = group),
         id = id,
         color = colors
       ) %>%
@@ -1244,14 +1779,14 @@ proxy_hist_to_group <- function(hc,
       highcharter::hcpxy_add_series(
         data = data,
         "column",
-        highcharter::hcaes(x, y, group = group),
+        mapping = highcharter::hcaes(x, y, group = group),
         id = id,
         color = colors
       ) %>%
       highcharter::hcpxy_set_data(
         "column",
         data = data_all,
-        highcharter::hcaes(x, y, group = group)
+        mapping = highcharter::hcaes(x, y, group = group)
       ) %>%
       highcharter::hcpxy_update(
         series = list(
@@ -1554,332 +2089,6 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
 
 
 
-#' Scatter Plot
-#'
-#' @param data Dataframe for the viz
-#'
-#' @return A redrawn figure.
-#' @export
-#'
-scatter_plot <- function(data, colors) {
-
-  data_for_n <- data
-
-  if (sum(stringr::str_detect(data_for_n$filter, "All LHDs")) > 0) {
-
-    n <- data_for_n$demoninator
-
-  } else {
-
-    data_for_n <- data_for_n %>%
-      dplyr::group_by(service_type, filter) %>%
-      dplyr::summarize(n = sum(demoninator))
-
-    n <- data_for_n$n
-  }
-
-  req(n)
-  highcharter::highchart() %>%
-    highcharter::hc_add_series(
-      id = "All",
-      data = data,
-      type = "scatter",
-      highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
-    ) %>%
-    highcharter::hc_chart(
-      panType = "xy",
-      panning = TRUE,
-      panKey = "shift",
-      zoomType = "xy",
-      resetZoomButton = list(
-        theme = list(
-          fill = "white",
-          stroke = "#80A14E",
-          style = list(
-            color = "#80A14E",
-            fontWeight = "bold",
-            fontFamily = "Heebo",
-            lineHeight = "25px" # positions text correctly inside button
-          ),
-          r = 20,  # border radius
-          padding = 10,
-          states = list(
-            hover = list(
-              fill = "#80A14E",
-              stroke = "white",
-              style = list(
-                color = "white"
-              )
-            )
-          )
-        )
-      )
-    ) %>%
-    highcharter::hc_tooltip(
-      useHTML = TRUE,
-      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
-      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
-      style = list(
-        fontFamily = "Heebo",
-        fontSize = "1.7vmin",
-        # lineHeight = "1.5vmin",
-        padding = 5,
-        textOutline = "none"
-      )
-    )%>%
-    highcharter::hc_plotOptions(
-      scatter = list(
-        events = list(
-          click = highcharter::JS("function() {
-                     this.selectionMarker.destroy();
-                     }")
-        ),
-        dataLabels = list(
-          enabled = TRUE,
-          allowOverlap = FALSE,
-          # format = "{point.name}",
-          formatter = highcharter::JS("
-          function() {
-            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
-          }
-        "),
-          style = list(
-            textOutline = "none",
-            fontFamily = "Heebo",
-            fontSize = "1.4vmin",
-            fontWeight = "bold"
-          )
-        ),
-        marker = list(
-          radius = 7,
-          lineWidth = 1
-        )
-      )
-    ) %>%
-    # # Add interactive horizontal line
-    # highcharter::hc_add_series(
-    #   name = "Average percent reduced (20%)",
-    #   type = "line",
-    #   data = list(list(x = 0, y = 20), list(x = 35, y = 20)),
-    #   color = "gray",
-    #   dashStyle = "ShortDash",
-    #   enableMouseTracking = TRUE,
-    #   marker = list(enabled = FALSE),
-    #   tooltip = list(
-    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent reduced: 20%</span>"
-    #   )
-    # ) %>%
-    # # Add interactive vertical line
-    # highcharter::hc_add_series(
-    #   name = "Average percent expanded (27%)",
-    #   type = "line",
-    #   data = list(list(x = 27, y = 0), list(x = 27, y = 100)),
-    #   color = "gray",
-    #   dashStyle = "ShortDash",
-    #   enableMouseTracking = TRUE,
-    #   marker = list(enabled = FALSE),
-    #   tooltip = list(
-    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent expanded: 27%</span>"
-    #   )
-    # ) %>%
-    highcharter::hc_xAxis(
-      min = 0,
-      max = 35,
-      title = list(
-        text = "Percent of LHDs reducing service",
-        align = "high"
-      ),
-      plotLines = list(
-        list(
-          value = 20,
-          color = "gray",
-          width = 2,
-          dashStyle = "ShortDash",
-          label = list(
-            text = "Average percent reduced (20%)",
-            style = list(
-              fontFamily = "Heebo",
-              fontSize = "1em"
-            )
-          )
-        )
-      ),
-      plotBands = list(
-        list(
-          from = 20,
-          to = 35,
-          color = "rgba(171, 97, 67, 0.2)",
-          label = list(
-            text = "",
-            verticalAlign = "bottom",
-            align = "right")
-        )
-      )
-    ) %>%
-    highcharter::hc_yAxis(
-      min = 0,
-      max = 100,
-      title = list(
-        text = "Percent of LHDs expanding service"
-      ),
-      plotLines = list(
-        list(
-          value = 27,
-          color = "gray",
-          width = 2,
-          dashStyle = "ShortDash",
-          label = list(
-            text = "Average percent expanded (27%)",
-            style = list(
-              fontFamily = "Heebo",
-              fontSize = "1em"
-            )
-          )
-        )
-      ),
-      plotBands = list(
-        list(
-          from = 0,
-          to = 27,
-          color = "rgba(236, 229, 225, 0.3)",
-          label = list(
-            text = "",
-            verticalAlign = "middle",
-            align = "right")
-        ),
-        list(
-          from = 27,
-          to = 100,
-          color = "rgba(0, 138, 150, 0.2)",
-          label = list(
-            text = "",
-            verticalAlign = "middle",
-            align = "left")
-        )
-      )
-    ) %>%
-    highcharter::hc_add_theme(
-      naccho.viz::scatter
-    ) %>%
-    highcharter::hc_colors(
-      colors = colors
-    ) %>%
-    # highcharter::hc_annotations(
-    #   list(
-    #     draggable = FALSE,
-    #     labels = list(
-    #       list(
-    #         point = list(
-    #           x = 1,
-    #           y = 78,
-    #           xAxis = 0,
-    #           yAxis = 0
-    #         ),
-    #         text = HTML('Services Growing'),
-    #         style = list(
-    #           color = "black",
-    #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
-    #           fontFamily = "Heebo"
-    #         ),
-    #         backgroundColor = "transparent",
-    #         borderColor = "transparent"
-    #       ),
-    #       list(
-    #         point = list(
-    #           x = 1,
-    #           y = 0,
-    #           xAxis = 0,
-    #           yAxis = 0
-    #         ),
-    #         text = HTML('Services Stable'),
-    #         style = list(
-    #           color = "black",
-    #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
-    #           fontFamily = "Heebo"
-    #         ),
-    #         backgroundColor = "transparent",
-    #         borderColor = "transparent"
-    #       ),
-    #       list(
-    #         point = list(
-    #           x = 34,
-    #           y = 78,
-    #           xAxis = 0,
-    #           yAxis = 0
-    #         ),
-    #         text = HTML('Mixed Trend'),
-    #         style = list(
-    #           color = "black",
-    #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
-    #           fontFamily = "Heebo"
-    #         ),
-    #         backgroundColor = "transparent",
-    #         borderColor = "transparent"
-    #       ),
-    #       list(
-    #         point = list(
-    #           x = 33,
-    #           y = 0,
-    #           xAxis = 0,
-    #           yAxis = 0
-    #         ),
-    #         text = HTML('Services Shrinking'),
-    #         style = list(
-    #           color = "black",
-    #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
-    #           fontFamily = "Heebo"
-    #         ),
-    #         backgroundColor = "transparent",
-    #         borderColor = "transparent"
-    #       )
-    #     )
-    #   )
-    # ) %>%
-    highcharter::hc_title(
-      text = "Expansion and Reduction of Services Among LHDs That Provide Service", # title text
-      margin = 10,
-      widthAdjust = -60
-    ) %>%
-    highcharter::hc_subtitle(
-      text = "Click and span to zoom into a specific area of the chart.
-    Hold the Shift key and drag to pan horizontally when zoomed in."
-    ) %>%
-    highcharter::hc_caption(
-      fontSize = "1.6vmin",
-      text = HTML("<b style='font-size: 1.6vmin; line-height: 1vmin;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1.6vmin; line-height: 1.4vmin; color: black;'>",
-                    "In the top left quadrant, services are <span style='color: #008A96; font-weight: bold;'>growing</span>. ",
-                    "In the top right quadrant, services show a <span style='color: #666; font-weight: bold;'>mixed trend</span>. ",
-                    "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
-                    "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
-                    "</span> <br> <b style='font-size: 1.6vmin; line-height: 1vmin;'> N: </b>",
-                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", min(n), " to ", max(n), "</span><br>",
-                    "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", source_line, "</span>"),
-
-      useHTML = TRUE,
-      margin = 20,
-      align = "center"
-    ) %>%
-    highcharter::hc_chart(spacingBottom = 0) %>%
-    highcharter::hc_legend(enabled = TRUE,
-                           align = "right",  # Align legend to the right of the chart
-                           verticalAlign = "middle",
-                           layout = "vertical",
-                           padding = 2,
-                           itemStyle = list(
-                             fontSize = "1.8vmin"        # Adjust font size for responsiveness            # Set font weight
-                           ),
-                           symbolRadius = 6,
-                           itemMarginTop = 0,
-                           itemMarginBottom = 0)
-}
-
-
-
-
 #' Scatter Proxy Redraw
 #'
 #' @param hc A `highchart` `htmlwidget` object.
@@ -1912,7 +2121,7 @@ proxy_to_scatter_single <- function(hc, data,...) {
         # id = "All",
         data = data,
         type = "scatter",
-        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+        mapping = highcharter::hcaes(x = x, y = y, group = group, name = service_type)
       ) %>%
       highcharter::hcpxy_update(
         chart = list(
@@ -1958,14 +2167,14 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
       highcharter::hcpxy_add_series(
         data = data,
         type = "scatter",
-        mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type),
+        mapping = highcharter::hcaes(x = x, y = y, group = group, name = service_type),
         id = id,
         color = colors
       ) %>%
     highcharter::hcpxy_set_data(
       data = data_all,
       type = "scatter",
-      mapping = highcharter::hcaes(x = x, y = y, group = Group, name = service_type)
+      mapping = highcharter::hcaes(x = x, y = y, group = group, name = service_type)
     ) %>%
 
     highcharter::hcpxy_update(
@@ -1990,208 +2199,3 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
   )
 }
 
-#' Generate Bar Chart Data for Specific Topics
-#'
-#' Retrieves filtered data to be used in bar chart visualizations for various topics.
-#' Data is processed differently depending on the specified topic and filtering parameter.
-#'
-#' @param topic Character string; specifies the topic for which data is needed. Options include:
-#'   - `"tech_use"`: Technology use data.
-#'   - `"comm_channels"`: Communication channels data.
-#'   - `"medical"`: Medical service data.
-#'   - `"dental"`: Dental service data.
-#'   - `"behavioral"`: Behavioral service data.
-#'   - `"chachip"`: Community Health Assessment and Community Health Improvement data.
-#'   - `"c12q260"`: Advocacy data for specified groups.
-#'   - `"Newc12q502"`: New advocacy data.
-#'   - `"m9q240"`: CHIP data.
-#'   - `"work"`: Partnerships data from the specified year.
-#' @param filtering Character string; specifies the filter criteria, such as `"All LHDs"`. Defaults to `NA`.
-#'
-#' @details
-#' This function dynamically prepares data for bar charts based on the `topic` and `filtering` values.
-#' When `filtering` is `"All LHDs"`, it selects data for all Local Health Departments (LHDs), while other filtering values
-#' narrow the data accordingly. Each topic undergoes specific data manipulation to ensure it is formatted for visualization.
-#'
-#' @return A processed data frame containing `x`, `y`, `group`, and `category` columns, ready for bar chart visualization.
-#'
-#' @export
-#'
-#' @examples
-#' # Retrieve data for technology use across all LHDs
-#' tech_data <- get_bar_data("tech_use", filtering = "All LHDs")
-#'
-
-get_bar_data <- function(topic, filtering = NA){
-
-  if (filtering == "All LHDs") {
-
-    if (topic == "tech_use") {
-
-      data <- tech_use_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% c("Implemented"))%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = tech_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "comm_channels") {
-
-      data <- comms_use_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked")%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = comms_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "medical") {
-
-      data <- med_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "dental") {
-
-      data <- dental_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "behavioral") {
-
-      data <- behav_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "chachip") {
-
-      data <- return_survey_weighted_counts("chachip")
-
-      # Calculate total responses and 'y_All LHDs'
-      total_responses <- sum(data$Responses, na.rm = TRUE)
-      data <- data %>%
-        dplyr::mutate(
-          y = 100 * (Responses / total_responses),
-          Responses = total_responses
-        ) %>%
-        dplyr::mutate(category = dplyr::recode(category,
-                                               "Yes" = "Completed both in past 5 years",
-                                               "No" = " Completed one or none in past 5 years"))
-
-
-    } else if (topic == "c12q260") {
-
-      data <- advocacy_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "Newc12q502") {
-
-      data <- new_advocacy_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = new_advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "m9q240") {
-
-      data <- chip_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = action)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }   else if (topic == "work") {
-
-      data <- partnerships %>%
-        dplyr::filter(year == "2022")%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }
-
-  } else {
-
-    if (topic == "tech_use") {
-
-      data <- tech_use_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% c("Implemented"))%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = tech_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-
-    } else if (topic == "comm_channels") {
-
-      data <- comms_use_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked")%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = comms_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-
-    } else if (topic == "medical") {
-
-      data <- med_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "dental") {
-
-      data <- dental_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-
-    } else if (topic == "behavioral") {
-
-      data <- behav_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-
-    } else if (topic == "chachip") {
-
-      data <- return_survey_weighted_counts(topic, filtering) %>%
-        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
-        dplyr::mutate(category = dplyr::recode(category,
-                                               "Yes" = "Completed both in past 5 years",
-                                               "No" = " Completed one or none in past 5 years"))
-
-    } else if (topic == "c12q260") {
-
-      data <- advocacy_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "Newc12q502") {
-
-
-      data <- new_advocacy_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = new_advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "m9q240") {
-
-
-      data <- chip_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = action)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }
-  }
-
-  return(data)
-
-}
