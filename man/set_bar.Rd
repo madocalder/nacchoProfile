@@ -11,7 +11,8 @@ set_bar(
   name_two = "Jobs Added",
   max_one = 1300,
   max_two = 5000,
-  set_format = NA
+  set_format = NA,
+  group_by = NULL
 )
 }
 \arguments{

@@ -266,8 +266,17 @@ set_bar <- function(data,
                     name_two = "Jobs Added",
                     max_one = 1300,
                     max_two = 5000,
-                    set_format = NA) {
+                    set_format = NA,
+                    group_by = NULL) {
 
+  # Preprocess data to include grouping
+  if (!is.null(group_by)) {
+    data <- data %>%
+      dplyr::arrange(!!rlang::sym(group_by)) %>%  # Sort data by grouping column
+      dplyr::mutate(group = as.factor(!!rlang::sym(group_by)))  # Add grouping factor
+  } else {
+    data$group <- factor(data$group)
+  }
 
   max_combined <- sum(max_one, max_two)
 
@@ -286,40 +295,19 @@ set_bar <- function(data,
   totalTicks <- sum(ticks_two, ticks_one)
 
   axis_one <- round_up((ticks_one/totalTicks), digits = 2)
-
   axis_two <- round_up((ticks_two/totalTicks), digits = 2)
-
-  # message("TICK, AXIS, INTERVAL CHECKs-----")
-  #
-  # print(paste("max_one =", max_one))
-  # print(paste("max_two =", max_two))
-  # print(paste("ticks_one =", ticks_one))
-  # print(paste("ticks_two =", ticks_two))
-  # print(paste("axis_one =", axis_one))
-  # print(paste("axis_two =", axis_two))
-  # print(paste("interval =", interval))
-
 
   # Update max_one and max_two to be multiples of interval
   max_one <- ticks_one * interval
   max_two <- ticks_two * interval
-
-  # axis_one <- round_up((max_one/(max_one + max_two)), 2)
-  #
-  # axis_two <- 1 - round_up((max_one/(max_one + max_two)), 2)
-
-  # print(paste("max_one's updated value is:", max_one))
-  # print(paste("max_two's updated value is:", max_two))
-
-  # print(paste("updated axis_one =", axis_one))
-  # print(paste("updated axis_two =", axis_two))
-  #
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
       type = "bar",
       spacingLeft = 10,
       spacingRight = 10
+      # ,
+      # height = (length(unique(data$group)) * 60)  # Adjust chart height based on the number of groups
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
@@ -333,66 +321,49 @@ set_bar <- function(data,
       shared = TRUE,
       crosshairs = TRUE
     ) %>%
-highcharter::hc_xAxis(
-  categories = unique(data$group),
-  labels = list(
-    enabled = TRUE,
-    allowOverlap = FALSE,
-    style = list(fontSize = "1.8vmin"),
-    minPadding = "2em",
-    y = 5,
-    # align = "center",
-    verticalAlign = "middle",
-    step = 1,                # Ensures all labels are displayed
-    # rotation = 0,            # Adjust rotation as needed (e.g., 45 for diagonal)
-    autoRotation = c(0, -45) # Allow rotation if space is limited
-  ),
-  tickInterval = 1            # Makes sure all labels are rendered
-)%>%
-      # ,
-      # plotBands = lapply(0:12, function(i) {
-      #   list(
-      #     from = i - 0.5,
-      #     to = i + 0.5,
-      #     color = ifelse(i == 12, "#EEEAE4", "transparent"),
-      #     label = list(
-      #       text = c("Rural", "Urban", "Local", "Shared", "State",
-      #                "Small", "Medium", "Large", "Midwest",
-      #                "Northeast", "South", "West", "All LHDs")[i + 1],
-      #       align = "center",
-      #       x = -1,
-      #       style = list(fontFamily = "Heebo", fontSize = "12px", fontWeight = ifelse(i == 12, "bold", "normal"))
-      #     )
-      #   )
-      # })
-    # ) %>%
+    highcharter::hc_xAxis(
+      categories = unique(data$group),
+      labels = list(
+        enabled = TRUE,
+        allowOverlap = FALSE,
+        style = list(fontSize = "1.8vmin"),
+        y = 5,
+        autoRotation = c(0, -45),
+        step = 1
+      ),
+      tickInterval = 1,
+      plotBands = lapply(seq_along(unique(data$group)), function(i) {
+        list(
+          from = i - 0.5,
+          to = i + 0.5,
+          color = ifelse(i %% 2 == 0, "#F9F8F7", "transparent")  # Alternating row colors
+        )
+      })
+    ) %>%
     highcharter::hc_yAxis_multiples(
       list(
         max = max_one,
-        title = list(text = "",
-                     y = 10),
-        labels = list(format = set_format,
-                      allowOverlap = FALSE,
-                      autoRotation = TRUE),
-        width = paste((100*axis_one), "%"),
+        title = list(text = ""),
+        labels = list(format = set_format),
+        width = paste((100 * axis_one), "%"),
         reversed = TRUE,
         offset = 10,
         alignTicks = FALSE,
         tickInterval = interval,
         tickAmount = ticks_one + 1
-        # ,
-        # opposite = TRUE
       ),
       list(
         max = max_two,
-        title = list(text = y_label,
-                     y = 20
-                     ),
-        labels = list(format = set_format,
-                      allowOverlap = FALSE,
-                      autoRotation = TRUE),
-        left = paste((100*axis_one), "%"),
-        width = paste((100*axis_two), "%"),
+        title = list(
+          text = y_label,
+          align = "high",  # Align the label to the far right
+          rotation = 0,    # Keep the label horizontal
+          y = 50,         # Adjust vertical position relative to the axis
+          x = -80           # Move label further away from the axis
+        ),
+        labels = list(format = set_format),
+        left = paste((100 * axis_one), "%"),
+        width = paste((100 * axis_two), "%"),
         offset = 10,
         alignTicks = FALSE,
         tickInterval = interval,
@@ -420,11 +391,7 @@ highcharter::hc_xAxis(
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
         style = list(fontSize = "1.5vmin")
       )
-    ) %>%
-    highcharter::hc_add_theme(naccho.viz::butterfly)
-  #   highcharter::hc_caption(
-  #     margin = -10
-  #   )
+    )
 }
 
 

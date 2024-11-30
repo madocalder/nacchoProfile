@@ -631,11 +631,10 @@ mod_services_server <- function(id){
     observeEvent(service_change_single_inputs(), {
       if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
 
-        req(input$service_changes)
+        req(input$service_changes_single)
 
         data <- scatter_data(set_filter = c(landscape_filters),
-                             set_service = input$service_changes) %>%
-         data <- data %>%
+                             set_service = input$service_changes_single) %>%
           dplyr::mutate(
             # group = sapply(Group, custom_str_to_title),
                         left = x,
