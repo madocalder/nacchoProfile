@@ -87,8 +87,8 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_cat() %>%
-      dplyr::mutate(`y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100),
-                    `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100),
+      dplyr::mutate(`y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100, 1),
+                    `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100, 1),
                     `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
                     `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`) %>%
       dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
@@ -116,11 +116,11 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
 #' @import tidyr
 clean_class_data <- function(topic, classifications, filtering) {
   if (!is.null(classifications) && length(classifications) >= 1) {
-    selected_vars <- paste0(classifications, topic)
+    selected_vars <- classifications
     selected_data <- get(paste0("classification_data_", topic))
 
     data_all_class <- selected_data %>%
-      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(Question %in% classifications) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
                     group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
@@ -165,7 +165,8 @@ process_data <- function(topic, filtering, classifications = NULL) {
       data <- return_survey_weighted_counts(topic) %>%
         pivot_data_group()
 
-    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
+    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop",
+                            "c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
 
       data <- return_survey_weighted_statistics(topic) %>%
         dplyr::select(Responses, y, group, Quantile_q50)%>%
@@ -177,12 +178,10 @@ process_data <- function(topic, filtering, classifications = NULL) {
         pivot_data_group()
 
 
+
+
     } else if (topic == "jobs_total") {
       data <- process_jobs_data(jobs_data)
-
-
-    } else if (topic == "jobs_standard") {
-      data <- process_jobs_data(jobs_data, is_standardized = TRUE)
 
     } else if (topic == "field") {
       data <- spec_data_all %>%
@@ -226,21 +225,44 @@ process_data <- function(topic, filtering, classifications = NULL) {
          ) %>%
          pivot_data_group()
 
-     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
-
-       data <- return_survey_weighted_statistics(topic)%>%
-         pivot_data_cat()
+     # } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+     #
+     #   data <- return_survey_weighted_statistics(topic) %>%
+     #     dplyr::select(Responses, y, group, Quantile_q50) %>%
+     #     dplyr::rename(
+     #       Mean = y,
+     #       Median = Quantile_q50
+     #     ) %>%
+     #     tidyr::pivot_longer(
+     #       cols = c("Mean", "Median"),
+     #       names_to = "category",
+     #       values_to = "y"
+     #     ) %>%
+     #     pivot_data_cat()
 
      } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                             "Other Entity", "Not Available in Community")) {
 
+
        data <- services_data %>%
-         dplyr::filter(service_classifications %in% classifications,
+         dplyr::filter(service_classification %in% classifications,
                        filter == "All LHDs",
-                       category == topic) %>%
+                       service_provision == topic) %>%
+         dplyr::group_by(service_type) %>%
+         dplyr::reframe(
+           y = y,
+           Responses = sum(Responses, na.rm = TRUE),
+           group = unique(group),
+           category = unique(category),
+           filter = unique(filter)
+         ) %>%
+         dplyr::filter(category == "Checked") %>%
          dplyr::mutate(group = filter,
-                       category = service_type)%>%
+                       category = service_type,
+                       subtitle = "All LHDs") %>%
+
          pivot_data_group()
+
 
      } else if (topic == "Reduced/Expanded Services") {
 classifications <- "Immunization"
@@ -249,7 +271,7 @@ classifications <- "Immunization"
                        service_type %in% classifications) %>%
          dplyr::group_by(category) %>%
          dplyr::reframe(
-           y = round_up(mean(y, na.rm = TRUE)),
+           y = round_up(mean(y, na.rm = TRUE), 1),
            Responses = sum(Responses, na.rm = TRUE),
            group = unique(group),
            category = unique(category)
@@ -301,7 +323,13 @@ classifications <- "Immunization"
        data <- return_survey_weighted_counts("chachip")
 
        # Calculate total responses and 'y_All LHDs'
-       total_responses <- sum(data$Responses, na.rm = TRUE)
+       data_n <- data %>%
+         dplyr::group_by(Group) %>%
+         dplyr::reframe(
+           Responses = sum(data$Responses, na.rm = TRUE)
+         )
+
+
        data <- data %>%
          dplyr::mutate(
            y = 100 * (Responses / total_responses),
@@ -373,10 +401,9 @@ classifications <- "Immunization"
         add_all_ldh_count(data_all = grp_data_all)
 
 
-    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
+    } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop",
+                            "c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
 
-      # topic <- "c5q36"
-      # filtering <- "c0popcat3"
 
       data_1 <- nacchoProfile::return_survey_weighted_statistics(topic, filtering) %>%
         dplyr::select(Question, category, Group, y, Responses) %>%
@@ -410,6 +437,9 @@ classifications <- "Immunization"
         pivot_data_group()
 
       data <- dplyr::left_join(data, all_data)
+
+      colnames(data) <- standardize_column_names(colnames(data))
+
 
 
       # data <- process_weighted_stats(topic, filtering) %>%
@@ -454,7 +484,7 @@ classifications <- "Immunization"
     } else if (topic == "tenure") {
       data <- return_survey_weighted_statistics("tenure", filtering) %>%
         dplyr::mutate(
-          'y_All LHDs' = round_up(y = mean(y, na.rm = TRUE)),  # Adjust calculation as needed
+          'y_All LHDs' = round_up(y = mean(y, na.rm = TRUE), 1),  # Adjust calculation as needed
           'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
         )  %>%
         dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
@@ -471,7 +501,7 @@ classifications <- "Immunization"
         dplyr::group_by(category)%>%
         dplyr::summarise(Responses = n(),
                          fig_value = sum(fig_value))%>%
-        dplyr::mutate(y = round_up(fig_value/sum(fig_value)*100),
+        dplyr::mutate(y = round_up(fig_value/sum(fig_value)*100, 1),
                       subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(group = "All LHDs") %>%
@@ -481,7 +511,7 @@ classifications <- "Immunization"
       overall_totals <- master_data %>%
         dplyr::summarise('Responses_All LHDs' = n(),
                          fig_value_All_LHDs = sum(get("totpop"))) %>%
-        dplyr::mutate('y_All LHDs' = round_up(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100))
+        dplyr::mutate('y_All LHDs' = round_up(fig_value_All_LHDs / sum(fig_value_All_LHDs) * 100, 1))
 
       # Add the calculated columns to your data
       data <- data %>%
@@ -531,37 +561,83 @@ classifications <- "Immunization"
         pivot_data_group()%>%
         add_all_ldh_count(data_all = rev_data_all )
 
-    } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+    # } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
+    #
+    #   all_lhds_data <- return_survey_weighted_statistics(topic) %>%
+    #     dplyr::select(Responses, y, group, Quantile_q50) %>%
+    #     dplyr::rename(
+    #       Mean = y,
+    #       Median = Quantile_q50
+    #     ) %>%
+    #     tidyr::pivot_longer(
+    #       cols = c("Mean", "Median"),
+    #       names_to = "category",
+    #       values_to = "y"
+    #     ) %>%
+    #     pivot_data_group()
+    #
+    #   filtered_data <- return_survey_weighted_statistics(topic, filtering) %>%
+    #     dplyr::select(Responses, y, Group, Quantile_q50) %>%
+    #     dplyr::rename(
+    #       Mean = y,
+    #       Median = Quantile_q50
+    #     ) %>%
+    #     dplyr::group_by(Group) %>%
+    #     tidyr::pivot_longer(
+    #       cols = c("Mean", "Median"),
+    #       names_to = "category",
+    #       values_to = "y"
+    #     )
+    #     pivot_data_group()
+    #
+    #   # Add All LHDs data to filtered data
+    #   data <- filtered_data %>%
+    #     add_all_ldh_count(data_all = all_lhds_data)
 
-      exp_data_all <- return_survey_weighted_statistics(topic)%>%
-        pivot_data_cat()
-
-
-      data <- process_weighted_stats(topic, filtering)%>%
-        pivot_data_cat() %>%
-        add_all_ldh_count(data_all = exp_data_all)
 
     } else if (topic %in% c("LHD (Directly)", "LHD (By Contract)",
                            "Other Entity", "Not Available in Community")) {
 
 
+
       services_data_all <- services_data %>%
-        dplyr::filter(service_classifications %in% classifications,
+        dplyr::filter(service_classification %in% classifications,
                       filter == "All LHDs",
-                      category == topic) %>%
+                      service_provision == topic) %>%
+        dplyr::group_by(service_type) %>%
+        dplyr::reframe(
+          y = y,
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group),
+          category = unique(category),
+          filter = unique(filter)
+        ) %>%
+        dplyr::filter(category == "Checked") %>%
         dplyr::mutate(group = filter,
-                      category = service_type)%>%
+                      category = service_type,
+                      subtitle = "All LHDs") %>%
+
         pivot_data_group()
 
 
-
       data <- services_data %>%
-        dplyr::filter(service_classifications %in% classifications,
+        dplyr::filter(service_classification %in% classifications,
                       filter == filtering,
-                      category == topic) %>%
+                      service_provision == topic) %>%
+        dplyr::group_by(service_type, group) %>%
+        dplyr::reframe(
+          y = y,
+          Responses = sum(Responses, na.rm = TRUE),
+          group = unique(group),
+          category = unique(category),
+          filter = unique(filter)
+        ) %>%
+        dplyr::filter(category == "Checked") %>%
         dplyr::mutate(category = service_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
+
+# View(data)
 
     } else if (topic == "Reduced/Expanded Services") {
 
@@ -570,7 +646,7 @@ classifications <- "Immunization"
                       service_type %in% classifications) %>%
         dplyr::group_by(category) %>%
         dplyr::reframe(
-          y = round_up(y = mean(y, na.rm = TRUE)),
+          y = round_up(y = mean(y, na.rm = TRUE), 1),
           Responses = sum(Responses, na.rm = TRUE),
           group = unique(group),
           category = unique(category)
@@ -584,7 +660,7 @@ classifications <- "Immunization"
                       service_type %in% classifications)%>%
         dplyr::group_by(group, category) %>%
         dplyr::reframe(
-          y = round_up(y = mean(y, na.rm = TRUE)),
+          y = round_up(y = mean(y, na.rm = TRUE), 1),
           Responses = sum(Responses, na.rm = TRUE),
           group = unique(group)
         ) %>%
@@ -782,6 +858,7 @@ data <- data %>%
 
 
 
+
 #number formatting------------------
  num_format <- function(x) {
     rounded_value <- round_up(x, 0)  # no decimals
@@ -794,11 +871,11 @@ data <- data %>%
     } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
     } else if (topic == "fte_bypop") {
-      paste0(rounded_value, "FTEs per 10,000 people")
+      paste0(rounded_value, "FTEs")
     } else if (topic == "c5q37") {
       paste0(rounded_value, " FTE")
     } else if (topic == "employee_bypop") {
-      paste0(rounded_value, " Employees per 10,000")
+      paste0(rounded_value, " Employees")
     } else if (topic == "c5q36") {
       paste0(rounded_value, " Total Employees")
     } else if (topic %in% c("c3q15", "totexp_percap", "non_weighted_revenue_percap")) {
@@ -880,8 +957,10 @@ data <- data %>%
 
                                           ifelse(topic == "c3q15", 13000000,
                                                  ifelse(topic == "jobs_total", 15000,
-                                                        ifelse(topic == "b", 21000,
-                                                               ifelse(topic == "jobs_standard", 10, 100))))),
+                                                        ifelse(topic == "b", 21000, 100)
+                                                        )
+                                                 )
+                                          ),
                        fill_color = naccho.viz::green,
                        background = 'none',
                        number_fmt = num_format
@@ -903,8 +982,7 @@ data <- data %>%
 #generate table if all LHDS -------------
   # Check if the data is for "All LHDs" a
 
- if (category == "All LHDs" && !(topic %in% c("jobs_standard", "jobs_total")))
-   {
+ if (category == "All LHDs" && !(topic == "jobs_total")){
 
     # Define column definitions for All LHDs------------
     column_definitions <- list(
@@ -955,12 +1033,14 @@ data <- data %>%
   } else {
     #reactable for other cases--------
     # Handle other cases with the existing logic
+    # Handle other cases with the existing logic
     group_definitions <- list(
-      Rurality = list(columns = c("y_Urban", "y_Rural")),
-      Governance = list(columns = c("y_Local", "y_Shared", "y_State")),
-      `LHD size` = list(columns = c("y_Small (<50,000)", "y_Medium (50,000-499,999)", "y_Large (500,000+)")),
-      Region = list(columns = c("y_Midwest", "y_Northeast", "y_South", "y_West"))
+      Rurality = list(columns = standardize_column_names(c("y_urban", "y_rural"))),
+      Governance = list(columns = standardize_column_names(c("y_local", "y_shared", "y_state"))),
+      `LHD size` = list(columns = standardize_column_names(c("y_small (<50,000)", "y_medium (50,000-499,999)", "y_large (500,000+)"))),
+      Region = list(columns = standardize_column_names(c("y_midwest", "y_northeast", "y_south", "y_west")))
     )
+
 
     # If the selected category is defined in group_definitions
     if (category %in% names(group_definitions)) {
@@ -1019,8 +1099,10 @@ data <- data %>%
                              max_value = ifelse(topic == "tenure", 8,
                                                 ifelse(topic == "c3q15", 200000000,
                                                        ifelse(topic == "jobs_total", 15000,
-                                                              ifelse(topic == "b", 21000,
-                                                                     ifelse(topic == "jobs_standard", 10, 100))))),
+                                                              ifelse(topic == "b", 21000, 100)
+                                                              )
+                                                       )
+                                                ),
 
                              fill_color = colors[i],
                              background = 'none',
@@ -1156,4 +1238,39 @@ table_n_count <- function(data, topic, col_name = NULL) {
     # Default behavior: sum the Responses column
     sum(data[[paste0(col_name)]], na.rm = TRUE)
   }
+}
+
+
+#' Standardize Column Names
+#'
+#' This helper function standardizes column names by ensuring that columns
+#' starting with "y_" have their second part capitalized (e.g., "y_urban" becomes "y_Urban").
+#' Columns that do not match the "y_" pattern are left unchanged.
+#'
+#' @param columns A character vector of column names to be standardized.
+#' @return A character vector of standardized column names where applicable.
+#' @examples
+#' # Example usage
+#' columns <- c("y_urban", "y_rural", "Responses")
+#' standardize_column_names(columns)
+#' # [1] "y_Urban"    "y_Rural"    "Responses"
+#'
+#' columns <- c("y_local", "y_state", "group")
+#' standardize_column_names(columns)
+#' # [1] "y_Local"    "y_State"    "group"
+#'
+#' @export
+standardize_column_names <- function(columns) {
+  sapply(columns, function(col) {
+    if (startsWith(col, "y_") || startsWith(col, "Responses_")) {
+      # Split by underscore, capitalize the second part, and recombine
+      parts <- strsplit(col, "_")[[1]]
+      if (length(parts) > 1) {
+        parts[2] <- stringr::str_to_title(parts[2])
+      }
+      paste(parts, collapse = "_")
+    } else {
+      col  # Return unchanged if it doesn't match the pattern
+    }
+  }, USE.NAMES = FALSE)
 }

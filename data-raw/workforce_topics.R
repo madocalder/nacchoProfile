@@ -8,8 +8,7 @@ workforce_topics <- list(
                      "Employees by Population" = "employee_bypop",
                      "Employee Groups" = "employee_numcat"),
 
-  "Jobs Lost and Added" = list("Total Jobs Lost/Added" = "jobs_total",
-                               "Jobs Lost/Added Per 100" = "jobs_standard"),
+  "Jobs Lost and Added" = list("Total Jobs Lost/Added" = "jobs_total"),
 
   "Occupation Classifications" = list("LHDs with Occupation" = "a",
                                    "Total FTEs in Occupation" = "b")

@@ -68,12 +68,13 @@ classification_data_b <- classification_data_b %>%
   dplyr::mutate(Question = gsub("new", "", Question),
                 category = "Yes",
                 y = Total,
-                group = sapply(Group, custom_str_to_title))
+                group = sapply(Group, custom_str_to_title))%>%
+  dplyr::mutate(y = round_up(y, -2))
 
 
 # print elapsed time
 end_time <- Sys.time() - start_time # calculate difference
-print(end_time) # 1.2 minutes
+print(end_time) # 1.073727 mins
 
 
 usethis::use_data(classification_data_b, overwrite = TRUE)

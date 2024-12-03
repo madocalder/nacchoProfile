@@ -90,7 +90,7 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
-                style = "height: 65vh; width: 50vw;")
+                style = "height: 63vh; width: 50vw; margin: auto;")
             ),
 
             # display when view Table is selected
@@ -118,53 +118,47 @@ mod_services_ui <- function(id){
             class = "row color-block-header",
             id = ns("dynamic_row"),
             div(
-              class = "col hover-text-side hide-icon",  # Hidden by default
+              class = "col hover-text-side",
               align = "center",
               actionLink(
-                ns("get_services"), # service topics
+                ns("get_services"),
                 "",
-                icon = tags$i(class = "fa-light fa-filter",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"),
+                icon = tags$i(class = "fa-light fa-filter", style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"
+              ),
               span(class = "hover-text-content-side", "Add Services")
             ),
-
             div(
               class = "col hover-text-side",
               align = "center",
-              br(),
               actionLink(
-                ns("takeaway"), # key takeaway
+                ns("takeaway"),
                 "",
-                icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"),
+                icon = tags$i(class = "fa-light fa-key", style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"
+              ),
               span(class = "hover-text-content-side", "Takeaways")
             ),
-
             div(
               class = "col hover-text-side",
               align = "center",
-              br(),
               actionLink(
-                ns("context"), # survey questions and responses
+                ns("context"),
                 "",
-                icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"),
+                icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"
+              ),
               span(class = "hover-text-content-side", "Notes")
             ),
-
             div(
               class = "col hover-text-side",
               align = "center",
-              br(),
               actionLink(
-                ns("definitions"), # related definitions
+                ns("definitions"),
                 "",
-                icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"),
+                icon = tags$i(class = "fa-light fa-list", style = "font-size: 30px; text-align: center;"),
+                class = "link-no-underline action-link-2"
+              ),
               span(class = "hover-text-content-side", "Definitions")
             ),
             hr(class = "right-hr")
@@ -211,7 +205,10 @@ mod_services_ui <- function(id){
           )
         ),
 
-        right_button = right_button
+        right_button = right_button,
+        left_width = 25,
+        right_width = 25,
+        center_width = 50
       )
     )
   )
@@ -272,11 +269,11 @@ mod_services_server <- function(id){
           naccho.viz::teal,
           naccho.viz::terracotta,
           naccho.viz::pink)
-      } else if (input$filter %in% c("All LHDs")) {
-        c(naccho.viz::navy,
-          naccho.viz::terracotta)
+      } else {
+        naccho.viz::green
       }
     })
+
 
     #table titles---------------------------------------------------------------
     output$table_title <- renderUI({
@@ -343,7 +340,8 @@ mod_services_server <- function(id){
                       category = service_type) %>%
         dplyr::group_by(group) %>%
         dplyr::mutate(x = seq_along(group) - 1) %>%
-        dplyr::ungroup()
+        dplyr::ungroup() %>%
+        dplyr::mutate(x = match(category, unique(category)) - 1)
 
 
 
@@ -376,7 +374,7 @@ mod_services_server <- function(id){
       req(input$service_changes)
 
       data <- scatter_data(set_filter = "All LHDs",
-                           set_service = input$service_changes) # %>%
+                           set_service = "Immunization") # %>%
         #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
 
       scatter_plot(data, colors = "#6D833A")
@@ -387,10 +385,10 @@ mod_services_server <- function(id){
     # used for butterfly plot
     output$figure_butterfly <- highcharter::renderHighchart({
 
-      req(input$service_changes)
+      req(input$service_changes_single)
 
       data <- scatter_data(set_filter = c(landscape_filters),
-                            set_service = "Immunization")   %>%
+                            set_service = input$service_changes_single)   %>%
         dplyr::mutate(
                       left = x,
                       right = y,
@@ -404,15 +402,16 @@ mod_services_server <- function(id){
       max_two <- max(data$right)
 
       set_bar(data,
-              y_label = "% of LHDs",
+              y_label = "{value}%",
               max_one = max_one,
               max_two = max_two,
-              name_one = "Service Shrunk",
-              name_two = "Service Grew",
+              name_one = "Shrunk Service",
+              name_two = "Grew Service",
               set_format = "{value}%") %>%
         viz_options(
           colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
+          legend_title = "% of LHDs that...",
           viz_title = "The Percent of LHDs that Shrunk or Grew Selected Service",
           viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
           viz_subtitle = paste(unique(data$service_type)),
@@ -420,30 +419,31 @@ mod_services_server <- function(id){
               {point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
         ) %>%
-        viz_export() %>%
-        highcharter::hc_tooltip(
-          backgroundColor = "white",
-          headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-          style = list(
-            textAlign = "left"
-          ),
-          hideDelay = 2000,
-          shadow = FALSE
-        # ,
-        #   positioner = highcharter::JS("
-        #   function (labelWidth, labelHeight, point) {
-        #     return {
-        #       x: 0,
-        #       y: 10
-        #     };
-        #   }
-        # ")
-        ) %>%
-        highcharter::hc_legend(enabled = TRUE,
-                               padding = 0,
-                               itemMarginTop = 0,
-                               itemMarginBottom = 0)%>%
-        highcharter::hc_caption(margin = 20)
+        viz_export()
+      # %>%
+      #   highcharter::hc_tooltip(
+      #     backgroundColor = "white",
+      #     headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
+      #     style = list(
+      #       textAlign = "left"
+      #     ),
+      #     hideDelay = 2000,
+      #     shadow = FALSE
+      #   # ,
+      #   #   positioner = highcharter::JS("
+      #   #   function (labelWidth, labelHeight, point) {
+      #   #     return {
+      #   #       x: 0,
+      #   #       y: 10
+      #   #     };
+      #   #   }
+      #   # ")
+      #   ) %>%
+      #   highcharter::hc_legend(enabled = TRUE,
+      #                          padding = 0,
+      #                          itemMarginTop = 0,
+      #                          itemMarginBottom = 0)%>%
+      #   highcharter::hc_caption(margin = 20)
 
       # %>%
       #   highcharter::hc_yAxis_multiples(
@@ -478,7 +478,7 @@ mod_services_server <- function(id){
     proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
     proxy_line <- highcharter::highchartProxy(ns("figure_line"))
     proxy_scatter <- highcharter::highchartProxy(ns("figure_scatter"))
-    proxy_butterfly <- highcharter::highchartProxy(ns("figure_butterfly"))
+    # proxy_butterfly <- highcharter::highchartProxy(ns("figure_butterfly"))
 
 
 
@@ -570,7 +570,7 @@ mod_services_server <- function(id){
         series_id <- unique(data$group) # provide ID for proxy
 
         proxy_bar %>%
-          proxy_hist_to_group(data = data,
+          proxy_to_group(data = data,
                               data_all = data_all,
                               meta = filter_meta(),
                               colors = colors(),
@@ -628,61 +628,61 @@ mod_services_server <- function(id){
 
 
 
-    observeEvent(service_change_single_inputs(), {
-      if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
-
-        req(input$service_changes_single)
-
-        data <- scatter_data(set_filter = c(landscape_filters),
-                             set_service = input$service_changes_single) %>%
-          dplyr::mutate(
-            # group = sapply(Group, custom_str_to_title),
-                        left = x,
-                        right = y,
-                        x = (1:length(group)-1)) %>%
-          dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
-
-        data_n <- data %>%
-          dplyr::filter(group == "All LHDs")
-
-        max_one <- max(data$left)
-        max_two <-max(data$right)
-
-        proxy_butterfly %>%
-          proxy_to_bar(data, max_one, max_two,
-                       meta,name_one = "Services shrunk",
-                                   name_two = "Services grew",
-                                   y_label = "% of LHDs")
-          # highcharter::hcpxy_update(
-          #   series = list(
-          #     list(id = "Left", data = data$left),  # Update Left series data
-          #     list(id = "Right", data = data$right) # Update Right series data
-          #   ),
-          #   subtitle = list(
-          #     text = paste(unique(data$service_type))
-          #   ),
-          #   caption = list(
-          #     text = paste0("<b> N: </b>", data_n$denominator, "<br>", source_line)
-          #   )
-          # ) %>%
-          # highcharter::hcpxy_update(
-          #   yAxis = list(
-          #     list(
-          #       max = max_one
-          #       # ,
-          #       # tickInterval = interval,
-          #       # tickAmount = ticks_one
-          #     ),
-          #     list(
-          #       max = max_two
-          #       # ,
-          #       # tickInterval = interval,
-          #       # tickAmount = ticks_two
-          #     )
-          #   )
-          # )
-      }
-    })
+    # observeEvent(service_change_single_inputs(), {
+    #   if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
+    #
+    #     req(input$service_changes_single)
+    #
+    #     data <- scatter_data(set_filter = c(landscape_filters),
+    #                          set_service = input$service_changes_single) %>%
+    #       dplyr::mutate(
+    #         # group = sapply(Group, custom_str_to_title),
+    #                     left = x,
+    #                     right = y,
+    #                     x = (1:length(group)-1)) %>%
+    #       dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
+    #
+    #     data_n <- data %>%
+    #       dplyr::filter(group == "All LHDs")
+    #
+    #     max_one <- max(data$left)
+    #     max_two <-max(data$right)
+    #
+    #     proxy_butterfly %>%
+    #       proxy_to_bar(data, max_one, max_two,
+    #                    meta,name_one = "Services shrunk",
+    #                                name_two = "Services grew",
+    #                                y_label = "% of LHDs")
+    #       # highcharter::hcpxy_update(
+    #       #   series = list(
+    #       #     list(id = "Left", data = data$left),  # Update Left series data
+    #       #     list(id = "Right", data = data$right) # Update Right series data
+    #       #   ),
+    #       #   subtitle = list(
+    #       #     text = paste(unique(data$service_type))
+    #       #   ),
+    #       #   caption = list(
+    #       #     text = paste0("<b> N: </b>", data_n$denominator, "<br>", source_line)
+    #       #   )
+    #       # ) %>%
+    #       # highcharter::hcpxy_update(
+    #       #   yAxis = list(
+    #       #     list(
+    #       #       max = max_one
+    #       #       # ,
+    #       #       # tickInterval = interval,
+    #       #       # tickAmount = ticks_one
+    #       #     ),
+    #       #     list(
+    #       #       max = max_two
+    #       #       # ,
+    #       #       # tickInterval = interval,
+    #       #       # tickAmount = ticks_two
+    #       #     )
+    #       #   )
+    #       # )
+    #   }
+    # })
 
     # for Tables -------
     output$data_table <- reactable::renderReactable({
@@ -771,158 +771,59 @@ mod_services_server <- function(id){
       shinyjs::hide("toggle_definitions")
 
       output$show_get_services <- renderUI({
-
-        if (input$topic != "Reduced/Expanded Services") {
-          div(
-            class = "radio-wrap",
-            radioButtons(
-              ns("services"),
-              strong("Select Service Topic"),
-              service_classifications,
-              selected = "Immunization"
-            )
-          )
-        } else if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
-          div(
-            class = "radio-wrap",
-            radioButtons(
-              ns("service_changes_single"),
-              strong("Select Service Topic"),
-              change_classifications,
-              selected = "Immunization"
-            )
-          )
-        } else {
+        if (input$topic == "Reduced/Expanded Services") {
+          # Render a checkboxGroupInput for multiple selection
           checkboxGroupInput(
             ns("service_changes"),
-            strong("Select One or More Topic"),
-            change_classifications,
+            strong("Select One or More Topics"),
+            choices = change_classifications,
             selected = change_classifications
           )
-
+        } else {
+          # Render a radio button for single selection
+          radioButtons(
+            ns("services"),
+            strong("Select Service Topic"),
+            choices = service_classifications,
+            selected = "Immunization"
+          )
         }
       })
-    }, ignoreNULL = FALSE)
+    })
 
 
     # takeaway ----------------------------------------------------------------
+
     observeEvent(input$takeaway, {
       shinyjs::hide("toggle_get_services")
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
-
       output$show_takeaway <- renderUI({
-        req(!is.null(input$topic))
-        notes <- notes %>%
-          dplyr::filter(topic == input$topic,
-                        view == input$view,
-                        filter == input$filter)
-
-        p(htmltools::HTML(
-          "<b>Key Takeaway(s)</b>: <br><br>",
-          notes$takeaway))
+        p(htmltools::HTML("<b>Key Takeaway(s)</b>: <br><br>", notes$takeaway))
       })
-    }, ignoreNULL = FALSE)
+    })
 
-
-
-    # survey questions, responses, and notes ----------------------------------
     observeEvent(input$context, {
       shinyjs::hide("toggle_get_services")
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
       shinyjs::hide("toggle_definitions")
-
       output$show_context <- renderUI({
-        req(!is.null(input$topic))
-        notes <- notes %>%
-          dplyr::filter(topic == input$topic,
-                        view == input$view,
-                        filter == input$filter)
-
-        if (is.na(notes$notes)) {
-          p(htmltools::HTML(
-            "<b>Survey Question(s)</b>: <br>",
-            notes$survey_question,
-            "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response,
-            "<br> <br> <b> Notes: </b>
-            <br> There were more than 3,300 LHDs in the U.S.,
-            but not every unit was included in the Profile study.
-            For the purposes of surveying and developing national estimates of
-            the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without \"double counting.\"
-            Therefore, the denominator of LHDs used for surveying and national
-            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
-            while still covering all local jurisdictions uniquely.
-            NACCHO is in frequent contact and consultation with state and local
-            officials to update the denominator. There were 2,512 LHDs included
-            in the 2022 Profile study population."))
-
-        } else {
-          p(htmltools::HTML(
-            "<b>Survey Question(s)</b>: <br>",
-            notes$survey_question,
-            "<br> <br> <b> Survey Response Options: </b>",
-            notes$survey_response,
-            "<br> <br> <b> Notes: </b>",
-            notes$notes,
-            "<br> There were more than 3,300 LHDs in the U.S.,
-            but not every unit was included in the Profile study.
-            For the purposes of surveying and developing national estimates of
-            the LHD landscape, NACCHO designed and utilizes a methodology to account
-            for the most unique individuals in the U.S. population without \"double counting.\"
-            Therefore, the denominator of LHDs used for surveying and national
-            estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
-            while still covering all local jurisdictions uniquely.
-            NACCHO is in frequent contact and consultation with state and local
-            officials to update the denominator. There were 2,512 LHDs included
-            in the 2022 Profile study population."))
-        }
+        p(htmltools::HTML("<b>Survey Question(s)</b>: <br>", notes$survey_question))
       })
     })
 
-
-
-    # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
       shinyjs::hide("toggle_get_services")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")
-
       output$show_definitions <- renderUI({
-        definitions <- definitions %>%
-          dplyr::filter(field %in% input$topic)
-
-        links <- lapply(seq_along(definitions$item), function(i) {
-          div(
-            tags$a(
-              class = "def-link",
-              `data-bs-toggle` = "collapse",
-              href = paste0("#collapseExample", i),
-              tags$i(class = "fa fa-plus"),
-              paste(definitions$item[[i]])
-            ),
-            div(
-              class= "collapse",
-              id= paste0("collapseExample", i),
-              HTML(definitions$definition[[i]], "<br> <br>")
-            )
-          )
-        })
-        div(
-          p(htmltools::HTML("<b>Definitions</b>: <br>")),
-
-          if (length(links) == 0) {
-            paste("No relevant definitions.")
-          } else {
-            links
-          }
-        )
+        p(htmltools::HTML("<b>Definitions</b>: <br>", definitions$definition))
       })
     })
+
 
   })
 }

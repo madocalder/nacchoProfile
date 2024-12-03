@@ -47,6 +47,11 @@
 
 
 process_line_data <- function(option, filtering, classifications = NULL) {
+
+  # Initial debugging
+  print(paste("Option:", option, "Filtering:", filtering))
+
+
 #All LHD CASES------------
   if (filtering == "All LHDs") {
 ##Local board of health------------------
@@ -56,7 +61,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         dplyr::filter(topic == "lboh",
                       filter == "All LHDs",
                       category %in% c("Yes", "No"))%>%
-        dplyr::mutate(y = round_up((100*as.numeric(y))))
+        dplyr::mutate(y = round_up((100*as.numeric(y)), 1))
 
       # View(hist_data)
 
@@ -108,7 +113,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "age_cat",
                         filter == "All LHDs")%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y)))
+            y = round_up((100*as.numeric(y)), 1)
           ) %>%
           dplyr::group_by(category, group, year, filter, topic) %>%
           dplyr::summarise(y = sum(y))
@@ -159,7 +164,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = (round_up((100*as.numeric(y)))),
+            y = (round_up((100*as.numeric(y)), 1)),
             category =dplyr::case_when(
               category == "Prefer not to answer" ~ "Not specified",
               category == "Other" ~ "Not specified",
@@ -211,7 +216,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y))),
+            y = round_up((100*as.numeric(y)), 1),
             category =dplyr::case_when(
               category %in% c("Some other race", "American Indian/Alaska Native",
                               "Black/African American", "Native Hawaiian/Other Pacific Islander",
@@ -265,7 +270,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y))))
+            y = round_up((100*as.numeric(y)), 1))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("ethnicity") %>%
@@ -347,7 +352,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "field",
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
-          dplyr::mutate(y = round_up((100*as.numeric(y))),
+          dplyr::mutate(y = round_up((100*as.numeric(y)), 1),
                         category =dplyr::case_when(
                           category == "None of the above" ~ "Other Field",
                           TRUE ~ category
@@ -394,7 +399,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "c4q34",
                         filter == "All LHDs") %>%
           dplyr::group_by(year, category, group, filter, topic)%>%
-          dplyr::mutate(y = round_up((100*as.numeric(y))))
+          dplyr::mutate(y = round_up((100*as.numeric(y)), 1))
 
 
         ### 2022 data-------------
@@ -454,7 +459,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
 
 
         ###historical-----
-        hist_data <- lines_data%>%
+        hist_data <- lines_data %>%
           dplyr::filter(topic == option,
                         filter == "All LHDs",
                         category %in% c("Mean", "Median"))%>%
@@ -491,6 +496,48 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                           two = paste(" ", y)) %>%
             dplyr::arrange(year)
         }
+
+      } else if (option == "fte_bypop"){
+
+        ###2022 data-----
+        current_data_1 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+          dplyr::select(Question, category, group, y )%>%
+          dplyr::mutate(y = round_up(as.numeric(y)),
+                        year = 2022)
+
+        current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+          dplyr::select(Question, category, group, y )%>%
+          dplyr::mutate(year = 2022,
+                        y = round_up(as.numeric(y)))
+
+        current_data <- dplyr::full_join(current_data_1, current_data_2)%>%
+          dplyr::mutate(category = "FTEs per 10,000 people",
+                        filter = "All LHDs")
+
+
+        ###historical-----
+        hist_data <- lines_data %>%
+          dplyr::filter(topic == option,
+                        filter == "All LHDs") %>%
+          dplyr::mutate(y = round_up(as.numeric(y)))%>%
+          dplyr::select(topic, group, filter, y, year, category)
+
+        ###combine
+        combined <- dplyr::full_join(current_data, hist_data,
+                                     by = c("Question" = "topic",
+                                            "group" = "group",
+                                            "filter" = "filter",
+                                            "y" = "y",
+                                            "year" = "year",
+                                            "category" = "category"
+                                     )) %>%
+          dplyr::mutate(y = round_up(as.numeric(y)),
+                        legend_label = paste(category),
+                        one = paste("the number of FTEs per 10,000 people was "),
+                        two = paste(y)) %>%
+          dplyr::arrange(year)
+
+
       } else if (option == "b"){
 
         current_vars <-  paste0("new", classifications)
@@ -530,8 +577,23 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         two = paste(scales::label_comma()(y), tolower(category), "FTEs")) %>%
           dplyr::arrange(year)
 
+      } else if (option %in% c("health_part", "comm_part", "gov_part")) {
 
-      } else { message("ERROR: No input identified")}
+
+        combined <- partnerships %>%
+          dplyr::filter(group == topic)
+
+
+      } else if (option == "totexp_percap"){
+
+
+      combined <- lines_data %>%
+        dplyr::filter(topic == "totexp_percap")
+
+
+       } else {
+          stop("ERROR: No matching option identified for All LHDs") }
+
 
 
     } else {
@@ -543,7 +605,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "lboh",
                         filter == filtering,
                         category == "Yes")%>%
-          dplyr::mutate(y = round_up((100*as.numeric(y))))
+          dplyr::mutate(y = round_up((100*as.numeric(y)), 1))
 
         # View(hist_data)
 
@@ -601,7 +663,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "age_cat",
                         filter == filtering)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y)))
+            y = round_up((100*as.numeric(y)), 1)
           ) %>%
           dplyr::group_by(category, group, year, filter, topic, subtitle) %>%
           dplyr::summarise(y = sum(y))
@@ -662,7 +724,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y))),
+            y = round_up((100*as.numeric(y)), 1),
             category =dplyr::case_when(
               category == "Prefer not to answer" ~ "Not specified",
               category == "Other" ~ "Not specified",
@@ -719,7 +781,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y))),
+            y = round_up((100*as.numeric(y)), 1),
           category = dplyr::case_when(
               category %in% c("American Indian Or Alaska Native",
                               "Black Or African American",
@@ -785,7 +847,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
           dplyr::mutate(
-            y = round_up((100*as.numeric(y))))
+            y = round_up((100*as.numeric(y)), 1))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("ethnicity", filtering) %>%
@@ -902,7 +964,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "field",
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
-          dplyr::mutate(y = round_up((100*as.numeric(y))),
+          dplyr::mutate(y = round_up((100*as.numeric(y)), 1),
                         category =dplyr::case_when(
                           category == "None of the above" ~ "Other Field",
                           TRUE ~ category
@@ -958,7 +1020,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           dplyr::filter(topic == "c4q34",
                         filter == filtering) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)%>%
-          dplyr::mutate(y = round_up((100*as.numeric(y))))
+          dplyr::mutate(y = round_up((100*as.numeric(y)), 1))
 
         ### 2022 data-------------
         current_data <- return_survey_weighted_counts("c4q34", filtering) %>%
@@ -1083,11 +1145,16 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                           two = paste(y, " employees")) %>%
             dplyr::arrange(year)
         }
-      } else if (option == ""){
+       } else {
+          stop("ERROR: No matching option identified for non-All LHDs")
 
-      }
 
     }
+
+    }
+
+
+    combined$year <- as.factor(combined$year)
 
   return(combined)
 }

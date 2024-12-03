@@ -1206,8 +1206,8 @@ b, strong {
 
 
 .carousel-indicators {
-    position: absolute;
-    bottom: 1.5vmin; /* Position from the bottom based on viewport size */
+    position: relative;
+   /*  bottom: 1.5vmin; Position from the bottom based on viewport size */
 
     display: flex;
     justify-content: center;

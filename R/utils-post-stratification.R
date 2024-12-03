@@ -149,12 +149,13 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 
     left_join(data, add_responses, by = c("Answer", "Group"))
 
-    answer_levels <- c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    data <- reorder_factor_levels(data, "Answer", answer_levels)
+
 
   }
 
 }
+
+
 
 
 
@@ -199,7 +200,7 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
     rename_all(~new_names) %>%
     select(all_of(c("Group", "Percentage", "Answer"))) %>%
     mutate(
-      y = round_up(Percentage),
+      y = round_up(Percentage, 1),
       category = sapply(Answer, custom_str_to_title),
       group = Group,
       subtitle = paste0("All LHDs")
@@ -243,7 +244,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 
   if (is.null(grps)) {
 
-    master_data %>%
+    data <- master_data %>%
       as_factor() %>%
       left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
       as_survey_design(strata = popcat, weights = wtype, fpc = "core_denom") %>%
@@ -268,7 +269,7 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
 
     } else {
 
-      master_data %>%
+      data <- master_data %>%
         as_factor() %>%
         left_join(add_weights(q_label, popcat = popcat), by = c(popcat, "core_denom")) %>%
         as_survey_design(strata = popcat, weights = wtype, fpc = "core_denom") %>%
@@ -293,8 +294,15 @@ return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0
           x_label = NA
         )
 
-    }
+      if (grps == "c0popcat3") {
+        data <- data %>%
+          dplyr::mutate(Group = factor(Group,
+                                       levels = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+          ))
+      }
 
+    }
+return(data)
 }
 
 
@@ -331,7 +339,7 @@ create_hist <- function(input, x_label) {
     category = midpoints,
     # category = paste(head(bins, -1), " - ", tail(bins, -1)),
     x = 1:length(midpoints) -1,
-    subtitle = "Click and span to zoom into a specific range on the chart.
+    subtitle = "Click and drag to zoom into a specific range on the chart.
     Hold the Shift key and drag to pan horizontally.",
     x_label = x_label,
     group = "All LHDs"
@@ -410,15 +418,15 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
       dplyr::mutate(x = as.numeric(as.factor(group))-1,
                     group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
                                              TRUE ~ group)) %>%
-      dplyr::select(group, Question, y, x, total_employees)
+      dplyr::select(group, Question, y, x, total_employees, filter)
 
 
     data %>%
       tidyr::pivot_wider(names_from = Question, values_from = y) %>%
       dplyr::rename(left = jobsgone,
                     right = jobsgain) %>%
-      dplyr::mutate(left_standard = round_up((left/total_employees)*100),
-                    right_standard = round_up((right/total_employees)*100),
+      dplyr::mutate(left_standard = round_up((left/total_employees)*100, 1),
+                    right_standard = round_up((right/total_employees)*100, 1),
                     difference = right - left) %>%
       dplyr::mutate(group = sub(" .*", "", group)) %>% # shorten labels
       dplyr::mutate_if(is.numeric, round, 1)
@@ -426,15 +434,16 @@ filtered_butterfly <- function(selected_data = "jobs_data") {
 
   } else if (selected_data == "budget_data") {
     data <- budget_data %>%
+      dplyr::filter(category != "Unknown") %>%
       dplyr::mutate(x = as.numeric(as.factor(group))-1,
                     group = dplyr::case_when(group == "All Lhds" ~ "All LHDs",
                                              TRUE ~ group)) %>%
-      dplyr::select(group, x, y, category, Responses) %>%
+      dplyr::select(group, x, y, category, Responses, filter) %>%
       tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
-      dplyr::rename(left = 3,
-                    right = 4,
-                    left_n = 5,
-                    right_n = 6) %>%
+      dplyr::rename(left = 4,
+                    right = 5,
+                    left_n = 6,
+                    right_n = 7) %>%
       dplyr::mutate(group = sub(" .*", "", group)) # shorten labels
   }
 }

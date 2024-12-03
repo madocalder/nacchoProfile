@@ -47,7 +47,7 @@ mod_overview_ui <- function(id) {
             class = "carousel-dark alt-2",
             bsutils::carouselItem(
               bslib::card(
-                height = "70vh",
+                height = "75vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -56,7 +56,7 @@ mod_overview_ui <- function(id) {
                   div(
                     class = "row",
                     div(
-                      class = "col-sm-3 color-carousel",
+                      class = "col-sm-4 color-carousel",
                       HTML("<span style = 'font-size: 2.5vmin; font-weight: 600; color: #212F5B; line-height: 2.5vmin;'>
                           Although only 6% of all LHDs were
                           classified as large, they served more
@@ -65,7 +65,7 @@ mod_overview_ui <- function(id) {
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
-                      class = "col-sm-9",
+                      class = "col-sm-8",
                       highcharter::highchartOutput(ns("population"), height = "50vh")
                     )
                   )
@@ -76,7 +76,7 @@ mod_overview_ui <- function(id) {
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = "70vh",
+                height = "75vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -85,7 +85,7 @@ mod_overview_ui <- function(id) {
                   div(
                     class = "row",
                     div(
-                      class = "col-sm-4 color-carousel-2",
+                      class = "col-sm-5 color-carousel-2",
                       HTML("<span style = 'font-size: 2.4vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
                           Of the 2,512 LHDs included in the 2022
                           Profile study population, 1,928 were
@@ -101,7 +101,7 @@ mod_overview_ui <- function(id) {
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
-                      class = "col-sm-8",
+                      class = "col-sm-7",
                       highcharter::highchartOutput(ns("map"),
                                                    # width = "auto",
                                                    height = "50vh"),
@@ -115,7 +115,7 @@ mod_overview_ui <- function(id) {
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = "70vh",
+                height = "75vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -124,7 +124,7 @@ mod_overview_ui <- function(id) {
                   div(
                     class = "row",
                     div(
-                      class = "col-sm-4 color-carousel",
+                      class = "col-sm-5 color-carousel",
                       HTML("<span style = 'font-size: 2.6vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
                           Approximately two-thirds of LHDs
                           were county-based and an additional
@@ -140,7 +140,7 @@ mod_overview_ui <- function(id) {
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
                     div(
-                      class = "col-sm-8",
+                      class = "col-sm-7",
                       highcharter::highchartOutput(ns("cities"),
                                                    # width = "65vmin",
                                                    height = "50vh")
@@ -189,7 +189,7 @@ mod_overview_server <- function(id){
           viz_title = "Percent of U.S. Population Served by LHDs",
           viz_caption = "",
           viz_subtitle = "",
-          tooltip = "{point.y:.0f}% of {point.group} are served by {point.category} LHDs.",
+          tooltip = "{point.tooltip}",
           legend_align = "center",
           legend_title = "% of"
         ) %>%
@@ -242,7 +242,8 @@ mod_overview_server <- function(id){
         tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
         caption_text = "",
         accessible_desc = ""
-      )
+      )%>%
+        highcharter::hc_add_theme(naccho.viz::basic)
 
       # %>%
       #   highcharter::hc_chart(
@@ -288,7 +289,20 @@ mod_overview_server <- function(id){
         stacking = "normal",
         dataLabels = list(
           enabled = TRUE,
-          format = "{point.y:.0f}%",
+          overflow = "allow",
+          formatter = JS(
+            "
+        function () {
+          let roundedValue;
+          if (this.y > 0 && this.y < 1) {
+            roundedValue = this.y.toFixed(1);
+          } else {
+            roundedValue = this.y.toFixed(0);
+          }
+          return roundedValue + '%';
+        }
+        "
+          ),
           overflow = TRUE,
           distance = 5,
           padding = 2,
@@ -315,7 +329,7 @@ mod_overview_server <- function(id){
           min = 0,
           max = 100,
           labels = list(
-            format = "{value}%"
+            format = "%"
           )
         ) %>%
         viz_options(

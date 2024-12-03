@@ -3,5 +3,5 @@
 # Or use the blue button on top of this file
 
 pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
-options( "golem.app.prod" = TRUE)
+options( "golem.app.prod" = FALSE)
 nacchoProfile::run_app(options = list(port = 3000L)) # add parameters here (if any)

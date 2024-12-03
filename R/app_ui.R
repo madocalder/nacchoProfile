@@ -25,7 +25,7 @@ app_ui <- function(request) {
 
   tagList(
 
-    flexlayout::defineGlobal(width = 1300),
+    flexlayout::defineGlobal(width = 1200),
 
     # Leave this function for adding external resources
     golem_add_external_resources(),

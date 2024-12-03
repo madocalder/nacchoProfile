@@ -22,7 +22,7 @@
 #' @importFrom dplyr mutate case_when
 #' @keywords internal
 #' @name lines_data
-lines_data <- function() {
+
   lines_data <- utils::read.csv("data-raw/time_data.csv") %>%
     dplyr::mutate(
       category = dplyr::case_when(
@@ -40,7 +40,3 @@ lines_data <- function() {
 
   # Save the processed data for package use
   usethis::use_data(lines_data, overwrite = TRUE)
-}
-
-# Run the function to prepare and save data
-lines_data()

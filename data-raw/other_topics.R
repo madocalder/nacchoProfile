@@ -50,8 +50,14 @@ other_topics <- list(
   "Planning & QI" = list("CHA and CHIP" = "chachip",
                          "CHIP Activities" = "m9q240"),
 
-  "Partnerships" = list("Formal & Informal" = "work")
+  "Partnerships" = list(
+                        "Healthcare Partnerships" = "health_part",
+                        "Community-Based Partnerships" = "comm_part",
+                        "Government Partnerships" = "gov_part"
+                        # "Formal/Informal" = "work",
+                        )
 )
 
 # Save the other_topics dataset
 usethis::use_data(other_topics, overwrite = TRUE)
+

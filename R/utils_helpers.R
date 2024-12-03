@@ -167,9 +167,15 @@ right_button <- flexlayout::offcanvas_button(
 round_up <- function(x, digits = 0) {
   multiplier <- 10^digits
   adjusted <- x * multiplier
-  rounded <- ifelse(adjusted %% 1 == 0.5, ceiling(adjusted), round(adjusted))
+
+  # Handle vectorized rounding
+  rounded <- ifelse(x > 0 & x < 1,
+                    round(x, 1), # Round to 1 decimal place for values in (0, 1)
+                    ifelse(adjusted %% 1 == 0.5, ceiling(adjusted), round(adjusted)))
+
   rounded / multiplier
 }
+
 
 
 #' Reorder Factor Levels

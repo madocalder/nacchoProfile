@@ -144,7 +144,7 @@ viz_options <- function(hc,
 #'
 #' @return column graph
 set_column <- function(data,
-                       y_label = "% of LHDs") {
+                       y_label = "{value}%") {
 
   highcharter::hchart(
     data,
@@ -158,7 +158,20 @@ set_column <- function(data,
     ),
     dataLabels = list(
       enabled = TRUE,
-      format = "{point.y:.0f}%",
+      overflow = "allow",
+      formatter = JS(
+        "
+        function () {
+          let roundedValue;
+          if (this.y > 0 && this.y < 1) {
+            roundedValue = this.y.toFixed(1);
+          } else {
+            roundedValue = this.y.toFixed(0);
+          }
+          return roundedValue + '%';
+        }
+        "
+      ),
       overflow = TRUE,
       distance = 5,
       padding = 2,
@@ -199,48 +212,48 @@ set_column <- function(data,
 #'
 #'
 #' @return column graph
-set_simple_bar <- function(data,
-                           y_label = "% of LHDs") {
+set_simple_bar <- function(data, y_label = "{value}%") {
+  if (!"category" %in% colnames(data)) {
+    stop("Category column is missing in the data passed to set_simple_bar")
+  }
+  if (!"group" %in% colnames(data)) {
+    stop("group column is missing in the data passed to set_simple_bar")
+  }
 
   highcharter::hchart(
     data,
     "bar",
     id = "All",
     highcharter::hcaes(
-      x = x,
+      x = category,
       y = y,
       group = group,
       name = category
     ),
     dataLabels = list(
       enabled = TRUE,
-      format = "{point.y:.0f}%",
-      overflow = TRUE,
-      distance = 5,
-      padding = 5,
-      style = list(
-        color = naccho.viz::grey,
-        fontFamily = "Heebo",
-        fontWeight = "500",
-        fontSize = "1.8vmin"
-      )
+      overflow = "allow",
+      formatter = JS("
+        function () {
+          let roundedValue;
+          if (this.y > 0 && this.y < 1) {
+            roundedValue = this.y.toFixed(1);
+          } else {
+            roundedValue = this.y.toFixed(0);
+          }
+          return roundedValue + '%';
+        }
+      ")
     )
   ) %>%
     highcharter::hc_xAxis(
-      title = list(text = ""), # x-axis label
-      categories = unique(data$category),
-      labels = list(
-        padding = "1vmin",
-        fontSize = "1.8vmin",
-        fontWeight = 300,
-        step = 1
-      )
+      title = list(text = ""),
+      categories = unique(data$category)  # Explicitly reference `data$category`
     ) %>%
     highcharter::hc_yAxis(
       title = list(
-        text = y_label,
-        y = "1.8vmin"
-      ), # y-axis label
+        text = y_label
+      ),
       min = 0,
       labels = list(
         format = "{value}%"
@@ -249,7 +262,8 @@ set_simple_bar <- function(data,
 }
 
 
-#' Set First Highcharter Bar Graph
+
+#' Set First Highcharter Butterfly Bar Graph
 #'
 #' @description Create the first highcharter visualizations from which proxies will redraw.
 #'
@@ -262,8 +276,9 @@ set_simple_bar <- function(data,
 #' @return column graph
 set_bar <- function(data,
                     y_label = "% of Population",
-                    name_one = "Jobs Lost",
-                    name_two = "Jobs Added",
+                    # legend_title = "Number of Jobs...",
+                    name_one = "Lost",
+                    name_two = "Added",
                     max_one = 1300,
                     max_two = 5000,
                     set_format = NA,
@@ -272,13 +287,26 @@ set_bar <- function(data,
   # Preprocess data to include grouping
   if (!is.null(group_by)) {
     data <- data %>%
-      dplyr::arrange(!!rlang::sym(group_by)) %>%  # Sort data by grouping column
-      dplyr::mutate(group = as.factor(!!rlang::sym(group_by)))  # Add grouping factor
+      dplyr::arrange(!!rlang::sym(group_by)) %>%
+      dplyr::mutate(group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs",
+                                             TRUE ~ group)) %>% # Sort data by grouping column
+      dplyr::mutate(group = as.factor(!!rlang::sym(group_by)))
   } else {
+
+    data <- data %>%
+      dplyr::mutate(group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs",
+                                             TRUE ~ group))
+
     data$group <- factor(data$group)
   }
 
+  #reverse order of cats so All LHDs is on top -----
+  data <- data[rev(seq_len(nrow(data))), ]
+
+
   max_combined <- sum(max_one, max_two)
+
+  message("max_combined = ", max_combined)
 
   # Define the "pretty" intervals in a vector
   pretty_intervals <- c(1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500)
@@ -289,17 +317,27 @@ set_bar <- function(data,
   # Find the largest "pretty" interval that is less than or equal to rough_interval
   interval <- max(pretty_intervals[pretty_intervals <= rough_interval])
 
+  message("interval = ", interval)
+
   ticks_one <- ceiling(max_one/interval)
   ticks_two <- ceiling(max_two/interval)
 
   totalTicks <- sum(ticks_two, ticks_one)
 
-  axis_one <- round_up((ticks_one/totalTicks), digits = 2)
-  axis_two <- round_up((ticks_two/totalTicks), digits = 2)
+  message("ticks_one = ", ticks_one, "  ticks_two = ", ticks_two,
+          " totalTicks = ", totalTicks)
+
+  axis_one <- round((ticks_one/totalTicks), digits = 2)
+  axis_two <- round((ticks_two/totalTicks), digits = 2)
+
+  message("axis_one = ", axis_one, "  axis_two =", axis_two)
 
   # Update max_one and max_two to be multiples of interval
   max_one <- ticks_one * interval
   max_two <- ticks_two * interval
+
+  message("max_one = ", max_one, "   max_two =", max_two)
+
 
   highcharter::highchart() %>%
     highcharter::hc_chart(
@@ -311,11 +349,16 @@ set_bar <- function(data,
     ) %>%
     highcharter::hc_legend(
       enabled = TRUE,
-      layout = "horizontal",
-      align = "center",
+      layout = "vertical",
+      align = "left",
       verticalAlign = "bottom",
-      itemStyle = list(fontSize = "1.8vmin"),
-      y = -20
+      itemStyle = list(fontSize = "1.5vmin")
+      # ,
+      # # y = -20,
+      # title = list(
+      #   text = legend_title,      # Your legend title here
+      #   style = list(fontSize = "1.8vmin", fontWeight = "bold")  # Customize title style
+      # )
     ) %>%
     highcharter::hc_tooltip(
       shared = TRUE,
@@ -343,31 +386,48 @@ set_bar <- function(data,
     highcharter::hc_yAxis_multiples(
       list(
         max = max_one,
-        title = list(text = ""),
-        labels = list(format = set_format),
+        # title = list(
+        #   text = paste0(y_label, " Lost"),
+        #   align = "middle",
+        #   verticalAlign = "top",
+        #   autoRotation = c(0, -45),
+        #   style = list(fontSize = "1.8vmin")
+        # ),
+        labels = list(
+          format = set_format,
+          style = list(fontSize = "1.5vmin")
+        ),
         width = paste((100 * axis_one), "%"),
         reversed = TRUE,
         offset = 10,
         alignTicks = FALSE,
         tickInterval = interval,
-        tickAmount = ticks_one + 1
+        tickAmount = ticks_one + 1,
+        opposite = TRUE  # Move this y-axis to the top
       ),
       list(
         max = max_two,
-        title = list(
-          text = y_label,
-          align = "high",  # Align the label to the far right
-          rotation = 0,    # Keep the label horizontal
-          y = 50,         # Adjust vertical position relative to the axis
-          x = -80           # Move label further away from the axis
+        # title = list(
+        #   text = paste0(y_label, " Added"),
+        #   align = "low",
+        #   verticalAlign = "bottom",
+        #   autoRotation = c(0, -45),
+        #   style = list(fontSize = "1.8vmin")
+        #   # ,
+        #   # y = -5,
+        #   # x = -150
+        # ),
+        labels = list(
+          format = set_format,
+          style = list(fontSize = "1.5vmin")
         ),
-        labels = list(format = set_format),
         left = paste((100 * axis_one), "%"),
         width = paste((100 * axis_two), "%"),
         offset = 10,
         alignTicks = FALSE,
         tickInterval = interval,
-        tickAmount = ticks_two + 1
+        tickAmount = ticks_two + 1,
+        opposite = FALSE  # Move this y-axis to the top
       )
     ) %>%
     highcharter::hc_add_series(
@@ -377,9 +437,12 @@ set_bar <- function(data,
       yAxis = 0,
       dataLabels = list(
         enabled = TRUE,
+        overflow = "allow",
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
         style = list(fontSize = "1.5vmin")
       )
+      # ,
+      # showInLegend = FALSE
     ) %>%
     highcharter::hc_add_series(
       id = "Right",
@@ -388,9 +451,12 @@ set_bar <- function(data,
       yAxis = 1,
       dataLabels = list(
         enabled = TRUE,
+        overflow = "allow",
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
         style = list(fontSize = "1.5vmin")
       )
+      # ,
+      # showInLegend = FALSE
     )
 }
 
@@ -643,6 +709,7 @@ scatter_plot <- function(data, colors) {
         dataLabels = list(
           enabled = TRUE,
           allowOverlap = FALSE,
+          overflow = "allow",
           # format = "{point.name}",
           formatter = highcharter::JS("
           function() {
@@ -851,7 +918,7 @@ scatter_plot <- function(data, colors) {
       widthAdjust = -60
     ) %>%
     highcharter::hc_subtitle(
-      text = "Click and span to zoom into a specific area of the chart.
+      text = "Click and drag to zoom into a specific area of the chart.
     Hold the Shift key and drag to pan horizontally when zoomed in."
     ) %>%
     highcharter::hc_caption(
@@ -915,180 +982,199 @@ scatter_plot <- function(data, colors) {
 #' tech_data <- get_bar_data("tech_use", filtering = "All LHDs")
 #'
 
-get_bar_data <- function(topic, filtering = NA){
-
-  if (filtering == "All LHDs") {
-
-    if (topic == "tech_use") {
-
-      data <- tech_use_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% c("Implemented"))%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = tech_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "comm_channels") {
-
-      data <- comms_use_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked")%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = comms_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "medical") {
-
-      data <- med_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "dental") {
-
-      data <- dental_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "behavioral") {
-
-      data <- behav_data %>%
-        dplyr::filter(filter == "All LHDs")%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "chachip") {
-
-      data <- return_survey_weighted_counts("chachip")
-
-      # Calculate total responses and 'y_All LHDs'
-      total_responses <- sum(data$Responses, na.rm = TRUE)
-      data <- data %>%
-        dplyr::mutate(
-          y = 100 * (Responses / total_responses),
-          Responses = total_responses
-        ) %>%
-        dplyr::mutate(category = dplyr::recode(category,
-                                               "Yes" = "Completed both in past 5 years",
-                                               "No" = " Completed one or none in past 5 years"))
+get_bar_data <- function(topic, filtering = "All LHDs") {
 
 
-    } else if (topic == "c12q260") {
+  # Helper function to aggregate data
+  calculate_aggregates <- function(data, category_col, group_col = NULL, extra_cols = NULL) {
+    group_vars <- c(category_col, group_col)
+    group_vars <- group_vars[!is.null(group_vars)]
 
-      data <- advocacy_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
+    data %>%
+      dplyr::filter(
+        (filter == filtering) # %in% TRUE # Handles non-atomic `filter`
+      ) %>%
+      dplyr::group_by(across(all_of(group_vars))) %>%
+      dplyr::summarize(
+        Responses = sum(Responses, na.rm = TRUE),
+        across(all_of(extra_cols), ~ unique(.x)[1], .names = "{.col}"), # Retain additional columns
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(
+        x = dplyr::dense_rank(!!sym(category_col))
+      )
+  }
 
-    } else if (topic == "Newc12q502") {
+  # Default handling
+  if (topic == "tech_use") {
+    data <- tech_use_data %>%
+      calculate_aggregates(
+        category_col = "tech_type",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      ) %>%
+      dplyr::rename(category = tech_type)
 
-      data <- new_advocacy_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = new_advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
+  } else if (topic == "comm_channels") {
+    data <- comms_use_data %>%
+      calculate_aggregates(
+        category_col = "comms_type",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      ) %>%
+      dplyr::rename(category = comms_type)
 
-    } else if (topic == "m9q240") {
+  } else if (topic == "medical") {
+    data <- med_data %>%
+      calculate_aggregates(
+        category_col = "category",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      )
 
-      data <- chip_data %>%
-        dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = action)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }   else if (topic == "work") {
+  } else if (topic == "dental") {
+    data <- dental_data %>%
+      calculate_aggregates(
+        category_col = "category",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      )
 
-      data <- partnerships %>%
-        dplyr::filter(year == "2022")%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }
+  } else if (topic == "behavioral") {
+    data <- behav_data %>%
+      calculate_aggregates(
+        category_col = "category",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      )
+     } else if (topic == "chachip") {
 
-  } else {
+       if (filtering == "All LHDs" || is.null(filtering)){
+         data <- return_survey_weighted_counts("chachip")
+       } else {
+        data <- return_survey_weighted_counts("chachip", filtering)
+       }
 
-    if (topic == "tech_use") {
-
-      data <- tech_use_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% c("Implemented"))%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = tech_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-
-    } else if (topic == "comm_channels") {
-
-      data <- comms_use_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked")%>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = comms_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-
-    } else if (topic == "medical") {
-
-      data <- med_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-    } else if (topic == "dental") {
-
-      data <- dental_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-
-    } else if (topic == "behavioral") {
-
-      data <- behav_data %>%
-        dplyr::filter(filter == filtering)%>%
-        dplyr::group_by(category)
-
-
-    } else if (topic == "chachip") {
-
-      data <- return_survey_weighted_counts(topic, filtering) %>%
-        dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
-        dplyr::mutate(category = dplyr::recode(category,
-                                               "Yes" = "Completed both in past 5 years",
-                                               "No" = " Completed one or none in past 5 years"))
-
-    } else if (topic == "c12q260") {
-
-      data <- advocacy_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-
-    } else if (topic == "Newc12q502") {
+        # Calculate total responses and 'y_All LHDs'
+        data_n <- data %>%
+          dplyr::group_by(Group) %>%
+          dplyr::reframe(
+            Responses = sum(data$Responses, na.rm = TRUE)
+          )
 
 
-      data <- new_advocacy_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = new_advocacy_type)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
+        data <- data %>%
+          dplyr::mutate(
+            # y = 100 * (Responses / total_responses),
+            Responses = show_n(data_n$Responses)
+          ) %>%
+          dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
+          dplyr::mutate(category = dplyr::recode(category,
+                                                 "Yes" = "Completed both in past 5 years",
+                                                 "No" = " Completed one or none in past 5 years"))
 
-    } else if (topic == "m9q240") {
 
 
-      data <- chip_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
-        dplyr::select(-category)%>%
-        dplyr::rename(category = action)%>%
-        dplyr::mutate(x = dplyr::dense_rank(category))
-    }
+  } else if (topic == "c12q260") {
+    data <- advocacy_data %>%
+      calculate_aggregates(
+        category_col = "advocacy_type",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      ) %>%
+      dplyr::rename(category = advocacy_type)
+
+  } else if (topic == "Newc12q502") {
+    data <- new_advocacy_data %>%
+      calculate_aggregates(
+        category_col = "new_advocacy_type",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      ) %>%
+      dplyr::rename(category = new_advocacy_type)
+
+  } else if (topic == "m9q240") {
+    data <- chip_data %>%
+      calculate_aggregates(
+        category_col = "action",
+        group_col = "group",
+        extra_cols = c("Question", "subtitle", "y", "filter")
+      ) %>%
+      dplyr::rename(category = action)
+
+  } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
+
+    data <- partnerships %>%
+      dplyr::filter(year == "2022") %>%
+      calculate_aggregates(
+        category_col = "category",
+        group_col = "group",
+        extra_cols = c("y", "filter")
+      )
+  }
+
+  # Ensure the 'category' column exists in the final dataset
+  if (!"category" %in% colnames(data)) {
+    stop("Error in get_bar_data: 'category' column is missing in the output.")
   }
 
   return(data)
-
 }
 
+
+
+#' Process Classification Data
+#'
+#' This function processes classification data based on the selected topic, classifications, and filtering options.
+#'
+#' @param topic A string representing the current topic (e.g., "a", "b").
+#' @param classifications A character vector of selected classifications (e.g., `c("c5q63", "c5q52")`).
+#' @param filtering A string representing the filtering option (e.g., "All LHDs", "Urban LHDs").
+#' @param q_remap A named character vector mapping classification questions to display-friendly titles.
+#'                For example, `c("c5q63" = "Question 63", "c5q52" = "Question 52")`.
+#'
+#' @return A data frame containing the processed classification data. The returned data frame includes:
+#'         - Filtered rows matching the selected classifications and filtering option.
+#'         - Mutated columns for user-friendly category and group values.
+#'
+#' @examples
+#' \dontrun{
+#' # Define inputs
+#' topic <- "a"
+#' classifications <- c("c5q63", "c5q52")
+#' filtering <- "Urban LHDs"
+#' q_remap <- c("c5q63" = "Question 63", "c5q52" = "Question 52")
+#'
+#' # Process data
+#' processed_data <- process_classification_data(topic, classifications, filtering, q_remap)
+#'
+#' # View results
+#' head(processed_data)
+#' }
+#'
+#' @importFrom dplyr filter mutate case_when
+#' @export
+process_classification_data <- function(topic, classifications, filtering, q_remap) {
+
+  observeEvent(input$classifications, {
+    req(input$classifications, input$filter, input$topic)
+
+    # Process classification data based on user inputs
+    data <- process_classification_data(
+      topic = input$topic,
+      classifications = input$classifications,
+      filtering = input$filter,
+      q_remap = q_remap  # Ensure this is pre-defined
+    )
+
+    # Use `data` for rendering outputs
+    output$classification_chart <- renderHighchart({
+      set_column(data) %>%
+        viz_export()
+    })
+  })
+
+}
 
 
 #' Single Column Proxy Redraw
@@ -2165,4 +2251,3 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
     )
   )
 }
-

@@ -2,13 +2,13 @@
 % Please edit documentation in R/utils_highcharter.R
 \name{set_bar}
 \alias{set_bar}
-\title{Set First Highcharter Bar Graph}
+\title{Set First Highcharter Butterfly Bar Graph}
 \usage{
 set_bar(
   data,
   y_label = "\% of Population",
-  name_one = "Jobs Lost",
-  name_two = "Jobs Added",
+  name_one = "Lost",
+  name_two = "Added",
   max_one = 1300,
   max_two = 5000,
   set_format = NA,

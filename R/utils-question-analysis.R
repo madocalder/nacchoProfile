@@ -244,10 +244,10 @@ compare_results_fig5.12 <- function() {
         `Plus1000k` = c("0.97", "0.17", "0.5", "1", "0.8", "0.77", "1", "0.93", "0.77", "0.83", "0.8", "0.4", "0.97", "1", "0.67", "1", "0.97", "0.83", "1")
         ) |>
         mutate(across(.data$All_LHDs:.data$Plus1000k, \(x) as.numeric(x))) |>
-        mutate(across(where(is.numeric), \(x) {round_up(x * 100, 0)}))
+        mutate(across(where(is.numeric), \(x) {round_up(x * 100, 1)}))
 
     results <- report2022_workforce_fig5.12() |>
-        mutate(across(where(is.numeric), \(x) {round_up(x, 0)}))
+        mutate(across(where(is.numeric), \(x) {round_up(x, 1)}))
 
     colnames(results) <- colnames(report)
 

@@ -66,14 +66,15 @@ jobs_data <- jobs_data %>%
                 y = dplyr::case_when(Question == "jobsgone" ~ Total,
                                      Question == "jobsgain" ~ Total),
                 category = case_when(Question == "jobsgone" ~ "Jobs Lost",
-                                     Question == "jobsgain" ~ "Jobs Added"))
+                                     Question == "jobsgain" ~ "Jobs Added"))%>%
+  dplyr::mutate(y = round_up(y, -1))
 
 
 # print elapsed time
 end_time <- Sys.time() - start_time # calculate difference
 
 # This shows how much time the script took
-print(end_time) # 12 seconds
+print(end_time) # 7.931908 secs
 
 
 

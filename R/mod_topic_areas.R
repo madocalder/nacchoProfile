@@ -80,7 +80,7 @@ mod_topic_areas_ui <- function(id){
                 HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
-                style = "height: 65vh; width: 50vw;")
+                style = "max-height: 60vh; width: 50vw;")
             ),
             br(),
           )
@@ -166,7 +166,12 @@ mod_topic_areas_ui <- function(id){
           )
         ),
 
-        right_button = right_button
+        right_button = right_button,
+        left_width = 25,
+        right_width = 25,
+        center_width = 50
+
+
       )
     )
   )
@@ -229,6 +234,13 @@ mod_topic_areas_server <- function(id){
     }) %>% debounce(100)
 
 
+    # filter meta data --------------------------------------------------------
+    # used to display the correct title, caption, labels, etc...
+    filter_meta <- reactive({
+      req(input$topic)
+      meta %>% dplyr::filter(field == input$topic)
+    })
+
     #table titles---------------------------------------------------------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
@@ -244,60 +256,89 @@ mod_topic_areas_server <- function(id){
     # main content ============================================================
 
 
-
-    # filter meta data --------------------------------------------------------
-    # used to display the correct title, caption, labels, etc...
-    filter_meta <- reactive({
-      req(input$topic)
-      meta %>% dplyr::filter(field == input$topic)
-    })
-
-
     # figure output -----------------------------------------------------------
     # used for bar graph
     output$figure_bar <- highcharter::renderHighchart({
       req(input$view == "Bar Graph")
-      req(input$topic)
+      req(input$topic, input$filter)
 
-      topic = input$topic
-      filtering = input$filter
+      topic <- input$topic
+      filtering <- input$filter
 
-      if (input$filter == "All LHDS"){
-        data <- get_bar_data(topic = topic)
+      message("topic =", topic)
+      message("filtering =", filtering)
+
+      if (!(input$topic %in% c("health_part", "comm_part", "gov_part"))) {
+
+      data <- get_bar_data(topic = topic, filter = filtering)
+
       } else {
-        data <- get_bar_data(topic = topic, filter = filtering)
+
+         data <- partnerships %>%
+           dplyr::filter(variable == topic)
+
+         data$year <- as.factor(data$year)
+
+         if(max(data$y, na.rm = TRUE) == 100) {
+           y_max_rel <- max(data$y, na.rm = TRUE) + 1
+         } else {
+           y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
+         }
+         naccho.viz::create_grouped_line(
+           data = data,
+           x_variable = "year",
+           x_group = "group",
+           y_variable = "y",
+           y_label = "% of LHDs",
+           # y_max = y_max_rel,
+           x_label = "Year",
+           select_theme = naccho.viz::basic,
+           title = "Formal {point.group} Over Time",
+           # subtitle = subtitle,
+           # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
+           tooltip = "In {point.year}, {point.one}{point.two}.",
+           legend_title = NA
+         )
+
       }
 
-      # View(data)
+
+      # show_n(data$Responses)
 
       # Adjust the bar chart settings for long names
       set_simple_bar(data) %>%
-        highcharter::hc_chart(type = "bar") %>%  # Specify bar type explicitly
-        highcharter::hc_xAxis(
-          categories = as.character(data$category),  # Use category column for x-axis labels
-          labels = list(
-            staggerLines = 2,                  # Stagger labels
-            # rotation = -45,
-            autoRotation = TRUE, # Rotate labels for better readability
-            style = list(
-                         textOverflow = "ellipsis",  # Add ellipsis for overflow
-                         width = "175vw"
-                         )      # Set width to manage label length
-          )
-        ) %>%
-        # highcharter::hc_plotOptions(bar = list(
-        #   pointPadding = 0.2,  # Space between bars within a category
-        #   groupPadding = 0.2   # Space between different categories
-        # )) %>%
+        # highcharter::hc_add_theme(naccho.viz::minimal)%>%
         viz_options(
-          viz_title = "Percent of LHDs that Have Implemented the Following Communication Channels",
-          viz_subtitle = unique(data$subtitle),
-          viz_caption = paste0("<b> N: </b>", sum(data$Responses), "<br>", source_line),
-          tooltip = "{point.category}: <br> {point.y}%",
-          legend_enable = FALSE,
-          colors = colors()
+          theme = naccho.viz::basic,
+          # ,
+          # viz_title = "Percent of LHDs that Have Implemented the Following Communication Channels",
+          # viz_subtitle = unique(data$subtitle),
+          # viz_caption = paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
+          tooltip = "{point.category}: <br> {point.y}%"
+          #,
+          # legend_enable = FALSE,
+          # colors = colors()
         ) %>%
         viz_export()
+
+        # highcharter::hc_chart(type = "column") %>%  # Specify bar type explicitly
+        # highcharter::hc_xAxis(
+        #   categories = as.character(data$category),  # Use category column for x-axis labels
+        #   labels = list(
+        #     staggerLines = 2,                  # Stagger labels
+        #     # rotation = -45,
+        #     autoRotation = TRUE, # Rotate labels for better readability
+        #     style = list(
+        #                  textOverflow = "ellipsis",  # Add ellipsis for overflow
+        #                  width = "175vw"
+        #                  )      # Set width to manage label length
+        #   )
+        # ) %>%
+        # # highcharter::hc_plotOptions(bar = list(
+        # #   pointPadding = 0.2,  # Space between bars within a category
+        # #   groupPadding = 0.2   # Space between different categories
+        # # )) %>%
+
     })
 
 

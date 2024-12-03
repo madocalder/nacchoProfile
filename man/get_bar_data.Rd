@@ -4,7 +4,7 @@
 \alias{get_bar_data}
 \title{Generate Bar Chart Data for Other Topics PAge}
 \usage{
-get_bar_data(topic, filtering = NA)
+get_bar_data(topic, filtering = "All LHDs")
 }
 \arguments{
 \item{topic}{Character string; specifies the topic for which data is needed. Options include:

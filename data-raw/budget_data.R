@@ -39,7 +39,7 @@ master_data <- master_data %>%
   dplyr::mutate(budget_changes = dplyr::case_when(
     c10q301 == 1 ~ "Less Than Previous Year's Budget",
     c10q301 == 2 | c10q301 == 3 ~ "The Same or Higher Than Last Year's Budget",
-    c10q301 == 4 ~ NA_character_
+    c10q301 == 4 ~ "unknown"
   ))
 
 # Set variables and filters

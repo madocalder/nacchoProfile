@@ -44,7 +44,7 @@ mod_key_findings_ui <- function(id){
             class = "carousel-dark alt-2",
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -57,7 +57,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -70,7 +70,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -83,7 +83,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -96,7 +96,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -109,7 +109,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -122,7 +122,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -135,7 +135,7 @@ mod_key_findings_ui <- function(id){
             ),
             bsutils::carouselItem(
               bslib::card(
-                height = 600,
+                height = "80vh",
                 class = "key-findings-cards",
                 bslib::card_header(
                   fill = FALSE
@@ -357,7 +357,7 @@ mod_key_findings_server <- function(id){
     output$finding_two <- highcharter::renderHighchart({
       data <- data.frame(
         year = c("2019", "2022", "2019", "2022"),
-        value = c(17, 31, 10, 18),
+        value = c(17, 31, 10, 17),
         stat = c("Mean", "Mean", "Median", "Median"),
         perc_change = c("\u002b45\u0025", "\u002b45\u0025", "\u002b44\u0025", "\u002b44\u0025")
       )
@@ -390,7 +390,7 @@ mod_key_findings_server <- function(id){
               point =
                 list(
                   x = 1,
-                  y = 30,
+                  y = 3,
                   xAxis = 0,
                   yAxis = 0
                 ),
@@ -405,7 +405,28 @@ mod_key_findings_server <- function(id){
                 fontWeight = "700",
                 fontSize = "2vmin"
               )
+            ),
+            list(
+              point =
+                list(
+                  x = 1.001,
+                  y = 17,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "\u002b44\u0025",
+              align = "center",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              style = list(
+                color = naccho.viz::green,
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "2vmin"
+              )
             )
+
           )
         )
     })
@@ -475,12 +496,14 @@ mod_key_findings_server <- function(id){
     output$finding_four <- highcharter::renderHighchart({
 
       data <- data.frame(
-        value = c(11, 47, 65, 11),
+        value = c(21, 9, 11, 47, 65, 11),
         type = c("Expanded",
                  "Reduced",
                  "Expanded",
+                 "Reduced",
+                 "Expanded",
                  "Reduced"),
-        year = c("2019", "2019", "2022", "2022")
+        year = c("2019", "2019", "2020", "2020", "2022", "2022")
       )
 
 
@@ -497,7 +520,7 @@ mod_key_findings_server <- function(id){
         legend_enable = TRUE,
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
         immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
-        subtitle_text = "In 2022, 65\u0025 of LHDs expanded immunization services, compared to 11\u0025 that expanded immunizations in 2020 and 21\u0025 in 2019."
+        subtitle_text = "In 2022, 65\u0025 of LHDs expanded immunization services, compared to 11\u0025 that expanded immunizations in 2020 and 21\u0025 in 2019. 2020 data are from NACCHO's Forces of Change Survey."
       )
     })
 
@@ -599,6 +622,13 @@ mod_key_findings_server <- function(id){
 
       data$rurality <- factor(data$rurality)
 
+      data <- data %>%
+        group_by(rurality) %>%
+        arrange(perc, .by_group = TRUE)
+
+      data$service <- factor(data$service, levels = unique(data$service))
+
+
       naccho.viz::create_grouped_bar(
         data = data,
         x_variable = "rurality",
@@ -613,12 +643,13 @@ mod_key_findings_server <- function(id){
         legend_title = "",
         tooltip = "{point.perc:.0f}\u0025 of {point.rurality} LHDs provided direct <br> {point.service} services in 2022",
         allow_export = FALSE,
-        select_theme = naccho.viz::bare
+        select_theme = naccho.viz::minimal
       ) %>%
         highcharter::hc_plotOptions(
           series = list(
             dataLabels = list(
               enabled = TRUE,
+              overflow = "allow",
               align = 'center',
               verticalAlign = 'bottom',
               style = list(
@@ -719,6 +750,7 @@ mod_key_findings_server <- function(id){
           marker = list(enabled = FALSE),
           dataLabels = list(
             enabled = TRUE,
+            overflow = "allow",
             format = '{point.name}',
             align = 'center',
             verticalAlign = 'bottom',
@@ -727,13 +759,14 @@ mod_key_findings_server <- function(id){
           enableMouseTracking = FALSE,
           showInLegend = FALSE
         ) %>%
-        highcharter::hc_add_theme(
-          naccho.viz::bare
-        ) %>%
+        # highcharter::hc_add_theme(
+        #   naccho.viz::minimal
+        # ) %>%
         highcharter::hc_plotOptions(
           series = list(
             dataLabels = list(
               enabled = TRUE,
+              overflow = "allow",
               align = 'center',
               verticalAlign = 'bottom',
               style = list(
@@ -758,6 +791,9 @@ mod_key_findings_server <- function(id){
         ) %>%
         highcharter::hc_subtitle(
           text = "In 2022, 42\u0025 of LHDs had a top executive younger than 50 \u002D an increase from the 34\u0025 in 2008. During the same period, the average tenure decreased from 8.7 years to 6.6 years." # text under title
+        ) %>%
+        highcharter::hc_tooltip(
+          pointFormat = "<b>{point.name}:</b> {point.y}%"
         )
     })
   })
