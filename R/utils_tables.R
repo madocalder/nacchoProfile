@@ -12,10 +12,8 @@
 pivot_data_group <- function(data) {
   data %>%
     dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees", "filter"))) %>%
-    # dplyr::mutate(
-    #   Responses = ifelse(category %in% c("Mean", "Median"), Responses / 2, Responses)
-    # ) %>%
-    tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
+    tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
+    dplyr::rename_with(standardize_column_names)  # Standardize column names
 }
 
 #' Helper to handle common pivoting logic when names from category
@@ -32,11 +30,9 @@ pivot_data_group <- function(data) {
 pivot_data_cat <- function(data) {
   data %>%
     dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees"))) %>%
-    # dplyr::mutate(
-    #   Responses = ifelse(category %in% c("Mean", "Median"), Responses / 2, Responses)
-    # ) %>%
     tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
-    dplyr::rename(category = group)
+    dplyr::rename(category = group) %>%
+    dplyr::rename_with(standardize_column_names)  # Standardize column names
 }
 
 #' Helper to calculate overall LHD data
@@ -49,11 +45,29 @@ pivot_data_cat <- function(data) {
 #' and optionally `Responses_All LHDs`.
 #' @return A data frame with additional columns for "All LHDs" values.
 #' @import dplyr
-add_all_ldh_count <- function(data = data, data_all = data_all) {
-  dplyr::left_join(data,
-                   data_all %>% dplyr::select(category, `y_All LHDs`, dplyr::any_of("Responses_All LHDs")),
-                   by = "category")
+add_all_ldh_count <- function(data, data_all) {
+  # Ensure input is a data frame
+  if (!is.data.frame(data)) stop("`data` must be a data frame.")
+  if (!is.data.frame(data_all)) stop("`data_all` must be a data frame.")
+
+  # Standardize column names
+  data <- data %>%
+    dplyr::rename_with(standardize_column_names)
+
+  data_all <- data_all %>%
+    dplyr::rename_with(standardize_column_names)
+
+  # Select necessary columns to avoid conflicts
+  data_all <- data_all %>%
+    dplyr::select(category, `y_All LHDs`, `Responses_All LHDs`)
+
+  # Perform the join
+  data <- data %>%
+    dplyr::left_join(data_all, by = "category")
+
+  return(data)
 }
+
 
 #' Helper to process weighted statistics
 #'
@@ -67,7 +81,8 @@ add_all_ldh_count <- function(data = data, data_all = data_all) {
 process_weighted_stats <- function(topic, filtering = NULL) {
   return_survey_weighted_statistics(topic, filtering) %>%
     dplyr::mutate(subtitle = paste0("By ", names(landscape_filters[landscape_filters == filtering]))) %>%
-    dplyr::select(category, group, y, subtitle, Responses)
+    dplyr::select(category, group, y, subtitle, Responses) %>%
+    dplyr::rename_with(standardize_column_names)  # Standardize here
 }
 
 #' Helper to process jobs-related data
@@ -87,20 +102,28 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_cat() %>%
-      dplyr::mutate(`y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100, 1),
-                    `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100, 1),
-                    `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
-                    `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`) %>%
-      dplyr::select(category, `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
-                    `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`)
+      dplyr::mutate(
+        `y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100, 1),
+        `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100, 1),
+        `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
+        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`
+      ) %>%
+      dplyr::select(
+        category,
+        `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
+        `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`
+      ) %>%
+      dplyr::rename_with(standardize_column_names)  # Standardize here
   } else {
     jobs_data %>%
       dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
-      pivot_data_group()
+      pivot_data_group() %>%
+      dplyr::rename_with(standardize_column_names)  # Standardize here
   }
 }
+
 
 #' Helper to clean and process classification data
 #'
@@ -124,9 +147,8 @@ clean_class_data <- function(topic, classifications, filtering) {
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
                     group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
-      pivot_data_group()
-
-    # print.data.frame(data_all_class)
+      pivot_data_group() %>%
+      dplyr::rename_with(standardize_column_names)  # Standardize here
 
     if (filtering == "All LHDs") {
       return(data_all_class)
@@ -137,13 +159,15 @@ clean_class_data <- function(topic, classifications, filtering) {
       dplyr::filter(category == "Yes", filter == filtering) %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
       pivot_data_group() %>%
-      add_all_ldh_count(data_all = data_all_class)
+      add_all_ldh_count(data_all = data_all_class) %>%
+      dplyr::rename_with(standardize_column_names)  # Standardize here
 
     return(data)
   }
 
   return(NULL)
 }
+
 
 #' Helper to process general data for tables
 #'
@@ -156,8 +180,10 @@ clean_class_data <- function(topic, classifications, filtering) {
 #' @return A processed data frame for the specified topic and filtering.
 #' @import dplyr
 #' @import tidyr
+#' @export
 #Function to filter data for tables--------
-process_data <- function(topic, filtering, classifications = NULL) {
+
+process_table_data <- function(topic, filtering, classifications = NULL) {
   # Handle All LHDs cases
   if (filtering == "All LHDs") {
 
@@ -250,7 +276,7 @@ process_data <- function(topic, filtering, classifications = NULL) {
                        service_provision == topic) %>%
          dplyr::group_by(service_type) %>%
          dplyr::reframe(
-           y = y,
+           y = unique(y),
            Responses = sum(Responses, na.rm = TRUE),
            group = unique(group),
            category = unique(category),
@@ -637,7 +663,7 @@ classifications <- "Immunization"
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
 
-# View(data)
+View(data)
 
     } else if (topic == "Reduced/Expanded Services") {
 
@@ -823,9 +849,11 @@ classifications <- "Immunization"
 
   } #closes not All LHDs filter else
 
-
+  data <- data %>%
+    dplyr::rename_with(standardize_column_names)
 
   return(data)
+
 }
 
 
@@ -844,26 +872,13 @@ classifications <- "Immunization"
 #' @import reactablefmtr
 #' @importFrom scales percent_format
 create_non_time_table <- function(data, category, colors, topic) {
+  # Ensure 'category' is the first column
+  data <- data %>%
+    dplyr::select(category, everything())
 
-
-data <- data %>%
-  dplyr::select(category, everything())  # Move 'category' to the first position
-
-#
-# if ("y_All LHDs" %in% colnames(data)) {
-#   message("y_All LHDs column exists")
-# } else {
-#   message("y_All LHDs column does not exist")
-# }
-
-
-
-
-#number formatting------------------
- num_format <- function(x) {
-    rounded_value <- round_up(x, 0)  # no decimals
-
-
+  # Helper for formatting numbers
+  num_format <- function(x) {
+    rounded_value <- round(x, 0)  # no decimals
     if (topic == "tenure") {
       paste0(rounded_value, " years")
     } else if (topic == "jobs_total") {
@@ -871,7 +886,7 @@ data <- data %>%
     } else if (topic == "b") {
       paste0(rounded_value, " FTEs")
     } else if (topic == "fte_bypop") {
-      paste0(rounded_value, "FTEs")
+      paste0(rounded_value, " FTEs")
     } else if (topic == "c5q37") {
       paste0(rounded_value, " FTE")
     } else if (topic == "employee_bypop") {
@@ -885,155 +900,47 @@ data <- data %>%
     }
   }
 
-
-  # Define theme----------
-  options(
-    reactable.theme = reactable::reactableTheme(
-      color = "#3d4242",
-      backgroundColor = "",
-      borderColor = NULL,
-      stripedColor = NULL,
-      highlightColor = "#EEEAE4",
-      inputStyle = list(
-        backgroundColor = "white"
-      ),
-      selectStyle = list(
-        backgroundColor = "white"
-      ),
-      pageButtonHoverStyle = list(
-        backgroundColor = ""
-      ),
-      pageButtonActiveStyle = list(
-        backgroundColor = ""
-      ),
-      headerStyle = list(
-        borderWidth = "3px",
-        paddingTop = "10px",
-        verticalAlign = "bottom",
-        textAlign = "center",
-        background = "white",
-        textTransform = "uppercase",
-        borderColor = "#3d4242",
-        color = "#3d4242",
-        fontSize = "2vmin",
-        fontWeight = "normal"
-      ),
-      groupHeaderStyle = list(
-        "&:not(:empty)" = list(
-          paddingBottom = "2px",
-          verticalAlign = "bottom",
-          borderWidth = "3px",
-          borderColor = "#3d4242",
-          textAlign = "center",
-          backgroundColor = "#ffffff",
-          textTransform = "uppercase",
-          fontSize = "2vmin",
-          fontWeight = "bold",
-          color = "#3d4242"
-        )
-      ),
-      cellPadding = "15px 25px",
-      style = list(
-        fontFamily = "Heebo",
-        fontSize = "1.75vmin",
-        borderTop = "1px solid #212F5B",
-        borderBottom = "2px solid #212F5B"
-      )
-    )
-  )
-
-  # Check if y_All_LHDs column exists in the data
-  if ("y_All LHDs" %in% colnames(data)) {
-    # Common column definition for y_All_LHDs-------------
+  # Handle y_All LHDs column
+  all_lhds_col_name <- intersect(c("y_All LHDs", "y_All Lhds"), colnames(data))
+  if (length(all_lhds_col_name) > 0) {
     all_lhds_col <- reactable::colDef(
       name = "All LHDs",
       align = "center",
       header = with_tooltip("All LHDs",
-              paste0("n = ", table_n_count(data, topic, 'Responses_All LHDs'))),
-
-      cell = reactablefmtr::data_bars(data,
-                       text_position = "outside-end",
-                       max_value = ifelse(topic == "tenure", 8,
-
-                                          ifelse(topic == "c3q15", 13000000,
-                                                 ifelse(topic == "jobs_total", 15000,
-                                                        ifelse(topic == "b", 21000, 100)
-                                                        )
-                                                 )
-                                          ),
-                       fill_color = naccho.viz::green,
-                       background = 'none',
-                       number_fmt = num_format
-                    ),
+                            paste0("n = ", table_n_count(data, topic, 'Responses_All LHDs'))),
+      cell = reactablefmtr::data_bars(
+        data,
+        text_position = "outside-end",
+        max_value = ifelse(topic == "tenure", 8,
+                           ifelse(topic == "c3q15", 13000000,
+                                  ifelse(topic == "jobs_total", 15000,
+                                         ifelse(topic == "b", 21000, 100)))),
+        fill_color = naccho.viz::green,  # Always use naccho.viz::green
+        background = 'none',
+        number_fmt = num_format
+      ),
       style = list(
-        borderLeft = "3px solid #3d4242"
+        borderLeft = "0.2em solid #3d4242"
       ),
       headerStyle = list(
-        fontWeight = "bolder"
+        fontWeight = "bolder",
+        textAlign = "center",
+        textTransform = "uppercase",
+        fontSize = "1em"  # Font size in em
       )
     )
-
   } else {
     all_lhds_col <- NULL
   }
 
-
-
-#generate table if all LHDS -------------
-  # Check if the data is for "All LHDs" a
-
- if (category == "All LHDs" && !(topic == "jobs_total")){
-
-    # Define column definitions for All LHDs------------
-    column_definitions <- list(
-      category = reactable::colDef(
-        name = "Category",
-        align = "center",
-        style = list(
-          fontFamily = "Heebo",
-          borderRight = "3px solid #3d4242"
-        ),
-        headerStyle = list(
-          fontWeight = "bold"
-        )
-      )
-    )
-
-    if (!is.null(all_lhds_col)) {
-      column_definitions$'y_All LHDs' <- all_lhds_col
+  # Handle selected_columns based on category
+  if (category == "All LHDs") {
+    if (!is.null(all_lhds_col_name)) {
+      selected_columns <- all_lhds_col_name
+    } else {
+      stop("No column matching 'y_All LHDs' or 'y_All Lhds' found in the data.")
     }
-
-    # Hide the extra column "Responses_All_LHDs"
-    hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs"))
-    hidden_col_definitions <- setNames(
-      lapply(hidden_columns, function(col) {
-        reactable::colDef(show = FALSE)
-      }),
-      hidden_columns
-    )
-
-    # Merge with hidden columns
-    column_definitions <- c(column_definitions, hidden_col_definitions)
-
-
-    # Create the All LHDs reactable table--------
-    reactable::reactable(
-      data = data,
-      columns = column_definitions,
-      filterable = FALSE,
-      showPageSizeOptions = TRUE,
-      defaultPageSize = 8,
-      striped = FALSE,
-      highlight = TRUE,
-      searchable = FALSE,
-      bordered = FALSE,
-      resizable = TRUE
-    )
-
   } else {
-    #reactable for other cases--------
-    # Handle other cases with the existing logic
-    # Handle other cases with the existing logic
     group_definitions <- list(
       Rurality = list(columns = standardize_column_names(c("y_urban", "y_rural"))),
       Governance = list(columns = standardize_column_names(c("y_local", "y_shared", "y_state"))),
@@ -1041,118 +948,108 @@ data <- data %>%
       Region = list(columns = standardize_column_names(c("y_midwest", "y_northeast", "y_south", "y_west")))
     )
 
-
-    # If the selected category is defined in group_definitions
     if (category %in% names(group_definitions)) {
       selected_columns <- group_definitions[[category]]$columns
-
+      selected_columns <- selected_columns[selected_columns %in% colnames(data)]  # Only include existing columns
     } else {
-      # Select all columns that start with 'y_' except 'y_All LHDs'
       selected_columns <- grep("^y_", colnames(data), value = TRUE)
       selected_columns <- setdiff(selected_columns, "y_All LHDs")
     }
 
-
-#
-#     selected_columns <- group_definitions[[category]]$columns
-#     selected_columns <- selected_columns[selected_columns %in% colnames(data)] # Filter out non-existing columns
-
-    # Ensure y_All_LHDs is included if it exists
-    if ("y_All LHDs" %in% colnames(data)) {
-      selected_columns <- c(selected_columns, "y_All LHDs")
+    # Ensure "All LHDs" column is included and renamed
+    if (!is.null(all_lhds_col_name)) {
+      selected_columns <- c(selected_columns, all_lhds_col_name)
     }
-
-    column_definitions <- list(
-      category = reactable::colDef(
-        name = "Category",
-        align = "center",
-        style = list(
-          fontFamily = "Heebo",
-          borderRight = "3px solid #3d4242"
-        ),
-        headerStyle = list(
-          fontWeight = "bold"
-        )
-      )
-    )
-
-    if (!is.null(all_lhds_col)) {
-      column_definitions$'y_All LHDs' <- all_lhds_col
-    }
-
-    # Handle selected columns for non-All LHDs cases
-    column_definitions <- c(
-      column_definitions,
-      setNames(
-        lapply(seq_along(selected_columns), function(i) {
-          col <- selected_columns[i]
-          col_name <- sub("^y_", "", col)
-          reactable::colDef(
-            name = stringr::str_replace_all(col_name, "_", " "),
-            align = "center",
-            header = with_tooltip(
-              col_name,
-              paste0("n = ", table_n_count(data, topic, paste0("Responses_", col_name)))
-            ),
-            cell = reactablefmtr::data_bars(data,
-                             text_position = "outside-end",
-                             max_value = ifelse(topic == "tenure", 8,
-                                                ifelse(topic == "c3q15", 200000000,
-                                                       ifelse(topic == "jobs_total", 15000,
-                                                              ifelse(topic == "b", 21000, 100)
-                                                              )
-                                                       )
-                                                ),
-
-                             fill_color = colors[i],
-                             background = 'none',
-                             number_fmt = num_format
-                          )
-
-          )
-        }),
-        selected_columns
-      )
-    )
-
-
-
-    # Hide the extra columns that are not needed
-    hidden_columns <- setdiff(colnames(data), c("category", "y_All LHDs", selected_columns ))
-    hidden_col_definitions <- setNames(
-      lapply(hidden_columns, function(col) {
-        reactable::colDef(show = FALSE)
-      }),
-      hidden_columns
-    )
-
-    column_definitions <- c(column_definitions, hidden_col_definitions)
-
-
-    reactable::reactable(
-      data = data,
-      columns = column_definitions,
-      columnGroups = if (category %in% names(group_definitions)) {
-        list(
-          reactable::colGroup(
-            name = category,
-            columns = setdiff(selected_columns, "y_All LHDs")  # Exclude "y_All LHDs" from the group
-          )
-        )
-      } else {
-        NULL  # No groups if not in group_definitions
-      },
-
-      defaultPageSize = 8,
-      filterable = FALSE,
-      showPageSizeOptions = TRUE,
-      striped = FALSE,
-      highlight = TRUE,
-      searchable = FALSE,
-      bordered = FALSE,
-      resizable = TRUE
-    )
   }
+
+  # Debugging messages for troubleshooting
+  message("Selected columns: ", paste(selected_columns, collapse = ", "))
+
+  # Ensure selected_columns is not empty
+  if (length(selected_columns) == 0) {
+    stop("No columns selected. Please check the data and category definitions.")
+  }
+
+  # Hide extra columns not needed
+  hidden_columns <- setdiff(colnames(data), c("category", all_lhds_col_name, selected_columns))
+  hidden_col_definitions <- setNames(
+    lapply(hidden_columns, function(col) {
+      reactable::colDef(show = FALSE)
+    }),
+    hidden_columns
+  )
+
+  # Define columns for reactable
+  column_definitions <- list(
+    category = reactable::colDef(
+      name = "Category",
+      align = "center",
+      headerStyle = list(
+        fontWeight = "bold",
+        textAlign = "center",
+        textTransform = "uppercase",
+        fontSize = "1em"  # Font size in em
+      ),
+      style = list(
+        fontFamily = "Heebo",
+        borderRight = "0.2em solid #3d4242"
+      )
+    )
+  )
+
+  # Add selected_columns to column definitions
+  column_definitions <- c(
+    column_definitions,
+    setNames(
+      lapply(seq_along(selected_columns), function(i) {
+        col <- selected_columns[i]
+        col_name <- sub("^y_", "", col)
+        reactable::colDef(
+          name = if (col == all_lhds_col_name) "All LHDs" else stringr::str_replace_all(col_name, "_", " "),
+          align = "center",
+          header = with_tooltip(
+            if (col == all_lhds_col_name) "All LHDs" else col_name,
+            paste0("n = ", table_n_count(data, topic, paste0("Responses_", col_name)))
+          ),
+          headerStyle = list(
+            fontWeight = "bold",
+            textAlign = "center",
+            textTransform = "uppercase",
+            fontSize = "1em"  # Font size in em
+          ),
+          cell = reactablefmtr::data_bars(
+            data,
+            text_position = "outside-end",
+            max_value = ifelse(topic == "tenure", 8,
+                               ifelse(topic == "c3q15", 200000000,
+                                      ifelse(topic == "jobs_total", 15000,
+                                             ifelse(topic == "b", 21000, 100)))),
+            fill_color = ifelse(col == all_lhds_col_name, naccho.viz::green, colors[i]),
+            background = 'none',
+            number_fmt = num_format
+          )
+        )
+      }),
+      selected_columns
+    )
+  )
+
+  # Add hidden columns to column definitions
+  column_definitions <- c(column_definitions, hidden_col_definitions)
+
+  # Generate reactable
+  reactable::reactable(
+    data = data,
+    columns = column_definitions,
+    defaultPageSize = 6,
+    filterable = FALSE,
+    showPageSizeOptions = TRUE,
+    striped = FALSE,
+    highlight = TRUE,
+    searchable = FALSE,
+    bordered = FALSE,
+    resizable = TRUE
+  )
 }
 
 
@@ -1262,15 +1159,18 @@ table_n_count <- function(data, topic, col_name = NULL) {
 #' @export
 standardize_column_names <- function(columns) {
   sapply(columns, function(col) {
-    if (startsWith(col, "y_") || startsWith(col, "Responses_")) {
-      # Split by underscore, capitalize the second part, and recombine
-      parts <- strsplit(col, "_")[[1]]
-      if (length(parts) > 1) {
-        parts[2] <- stringr::str_to_title(parts[2])
-      }
-      paste(parts, collapse = "_")
-    } else {
-      col  # Return unchanged if it doesn't match the pattern
+    if (grepl("^(y_|Responses_).*All\\sLhds?$", col, ignore.case = TRUE)) {
+      normalized <- gsub("\\s+", " ", stringr::str_replace(col, "All\\sLhds?$", "All LHDs"))
+      return(normalized)
     }
+    if (startsWith(col, "y_") || startsWith(col, "Responses_")) {
+      parts <- strsplit(col, "_")[[1]]
+      parts <- c(parts[1], stringr::str_to_title(parts[-1]))
+      transformed <- paste(parts, collapse = "_")
+      return(transformed)
+    }
+    return(col)
   }, USE.NAMES = FALSE)
 }
+
+

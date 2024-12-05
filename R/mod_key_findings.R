@@ -390,27 +390,7 @@ mod_key_findings_server <- function(id){
               point =
                 list(
                   x = 1,
-                  y = 3,
-                  xAxis = 0,
-                  yAxis = 0
-                ),
-              text = "\u002b45\u0025",
-              align = "center",
-              backgroundColor = "transparent",
-              borderRadius = 50,
-              borderWidth = 0,
-              style = list(
-                color = naccho.viz::terracotta,
-                fontFamily = "Heebo",
-                fontWeight = "700",
-                fontSize = "2vmin"
-              )
-            ),
-            list(
-              point =
-                list(
-                  x = 1.001,
-                  y = 17,
+                  y = 29,
                   xAxis = 0,
                   yAxis = 0
                 ),
@@ -419,11 +399,35 @@ mod_key_findings_server <- function(id){
               backgroundColor = "transparent",
               borderRadius = 50,
               borderWidth = 0,
+              draggable = "",
+              style = list(
+                color = naccho.viz::terracotta,
+                fontFamily = "Heebo",
+                fontWeight = "700",
+                fontSize = "2vmin",
+                draggable = ""
+              )
+            ),
+            list(
+              point =
+                list(
+                  x = 1.001,
+                  y = 15,
+                  xAxis = 0,
+                  yAxis = 0
+                ),
+              text = "\u002b45\u0025",
+              align = "center",
+              backgroundColor = "transparent",
+              borderRadius = 50,
+              borderWidth = 0,
+              draggable = "",
               style = list(
                 color = naccho.viz::green,
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "2vmin",
+                draggable = ""
               )
             )
 
@@ -513,7 +517,7 @@ mod_key_findings_server <- function(id){
         y_variable = "value",
         my_colors = c(naccho.viz::terracotta, naccho.viz::green, naccho.viz::pink),
         y_format = "{value}\u0025",
-        y_label = "Percent of LHDs",
+        y_label = "% of LHDs",
         x_group = "type",
         allow_export = FALSE,
         tooltip = "{point.value:.0f}\u0025 of LHDs {point.type} <br> immunization services in {point.year}",
@@ -580,7 +584,7 @@ mod_key_findings_server <- function(id){
         title_text = "Implementation of <span style='color:#AB6143;font-weight:bold;'>electronic health records</span> increased by 42 percentage points between 2008 and 2022.",
         subtitle_text = "Participation in health information exchanges increased 24 percentage points over the same period, with fewer small LHDs using these systems.",
         x_group = "type",
-        y_label = "Percent of LHDs",
+        y_label = "% of LHDs",
         my_colors = c(naccho.viz::terracotta, naccho.viz::green),
         y_format = "{value}\u0025",
         legend_enable = TRUE,

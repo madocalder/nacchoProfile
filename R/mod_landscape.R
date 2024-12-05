@@ -223,9 +223,23 @@ mod_landscape_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
+      req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
       meta %>%
-        dplyr::filter(field == input$topic)
+        dplyr::filter(field == input$topic,
+                      stringr::str_detect(view, input$view),
+                      stringr::str_detect(filter, input$filter))
+
+
     })
+
+    observeEvent(input$view, {
+      if (input$view == "Bar Graph") {
+        output$line <- NULL  # Explicitly reset the line chart output
+      } else if (input$view == "Line Graph") {
+        output$figure <- NULL  # Explicitly reset the bar chart output
+      }
+    })
+
 
     #table titles-----------------
     output$table_title <- renderUI({
@@ -233,89 +247,10 @@ mod_landscape_server <- function(id){
       req(input$topic)
 
       # Subset based on the reactive input$topic and convert to character
-      title_values <- as.character(subset(meta, field == input$topic)$title)
+      title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
       p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
-    })
-
-
-    # Bar figure output -----------------------------------------------------------
-    output$figure <- highcharter::renderHighchart({
-      req(input$view == "Bar Graph", input$topic, input$filter)
-
-      if (input$filter == "All LHDs") {
-        # Data for "All LHDs"
-        data <- if (input$topic == "field") {
-          spec_data_all
-        } else {
-          return_survey_weighted_counts(input$topic)
-        }
-
-        # Render chart for "All LHDs" using predefined functions
-        set_column(data) %>%
-          viz_options(
-            viz_title = filter_meta()$title,
-            viz_caption = paste("<b> N: </b>", sum(unique(data$Responses), na.rm = TRUE), "<br>", source_line),
-            tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of {point.category}."
-          ) %>%
-          viz_export()
-      }
-    })
-
-    proxy <- highcharter::highchartProxy(ns("figure"))
-
-    # Dynamic updates for specific filters ----------------------------------------
-    observe({
-      req(input$filter != "All LHDs")
-
-      # Fetch data based on topic and filter
-      data <- if (input$topic == "field") {
-        spec_data %>% dplyr::filter(filter == input$filter)
-      } else {
-        return_survey_weighted_counts(input$topic, input$filter)
-      }
-
-      # Adjust grouping for filters
-      if (input$filter == "c0popcat3") {
-        data <- data %>%
-          dplyr::mutate(group = factor(group, levels = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")))
-      } else if (input$filter == "urbanrural2022") {
-        data <- data %>%
-          dplyr::mutate(group = factor(group, levels = c("Urban", "Rural")))
-      } else if (input$filter == "censusregion") {
-        data <- data %>%
-          dplyr::mutate(group = factor(group, levels = c("Northeast", "Midwest", "South", "West")))
-      }
-
-      # Ensure group column exists
-      if (!"group" %in% names(data)) {
-        data$group <- "All"
-      }
-
-      # Update chart using proxy function
-
-      proxy %>%
-        proxy_to_group(
-          data = data,
-          meta = filter_meta(),
-          id = unique(data$group),
-          colors = colors(),
-          tooltip = "<span style=\"color:{point.color}\">\u25CF</span> {point.y:.0f}% of {point.group} LHDs specialize in {point.category}."
-        )
-    })
-
-    # Update the yAxis title dynamically ------------------------------------------
-    use_js_proxy <- reactive({
-      shinyjs::runjs(paste0("
-    var chart = $('#landscape_1-figure').highcharts();
-    chart.yAxis[0].update({
-      title: {
-        text: '", filter_meta()$y_label, "',
-        style: { color: '#333333' }
-      }
-    }, true, { duration: 1000 });
-  "))
     })
 
     # Dynamic color definitions ---------------------------------------------------
@@ -333,7 +268,7 @@ mod_landscape_server <- function(id){
 
 
 
-   #Tables output ------
+    #Tables output ------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
 
@@ -362,7 +297,7 @@ mod_landscape_server <- function(id){
 
 
 
-      data <- process_data(topic, filtering, classifications)
+      data <- process_table_data(topic, filtering, classifications)
 
       data <- data %>%
         dplyr::mutate(
@@ -391,8 +326,122 @@ mod_landscape_server <- function(id){
     })
 
 
-    # Line Output-------------------
 
+    # Bar figure output -----------------------------------------------------------
+    output$figure <- highcharter::renderHighchart({
+      req(input$view == "Bar Graph", input$topic, input$filter)
+
+      # Combine data for "All LHDs" and filtered LHDs
+      combined_data <- if (input$filter == "All LHDs") {
+        if (input$topic == "field") {
+          spec_data_all
+        } else {
+          return_survey_weighted_counts(input$topic)
+        }
+      } else {
+        all_data <- if (input$topic == "field") {
+          spec_data_all
+        } else {
+          return_survey_weighted_counts(input$topic)
+        }
+
+        filtered_data <- if (input$topic == "field") {
+          spec_data %>% dplyr::filter(filter == input$filter)
+        } else {
+          return_survey_weighted_counts(input$topic, input$filter)
+        }
+
+        dplyr::bind_rows(
+          all_data %>% dplyr::mutate(filter = "All LHDs"),
+          filtered_data
+        )
+      }
+
+      # Render the chart with additional series for filtered data
+      bar_chart <- set_column(combined_data,
+                          y_format = filter_meta()$y_format) %>%
+        viz_options(
+          viz_title = filter_meta()$title,
+          viz_caption = paste(
+            "<b> N: </b>", sum(unique(combined_data$Responses), na.rm = TRUE),
+            "<br>", source_line
+          ),
+          tooltip = filter_meta()$tooltip
+        )
+
+      # Add additional series when not "All LHDs"
+      if (input$filter != "All LHDs") {
+        bar_chart <- bar_chart %>%
+          highcharter::hc_add_series(
+            id = "all_lhds_bar_series",
+            name = "All LHDs",
+            data = combined_data %>% dplyr::filter(filter == "All LHDs"),
+            states = list(inactive = list(enabled = TRUE)),
+            selected = FALSE
+          ) %>%
+          highcharter::hc_add_series(
+            id = "filtered_bar_series",
+            name = input$filter,
+            data = combined_data %>% dplyr::filter(filter == input$filter),
+            selected = TRUE
+          )
+      }
+
+      bar_chart %>%
+        viz_export()
+    })
+
+    proxy_bar <- highcharter::highchartProxy(ns("figure"))
+
+    # Observe Updates for Bar Chart
+    observe({
+      req(input$view == "Bar Graph", input$filter != "All LHDs")  # Ensure this runs only for Bar Graph view
+
+      # Fetch data for the bar chart
+      data <- if (input$topic == "field") {
+        spec_data %>% dplyr::filter(filter == input$filter)
+      } else {
+        return_survey_weighted_counts(input$topic, input$filter)
+      }
+
+      # Remove all existing series
+      proxy_bar %>%
+        highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
+        highcharter::hcpxy_remove_series(id = "all_lhds_line_series") %>%
+        highcharter::hcpxy_remove_series(
+          id = c("Urban", "Rural")
+        ) %>%
+        highcharter::hcpxy_remove_series(
+          id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+        ) %>%
+        highcharter::hcpxy_remove_series(
+          id = c("State", "Local", "Shared")
+        ) %>%
+        highcharter::hcpxy_remove_series(
+          id = c("Midwest", "South", "West", "Northeast")
+        ) %>%
+        highcharter::hcpxy_remove_series(
+          id = "All"
+        ) %>%
+        highcharter::hcpxy_update(
+          series = list())
+
+
+      # Add filtered data series
+      proxy_bar %>%
+        proxy_to_group(
+          data = data,
+          meta = filter_meta(),
+          id = "filtered_bar_series",
+          type = "column",
+          colors = colors(),
+          tooltip = filter_meta()$tooltip
+        )
+    })
+
+
+
+    # Line Output-------------------
     output$line <- highcharter::renderHighchart({
       req(input$view == "Line Graph")
 
@@ -426,7 +475,7 @@ mod_landscape_server <- function(id){
 
 
       if(max(data$y, na.rm = TRUE) == 100) {
-       y_max_rel <- max(data$y, na.rm = TRUE) + 1
+        y_max_rel <- max(data$y, na.rm = TRUE)
       } else {
         y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
       }
@@ -443,10 +492,8 @@ mod_landscape_server <- function(id){
         subtitle <- NULL
       }
 
-# data$responses <- sum(data$Responses)
-# print(data)
-
-      data$year <- as.factor(data$year)
+      # data$responses <- sum(data$Responses)
+      # print(data)
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -467,7 +514,141 @@ mod_landscape_server <- function(id){
 
     })
 
+    # output$line <- highcharter::renderHighchart({
+    #   req(input$view == "Line Graph", input$topic, input$filter)
+    #
+    #   # Process data for the line graph
+    #   data <- process_line_data(input$topic, input$filter)
+    #
+    #   # Determine y-axis maximum
+    #   y_max_rel <- if (max(data$y, na.rm = TRUE) == 100) {
+    #     101
+    #   } else {
+    #     max(data$y, na.rm = TRUE) * 1.01
+    #   }
+    #
+    #   # Title and subtitle
+    #   line_title <- paste(filter_meta()$title)
+    #
+    #
+    #   subtitle <- if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {
+    #     data$subtitle[1]
+    #   } else {
+    #     NULL
+    #   }
+    #
+    #   # Initialize the chart
+    #   line_chart <- naccho.viz::create_grouped_line(
+    #     data = data,
+    #     x_variable = "year",
+    #     x_group = "legend_label",
+    #     y_variable = "y",
+    #     y_label = filter_meta()$y_label,
+    #     y_max = y_max_rel,
+    #     x_label = "Year",
+    #     select_theme = naccho.viz::basic,
+    #     title = line_title,
+    #     subtitle = subtitle,
+    #     tooltip = filter_meta()$tooltip,
+    #     legend_title = NULL
+    #   )
+    #
+    #   # Add a series for "All LHDs" if filter is applied
+    #   if (input$filter != "All LHDs") {
+    #     all_data <- data %>% dplyr::filter(filter == "All LHDs")
+    #     filtered_data <- data %>% dplyr::filter(filter == input$filter)
+    #
+    #     line_chart <- line_chart %>%
+    #       highcharter::hc_add_series(
+    #         id = "all_lhds_line_series",
+    #         name = "All LHDs",
+    #         data = all_data,
+    #         type = "line",
+    #         color = naccho.viz::green, #
+    #         dashStyle = "ShortDash"
+    #       ) %>%
+    #       highcharter::hc_add_series(
+    #         id = "filtered_line_series",
+    #         name = input$filter,
+    #         data = filtered_data,
+    #         type = "line",
+    #         color = colors(),
+    #         lineWidth = 2
+    #       )
+    #   }
+    #
+    #   line_chart
+    # })
+    #
+    # proxy_line <- highcharter::highchartProxy(ns("line"))
+    #
+    # # Observe Updates for Line Chart
+    # observe({
+    #   req(input$view == "Line Graph")  # Ensure this runs only for Line Graph view
+    #   if (input$view != "Line Graph") return()
+    #
+    #
+    #   # Fetch data for the line graph
+    #   data <- process_line_data(input$topic, input$filter)
+    #
+    #   # Remove all existing series
+    #   proxy_line %>%
+    #     highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
+    #     highcharter::hcpxy_remove_series(id = "all_lhds_bar_series") %>%
+    #     highcharter::hcpxy_remove_series(
+    #       id = c("Urban", "Rural")
+    #     ) %>%
+    #     highcharter::hcpxy_remove_series(
+    #       id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
+    #     ) %>%
+    #     highcharter::hcpxy_remove_series(
+    #       id = c("State", "Local", "Shared")
+    #     ) %>%
+    #     highcharter::hcpxy_remove_series(
+    #       id = c("Midwest", "South", "West", "Northeast")
+    #     ) %>%
+    #     highcharter::hcpxy_remove_series(
+    #       id = "All"
+    #     ) %>%
+    #     highcharter::hcpxy_update(
+    #       series = list())
+    #
+    #   # Add "All LHDs" series
+    #   all_data <- data %>% dplyr::mutate(filter = "All LHDs")
+    #
+    #   if (nrow(all_data) > 0) {
+    #     proxy_line %>%
+    #       highcharter::hcpxy_add_series(
+    #         id = "all_lhds_line_series",
+    #         name = "All LHDs",
+    #         data = highcharter::list_parse2(all_data),
+    #         type = "line",
+    #         color = naccho.viz::green,
+    #         dashStyle = "ShortDash"
+    #       )
+    #   }
+    #
+    #   # Add filtered data series
+    #   filtered_data <- data %>% dplyr::filter(filter == input$filter)
+    #
+    #   if (nrow(filtered_data) > 0) {
+    #     proxy_line %>%
+    #       highcharter::hcpxy_add_series(
+    #         id = "filtered_line_series",
+    #         name = input$filter,
+    #         data = highcharter::list_parse2(filtered_data),
+    #         type = "line",
+    #         color = colors(),
+    #         lineWidth = 2
+    #       )
+    #   }
+    # })
 
+    # observe({
+    #   req(input$view)
+    #   print(highcharter::hcpxy_get(proxy_bar))
+    #   print(highcharter::hcpxy_get(proxy_line))
+    # })
 
 
     # right content ===========================================================

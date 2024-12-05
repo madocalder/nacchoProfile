@@ -4,7 +4,7 @@
 \alias{add_all_ldh_count}
 \title{Helper to calculate overall LHD data}
 \usage{
-add_all_ldh_count(data = data, data_all = data_all)
+add_all_ldh_count(data, data_all)
 }
 \arguments{
 \item{data}{A data frame to be augmented with "All LHDs" data.}

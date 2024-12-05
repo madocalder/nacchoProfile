@@ -9,7 +9,7 @@ proxy_hist_to_single(
   data,
   meta,
   rotate = 0,
-  size = "1.8vmin",
+  size = "1.125em",
   overflow = "none",
   responses = sum(data$Responses),
   theme = naccho.viz::basic,

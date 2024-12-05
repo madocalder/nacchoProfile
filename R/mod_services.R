@@ -21,7 +21,7 @@ mod_services_ui <- function(id){
             class = "row",
             align = "center",
             div(
-              class = "col-sm-6 min-height-250",
+              class = "col-sm-6 min-height-150",
               br(),
               selectInput(
                 inputId = ns("topic"),
@@ -67,7 +67,8 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 65vh; width: 48vw;")
+              style = "margin-left: auto !important;
+                        margin-right: auto !important;")
             ),
 
 
@@ -89,8 +90,8 @@ mod_services_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
               div(
-                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
-                style = "height: 63vh; width: 50vw; margin: auto;")
+                highcharter::highchartOutput(ns("figure_butterfly"), height = "55vh"), #675
+                style = "margin-left: auto !important; margin-right: auto !important;")
             ),
 
             # display when view Table is selected
@@ -103,107 +104,90 @@ mod_services_ui <- function(id){
               HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
-            style = "height: 65vh; width: 50vw;")
+            style = "margin-left: auto !important;
+                        margin-right: auto !important;"
             ),
 
             # br(),
-
+)
         )
         ),
 
      # end of main content -----------------------------------------------------
+# right pane begins--------
+right = div(
+  div(
+    class = "row color-block-header",
+    id = ns("dynamic_row"),
+    # Define the default state with all panels hidden
+    div(
+      class = "col hover-text-side",
+      align = "center",
+      actionLink(
+        ns("get_services"),
+        "",
+        icon = tags$i(class = "fa-light fa-filter", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        class = "link-no-underline action-link-2"
+      ),
+      span(class = "hover-text-content-side", "Add Services")
+    ),
+    div(
+      class = "col hover-text-side",
+      align = "center",
+      actionLink(
+        ns("takeaway"),
+        "",
+        icon = tags$i(class = "fa-light fa-key", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        class = "link-no-underline action-link-2"
+      ),
+      span(class = "hover-text-content-side", "Takeaways")
+    ),
+    div(
+      class = "col hover-text-side",
+      align = "center",
+      actionLink(
+        ns("context"),
+        "",
+        icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        class = "link-no-underline action-link-2"
+      ),
+      span(class = "hover-text-content-side", "Notes")
+    ),
+    div(
+      class = "col hover-text-side",
+      align = "center",
+      actionLink(
+        ns("definitions"),
+        "",
+        icon = tags$i(class = "fa-light fa-list", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        class = "link-no-underline action-link-2"
+      ),
+      span(class = "hover-text-content-side", "Definitions")
+    ),
+    hr(class = "right-hr")
+  ),
 
-        right = div(
-          div(
-            class = "row color-block-header",
-            id = ns("dynamic_row"),
-            div(
-              class = "col hover-text-side",
-              align = "center",
-              actionLink(
-                ns("get_services"),
-                "",
-                icon = tags$i(class = "fa-light fa-filter", style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"
-              ),
-              span(class = "hover-text-content-side", "Add Services")
-            ),
-            div(
-              class = "col hover-text-side",
-              align = "center",
-              actionLink(
-                ns("takeaway"),
-                "",
-                icon = tags$i(class = "fa-light fa-key", style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"
-              ),
-              span(class = "hover-text-content-side", "Takeaways")
-            ),
-            div(
-              class = "col hover-text-side",
-              align = "center",
-              actionLink(
-                ns("context"),
-                "",
-                icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"
-              ),
-              span(class = "hover-text-content-side", "Notes")
-            ),
-            div(
-              class = "col hover-text-side",
-              align = "center",
-              actionLink(
-                ns("definitions"),
-                "",
-                icon = tags$i(class = "fa-light fa-list", style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-2"
-              ),
-              span(class = "hover-text-content-side", "Definitions")
-            ),
-            hr(class = "right-hr")
-          ),
-
-          div(
-            class = "row color-block-content",
-
-            # toggle side content -----------------------------------------------------
-            shinyjs::hidden(
-              div(
-                id = ns("toggle_get_services"),
-                class = "context-content",
-                uiOutput(ns("show_get_services"))
-              )
-            ),
-
-            shinyjs::hidden(
-              div(
-                id = ns("toggle_takeaway"),
-                class = "context-content",
-                uiOutput(ns("show_takeaway"))
-              )
-            ),
-
-            shinyjs::hidden(
-              div(
-                id = ns("toggle_context"),
-                class = "context-content",
-                uiOutput(ns("show_context"))
-              )
-            ),
-
-            shinyjs::hidden(
-              div(
-                id = ns("toggle_definitions"),
-                class = "context-content",
-                uiOutput(ns("show_definitions"))
-              )
-            )
-          ),
-          div(
-            class = "row color-block-footer"
-          )
-        ),
+  # Add placeholders for the toggled content
+  div(
+    class = "row color-block-content",
+    # Right panel setup in the UI
+    # Services panel (filter) visible by default
+    div(
+      id = ns("toggle_get_services"),
+      uiOutput(ns("services_input"))
+    ),
+    shinyjs::hidden(
+      div(id = ns("toggle_takeaway"), class = "context-content", uiOutput(ns("show_takeaway")))
+    ),
+    shinyjs::hidden(
+      div(id = ns("toggle_context"), class = "context-content", uiOutput(ns("show_context")))
+    ),
+    shinyjs::hidden(
+      div(id = ns("toggle_definitions"), class = "context-content", uiOutput(ns("show_definitions")))
+    )
+  ),
+  div(class = "row color-block-footer")
+),
 
         right_button = right_button,
         left_width = 25,
@@ -219,78 +203,97 @@ mod_services_ui <- function(id){
 #' services Server Functions
 #'
 #' @noRd
-mod_services_server <- function(id){
-  moduleServer( id, function(input, output, session){
+mod_services_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-
-    # update inputs based on selections ---------------------------------------
+    # Input Updates ==========================================================
     observe({
+      req(input$topic)
       if (input$topic != "Reduced/Expanded Services") {
-        shinyWidgets::updateRadioGroupButtons(session, "view",
-                                              choiceNames = list(
-                                                HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-table"></i>')
-                                              ),
-                                              choiceValues = c("Bar Graph", "Table"))
-
-
+        shinyWidgets::updateRadioGroupButtons(
+          session, "view",
+          choiceNames = list(
+            HTML('<i class="fas fa-chart-simple"></i>'),
+            HTML('<i class="fas fa-table"></i>')
+          ),
+          choiceValues = c("Bar Graph", "Table")
+        )
       } else {
-        shinyWidgets::updateRadioGroupButtons(session, "view",
-                                              choiceNames = list(
-                                                HTML('<i class="fas fa-chart-scatter"></i>'),
-                                                HTML('<i class="fas fa-chart-bar"></i>'),
-                                                HTML('<i class="fas fa-table"></i>')
-                                              ),
-                                              choiceValues = c("Scatter Plot", "Butterfly Graph", "Table"))
+        shinyWidgets::updateRadioGroupButtons(
+          session, "view",
+          choiceNames = list(
+            HTML('<i class="fas fa-chart-scatter"></i>'),
+            HTML('<i class="fas fa-chart-bar"></i>'),
+            HTML('<i class="fas fa-table"></i>')
+          ),
+          choiceValues = c("Scatter Plot", "Butterfly Graph", "Table")
+        )
       }
     })
+
+    observe({
+      req(input$topic, input$view)
+      if (input$topic == "Reduced/Expanded Services" && input$view == "Butterfly Graph") {
+        updateSelectInput(
+          session, "filter",
+          choices = landscape_filters[1]
+        )
+      }
+    })
+
+    # Dynamically switch between single-select and multi-select
+    observe({
+      req(input$topic)
+
+      if (input$topic == "Reduced/Expanded Services") {
+        # Multi-select using checkboxes
+        output$services_input <- renderUI({
+          checkboxGroupInput(
+            inputId = ns("services"),
+            label = "<b> Select Services: </b>",
+            choices = service_classifications,  # List of services
+            selected = service_classifications[1]
+          )
+        })
+      } else {
+        # Single-select using radio buttons
+        output$services_input <- renderUI({
+          radioButtons(
+            inputId = ns("services"),
+            label = "<b>Select Service:</b>",
+            choices = service_classifications,  # List of services
+            selected = service_classifications[1]  # Default first service
+          )
+        })
+      }
+    })
+
+
+
 
 
     observe({
-      if (input$topic == "Reduced/Expanded Services" && input$view == "Butterfly Graph") {
-        updateSelectInput(session, "filter",
-                          choices = "All LHDs")
-      }
+      updateSelectInput(session, "view", selected = "Table")
+      updateSelectInput(session, "filter", selected = landscape_filters[1])
+      updateSelectInput(session, "services", selected = service_classifications[1])
+      updateSelectInput(session, "topic", selected = service_topics[[1]][1])
     })
 
-    # colors ------------------------------------------------------------------
-    # reactively define the colors based on the filter
-    colors <- reactive ({
+    # Reactive Color Definitions =============================================
+    colors <- reactive({
       if (input$filter == "urbanrural2022") {
-        c(naccho.viz::navy,
-          naccho.viz::teal)
+        c(naccho.viz::navy, naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
-        c(naccho.viz::navy,
-          naccho.viz::teal,
-          naccho.viz::terracotta)
+        c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta)
       } else if (input$filter == "censusregion") {
-        c(naccho.viz::navy,
-          naccho.viz::teal,
-          naccho.viz::terracotta,
-          naccho.viz::pink)
+        c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta, naccho.viz::pink)
       } else {
         naccho.viz::green
       }
     })
 
-
-    #table titles---------------------------------------------------------------
-    output$table_title <- renderUI({
-      # Ensure input$topic exists before using it
-      req(input$topic)
-
-      # Subset based on the reactive input$topic and convert to character
-      title_values <- as.character(subset(meta, field == input$topic)$title)
-
-      # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
-    })
-
-
-    # main content ============================================================
-
-    # inputs for each topic ---------------------------------------------------
+    # Debounced Inputs =======================================================
     updated_inputs <- reactive({
       input$topic
       input$filter
@@ -300,444 +303,56 @@ mod_services_server <- function(id){
     service_change_inputs <- reactive({
       input$topic
       input$filter
-      input$service_changes
+      input$services
     }) %>% debounce(100)
 
 
-    service_change_single_inputs <- reactive({
-      input$topic
-      input$filter
-      input$service_changes_single
-    }) %>% debounce(100)
-
-
-
-    # filter meta data --------------------------------------------------------
-    # used to display the correct title, caption, labels, etc...
+    # Metadata Filtering =====================================================
     filter_meta <- reactive({
-      req(!is.null(input$topic))
-      meta %>% dplyr::filter(field == input$topic)
+      req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
+      meta %>%
+        dplyr::filter(field == input$topic,
+                      stringr::str_detect(view, paste0("'", input$view, "'")),
+                      stringr::str_detect(filter, paste0("'", input$filter, "'")))
+    })
+
+    # Outputs ================================================================
+
+    output$table_title <- renderUI({
+      req(input$topic)
+      title_values <- as.character(filter_meta()$title)
+      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
 
-    # figure output -----------------------------------------------------------
-    # used for bar graph
-    output$figure_bar <- highcharter::renderHighchart({
-
-      data <- services_data %>%
-        dplyr::filter(service_classification == "Immunization") %>%
-        dplyr::filter(filter == "All LHDs") %>%
-        dplyr::filter(service_provision == "LHD (Directly)")
-
-
-      data_n <- data %>%
-        dplyr::group_by(Question) %>%
-        dplyr::summarise(Responses = sum(Responses))
-
-      data <- data %>%
-        dplyr::filter(Answer == "checked") %>%
-        dplyr::mutate(group = filter,
-                      category = service_type) %>%
-        dplyr::group_by(group) %>%
-        dplyr::mutate(x = seq_along(group) - 1) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(x = match(category, unique(category)) - 1)
-
-
-
-      set_simple_bar(data) %>%
-        viz_options(
-          viz_title = "Percent of LHDs that Directly Provide Selected Services",
-          viz_subtitle = "Immunization Services", # unique(data$service_classification)
-          viz_caption = paste0("<b> N: </b>",  show_n(data_n$Responses), "<br>", source_line),
-          tooltip = "",
-          theme = naccho.viz::basic ,
-          legend_enable = FALSE,
-          colors = naccho.viz::green
-        ) %>%
-        viz_export()
-    })
-
-
-    # used for line graph
-    output$figure_line <- highcharter::renderHighchart({
-      # data <- services_data %>%
-      #   dplyr::filter(service_classification %in% c(input$services)) %>%
-      #   dplyr::filter(category %in% c("Performed Directly by LHD", "Contracted Out by LHD"))
-    })
-
-
-
-    # used for scatter plot
-    output$figure_scatter <- highcharter::renderHighchart({
-
-      req(input$service_changes)
-
-      data <- scatter_data(set_filter = "All LHDs",
-                           set_service = "Immunization") # %>%
-        #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
-
-      scatter_plot(data, colors = "#6D833A")
-    })
-
-
-
-    # used for butterfly plot
-    output$figure_butterfly <- highcharter::renderHighchart({
-
-      req(input$service_changes_single)
-
-      data <- scatter_data(set_filter = c(landscape_filters),
-                            set_service = input$service_changes_single)   %>%
-        dplyr::mutate(
-                      left = x,
-                      right = y,
-                      x = (1:length(group)-1)) %>%
-        dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
-
-      data_n <- data %>%
-        dplyr::filter(filter == "All LHDs")
-
-      max_one <- max(data$left)
-      max_two <- max(data$right)
-
-      set_bar(data,
-              y_label = "{value}%",
-              max_one = max_one,
-              max_two = max_two,
-              name_one = "Shrunk Service",
-              name_two = "Grew Service",
-              set_format = "{value}%") %>%
-        viz_options(
-          colors = c(naccho.viz::terracotta, naccho.viz::green),
-          legend_enable = TRUE,
-          legend_title = "% of LHDs that...",
-          viz_title = "The Percent of LHDs that Shrunk or Grew Selected Service",
-          viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
-          viz_subtitle = paste(unique(data$service_type)),
-          tooltip = "<b> {series.name}: </b>
-              {point.y:.0f}% <br>",
-          theme = naccho.viz::butterfly
-        ) %>%
-        viz_export()
-      # %>%
-      #   highcharter::hc_tooltip(
-      #     backgroundColor = "white",
-      #     headerFormat = "<b>{point.x:.0f} LHDs </b> <hr class = 'tt'>",
-      #     style = list(
-      #       textAlign = "left"
-      #     ),
-      #     hideDelay = 2000,
-      #     shadow = FALSE
-      #   # ,
-      #   #   positioner = highcharter::JS("
-      #   #   function (labelWidth, labelHeight, point) {
-      #   #     return {
-      #   #       x: 0,
-      #   #       y: 10
-      #   #     };
-      #   #   }
-      #   # ")
-      #   ) %>%
-      #   highcharter::hc_legend(enabled = TRUE,
-      #                          padding = 0,
-      #                          itemMarginTop = 0,
-      #                          itemMarginBottom = 0)%>%
-      #   highcharter::hc_caption(margin = 20)
-
-      # %>%
-      #   highcharter::hc_yAxis_multiples(
-      #     list(
-      #     max = max_one,
-      #     title = list(text = "",
-      #                  y = 10),
-      #     width = "50%",
-      #     reversed = TRUE,
-      #     offset = 10,
-      #     alignTicks = FALSE,
-      #     tickInterval = interval,
-      #     tickAmount = ticks
-      #     # ,
-      #     # opposite = TRUE
-      #   ),
-      #   list(
-      #     max = max_two,
-      #     left = "50%",
-      #     width = "50%",
-      #     offset = 10,
-      #     alignTicks = FALSE,
-      #     tickInterval = interval,
-      #     tickAmount = ticks
-      #   )
-      #   )
-    })
-
-
-    # proxy -------------------------------------------------------------------
-    # save the figure as a proxy to redraw
-    proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
-    proxy_line <- highcharter::highchartProxy(ns("figure_line"))
-    proxy_scatter <- highcharter::highchartProxy(ns("figure_scatter"))
-    # proxy_butterfly <- highcharter::highchartProxy(ns("figure_butterfly"))
-
-
-
-    # update proxy ------------------------------------------------------------
-    observeEvent(updated_inputs(), {
-
-      # message("input$services =")
-      # print(input$services)
-
-      if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter == "All LHDs") {
-        req(length(input$services) >= 1) # prevents error
-
-        data <- services_data %>%
-          dplyr::filter(service_classification %in% c(input$services)) %>%
-          dplyr::filter(filter == "All LHDs") %>%
-          dplyr::filter(service_provision == input$topic)
-
-
-        data_n <- data %>%
-          dplyr::group_by(Question) %>%
-          dplyr::summarise(Responses = sum(Responses))
-
-        data <- data %>%
-          dplyr::filter(Answer == "checked") %>%
-          dplyr::mutate(group = filter,
-                        category = service_type) %>%
-          dplyr::group_by(group) %>%
-          dplyr::mutate(x = seq_along(group) - 1) %>%
-          dplyr::ungroup()
-
-
-        # nested
-        if (length(data$x) >= 8) {
-          size = "2vmin"
-          overflow = "ellipsis"
-        } else {
-          size = "2vmin"
-          overflow = "none"
-        }
-
-        proxy_bar %>%
-          proxy_to_single(data,
-                          meta = filter_meta(),
-                          size = size,
-                          overflow = overflow,
-                          responses = paste0(show_n(data_n$Responses)))
-
-
-      } else if (input$topic != "Reduced/Expanded Services" & input$view == "Bar Graph" & input$filter != "All LHDs") {
-        req(length(input$services) >= 1) # prevents error
-
-        data <- services_data %>%
-          dplyr::filter(service_classification %in% c(input$services),
-                        filter == input$filter,
-                        service_provision == input$topic,
-                        Answer == "checked") %>%
-          dplyr::mutate(category = service_type) %>%
-          dplyr::group_by(category) %>%
-          dplyr::mutate(x = seq_along(category) - 1) %>%
-          dplyr::ungroup()
-
-        data_all <- services_data %>%
-          dplyr::filter(service_classification %in% c(input$services),
-                        filter == "All LHDs",
-                        category == input$topic)
-
-        data_all_n <- data_all %>%
-          dplyr::group_by(Question) %>%
-          dplyr::summarise(Responses = sum(Responses))
-
-        data_all <- data_all %>%
-          dplyr::filter(Answer == "checked") %>%
-          dplyr::mutate(group = filter,
-                        category = service_type) %>%
-          dplyr::group_by(group) %>%
-          dplyr::mutate(x = seq_along(group) - 1) %>%
-          dplyr::ungroup()
-
-
-        # nested
-        if (length(data$x) >= 8) {
-          size = "1.8vmin"
-          overflow = "ellipsis"
-        } else {
-          size = "2vmin"
-          overflow = "none"
-        }
-
-        series_id <- unique(data$group) # provide ID for proxy
-
-        proxy_bar %>%
-          proxy_to_group(data = data,
-                              data_all = data_all,
-                              meta = filter_meta(),
-                              colors = colors(),
-                              id = series_id,
-                              size = size,
-                              overflow = overflow,
-                              responses = paste0(show_n(data_all_n$Responses)))
-
-
-      } else if (input$topic != "Reduced/Expanded Services" & input$view == "Line Graph") {
-        #ADD
-      }
-    })
-
-
-    observeEvent(service_change_inputs(), {
-      if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter != "All LHDs") {
-        req(input$service_changes)
-        data <- scatter_data(set_filter = input$filter,
-                             set_service = input$service_changes)
-        # %>%
-  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
-
-        data_all <- scatter_data(set_filter = "All LHDs",
-                             set_service = input$service_changes)
-
-
-        # %>%
-  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
-
-        View(data)
-        View(data_all)
-
-
-        series_id <- unique(data$group)
-
-        proxy_scatter %>%
-          proxy_to_scatter_group(data = data,
-                                 data_all = data_all,
-                                 input = input$filter,
-                                 id = series_id,
-                                 colors = colors())
-
-
-      } else if (input$topic == "Reduced/Expanded Services" & input$view == "Scatter Plot" & input$filter == "All LHDs") {
-        req(input$service_changes)
-        data <- scatter_data(set_filter = "All LHDs",
-                                 set_service = input$service_changes) # %>%
-  #         dplyr::mutate(Group = sapply(Group, custom_str_to_title))
-
-        proxy_scatter %>%
-          proxy_to_scatter_single(data)
-        }
-    })
-
-
-
-    # observeEvent(service_change_single_inputs(), {
-    #   if (input$topic == "Reduced/Expanded Services" & input$view == "Butterfly Graph") {
-    #
-    #     req(input$service_changes_single)
-    #
-    #     data <- scatter_data(set_filter = c(landscape_filters),
-    #                          set_service = input$service_changes_single) %>%
-    #       dplyr::mutate(
-    #         # group = sapply(Group, custom_str_to_title),
-    #                     left = x,
-    #                     right = y,
-    #                     x = (1:length(group)-1)) %>%
-    #       dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
-    #
-    #     data_n <- data %>%
-    #       dplyr::filter(group == "All LHDs")
-    #
-    #     max_one <- max(data$left)
-    #     max_two <-max(data$right)
-    #
-    #     proxy_butterfly %>%
-    #       proxy_to_bar(data, max_one, max_two,
-    #                    meta,name_one = "Services shrunk",
-    #                                name_two = "Services grew",
-    #                                y_label = "% of LHDs")
-    #       # highcharter::hcpxy_update(
-    #       #   series = list(
-    #       #     list(id = "Left", data = data$left),  # Update Left series data
-    #       #     list(id = "Right", data = data$right) # Update Right series data
-    #       #   ),
-    #       #   subtitle = list(
-    #       #     text = paste(unique(data$service_type))
-    #       #   ),
-    #       #   caption = list(
-    #       #     text = paste0("<b> N: </b>", data_n$denominator, "<br>", source_line)
-    #       #   )
-    #       # ) %>%
-    #       # highcharter::hcpxy_update(
-    #       #   yAxis = list(
-    #       #     list(
-    #       #       max = max_one
-    #       #       # ,
-    #       #       # tickInterval = interval,
-    #       #       # tickAmount = ticks_one
-    #       #     ),
-    #       #     list(
-    #       #       max = max_two
-    #       #       # ,
-    #       #       # tickInterval = interval,
-    #       #       # tickAmount = ticks_two
-    #       #     )
-    #       #   )
-    #       # )
-    #   }
-    # })
-
-    # for Tables -------
+    # Data Table Output
     output$data_table <- reactable::renderReactable({
-      req(input$view == "Table")
+      req(updated_inputs())
+      req(input$view == "Table", input$topic, input$filter) # Ensure the table is only rendered for the "Table" view
 
-      #add topic value for function
-      topic = input$topic
+      # Define topic and filtering based on input
+      topic <- input$topic
+      filtering <- input$filter
 
-      filtering = input$filter
+      # Determine classifications based on service changes or services inputs
+      classifications <- input$services
 
-      classifications <- if (!is.null(input$service_changes) && length(input$service_changes) > 0) {
-        input$service_changes
+      # Debug messages (optional for troubleshooting)
+      # message("input$topic =", input$topic)
+      # message("topic variable =", topic)
+      # message("input$filter =", input$filter)
+      # message("filtering variable =", filtering)
+      # message("classifications variable =", classifications)
 
-      } else if (!is.null(input$services) && length(input$services) > 0) {
-
-          input$services
-
-      } else {
-        NULL  # If input$classifications does not exist, set it to NULL
-      }
-
-      # #debug
-      # message("input$topic =")
-      # print(input$topic)
-      # message("topic variable =")
-      # print(topic)
-      #
-      # #debug
-      # message("input$filter =")
-      # print(input$filter)
-      # message("filtering variable =")
-      # print(filtering)
-      #
-      # #debug
-      # message("input$services =")
-      # print(input$services)
-      # message("input$service_changes =")
-      # print(input$service_changes)
-      #
-      # message("classifications variable =")
-      # print(classifications)
-
-
-
-      data <- process_data(topic, filtering, classifications)
-
-      data <- data %>%
-        dplyr::mutate(
-          dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
-        )
-
+      # Process the data for the table based on the topic, filter, and classifications
+      data <- process_table_data(topic, filtering, classifications)
+      # %>%
+      #   dplyr::mutate(
+      #     dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+      #   )
 
       # Define colors reactively based on the filter
       colors <- colors()
-
 
       # Determine the category based on the input filter
       category <- case_when(
@@ -748,88 +363,230 @@ mod_services_server <- function(id){
         input$filter == "All LHDs" ~ "All LHDs"
       )
 
-      # print(data)
-
-      # Call the table creation function with the appropriate data and parameters
+      # Generate the table using a custom table creation function
       create_non_time_table(data, category, colors, topic)
-    }) #end of tables output code
-
-
-
-    # right content ===========================================================
-
-    observeEvent(input$topic, {
-        shinyjs::addClass(selector = "#services_1-dynamic_row", class = "show-icon")
-        session$sendCustomMessage(type = "triggerClickService", message = "services_1-get_services")
     })
 
-    # show services by category  ---------------------------------------
+    output$figure_bar <- highcharter::renderHighchart({
+      req(updated_inputs())
+      req(input$topic, input$filter, input$services)
+
+      topic <- input$topic
+      services <- input$services
+      filtering <- input$filter
+
+      data <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic,
+          Answer == "checked"
+        ) %>%
+        dplyr::mutate(category = service_type) %>%
+        dplyr::group_by(Group) %>%
+        dplyr::mutate(x = seq_along(category) - 1) %>%
+        dplyr::ungroup()
+
+      data_n <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic
+        ) %>%
+        dplyr::group_by(service_type) %>%
+        dplyr::summarize(Responses = sum(Responses, na.rm = TRUE)) %>%
+        dplyr::ungroup()
+
+      set_column(data,
+                 y_label = filter_meta()$y_label,
+                 y_format = filter_meta()$y_format,
+                 data_label = filter_meta()$data_label) %>%
+        viz_options(
+          viz_title = "",
+          viz_subtitle = "",
+          viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
+          caption_align = "center",
+          colors = colors(),
+          theme = naccho.viz::basic,
+          tooltip = filter_meta()$tooltip
+        )
+    })
+
+    output$figure_scatter <- highcharter::renderHighchart({
+      req(updated_inputs())
+      req(input$services)
+
+      data <- scatter_data(set_filter = input$filter, set_service = input$services)
+      scatter_plot(data, colors = colors())
+    })
+
+    output$figure_butterfly <- highcharter::renderHighchart({
+      req(updated_inputs())
+      req(input$services)
+
+      data <- scatter_data(set_filter = c(landscape_filters),
+                           set_service = input$services) %>%
+        dplyr::mutate(
+          left = x,
+          right = y,
+          x = seq_along(unique(group)) - 1
+        ) %>%
+        dplyr::mutate(group = ifelse(group == 13, "All LHDs", group))
+
+      data_n <- data %>%
+        dplyr::filter(filter == "All LHDs")
+
+      max_one <- max(data$left)
+      max_two <- max(data$right)
+
+      set_bar(data,
+              y_label = "",
+              max_one = max_one,
+              max_two = max_two,
+              name_one = "Shrunk Service",
+              name_two = "Grew Service",
+              y_format = "{value}%") %>%
+        viz_options(
+          colors = c(naccho.viz::terracotta, naccho.viz::green),
+          legend_enable = TRUE,
+          legend_title = "% of LHDs that...",
+          viz_title = "Percent of LHDs that Shrunk or Grew Selected Service",
+          viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
+          viz_subtitle = paste(unique(data$service_type)),
+          tooltip = "<b> {series.name}: </b>{point.y:.0f}% <br>",
+          theme = naccho.viz::butterfly
+        )
+    })
+
+    # Event Handling =========================================================
+
+    # Show Filter Services
     observeEvent(input$get_services, {
-      shinyjs::show("toggle_get_services")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::hide("toggle_definitions")
+      shinyjs::show("toggle_get_services")  # Show the Filter Services UI
+      shinyjs::hide("toggle_takeaway")      # Hide Takeaways
+      shinyjs::hide("toggle_context")       # Hide Notes
+      shinyjs::hide("toggle_definitions")   # Hide Definitions
 
-      output$show_get_services <- renderUI({
-        if (input$topic == "Reduced/Expanded Services") {
-          # Render a checkboxGroupInput for multiple selection
-          checkboxGroupInput(
-            ns("service_changes"),
-            strong("Select One or More Topics"),
-            choices = change_classifications,
-            selected = change_classifications
-          )
-        } else {
-          # Render a radio button for single selection
-          radioButtons(
-            ns("services"),
-            strong("Select Service Topic"),
-            choices = service_classifications,
-            selected = "Immunization"
-          )
-        }
-      })
     })
 
 
-    # takeaway ----------------------------------------------------------------
-
+    #takeaway ----
     observeEvent(input$takeaway, {
       shinyjs::hide("toggle_get_services")
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
+
       output$show_takeaway <- renderUI({
-        p(htmltools::HTML("<b>Key Takeaway(s)</b>: <br><br>", notes$takeaway))
+        req(input$topic, input$filter)  # Ensure inputs are not NULL
+        req(notes)  # Ensure `notes` is not NULL
+
+        # Filter notes for key takeaways
+        filtered_notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        filter == input$filter)
+
+        if (nrow(filtered_notes) == 0) {
+          p("No key takeaways available for the selected filters.")
+        } else {
+          # Check if takeaway is available
+          if (is.na(filtered_notes$takeaway)) {
+            p("No specific takeaways for this selection.")
+          } else {
+            p(htmltools::HTML(
+              "<b>Key Takeaway(s)</b>: <br><br>",
+              filtered_notes$takeaway
+            ))
+          }
+        }
       })
     })
+
+    #context ----
 
     observeEvent(input$context, {
       shinyjs::hide("toggle_get_services")
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
       shinyjs::hide("toggle_definitions")
+
       output$show_context <- renderUI({
-        p(htmltools::HTML("<b>Survey Question(s)</b>: <br>", notes$survey_question))
+        req(input$topic, input$filter)  # Ensure inputs are not NULL
+        req(notes)  # Ensure `notes` is not NULL
+
+        filtered_notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        filter == input$filter)
+
+        if (nrow(filtered_notes) == 0) {
+          p("No relevant notes available.")
+        } else {
+          if (is.na(filtered_notes$notes)) {
+            p(htmltools::HTML(
+              "<b>Survey Question(s)</b>: <br>",
+              filtered_notes$survey_question,
+              "<br> <br> <b> Survey Response Options: </b>",
+              filtered_notes$survey_response
+            ))
+          } else {
+            p(htmltools::HTML(
+              "<b>Survey Question(s)</b>: <br>",
+              filtered_notes$survey_question,
+              "<br> <br> <b> Survey Response Options: </b>",
+              filtered_notes$survey_response,
+              "<br> <br> <b> Notes: </b>",
+              filtered_notes$notes
+            ))
+          }
+        }
       })
     })
+
+
+    #definitions------
 
     observeEvent(input$definitions, {
       shinyjs::hide("toggle_get_services")
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")
+
       output$show_definitions <- renderUI({
-        p(htmltools::HTML("<b>Definitions</b>: <br>", definitions$definition))
+
+        definitions <- definitions %>%
+          dplyr::filter(field %in% c(input$topic, input$filter))
+
+        links <- lapply(seq_along(definitions$item), function(i) {
+          div(
+            tags$a(
+              class = "def-link",
+              `data-bs-toggle` = "collapse",
+              href = paste0("#collapseExample", i),
+              tags$i(class = "fa fa-plus"),
+              paste(definitions$item[[i]])
+            ),
+            div(
+              class= "collapse",
+              id= paste0("collapseExample", i),
+              HTML(definitions$definition[[i]], "<br> <br>")
+            )
+          )
+        })
+        div(
+          p(htmltools::HTML("<b>Definitions</b>: <br>")),
+
+          # side right --------------------------------------------------------------
+
+
+          if (length(links) == 0) {
+            paste("No relevant definitions.")
+          } else {
+            links
+          }
+        )
       })
     })
 
 
   })
 }
-
-## To be copied in the UI
-# mod_services_ui("services_1")
-
-## To be copied in the server
-# mod_services_server("services_1")

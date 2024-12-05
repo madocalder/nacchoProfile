@@ -35,16 +35,20 @@ card_thumbnail <- function(
 #' show_n(n)
 #'
 show_n <- function(variable) {
-  min <- min(variable)
-  max <- max(variable)
+  if (all(is.na(variable))) {
+    return("All values are NA")
+  }
 
-  if (min != max) {
-    paste(min, "to", max)
+  # Remove NA values before computing min and max
+  min_val <- min(variable, na.rm = TRUE)
+  max_val <- max(variable, na.rm = TRUE)
+
+  if (min_val != max_val) {
+    paste(min_val, "to", max_val)
   } else {
-    min
+    min_val
   }
 }
-
 
 
 

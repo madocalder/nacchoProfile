@@ -80,7 +80,8 @@ mod_topic_areas_ui <- function(id){
                 HTML('<div style="font-size: 2vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
-                style = "max-height: 60vh; width: 50vw;")
+                style = "margin-left: auto !important;
+                        margin-right: auto !important;")
             ),
             br(),
           )
@@ -237,8 +238,11 @@ mod_topic_areas_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      req(input$topic)
-      meta %>% dplyr::filter(field == input$topic)
+      req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
+      meta %>%
+        dplyr::filter(field == input$topic,
+                      stringr::str_detect(view, input$view),
+                      stringr::str_detect(filter, input$filter))
     })
 
     #table titles---------------------------------------------------------------
@@ -467,7 +471,7 @@ mod_topic_areas_server <- function(id){
 
 
 
-      data <- process_data(topic, filtering, classifications)
+      data <- process_table_data(topic, filtering, classifications)
 
       data <- data %>%
         dplyr::mutate(

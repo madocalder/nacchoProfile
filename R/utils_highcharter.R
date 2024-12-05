@@ -103,7 +103,7 @@ viz_options <- function(hc,
       style = list(
         fontWeight = 400,
         textAlign = tooltip_align,
-        fontSize = "1.8vmin",
+        fontSize = "1.125em",
         color = "black"
       ),
       backgroundColor = "#EEEAE5",
@@ -144,7 +144,9 @@ viz_options <- function(hc,
 #'
 #' @return column graph
 set_column <- function(data,
-                       y_label = "{value}%") {
+                       y_label = "% of LHDs",
+                       y_format = "{value}",
+                       data_label = '{point.y:.0f}%') {
 
   highcharter::hchart(
     data,
@@ -159,19 +161,20 @@ set_column <- function(data,
     dataLabels = list(
       enabled = TRUE,
       overflow = "allow",
-      formatter = JS(
-        "
-        function () {
-          let roundedValue;
-          if (this.y > 0 && this.y < 1) {
-            roundedValue = this.y.toFixed(1);
-          } else {
-            roundedValue = this.y.toFixed(0);
-          }
-          return roundedValue + '%';
-        }
-        "
-      ),
+      format = data_label,
+      # formatter = JS(
+      #   "
+      #   function () {
+      #     let roundedValue;
+      #     if (this.y > 0 && this.y < 1) {
+      #       roundedValue = this.y.toFixed(1);
+      #     } else {
+      #       roundedValue = this.y.toFixed(0);
+      #     }
+      #     return roundedValue + '%';
+      #   }
+      #   "
+      # ),
       overflow = TRUE,
       distance = 5,
       padding = 2,
@@ -179,7 +182,7 @@ set_column <- function(data,
         color = naccho.viz::grey,
         fontFamily = "Heebo",
         fontWeight = "500",
-        fontSize = "1.8vmin"
+        fontSize = "1.125em"
       )
     )
   ) %>%
@@ -193,7 +196,7 @@ set_column <- function(data,
       ), # y-axis label
       min = 0,
       labels = list(
-        format = "{value}"
+        format = y_format
       )
     )
 }
@@ -212,7 +215,7 @@ set_column <- function(data,
 #'
 #'
 #' @return column graph
-set_simple_bar <- function(data, y_label = "{value}%") {
+set_simple_bar <- function(data, y_label = "", y_format = "{value}") {
   if (!"category" %in% colnames(data)) {
     stop("Category column is missing in the data passed to set_simple_bar")
   }
@@ -232,18 +235,19 @@ set_simple_bar <- function(data, y_label = "{value}%") {
     ),
     dataLabels = list(
       enabled = TRUE,
-      overflow = "allow",
-      formatter = JS("
-        function () {
-          let roundedValue;
-          if (this.y > 0 && this.y < 1) {
-            roundedValue = this.y.toFixed(1);
-          } else {
-            roundedValue = this.y.toFixed(0);
-          }
-          return roundedValue + '%';
-        }
-      ")
+      overflow = "allow"
+      # ,
+      # formatter = JS("
+      #   function () {
+      #     let roundedValue;
+      #     if (this.y > 0 && this.y < 1) {
+      #       roundedValue = this.y.toFixed(1);
+      #     } else {
+      #       roundedValue = this.y.toFixed(0);
+      #     }
+      #     return roundedValue + '%';
+      #   }
+      # ")
     )
   ) %>%
     highcharter::hc_xAxis(
@@ -256,7 +260,7 @@ set_simple_bar <- function(data, y_label = "{value}%") {
       ),
       min = 0,
       labels = list(
-        format = "{value}%"
+        format = y_format
       )
     )
 }
@@ -281,7 +285,7 @@ set_bar <- function(data,
                     name_two = "Added",
                     max_one = 1300,
                     max_two = 5000,
-                    set_format = NA,
+                    y_format = NA,
                     group_by = NULL) {
 
   # Preprocess data to include grouping
@@ -352,12 +356,12 @@ set_bar <- function(data,
       layout = "vertical",
       align = "left",
       verticalAlign = "bottom",
-      itemStyle = list(fontSize = "1.5vmin")
+      itemStyle = list(fontSize = "0.9375em")
       # ,
       # # y = -20,
       # title = list(
       #   text = legend_title,      # Your legend title here
-      #   style = list(fontSize = "1.8vmin", fontWeight = "bold")  # Customize title style
+      #   style = list(fontSize = "1.125em", fontWeight = "bold")  # Customize title style
       # )
     ) %>%
     highcharter::hc_tooltip(
@@ -369,7 +373,7 @@ set_bar <- function(data,
       labels = list(
         enabled = TRUE,
         allowOverlap = FALSE,
-        style = list(fontSize = "1.8vmin"),
+        style = list(fontSize = "1.125em"),
         y = 5,
         autoRotation = c(0, -45),
         step = 1
@@ -391,11 +395,11 @@ set_bar <- function(data,
         #   align = "middle",
         #   verticalAlign = "top",
         #   autoRotation = c(0, -45),
-        #   style = list(fontSize = "1.8vmin")
+        #   style = list(fontSize = "1.125em")
         # ),
         labels = list(
-          format = set_format,
-          style = list(fontSize = "1.5vmin")
+          format = y_format,
+          style = list(fontSize = "0.9375em")
         ),
         width = paste((100 * axis_one), "%"),
         reversed = TRUE,
@@ -412,14 +416,14 @@ set_bar <- function(data,
         #   align = "low",
         #   verticalAlign = "bottom",
         #   autoRotation = c(0, -45),
-        #   style = list(fontSize = "1.8vmin")
+        #   style = list(fontSize = "1.125em")
         #   # ,
         #   # y = -5,
         #   # x = -150
         # ),
         labels = list(
-          format = set_format,
-          style = list(fontSize = "1.5vmin")
+          format = y_format,
+          style = list(fontSize = "0.9375em")
         ),
         left = paste((100 * axis_one), "%"),
         width = paste((100 * axis_two), "%"),
@@ -427,7 +431,7 @@ set_bar <- function(data,
         alignTicks = FALSE,
         tickInterval = interval,
         tickAmount = ticks_two + 1,
-        opposite = FALSE  # Move this y-axis to the top
+        opposite = FALSE
       )
     ) %>%
     highcharter::hc_add_series(
@@ -439,7 +443,7 @@ set_bar <- function(data,
         enabled = TRUE,
         overflow = "allow",
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
-        style = list(fontSize = "1.5vmin")
+        style = list(fontSize = "0.9375em")
       )
       # ,
       # showInLegend = FALSE
@@ -453,7 +457,7 @@ set_bar <- function(data,
         enabled = TRUE,
         overflow = "allow",
         formatter = JS("function() { return Highcharts.numberFormat(this.y, 0); }"),
-        style = list(fontSize = "1.5vmin")
+        style = list(fontSize = "0.9375em")
       )
       # ,
       # showInLegend = FALSE
@@ -655,7 +659,13 @@ scatter_plot <- function(data, colors) {
       id = "All",
       data = data,
       type = "scatter",
-      mapping = highcharter::hcaes(x = x, y = y, group = filter, name = service_type)
+      mapping = highcharter::hcaes(x = x,
+                                   y = y,
+                                   group = group
+                                   # ,
+                                   # name = service_type,
+                                   # data_label = ""
+                                   )
 
     ) %>%
     highcharter::hc_chart(
@@ -689,12 +699,12 @@ scatter_plot <- function(data, colors) {
     ) %>%
     highcharter::hc_tooltip(
       useHTML = TRUE,
-      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
-      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      # headerFormat = '<span style="font-size: 1.125em; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
       style = list(
         fontFamily = "Heebo",
-        fontSize = "1.7vmin",
-        # lineHeight = "1.5vmin",
+        fontSize = "1.0625em",
+        # lineHeight = "0.9375em",
         padding = 5,
         textOutline = "none"
       )
@@ -710,7 +720,7 @@ scatter_plot <- function(data, colors) {
           enabled = TRUE,
           allowOverlap = FALSE,
           overflow = "allow",
-          # format = "{point.name}",
+          # format = data_label,
           formatter = highcharter::JS("
           function() {
             return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
@@ -719,7 +729,7 @@ scatter_plot <- function(data, colors) {
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
-            fontSize = "1.4vmin",
+            fontSize = "0.875em",
             fontWeight = "bold"
           )
         ),
@@ -739,7 +749,7 @@ scatter_plot <- function(data, colors) {
     #   enableMouseTracking = TRUE,
     #   marker = list(enabled = FALSE),
     #   tooltip = list(
-    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent reduced: 20%</span>"
+    #     pointFormat = "<span style='font-size: 0.9375em;'>Average percent reduced: 20%</span>"
     #   )
     # ) %>%
     # # Add interactive vertical line
@@ -752,14 +762,14 @@ scatter_plot <- function(data, colors) {
     #   enableMouseTracking = TRUE,
     #   marker = list(enabled = FALSE),
     #   tooltip = list(
-    #     pointFormat = "<span style='font-size: 1.5vmin;'>Average percent expanded: 27%</span>"
+    #     pointFormat = "<span style='font-size: 0.9375em;'>Average percent expanded: 27%</span>"
     #   )
     # ) %>%
     highcharter::hc_xAxis(
       min = 0,
       max = 35,
       title = list(
-        text = "Percent of LHDs reducing service",
+        text = "% of LHDs reducing service",
         align = "high"
       ),
       plotLines = list(
@@ -769,7 +779,7 @@ scatter_plot <- function(data, colors) {
           width = 2,
           dashStyle = "ShortDash",
           label = list(
-            text = "Average percent reduced (20%)",
+            text = "Average % reduced (20%)",
             style = list(
               fontFamily = "Heebo",
               fontSize = "1em"
@@ -793,7 +803,7 @@ scatter_plot <- function(data, colors) {
       min = 0,
       max = 100,
       title = list(
-        text = "Percent of LHDs expanding service"
+        text = "% of LHDs expanding service"
       ),
       plotLines = list(
         list(
@@ -802,7 +812,7 @@ scatter_plot <- function(data, colors) {
           width = 2,
           dashStyle = "ShortDash",
           label = list(
-            text = "Average percent expanded (27%)",
+            text = "Average % expanded (27%)",
             style = list(
               fontFamily = "Heebo",
               fontSize = "1em"
@@ -852,7 +862,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
+    #           fontSize = "1.4375em",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -869,7 +879,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
+    #           fontSize = "1.4375em",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -886,7 +896,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
+    #           fontSize = "1.4375em",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -903,7 +913,7 @@ scatter_plot <- function(data, colors) {
     #         style = list(
     #           color = "black",
     #           fontWeight = "bold",
-    #           fontSize = "2.3vmin",
+    #           fontSize = "1.4375em",
     #           fontFamily = "Heebo"
     #         ),
     #         backgroundColor = "transparent",
@@ -922,15 +932,15 @@ scatter_plot <- function(data, colors) {
     Hold the Shift key and drag to pan horizontally when zoomed in."
     ) %>%
     highcharter::hc_caption(
-      fontSize = "1.6vmin",
-      text = HTML("<b style='font-size: 1.6vmin; line-height: 1vmin;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1.6vmin; line-height: 1.4vmin; color: black;'>",
+      fontSize = "1em",
+      text = HTML("<b style='font-size: 1em; line-height: 0.625em;'> About the Quadrants:</b> <span style='font-family: Heebo; font-size: 1em; line-height: 0.875em; color: black;'>",
                   "In the top left quadrant, services are <span style='color: #008A96; font-weight: bold;'>growing</span>. ",
                   "In the top right quadrant, services show a <span style='color: #666; font-weight: bold;'>mixed trend</span>. ",
                   "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
                   "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
-                  "</span> <br> <b style='font-size: 1.6vmin; line-height: 1vmin;'> N: </b>",
-                  "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", show_n(data$Responses), "</span><br>",
-                  "<span style='font-size: 1.6vmin; line-height: 1vmin;'>", source_line, "</span>"),
+                  "</span> <br> <b style='font-size: 1em; line-height: 0.625em;'> N: </b>",
+                  "<span style='font-size: 1em; line-height: 0.625em;'>", show_n(data$Responses), "</span><br>",
+                  "<span style='font-size: 1em; line-height: 0.625em;'>", source_line, "</span>"),
 
       useHTML = TRUE,
       margin = 20,
@@ -943,7 +953,7 @@ scatter_plot <- function(data, colors) {
                            layout = "vertical",
                            padding = 2,
                            itemStyle = list(
-                             fontSize = "1.8vmin"        # Adjust font size for responsiveness            # Set font weight
+                             fontSize = "1.125em"        # Adjust font size for responsiveness            # Set font weight
                            ),
                            symbolRadius = 6,
                            itemMarginTop = 0,
@@ -1194,6 +1204,10 @@ proxy_to_single <- function(
     add_n = paste(sum(data$Responses)),
     ...) {
 
+  if (nrow(data) == 0) {
+    stop("No data available for proxy_to_single.")
+  }
+
   hc %>%
     highcharter::hcpxy_remove_series(
       id = c("Urban", "Rural")
@@ -1279,6 +1293,8 @@ proxy_to_group <- function(
     highcharter::hcpxy_remove_series(
       id = c("Midwest", "South", "West", "Northeast")
     ) %>%
+    highcharter::hcpxy_remove_series(id = "all_lhds_series") %>%
+    highcharter::hcpxy_remove_series(id = "filtered_series") %>%
     highcharter::hcpxy_add_series(
       data = data,
       "column",
@@ -1297,7 +1313,7 @@ proxy_to_group <- function(
         title = list(
           text = meta$y_label,
           style = list(
-            fontSize = "1.8vmin"
+            fontSize = "1.125em"
           )
         ),
         max = meta$y_max,
@@ -1469,7 +1485,7 @@ proxy_to_hist_total <- function(hc,
         #   step = 1,
         #   format = "{value:,.0f}",
         #   style = list(
-        #     fontSize = "1.8vmin",
+        #     fontSize = "1.125em",
         #     textOverflow = "none"
         #   )
         # )
@@ -1583,7 +1599,7 @@ proxy_to_hist_pc <- function(hc,
         #   step = 20,
         #   format = "{value:,.0f}",
         #   style = list(
-        #     fontSize = "1.8vmin",
+        #     fontSize = "1.125em",
         #     textOverflow = "none"
         #   )
         # )
@@ -1613,7 +1629,7 @@ proxy_hist_to_single <- function(hc,
                                  data,
                                  meta,
                                  rotate = 0,
-                                 size = "1.8vmin",
+                                 size = "1.125em",
                                  overflow = "none",
                                  responses = sum(data$Responses),
                                  theme = naccho.viz::basic,
@@ -1660,7 +1676,7 @@ proxy_hist_to_single <- function(hc,
             color = naccho.viz::grey,
             fontFamily = "Heebo",
             fontWeight = "500",
-            fontSize = "1.8vmin"
+            fontSize = "1.125em"
           )
         )
       ),
@@ -1732,7 +1748,7 @@ proxy_hist_to_group <- function(hc,
                                 id,
                                 colors,
                                 rotate = 0,
-                                size = "2.5vmin",
+                                size = "1.5625em",
                                 overflow = "none",
                                 responses = sum(data$Responses),
                                 theme = naccho.viz::histogram, ...) {
@@ -1776,7 +1792,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "1.8vmin"
+              fontSize = "1.125em"
             )
           )
         ),
@@ -1855,7 +1871,7 @@ proxy_hist_to_group <- function(hc,
               color = naccho.viz::grey,
               fontFamily = "Heebo",
               fontWeight = "500",
-              fontSize = "1.8vmin"
+              fontSize = "1.125em"
             )
           )
         ),
@@ -2106,7 +2122,7 @@ proxy_to_group_box <- function(hc, data, meta, ...) {
       ),
       tooltip = list(
         pointFormat = "<b>Mean:</b> ${point.y:.0f}",
-        fontSize = "1.5vmin"
+        fontSize = "0.9375em"
       ),
       redraw = TRUE
     ) %>%
@@ -2239,12 +2255,12 @@ proxy_to_scatter_group <- function(hc, data, data_all, id = NULL, input, colors 
       ),
       tooltip = list(
         useHTML = TRUE,
-      # headerFormat = '<span style="font-size: 1.8vmin; font-weight: bold">{series.name}</span><br>',
-      pointFormat = '<span style="font-size: 1.6vmin; line-height: 1vmin">{point.y}% of {point.Group} LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      # headerFormat = '<span style="font-size: 1.125em; font-weight: bold">{series.name}</span><br>',
+      pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of {point.Group} LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
       style = list(
         fontFamily = "Heebo",
-        fontSize = "1.7vmin",
-        # lineHeight = "1.5vmin",
+        fontSize = "1.0625em",
+        # lineHeight = "0.9375em",
         padding = 5,
         textOutline = "none"
       )

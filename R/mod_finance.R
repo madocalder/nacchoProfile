@@ -98,7 +98,8 @@ mod_finance_ui <- function(id){
                 br(),
                 HTML('<div style="font-size: 2vmin;">', source_line, '
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
-                style = "height: 65vh; width: 50vw;"
+                style = "margin-left: auto !important;
+                        margin-right: auto !important;"
               )
             )
             )
@@ -213,18 +214,17 @@ mod_finance_server <- function(id){
     }) %>% debounce(100)
 
 
-    #table titles--------------
+    #table title output
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
       req(input$topic)
 
       # Subset based on the reactive input$topic and convert to character
-      title_values <- as.character(subset(meta, field == input$topic)$title)
+      title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
       p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
-
 
 
 
@@ -262,7 +262,7 @@ mod_finance_server <- function(id){
     observe({
       if (input$topic == "budget_changes") {
         updateSelectInput(session, "filter",
-                          choices = "All LHDs")
+                          choices = landscape_filters[1])
 
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
@@ -277,7 +277,7 @@ mod_finance_server <- function(id){
                  input$view == "Line Graph") {
 
         updateSelectInput(session, "filter",
-                          choices = "All LHDs")
+                          choices = landscape_filters[1])
 
      } else {
         updateSelectInput(session, "filter",
@@ -314,9 +314,15 @@ mod_finance_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
-      req(!is.null(input$topic))
-      meta %>% dplyr::filter(field == input$topic)
+      req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
+      meta %>%
+        dplyr::filter(field == input$topic,
+                      stringr::str_detect(view, input$view),
+                      stringr::str_detect(filter, input$filter))
     })
+
+
+
 
 
     # figure output -----------------------------------------------------------
@@ -351,7 +357,7 @@ mod_finance_server <- function(id){
 
       set_column(data) %>%
         viz_options(
-          viz_title = "Percent of LHDs by Grouped Total Expenditures",
+          viz_title = "% of LHDs by Grouped Total Expenditures",
           viz_caption = source_line,
           viz_subtitle = "Estimated Across All LHDs",
           tooltip = "<span style=\"color:{point.color}\">\u25CF</span>
@@ -387,7 +393,7 @@ mod_finance_server <- function(id){
               max_two = max_two,
               name_one = "Cut",
               name_two = "Same or Higher",
-              set_format = "{value}%") %>%
+              y_format = "{value}%") %>%
         viz_options(
           colors = c(naccho.viz::terracotta, naccho.viz::green),
           legend_enable = TRUE,
@@ -692,20 +698,20 @@ mod_finance_server <- function(id){
       }
 
       #debug
-      message("input$topic =")
+      message("input$topic = ")
       print(input$topic)
-      message("topic variable =")
+      message("topic variable = ")
       print(topic)
 
       #debug
-      message("input$filter =")
+      message("input$filter = ")
       print(input$filter)
-      message("filtering variable =")
+      message("filtering variable = ")
       print(filtering)
 
 
 
-      data <- process_data(topic, filtering, classifications)
+      data <- process_table_data(topic, filtering, classifications)
 
 
       data <- data %>%

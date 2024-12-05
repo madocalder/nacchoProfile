@@ -66,11 +66,13 @@ mod_workforce_ui <- function(id) {
             class = "viz-content",
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Bar Graph'"),
-              highcharter::highchartOutput(ns("figure"), height = "100%")
+              highcharter::highchartOutput(ns("figure"), height = "100%"),
+                                           style = "height: 58vh; width: auto;"
             ),
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Line Graph'"),
-              highcharter::highchartOutput(ns("line"), height = "auto")
+              highcharter::highchartOutput(ns("line"), height = "auto"),
+                                           style = "height: 62vh; width: auto;"
             ),
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Table'"),
@@ -78,7 +80,9 @@ mod_workforce_ui <- function(id) {
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 1.8vmin;">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+                HTML('<div style="font-size: 1.8vmin;">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+                     style = "margin-left: auto !important;
+                        margin-right: auto !important;"
               )
             )
           )
@@ -202,21 +206,45 @@ mod_workforce_server <- function(id) {
       }
     })
 
+    observe({
+      if (input$topic %in% c("c5q37", "c5q36", "fte_bypop")) {
+        updateSelectInput(session, "filter",
+                          choices = c(landscape_filters[1], landscape_filters[4]))
+
+
+      } else if (input$topic %in% c("fte_numcat", "employee_numcat")) {
+
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[1])
+
+      } else {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters)
+      }
+    })
+
     # Reactive to filter metadata based on the selected topic
     filter_meta <- reactive({
-      req(input$topic)
-      meta %>% dplyr::filter(field == input$topic)
+      req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
+      meta %>%
+        dplyr::filter(field == input$topic,
+                      stringr::str_detect(view, input$view),
+                      stringr::str_detect(filter, input$filter))
     })
+
+
 
     # Reactive for colors based on the filter
     colors <- reactive({
-      req(input$filter)
-      switch(input$filter,
-             "urbanrural2022" = c(naccho.viz::navy, naccho.viz::teal),
-             "c0govcat" = c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta),
-             "censusregion" = c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta, naccho.viz::pink),
-             "All LHDs" = c(naccho.viz::navy, naccho.viz::terracotta),
-             naccho.viz::basic_palette)
+      if (input$filter == "urbanrural2022") {
+        c(naccho.viz::navy, naccho.viz::teal)
+      } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
+        c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta)
+      } else if (input$filter == "censusregion") {
+        c(naccho.viz::navy, naccho.viz::teal, naccho.viz::terracotta, naccho.viz::pink)
+      } else {
+        c(naccho.viz::navy)
+      }
     })
 
     # Generalized data processing for charts
@@ -244,18 +272,33 @@ mod_workforce_server <- function(id) {
     })
 
     # Generalized data processing for tables
-    process_table_data <- reactive({
+   table_data <- reactive({
       req(input$topic, input$filter)
+
+      topic <- input$topic
+      filtering <- input$filter
+      classifications <- NULL
+
       classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
         input$classifications
       } else {
         NULL
       }
 
-      data <- process_data(input$topic, input$filter, classifications)
-      data %>% dplyr::mutate(
-        dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
-      )
+      table_data <- process_table_data(topic, filtering, classifications)
+
+
+      # table_data %>% dplyr::mutate(
+      #   dplyr::across(dplyr::starts_with("Responses_"), ~ ifelse(is.na(.), 0, .))
+      # )
+
+      message("topic = ", topic)
+      message("filtering = ", filtering)
+      View(table_data)
+
+      return(table_data)
+
+
     })
 
     # Generalized data processing for line charts
@@ -270,16 +313,18 @@ mod_workforce_server <- function(id) {
 
       process_line_data(input$topic, input$filter, classifications)
 
+      process_line_data("c5q37", "c0popcat3")
     })
 
     #table title output
     output$table_title <- renderUI({
-      req(input$topic)  # Ensure `input$topic` exists before proceeding
+      # Ensure input$topic exists before using it
+      req(input$topic)
 
-      # Extract the title associated with the selected topic
-      title_values <- as.character(subset(meta, field == input$topic)$title)
+      # Subset based on the reactive input$topic and convert to character
+      title_values <- as.character(filter_meta()$title)
 
-      # Render the title as HTML
+      # Render the HTML
       p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
     })
 
@@ -298,7 +343,7 @@ mod_workforce_server <- function(id) {
           max_two = max_two,
           name_one = "Added",
           name_two = "Lost",
-          set_format = "{value}"
+          y_format = "{value}"
         ) %>%
           viz_options(
             colors = c(naccho.viz::terracotta, naccho.viz::green),
@@ -343,7 +388,7 @@ mod_workforce_server <- function(id) {
     # Table Rendering
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
-      data <- process_table_data()
+      data <- table_data()
       create_non_time_table(data, input$filter, colors(), input$topic)
     })
 

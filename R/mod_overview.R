@@ -186,7 +186,7 @@ mod_overview_server <- function(id){
 
       set_column(data) %>%
         viz_options(
-          viz_title = "Percent of U.S. Population Served by LHDs",
+          viz_title = "% of U.S. Population Served by LHDs",
           viz_caption = "",
           viz_subtitle = "",
           tooltip = "{point.tooltip}",
@@ -290,19 +290,20 @@ mod_overview_server <- function(id){
         dataLabels = list(
           enabled = TRUE,
           overflow = "allow",
-          formatter = JS(
-            "
-        function () {
-          let roundedValue;
-          if (this.y > 0 && this.y < 1) {
-            roundedValue = this.y.toFixed(1);
-          } else {
-            roundedValue = this.y.toFixed(0);
-          }
-          return roundedValue + '%';
-        }
-        "
-          ),
+          format = '{point.value:.0f}%',
+        #   formatter = JS(
+        #     "
+        # function () {
+        #   let roundedValue;
+        #   if (this.y > 0 && this.y < 1) {
+        #     roundedValue = this.y.toFixed(1);
+        #   } else {
+        #     roundedValue = this.y.toFixed(0);
+        #   }
+        #   return roundedValue + '%';
+        # }
+        # "
+        #   ),
           overflow = TRUE,
           distance = 5,
           padding = 2,
@@ -329,7 +330,7 @@ mod_overview_server <- function(id){
           min = 0,
           max = 100,
           labels = list(
-            format = "%"
+            format = "{value}%"
           )
         ) %>%
         viz_options(

@@ -258,7 +258,7 @@ services_data <- services_data %>%
 
 # Save and Print Elapsed Time ---------------------------------------------
 end_time <- Sys.time() - start_time  # Calculate elapsed time
-print(end_time)
+print(end_time) #21.25589 mins
 
 usethis::use_data(services_data, overwrite = TRUE)
 
