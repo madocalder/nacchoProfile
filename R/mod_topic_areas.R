@@ -207,6 +207,25 @@ mod_topic_areas_server <- function(id){
       }
     })
 
+    # Update filter options based on topic and view selection
+    observe({
+      req(input$topic, input$view)
+
+      # Restrict filter to "All LHDs" for specific topics and views
+      if (input$topic %in% c("health_part", "comm_part", "gov_part") &&
+          input$view %in% c("Table", "Bar Graph")) {
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[1],
+                          selected = landscape_filters[1])
+      } else {
+        # Restore the full set of filters for other topics
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters,
+                          selected = landscape_filters[1])
+      }
+    })
+
+
 
     # colors ------------------------------------------------------------------
     # reactively define the colors based on the filter
@@ -232,6 +251,7 @@ mod_topic_areas_server <- function(id){
     updated_inputs <- reactive({
       input$topic
       input$filter
+      input$view
     }) %>% debounce(100)
 
 
@@ -283,11 +303,12 @@ mod_topic_areas_server <- function(id){
 
          data$year <- as.factor(data$year)
 
-         if(max(data$y, na.rm = TRUE) == 100) {
-           y_max_rel <- max(data$y, na.rm = TRUE) + 1
-         } else {
-           y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
-         }
+         # if(max(data$y, na.rm = TRUE) == 100) {
+         #   y_max_rel <- max(data$y, na.rm = TRUE) + 1
+         # } else {
+         #   y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
+         # }
+         #
          naccho.viz::create_grouped_line(
            data = data,
            x_variable = "year",

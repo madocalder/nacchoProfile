@@ -1002,7 +1002,7 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
 
     data %>%
       dplyr::filter(
-        (filter == filtering) # %in% TRUE # Handles non-atomic `filter`
+        (as.character(filter) == as.character(filtering)) # %in% TRUE # Handles non-atomic `filter`
       ) %>%
       dplyr::group_by(across(all_of(group_vars))) %>%
       dplyr::summarize(
@@ -1113,6 +1113,7 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
       dplyr::rename(category = action)
 
   } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
+
 
     data <- partnerships %>%
       dplyr::filter(year == "2022") %>%

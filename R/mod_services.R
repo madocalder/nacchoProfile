@@ -67,7 +67,7 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
               div(
                 highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "margin-left: auto !important;
+              style = "height: 60vh; width: auto; margin-left: auto !important;
                         margin-right: auto !important;")
             ),
 
@@ -90,8 +90,8 @@ mod_services_ui <- function(id){
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
               div(
-                highcharter::highchartOutput(ns("figure_butterfly"), height = "55vh"), #675
-                style = "margin-left: auto !important; margin-right: auto !important;")
+                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
+                style = "height: 70vh; margin-left: auto !important; margin-right: auto !important;")
             ),
 
             # display when view Table is selected
@@ -99,18 +99,19 @@ mod_services_ui <- function(id){
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
                 uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto"),
+              reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
               br(),
               HTML('<div style="font-size: 1.8vmin;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
-            style = "margin-left: auto !important;
+            style = "min-width: 50vw; min-height: 45vh; margin-left: auto !important;
                         margin-right: auto !important;"
             ),
 
             # br(),
 )
-        )
+)
+
         ),
 
      # end of main content -----------------------------------------------------
@@ -174,6 +175,7 @@ right = div(
     # Services panel (filter) visible by default
     div(
       id = ns("toggle_get_services"),
+      p(htmltools::HTML("<b>Select Service(s):</b>")),
       uiOutput(ns("services_input"))
     ),
     shinyjs::hidden(
@@ -251,7 +253,7 @@ mod_services_server <- function(id) {
         output$services_input <- renderUI({
           checkboxGroupInput(
             inputId = ns("services"),
-            label = "<b> Select Services: </b>",
+            label = "",
             choices = service_classifications,  # List of services
             selected = service_classifications[1]
           )
@@ -261,7 +263,7 @@ mod_services_server <- function(id) {
         output$services_input <- renderUI({
           radioButtons(
             inputId = ns("services"),
-            label = "<b>Select Service:</b>",
+            label = "",
             choices = service_classifications,  # List of services
             selected = service_classifications[1]  # Default first service
           )

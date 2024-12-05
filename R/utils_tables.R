@@ -397,6 +397,14 @@ classifications <- "Immunization"
          pivot_data_group()
 
 
+     } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
+
+       data <- partnerships %>%
+         dplyr::filter(year == "2022",
+                       variable == topic) %>%
+         dplyr::mutate(Responses = "205 - 485") %>%
+         pivot_data_group()
+
 
     } else {
       data <- return_survey_weighted_counts(topic)

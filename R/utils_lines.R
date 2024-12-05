@@ -47,7 +47,7 @@
 
 
 process_line_data <- function(option, filtering, classifications = NULL) {
-
+ req(option != "c2q501")
   # Initial debugging
   print(paste("Option:", option, "Filtering:", filtering))
 

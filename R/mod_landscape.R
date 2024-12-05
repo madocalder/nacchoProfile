@@ -27,7 +27,8 @@ mod_landscape_ui <- function(id){
                 inputId = ns("topic"),
                 strong("Topic"),
                 choices = landscape_topics,
-                selectize = TRUE
+                selectize = TRUE,
+                selected = landscape_topics[2]
               )
             ),
             div(
@@ -54,7 +55,8 @@ mod_landscape_ui <- function(id){
                 HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
                 HTML('<i class="fas fa-table"></i>')         # Map icon
               ),
-              choiceValues = c('Bar Graph', 'Line Graph', 'Table')
+              choiceValues = c('Bar Graph', 'Line Graph', 'Table'),
+              selected = 'Bar Graph'
             )
           ),
 
@@ -220,6 +222,20 @@ mod_landscape_server <- function(id){
       }
     })
 
+    # observe({
+    #   req(input$topic, input$filter, input$view)
+    #
+    #   # If the selected view is "Line Graph", ensure the topic is valid
+    #   if (input$view == "Line Graph" && input$topic == "c2q501") {
+    #     # If the combination is invalid, reset the view to "Bar Graph" or another valid view
+    #     shinyWidgets::updateRadioGroupButtons(session, "view", selected = "Bar Graph")
+    #
+    #     # Optionally, show a message to the user about invalid combination
+    #     showNotification("This topic cannot display a Line Graph.", type = "error")
+    #   }
+    #
+    # })
+
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
@@ -232,13 +248,10 @@ mod_landscape_server <- function(id){
 
     })
 
-    observeEvent(input$view, {
-      if (input$view == "Bar Graph") {
-        output$line <- NULL  # Explicitly reset the line chart output
-      } else if (input$view == "Line Graph") {
-        output$figure <- NULL  # Explicitly reset the bar chart output
-      }
-    })
+
+
+
+
 
 
     #table titles-----------------
@@ -328,8 +341,12 @@ mod_landscape_server <- function(id){
 
 
     # Bar figure output -----------------------------------------------------------
+    # Bar Graph output with proxy
     output$figure <- highcharter::renderHighchart({
       req(input$view == "Bar Graph", input$topic, input$filter)
+
+      # Create an empty bar chart for setup
+      bar_chart <- highcharter::highchart()
 
       # Combine data for "All LHDs" and filtered LHDs
       combined_data <- if (input$filter == "All LHDs") {
@@ -357,9 +374,8 @@ mod_landscape_server <- function(id){
         )
       }
 
-      # Render the chart with additional series for filtered data
-      bar_chart <- set_column(combined_data,
-                          y_format = filter_meta()$y_format) %>%
+      # Generate the bar chart (no series yet)
+      bar_chart <- set_column(combined_data, y_format = filter_meta()$y_format) %>%
         viz_options(
           viz_title = filter_meta()$title,
           viz_caption = paste(
@@ -369,286 +385,194 @@ mod_landscape_server <- function(id){
           tooltip = filter_meta()$tooltip
         )
 
-      # Add additional series when not "All LHDs"
-      if (input$filter != "All LHDs") {
-        bar_chart <- bar_chart %>%
-          highcharter::hc_add_series(
-            id = "all_lhds_bar_series",
-            name = "All LHDs",
-            data = combined_data %>% dplyr::filter(filter == "All LHDs"),
-            states = list(inactive = list(enabled = TRUE)),
-            selected = FALSE
-          ) %>%
-          highcharter::hc_add_series(
-            id = "filtered_bar_series",
-            name = input$filter,
-            data = combined_data %>% dplyr::filter(filter == input$filter),
-            selected = TRUE
-          )
-      }
-
-      bar_chart %>%
-        viz_export()
+      bar_chart
     })
 
+    # Proxy for the Bar Chart
     proxy_bar <- highcharter::highchartProxy(ns("figure"))
 
-    # Observe Updates for Bar Chart
+    # Update the bar chart with new data when inputs change
     observe({
-      req(input$view == "Bar Graph", input$filter != "All LHDs")  # Ensure this runs only for Bar Graph view
+      req(input$topic, input$filter)  # Ensure inputs are available
 
-      # Fetch data for the bar chart
-      data <- if (input$topic == "field") {
-        spec_data %>% dplyr::filter(filter == input$filter)
+      # Remove all old series (to prevent overlap)
+      proxy_bar %>%
+        highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
+        highcharter::hcpxy_remove_series(id = "all_lhds_bar_series")
+
+      # Combine the updated data based on input$topic and input$filter
+      combined_data <- if (input$filter == "All LHDs") {
+        if (input$topic == "field") {
+          spec_data_all
+        } else {
+          return_survey_weighted_counts(input$topic)
+        }
       } else {
-        return_survey_weighted_counts(input$topic, input$filter)
+        all_data <- if (input$topic == "field") {
+          spec_data_all
+        } else {
+          return_survey_weighted_counts(input$topic)
+        }
+
+        filtered_data <- if (input$topic == "field") {
+          spec_data %>% dplyr::filter(filter == input$filter)
+        } else {
+          return_survey_weighted_counts(input$topic, input$filter)
+        }
+
+        dplyr::bind_rows(
+          all_data %>% dplyr::mutate(filter = "All LHDs"),
+          filtered_data
+        )
       }
 
-      # Remove all existing series
+      # Dynamically update the bar chart with new data
       proxy_bar %>%
-        highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
-        highcharter::hcpxy_remove_series(id = "all_lhds_line_series") %>%
-        highcharter::hcpxy_remove_series(
-          id = c("Urban", "Rural")
-        ) %>%
-        highcharter::hcpxy_remove_series(
-          id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-        ) %>%
-        highcharter::hcpxy_remove_series(
-          id = c("State", "Local", "Shared")
-        ) %>%
-        highcharter::hcpxy_remove_series(
-          id = c("Midwest", "South", "West", "Northeast")
-        ) %>%
-        highcharter::hcpxy_remove_series(
-          id = "All"
-        ) %>%
-        highcharter::hcpxy_update(
-          series = list())
-
-
-      # Add filtered data series
-      proxy_bar %>%
-        proxy_to_group(
-          data = data,
-          meta = filter_meta(),
+        highcharter::hcpxy_add_series(
           id = "filtered_bar_series",
-          type = "column",
-          colors = colors(),
-          tooltip = filter_meta()$tooltip
+          name = input$filter,
+          data = combined_data,
+          type = "column",  # Ensure this is a column chart (bar graph)
+          selected = TRUE
         )
     })
 
 
-
     # Line Output-------------------
+    # Line Graph output with proxy
     output$line <- highcharter::renderHighchart({
-      req(input$view == "Line Graph")
+      req(input$view == "Line Graph", input$topic != "c2q501", input$filter)
 
-      #add option value for function
-      option <- input$topic
+      # Create an empty line chart for setup
+      line_chart <- highcharter::highchart()
 
-      filtering <- input$filter
+      # Process data for the line graph
+      data <- process_line_data(input$topic, input$filter)
 
-      classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
-        input$classifications
+      # If data is empty, return an empty chart
+      if (nrow(data) > 0) {
+        line_chart <- naccho.viz::create_grouped_line(
+          data = data,
+          x_variable = "year",
+          x_group = "legend_label",
+          y_variable = "y",
+          y_label = filter_meta()$y_label,
+          y_max = max(data$y, na.rm = TRUE) * 1.1,
+          x_label = "Year",
+          select_theme = naccho.viz::basic,
+          title = filter_meta()$title,
+          tooltip = filter_meta()$tooltip
+        )
       } else {
-        NULL  # If input$classifications does not exist, set it to NULL
+        line_chart <- highcharter::highchart()  # Empty chart for no data
       }
 
-      # #debug
-      # message("input$topic =")
-      # print(input$topic)
-      # message("option variable =")
-      # print(option)
-      #
-      # message("view selected =")
-      # print(input$view)
-      #
-      # #debug
-      # message("input$filter =")
-      # print(input$filter)
-      # message("filtering variable =")
-      # print(filtering)
-
-      data <- process_line_data(option, filtering)
-
-
-      if(max(data$y, na.rm = TRUE) == 100) {
-        y_max_rel <- max(data$y, na.rm = TRUE)
-      } else {
-        y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
-      }
-
-      if ("legend_title" %in% names(data) && !is.null(data$legend_title[1])) {
-        line_title <- data$legend_title[1]  # Get the first value
-      } else {
-        line_title <- paste(filter_meta()$title, "Over Time")  # Default value if `legend_title` column is missing
-      }
-
-      if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {
-        subtitle <- data$subtitle[1]  # Get the first value
-      } else {
-        subtitle <- NULL
-      }
-
-      # data$responses <- sum(data$Responses)
-      # print(data)
-
-      naccho.viz::create_grouped_line(
-        data = data,
-        x_variable = "year",
-        x_group = "legend_label",
-        y_variable = "y",
-        y_label = filter_meta()$y_label,
-        y_max = y_max_rel,
-        x_label = "Year",
-        select_theme = naccho.viz::basic,
-        title = line_title,
-        subtitle = subtitle,
-        # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
-        tooltip = "In {point.year}, {point.one}{point.two}.",
-        legend_title = NA
-      )
-
-
+      line_chart
     })
 
-    # output$line <- highcharter::renderHighchart({
-    #   req(input$view == "Line Graph", input$topic, input$filter)
-    #
-    #   # Process data for the line graph
-    #   data <- process_line_data(input$topic, input$filter)
-    #
-    #   # Determine y-axis maximum
-    #   y_max_rel <- if (max(data$y, na.rm = TRUE) == 100) {
-    #     101
-    #   } else {
-    #     max(data$y, na.rm = TRUE) * 1.01
-    #   }
-    #
-    #   # Title and subtitle
-    #   line_title <- paste(filter_meta()$title)
-    #
-    #
-    #   subtitle <- if ("subtitle" %in% names(data) && !is.null(data$subtitle[1])) {
-    #     data$subtitle[1]
-    #   } else {
-    #     NULL
-    #   }
-    #
-    #   # Initialize the chart
-    #   line_chart <- naccho.viz::create_grouped_line(
-    #     data = data,
-    #     x_variable = "year",
-    #     x_group = "legend_label",
-    #     y_variable = "y",
-    #     y_label = filter_meta()$y_label,
-    #     y_max = y_max_rel,
-    #     x_label = "Year",
-    #     select_theme = naccho.viz::basic,
-    #     title = line_title,
-    #     subtitle = subtitle,
-    #     tooltip = filter_meta()$tooltip,
-    #     legend_title = NULL
-    #   )
-    #
-    #   # Add a series for "All LHDs" if filter is applied
-    #   if (input$filter != "All LHDs") {
-    #     all_data <- data %>% dplyr::filter(filter == "All LHDs")
-    #     filtered_data <- data %>% dplyr::filter(filter == input$filter)
-    #
-    #     line_chart <- line_chart %>%
-    #       highcharter::hc_add_series(
-    #         id = "all_lhds_line_series",
-    #         name = "All LHDs",
-    #         data = all_data,
-    #         type = "line",
-    #         color = naccho.viz::green, #
-    #         dashStyle = "ShortDash"
-    #       ) %>%
-    #       highcharter::hc_add_series(
-    #         id = "filtered_line_series",
-    #         name = input$filter,
-    #         data = filtered_data,
-    #         type = "line",
-    #         color = colors(),
-    #         lineWidth = 2
-    #       )
-    #   }
-    #
-    #   line_chart
-    # })
-    #
-    # proxy_line <- highcharter::highchartProxy(ns("line"))
-    #
-    # # Observe Updates for Line Chart
-    # observe({
-    #   req(input$view == "Line Graph")  # Ensure this runs only for Line Graph view
-    #   if (input$view != "Line Graph") return()
-    #
-    #
-    #   # Fetch data for the line graph
-    #   data <- process_line_data(input$topic, input$filter)
-    #
-    #   # Remove all existing series
-    #   proxy_line %>%
-    #     highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
-    #     highcharter::hcpxy_remove_series(id = "all_lhds_bar_series") %>%
-    #     highcharter::hcpxy_remove_series(
-    #       id = c("Urban", "Rural")
-    #     ) %>%
-    #     highcharter::hcpxy_remove_series(
-    #       id = c("Small (<50,000)", "Medium (50,000-499,999)", "Large (500,000+)")
-    #     ) %>%
-    #     highcharter::hcpxy_remove_series(
-    #       id = c("State", "Local", "Shared")
-    #     ) %>%
-    #     highcharter::hcpxy_remove_series(
-    #       id = c("Midwest", "South", "West", "Northeast")
-    #     ) %>%
-    #     highcharter::hcpxy_remove_series(
-    #       id = "All"
-    #     ) %>%
-    #     highcharter::hcpxy_update(
-    #       series = list())
-    #
-    #   # Add "All LHDs" series
-    #   all_data <- data %>% dplyr::mutate(filter = "All LHDs")
-    #
-    #   if (nrow(all_data) > 0) {
-    #     proxy_line %>%
-    #       highcharter::hcpxy_add_series(
-    #         id = "all_lhds_line_series",
-    #         name = "All LHDs",
-    #         data = highcharter::list_parse2(all_data),
-    #         type = "line",
-    #         color = naccho.viz::green,
-    #         dashStyle = "ShortDash"
-    #       )
-    #   }
-    #
-    #   # Add filtered data series
-    #   filtered_data <- data %>% dplyr::filter(filter == input$filter)
-    #
-    #   if (nrow(filtered_data) > 0) {
-    #     proxy_line %>%
-    #       highcharter::hcpxy_add_series(
-    #         id = "filtered_line_series",
-    #         name = input$filter,
-    #         data = highcharter::list_parse2(filtered_data),
-    #         type = "line",
-    #         color = colors(),
-    #         lineWidth = 2
-    #       )
-    #   }
-    # })
+    # Proxy for the Line Chart
+    proxy_line <- highcharter::highchartProxy(ns("line"))
 
+    # Update the line chart with new data when inputs change
+    observe({
+      req(input$topic, input$filter)  # Ensure inputs are available
+
+      # Remove old series to prevent overlap
+      proxy_line %>%
+        highcharter::hcpxy_remove_series(id = "filtered_line_series")
+
+      # Process and generate the updated data for the line graph
+      data <- process_line_data(input$topic, input$filter)
+
+      # Dynamically update the line chart with new data
+      proxy_line %>%
+        highcharter::hcpxy_add_series(
+          id = "filtered_line_series",
+          name = input$filter,
+          data = data,
+          type = "line",  # Ensure this is a line chart
+          selected = TRUE
+        )
+    })
+
+
+    # # Update bar graph and line graph when topic or filter changes
     # observe({
-    #   req(input$view)
-    #   print(highcharter::hcpxy_get(proxy_bar))
-    #   print(highcharter::hcpxy_get(proxy_line))
+    #   req(input$topic, input$filter)  # Ensure inputs are available
+    #
+    #   # Update the bar graph
+    #   if (input$view == "Bar Graph") {
+    #     output$figure <- highcharter::renderHighchart({
+    #       req(input$topic, input$filter)
+    #
+    #       # Combine data for "All LHDs" and filtered LHDs
+    #       combined_data <- if (input$filter == "All LHDs") {
+    #         if (input$topic == "field") {
+    #           spec_data_all
+    #         } else {
+    #           return_survey_weighted_counts(input$topic)
+    #         }
+    #       } else {
+    #         all_data <- if (input$topic == "field") {
+    #           spec_data_all
+    #         } else {
+    #           return_survey_weighted_counts(input$topic)
+    #         }
+    #
+    #         filtered_data <- if (input$topic == "field") {
+    #           spec_data %>% dplyr::filter(filter == input$filter)
+    #         } else {
+    #           return_survey_weighted_counts(input$topic, input$filter)
+    #         }
+    #
+    #         dplyr::bind_rows(
+    #           all_data %>% dplyr::mutate(filter = "All LHDs"),
+    #           filtered_data
+    #         )
+    #       }
+    #
+    #
+    #       bar_chart <- set_column(combined_data, y_format = filter_meta()$y_format) %>%
+    #         viz_options(
+    #           viz_title = filter_meta()$title,
+    #           viz_caption = paste("<b> N: </b>", sum(unique(combined_data$Responses), na.rm = TRUE), "<br>", source_line),
+    #           tooltip = filter_meta()$tooltip
+    #         )
+    #
+    #       bar_chart
+    #     })
+    #   }
+    #
+    #   # Update the line graph
+    #   if (input$view == "Line Graph") {
+    #     output$line <- highcharter::renderHighchart({
+    #       req(input$topic, input$filter)
+    #
+    #       # Process and generate line graph data
+    #       data <- process_line_data(input$topic, input$filter)
+    #
+    #       # Make sure there is data before rendering
+    #       if (nrow(data) > 0) {
+    #         naccho.viz::create_grouped_line(
+    #           data = data,
+    #           x_variable = "year",
+    #           x_group = "legend_label",
+    #           y_variable = "y",
+    #           y_label = filter_meta()$y_label,
+    #           y_max = max(data$y, na.rm = TRUE) * 1.1,
+    #           x_label = "Year",
+    #           select_theme = naccho.viz::basic,
+    #           title = filter_meta()$title,
+    #           tooltip = filter_meta()$tooltip
+    #         )
+    #       } else {
+    #         return(NULL)  # Return nothing if there's no data for the line graph
+    #       }
+    #     })
+    #   }
     # })
+    #
+    #
 
 
     # right content ===========================================================

@@ -313,7 +313,6 @@ mod_workforce_server <- function(id) {
 
       process_line_data(input$topic, input$filter, classifications)
 
-      process_line_data("c5q37", "c0popcat3")
     })
 
     #table title output

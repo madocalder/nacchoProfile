@@ -44,11 +44,11 @@
 partnerships <- data.frame(
   group = c(
     # Healthcare Partners
-    rep("Healthcare Partners", 6 * 4),
+    rep("Healthcare Partnerships", 6 * 4),
     # Community-Based Partners
-    rep("Community-Based Partners", 7 * 4),
+    rep("Community-Based Partnerships", 7 * 4),
     # Government Partners
-    rep("Government Partners", 7 * 4)
+    rep("Government Partnerships", 7 * 4)
   ),
   category = c(
     # Healthcare Partners
@@ -131,9 +131,9 @@ partnerships <- data.frame(
 
 partnerships <- partnerships %>%
   mutate(variable = case_when(
-    category == "Healthcare Partners" ~ "health_part",
-    category == "Community-Based Partners" ~ "comm_part",
-    category == "Government Partners" ~ "gov_part"  # Assign NA for non-Partnerships categorys
+    group == "Healthcare Partnerships" ~ "health_part",
+    group == "Community-Based Partnerships" ~ "comm_part",
+    group == "Government Partnerships" ~ "gov_part"  # Assign NA for non-Partnerships categorys
   ))
 
   # Save the processed data for package use
