@@ -284,7 +284,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "1.4em"
               )
             ),
             list(
@@ -304,7 +304,7 @@ mod_key_findings_server <- function(id){
                 color = "#000",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "1.4em"
               )
             ),
             list(
@@ -325,7 +325,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "1.4em"
               )
             ),
             list(
@@ -346,7 +346,7 @@ mod_key_findings_server <- function(id){
                 color = "#9A639F",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "1.4em"
               )
             )
           )
@@ -404,7 +404,7 @@ mod_key_findings_server <- function(id){
                 color = naccho.viz::terracotta,
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin",
+                fontSize = "1.4em",
                 draggable = ""
               )
             ),
@@ -426,7 +426,7 @@ mod_key_findings_server <- function(id){
                 color = naccho.viz::green,
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin",
+                fontSize = "1.4em",
                 draggable = ""
               )
             )
@@ -487,7 +487,7 @@ mod_key_findings_server <- function(id){
                 color = "#fff",
                 fontFamily = "Heebo",
                 fontWeight = "700",
-                fontSize = "2vmin"
+                fontSize = "1.4em"
               )
             )
           )
@@ -658,7 +658,7 @@ mod_key_findings_server <- function(id){
               verticalAlign = 'bottom',
               style = list(
                 fontWeight = "500",
-                fontSize = "1.8vmin",
+                fontSize = "1.2em",
                 fontFamily = "Heebo",
                 textOutline = "none"),
               format = "{point.perc:.0f}\u0025",
@@ -758,7 +758,7 @@ mod_key_findings_server <- function(id){
             format = '{point.name}',
             align = 'center',
             verticalAlign = 'bottom',
-            style = list(fontSize = "2vmin")
+            style = list(fontSize = "1.4em")
           ),
           enableMouseTracking = FALSE,
           showInLegend = FALSE
@@ -775,7 +775,7 @@ mod_key_findings_server <- function(id){
               verticalAlign = 'bottom',
               style = list(
                 fontWeight = "500",
-                fontSize = "1.8vmin",
+                fontSize = "1.2em",
                 fontFamily = "Heebo",
                 textOutline = "none"),
               format = "{point.y:.0f}\u0025",

@@ -101,7 +101,7 @@ mod_services_ui <- function(id){
                 uiOutput(ns("table_title")),
               reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
               br(),
-              HTML('<div style="font-size: 1.8vmin;">', source_line,'
+              HTML('<div style="font-size: 1.2em;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
             style = "min-width: 50vw; min-height: 45vh; margin-left: auto !important;
@@ -323,7 +323,7 @@ mod_services_server <- function(id) {
     output$table_title <- renderUI({
       req(input$topic)
       title_values <- as.character(filter_meta()$title)
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 2em; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -419,6 +419,7 @@ mod_services_server <- function(id) {
       req(input$services)
 
       data <- scatter_data(set_filter = input$filter, set_service = input$services)
+
       scatter_plot(data, colors = colors())
     })
 
@@ -426,7 +427,7 @@ mod_services_server <- function(id) {
       req(updated_inputs())
       req(input$services)
 
-      data <- scatter_data(set_filter = c(landscape_filters),
+      data <- scatter_data(set_filter = landscape_filters,
                            set_service = input$services) %>%
         dplyr::mutate(
           left = x,

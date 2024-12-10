@@ -67,7 +67,7 @@ mod_workforce_ui <- function(id) {
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Bar Graph'"),
               highcharter::highchartOutput(ns("figure"), height = "100%"),
-                                           style = "height: 58vh; width: auto;"
+                                           style = "height: 65vh; width: auto;"
             ),
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Line Graph'"),

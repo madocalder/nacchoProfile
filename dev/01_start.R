@@ -25,7 +25,7 @@ golem::fill_desc(
   author_first_name = "Madoc", # Your First Name
   author_last_name = "Alder", # Your Last Name
   author_email = "mmarshall@astho.org", # Your Email
-  repo_url =" https://github.com/lindsayjorgenson/nacchoProfile", # The URL of the GitHub Repo (optional),
+  repo_url =" https://github.com/madalder/nacchoProfile", # The URL of the GitHub Repo (optional),
   pkg_version = "0.0.0.9000" # The Version of the package containing the App
 )
 
@@ -42,7 +42,7 @@ usethis::use_gpl_license(version = 3, include_future = TRUE)
 
 usethis::use_readme_rmd(open = FALSE)
 devtools::build_readme()
-usethis::use_code_of_conduct(contact = "ljorgenson@astho.org")
+usethis::use_code_of_conduct(contact = "mmarshalln@astho.org")
 usethis::use_lifecycle_badge("Experimental")
 usethis::use_news_md(open = FALSE)
 

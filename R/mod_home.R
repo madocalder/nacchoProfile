@@ -89,13 +89,15 @@ mod_home_ui <- function(id){
                 Foundation.",
             br(),
             br(),
-            "This dashboard was developed using R Shiny. Lindsay Jorgenson served
-            as the lead developer, with Madoc Marshall as the senior developer
-            representing the Association of State and Territorial Health Officials (ASTHO).
-            Additional contributions were provided by John Coene and Pierre Saoter
-            from the Y Company, and Elizabeth Woods from ASTHO.
-            For inquiries or to report an issue, please visit",
-            tags$a(href="https://github.com/lindsayjorgenson/nacchoProfile",
+
+            "This dashboard was developed using R Shiny. Madoc Alder Marshall
+            served as the lead developer on behalf of the Association of State
+            and Territorial Health Officials (ASTHO), building on the initial
+            development work led by Lindsay Jorgenson during her tenure at ASTHO.
+            Additional contributions were provided by John Coene and
+            Pierre Saoter from the Y Company, and Elizabeth Woods from ASTHO.",
+
+            tags$a(href="https://github.com/madalder/nacchoProfile",
                    "the nacchoProfile GitHub repository",
                    style = "text-decoration: underline !important;"),
             "."

@@ -77,7 +77,7 @@ mod_topic_areas_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
+                HTML('<div style="font-size: 1.4em;">', source_line,'
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
 
                 style = "margin-left: auto !important;
@@ -274,7 +274,7 @@ mod_topic_areas_server <- function(id){
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 2em; font-weight: bold !important; text-align: center;")
     })
 
     # main content ============================================================
@@ -344,7 +344,7 @@ mod_topic_areas_server <- function(id){
           # legend_enable = FALSE,
           # colors = colors()
         ) %>%
-        viz_export()
+        viz_export()%>%
 
         # highcharter::hc_chart(type = "column") %>%  # Specify bar type explicitly
         # highcharter::hc_xAxis(
@@ -359,10 +359,10 @@ mod_topic_areas_server <- function(id){
         #                  )      # Set width to manage label length
         #   )
         # ) %>%
-        # # highcharter::hc_plotOptions(bar = list(
-        # #   pointPadding = 0.2,  # Space between bars within a category
-        # #   groupPadding = 0.2   # Space between different categories
-        # # )) %>%
+        highcharter::hc_plotOptions(bar = list(
+          pointPadding = 0.2,  # Space between bars within a category
+          groupPadding = 0.2   # Space between different categories
+        ))
 
     })
 

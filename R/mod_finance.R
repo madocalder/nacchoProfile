@@ -96,7 +96,7 @@ mod_finance_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 2vmin;">', source_line, '
+                HTML('<div style="font-size: 1.4em;">', source_line, '
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
@@ -223,7 +223,7 @@ mod_finance_server <- function(id){
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 2em; font-weight: bold !important; text-align: center;")
     })
 
 
@@ -570,7 +570,7 @@ mod_finance_server <- function(id){
                 overflow = "allow",
                 # format = '<b>{point.name}</b> <br> {point.value:.0f}%',
                 style = list(
-                  fontSize = "2vmin",
+                  fontSize = "1.4em",
                   fontFamily = "Heebo",
                   fontWeight = 300,
                   textOutline = "none"

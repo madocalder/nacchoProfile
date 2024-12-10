@@ -156,7 +156,7 @@ app_ui <- function(request) {
                        class = "linkedin-button",
                        icon = icon("linkedin"),
                        onclick ="window.open('https://www.linkedin.com/showcase/naccho-research', '_blank')"),
-        style = "font-size: 2vmin; font-weight: 700; color: white !important;")
+        style = "font-size: 1.4em; font-weight: 700; color: white !important;")
       ),
 
     # modal for key findings download

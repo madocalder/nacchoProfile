@@ -5,8 +5,8 @@
 .viz-view {
     display: flex;
     justify-content: center;
-    margin-top: 5em;
-    padding-bottom: .5em;
+    margin-top: -67px;
+    padding-bottom: 5px;
 }
 
 .btn-group {
@@ -1164,7 +1164,7 @@ label:select-input {
 
 h2 {
   text-transform: none !important;
-  font-size: 3vmin !important;
+  font-size: 2em !important;
   letter-spacing: 1px !important;
   padding-top: 1.5vmin !important;
 }
@@ -1195,7 +1195,7 @@ b, strong {
 
 .highcharts-legend {
     max-height: 3vmin !important;
-    font-size: 1.5vmin !important;
+    font-size: 1em !important;
     overflow-y: auto !important;
       }
 

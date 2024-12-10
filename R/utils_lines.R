@@ -334,18 +334,17 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         ##Top exec field of study --------
       } else if (option == "field"){
         ###create other 2016 rows
-        other_2016 <- lines_data %>%
-          dplyr::filter(topic == "field",
-                        year == 2016,
-                        filter == "All LHDs") %>%  # Only for 2016
-          dplyr::group_by(year, group, filter, topic) %>%
-          dplyr::summarise(
-            y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
-          dplyr::mutate(
-            y = round_up((100*as.numeric(1 - y_sum))),  # Subtract the sum of 'y' from 100
-            category = "Other Field"  # Create the "Other Field" category
-          ) %>%
-          dplyr::select(year, category, group, filter, topic, y)  # Select relevant columns
+        # other_2016 <- lines_data %>%
+        #   dplyr::filter(topic == "field",
+        #                 year == 2016,
+        #                 filter == "All LHDs") %>%  # Only for 2016
+        #   dplyr::group_by(year, group, filter, topic) %>%
+        #   dplyr::summarise(
+        #     y_sum = sum(as.numeric(y), na.rm = TRUE)) %>%
+        #   dplyr::mutate(
+        #     y = round_up((100*as.numeric(1 - y_sum)))
+        #   ) %>%
+        #   dplyr::select(year, category, group, filter, topic, y)  # Select relevant columns
 
         ###historical data-----------
         hist_data <- lines_data %>%
@@ -359,7 +358,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         ),
                         year = as.integer(year))
 
-        hist_data <- rbind(hist_data, other_2016)
+        # hist_data <- rbind(hist_data, other_2016)
 
         ###2022 data-------------
         current_data <- spec_data_all %>%
@@ -945,19 +944,18 @@ process_line_data <- function(option, filtering, classifications = NULL) {
 
         ##Top exec field of study --------
       } else if (option == "field"){
-          ###create other 2016 rows
-        other_2016 <- lines_data %>%
-          dplyr::filter(topic == "field",
-                        year == 2016,
-                        filter == filtering) %>%  # Only for 2016
-          dplyr::group_by(year, group, filter, topic, subtitle) %>%
-          dplyr::summarise(
-            y_sum = round_up(sum(as.numeric(y), na.rm = TRUE))) %>%
-          dplyr::mutate(
-            y = round_up((100*as.numeric(1 - y_sum))),  # Subtract the sum of 'y' from 100
-            category = "Other Field"  # Create the "Other Field" category
-          ) %>%
-          dplyr::select(year, category, group, filter, topic, y, subtitle)  # Select relevant columns
+        #   ###create other 2016 rows
+        # other_2016 <- lines_data %>%
+        #   dplyr::filter(topic == "field",
+        #                 year == 2016,
+        #                 filter == filtering) %>%  # Only for 2016
+        #   dplyr::group_by(year, group, filter, topic, subtitle) %>%
+        #   dplyr::summarise(
+        #     y_sum = round_up(sum(as.numeric(y), na.rm = TRUE))) %>%
+        #   dplyr::mutate(
+        #     y = round_up((100*as.numeric(1 - y_sum)))
+        #   ) %>%
+        #   dplyr::select(year, category, group, filter, topic, y, subtitle)  # Select relevant columns
 
        ###historical data-----------
         hist_data <- lines_data %>%
@@ -971,7 +969,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                         ),
                         year = as.integer(year))
 
-        hist_data <- rbind(hist_data, other_2016)
+        # hist_data <- rbind(hist_data, other_2016)
 
         ###2022 data-------------
         current_data <- spec_data %>%

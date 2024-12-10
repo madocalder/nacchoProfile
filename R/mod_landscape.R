@@ -90,7 +90,7 @@ mod_landscape_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
                 br(),
-                HTML('<div style="font-size: 1.8vmin;">', source_line,'
+                HTML('<div style="font-size: 1.2em;">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
@@ -263,7 +263,7 @@ mod_landscape_server <- function(id){
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+      p(title_values, style = "font-size: 2em; font-weight: bold !important; text-align: center;")
     })
 
     # Dynamic color definitions ---------------------------------------------------
@@ -610,7 +610,7 @@ mod_landscape_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        # view == input$view, # fix
+                        view == input$view, # fix
                         filter == input$filter)
 
         if (is.na(notes$notes)) {

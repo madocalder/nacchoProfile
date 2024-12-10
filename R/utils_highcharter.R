@@ -260,7 +260,8 @@ set_simple_bar <- function(data, y_label = "", y_format = "{value}") {
       ),
       min = 0,
       labels = list(
-        format = y_format
+        format = y_format,
+        allowOverlap = FALSE
       )
     )
 }

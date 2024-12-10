@@ -6,7 +6,7 @@ devtools::load_all()
 
 start_time <- Sys.time() # get start time
 
-master_data <- haven::read_dta("data-raw/Profile2022_dashboarddataset.dta")
+master_data <- haven::read_dta("data-raw/Profile2022_dashboarddataset2.dta")
 
 
 # rename factor labels ----------------------------------------------------
@@ -161,13 +161,13 @@ master_data$non_weighted_revenue_percap <- dplyr::na_if(master_data$non_weighted
 # Add exp and rev categories for bar --------------------------------------
 # categories loosely based on jenks natural breaks
 master_data <- master_data %>%
-  dplyr::mutate(exp_total_numcat = dplyr::case_when(c3q15 < 250000 ~ "Less than $250,000",
-                                                    c3q15 >= 250000 & c3q15 < 500000 ~ "$250,000 to $499,999",
-                                                    c3q15 >= 500000 & c3q15 < 1000000 ~ "$500,000 to $999,999",
-                                                    c3q15 >= 1000000 & c3q15 < 2000000 ~ "$1,000,000 to $1,999,999",
-                                                    c3q15 >= 2000000 & c3q15 < 5000000 ~ "$2,000,000 to $4,999,999",
-                                                    c3q15 >= 5000000 & c3q15 < 10000000 ~ "$5,000,000 to $9,999,999",
-                                                    c3q15 >= 10000000 ~ "$10,000,000 or more")) %>%
+  dplyr::mutate(exp_total_numcat = dplyr::case_when(c3q16 < 250000 ~ "Less than $250,000",
+                                                    c3q16 >= 250000 & c3q15 < 500000 ~ "$250,000 to $499,999",
+                                                    c3q16 >= 500000 & c3q15 < 1000000 ~ "$500,000 to $999,999",
+                                                    c3q16 >= 1000000 & c3q15 < 2000000 ~ "$1,000,000 to $1,999,999",
+                                                    c3q16 >= 2000000 & c3q15 < 5000000 ~ "$2,000,000 to $4,999,999",
+                                                    c3q16 >= 5000000 & c3q15 < 10000000 ~ "$5,000,000 to $9,999,999",
+                                                    c3q16 >= 10000000 ~ "$10,000,000 or more")) %>%
   dplyr::mutate(exp_percap_numcat = dplyr::case_when(totexp_percap < 10 ~ "Less than $10",
                                                      totexp_percap >= 10 & totexp_percap < 25 ~ "$10 to $24",
                                                      totexp_percap >= 25 & totexp_percap < 50 ~ "$24 to $50",
@@ -206,7 +206,7 @@ master_data$exp_total_numcat <- haven::labelled(
              "$5,000,000 to $9,999,999" = 6,
              "$10,000,000 or more" = 7
              ),
-  label = "Total expenditures, by group, created by LJ"
+  label = "Total expenditures, by group, created by MA"
 )
 
 
