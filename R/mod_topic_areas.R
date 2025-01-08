@@ -15,14 +15,12 @@ mod_topic_areas_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
             div(
-              class = "col-sm-6 min-height-400",
-              br(),
+              class = "topic-select",
+
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
@@ -31,16 +29,15 @@ mod_topic_areas_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              class = "filter-select",
+
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
+            ),
 
 
           # viz toggles here --------------------------------------------------
@@ -65,9 +62,10 @@ mod_topic_areas_ui <- function(id){
 
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] != \'Table\'"),
-              div(
-              highcharter::highchartOutput(ns("figure_bar"), height = "100%"),
-              style = "height: 65vh; width: 52vw;")
+              # div(
+              highcharter::highchartOutput(ns("figure_bar"), height = "100%")
+              # ,
+              # style = "height: 65vh; width: 52vw;")
               ),
 
             # display when view Table is selected
@@ -84,8 +82,7 @@ mod_topic_areas_ui <- function(id){
                         margin-right: auto !important;")
             ),
             br(),
-          )
-        ),
+          ),
 
         # end of main content -----------------------------------------------------
 
@@ -100,7 +97,7 @@ mod_topic_areas_ui <- function(id){
                 ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Takeaways")
             ),
@@ -113,7 +110,7 @@ mod_topic_areas_ui <- function(id){
                 ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Notes")
             ),
@@ -126,7 +123,7 @@ mod_topic_areas_ui <- function(id){
                 ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Definitions")
             ),
@@ -176,6 +173,9 @@ mod_topic_areas_ui <- function(id){
       )
     )
   )
+  )
+
+
 }
 
 #' topic_areas Server Functions

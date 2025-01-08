@@ -20,64 +20,125 @@ mod_workforce_ui <- function(id) {
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
+          style = "display: grid !important;
+    grid-template-rows: minmax(75px, 8%) minmax(40px, 4%) minmax(350px, 75vh);
+    grid-template-columns: minmax(40%, auto) minmax(40%, auto);
+    gap: clamp(3px, 2.5vh, 30px) 5%;
+    width: clamp(50vw, 100%, 95vw);
+    height: calc(100vh - 4rem);
+    padding-left: 4vw;
+   /*  padding-bottom: 3em; */
+    padding-right: 1vw;
+    min-width: 70%;
+    max-width: 95%;
+    align-items: start;
+    /* justify-content: center !important;  */
+    /* padding-top: 1em; */
+    max-height: calc(100vh - 4rem);
+    /* margin-top: -10px; */;
+          ",
+
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
-            # Topic and Filter selectors
+
             div(
-              class = "col-sm-6 min-height-400",
-              br(),
+              # class = "col-sm-6",
+              # style = "max-height: 10vh",
+              style = "grid-area: 1 / 1 / 2 / 2;
+              justify-self: center;
+              display: block;
+              /* align-self: end; */
+              /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
+              # br(),
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
                 choices = workforce_topics,
-                selectize = TRUE
+                selectize = TRUE,
+                selected = workforce_topics[[1]][3]
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              # class = "col-sm-6",
+              # style = "max-height: 10vh",
+              style = "grid-area: 1 / 2 / 2 / 3;
+              justify-self: center;
+              display: block;
+              /* align-self: end; */
+              /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
+
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
-          # Visualization view toggle buttons
-          div(
-            class = "viz-view",
-            shinyWidgets::radioGroupButtons(
-              inputId = ns("view"),
-              "",
-              choiceNames = list(
-                HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
-                HTML('<i class="fas fa-chart-line"></i>'),    # Line Graph icon
-                HTML('<i class="fas fa-table"></i>')          # Table icon
-              ),
-              choiceValues = c("Bar Graph", "Line Graph", "Table")
-            )
+
+           ),
+
+            div(
+             #  class = "viz-view",
+             #  style = "grid-column: 1 / -1; display: grid;
+
+              style = "grid-area: 2 / 1 / 3 / 3;
+    /* justify-self: center; */
+    /* align-self: start; */
+    display: unset !important;
+    position: relative;
+    background: linear-gradient(to right, #008A96 100%, transparent 0%)
+             no-repeat center / 100% 1.5px;
+    padding-right: 30%;
+    padding-left: 30%;
+    justify-self: center;
+    align-self: center;
+    /* margin-bottom: clamp(5px, 3%, 30px); */
+    margin-top: clamp(-2px, -2.5%, -8px);",
+
+              shinyWidgets::radioGroupButtons(
+                inputId = ns("view"),
+                "",
+                choiceNames = list(
+                  HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
+                  HTML('<i class="fas fa-chart-line"></i>'),    # Line Graph icon
+                  HTML('<i class="fas fa-table"></i>')          # Table icon
+                ),
+                choiceValues = c("Bar Graph", "Line Graph", "Table"),
+                selected = "Bar Graph",
+                # size = "lg", # Optional: Adjust button size
+                direction = "horizontal" # Ensure buttons are in a single row
+              )
+
           ),
           # Visualization content area
           div(
-            class = "viz-content",
+            # class = "viz-content",
+          style = "grid-area: 3 / 1 / 3 / 3;
+    justify-self: center;
+    align-self: start;
+    overflow-y: visible;
+    overflow-x: clip;
+    width: clamp(50vw, 100%, 90vw);
+    height: clamp(375px, 100%, 70vh);
+    padding-bottom: 1em;
+    /* margin-top: 1%; */",
+
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Bar Graph'"),
-              highcharter::highchartOutput(ns("figure"), height = "100%"),
-                                           style = "height: 65vh; width: auto;"
+              highcharter::highchartOutput(ns("figure"), height = "100%")
+              # ,
+              #                              style = "height: 65vh; width: auto;"
             ),
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Line Graph'"),
-              highcharter::highchartOutput(ns("line"), height = "auto"),
-                                           style = "height: 62vh; width: auto;"
+              highcharter::highchartOutput(ns("line"), height = "100%")
+              # ,
+              #                              style = "height: 65vh; width: auto;"
             ),
             conditionalPanel(
               condition = paste0("input['", ns('view'), "'] == 'Table'"),
               div(
                 uiOutput(ns("table_title")),
+                csvDownloadButton(ns("data_table"), filename = "workforceNACCHO.csv"),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
                 HTML('<div style="font-size: 1.8vmin;">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
@@ -91,6 +152,7 @@ mod_workforce_ui <- function(id) {
         right = div(
           div(
             class = "row color-block-header",
+            uiOutput(ns("class_icon_container")),
             div(
               class = "col hover-text-side",
               align = "center",
@@ -98,7 +160,7 @@ mod_workforce_ui <- function(id) {
               actionLink(
                 ns("takeaway"),
                 "",
-                icon = tags$i(class = "fa-light fa-key", style = "font-size: 30px; text-align: center;"),
+                icon = tags$i(class = "fa-light fa-key", style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-2"
               ),
               span(class = "hover-text-content-side", "Takeaways")
@@ -110,7 +172,7 @@ mod_workforce_ui <- function(id) {
               actionLink(
                 ns("context"),
                 "",
-                icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 30px; text-align: center;"),
+                icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-2"
               ),
               span(class = "hover-text-content-side", "Context")
@@ -122,7 +184,7 @@ mod_workforce_ui <- function(id) {
               actionLink(
                 ns("definitions"),
                 "",
-                icon = tags$i(class = "fa-light fa-list", style = "font-size: 30px; text-align: center;"),
+                icon = tags$i(class = "fa-light fa-list", style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-2"
               ),
               span(class = "hover-text-content-side", "Definitions")
@@ -132,6 +194,13 @@ mod_workforce_ui <- function(id) {
           # Toggling side content
           div(
             class = "row color-block-content",
+
+            shinyjs::hidden(div( id = ns("toggle_get_class"),
+              p(htmltools::HTML("<b>Select Occupation Classification:</b>")),
+              uiOutput(ns("class_input"))
+              )
+              ),
+
             shinyjs::hidden(div(id = ns("toggle_takeaway"), class = "context-content", uiOutput(ns("show_takeaway")))),
             shinyjs::hidden(div(id = ns("toggle_context"), class = "context-content", uiOutput(ns("show_context")))),
             shinyjs::hidden(div(id = ns("toggle_definitions"), class = "context-content", uiOutput(ns("show_definitions"))))
@@ -167,12 +236,40 @@ mod_workforce_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    updated_inputs <- reactive({
+      input$topic
+      input$filter
+      input$view
+      # input$classifications
+    }) %>% debounce(100)
+
+    output$class_icon_container <- renderUI({
+      if (input$topic %in% c("a", "b")) {
+        div(
+          class = "col hover-text-side",
+          align = "center",
+          br(),
+          actionLink(
+            ns("get_class"),
+            "",
+            icon = tags$i(class = "fa-light fa-filter", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+            class = "link-no-underline action-link-2"
+          ),
+          span(class = "hover-text-content-side", "Select Occupation Classification")
+        )
+      } else {
+        NULL  # Remove the entire container
+      }
+    })
+
+
     observe({
-      req(input$topic)
+      req(updated_inputs())
+
       topic <- input$topic
 
       # Define views based on the topic
-      if (topic %in% c("fte_numcat", "employee_numcat", "jobs_total", "a", "b")) {
+      if (topic %in% c("FTE_numcat", "employee_numcat", "jobs_total", "a", "b")) {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
           choiceNames = list(
@@ -207,12 +304,14 @@ mod_workforce_server <- function(id) {
     })
 
     observe({
+      # req(updated_inputs())
+
       if (input$topic %in% c("c5q37", "c5q36", "fte_bypop")) {
         updateSelectInput(session, "filter",
                           choices = c(landscape_filters[1], landscape_filters[4]))
 
 
-      } else if (input$topic %in% c("fte_numcat", "employee_numcat")) {
+      } else if (input$topic %in% c("FTE_numcat", "employee_numcat")) {
 
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1])
@@ -225,17 +324,19 @@ mod_workforce_server <- function(id) {
 
     # Reactive to filter metadata based on the selected topic
     filter_meta <- reactive({
+      # req(updated_inputs())
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
       meta %>%
         dplyr::filter(field == input$topic,
                       stringr::str_detect(view, input$view),
                       stringr::str_detect(filter, input$filter))
-    })
 
+    })
 
 
     # Reactive for colors based on the filter
     colors <- reactive({
+      # req(updated_inputs())
       if (input$filter == "urbanrural2022") {
         c(naccho.viz::navy, naccho.viz::teal)
       } else if (input$filter %in% c("c0govcat", "c0popcat3")) {
@@ -249,13 +350,15 @@ mod_workforce_server <- function(id) {
 
     # Generalized data processing for charts
     process_chart_data <- reactive({
-      req(input$topic, input$filter)
+      # req(updated_inputs())
+
       data <- if (input$topic %in% c("a", "b")) {
         classification_data <- process_classification_data(
           topic = input$topic,
           classifications = input$classifications,
-          filtering = input$filter,
-          q_remap = q_remap
+          filtering = input$filter
+          # ,
+          # q_remap = q_remap
         )
         classification_data
       } else if (input$topic == "jobs_total") {
@@ -273,7 +376,7 @@ mod_workforce_server <- function(id) {
 
     # Generalized data processing for tables
    table_data <- reactive({
-      req(input$topic, input$filter)
+     # req(updated_inputs())
 
       topic <- input$topic
       filtering <- input$filter
@@ -294,7 +397,7 @@ mod_workforce_server <- function(id) {
 
       message("topic = ", topic)
       message("filtering = ", filtering)
-      View(table_data)
+      # View(table_data)
 
       return(table_data)
 
@@ -304,7 +407,7 @@ mod_workforce_server <- function(id) {
     # Generalized data processing for line charts
     process_line_chart_data <- reactive({
 
-      req(input$topic, input$filter)
+      # req(updated_inputs())
       classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
         input$classifications
       } else {
@@ -318,8 +421,8 @@ mod_workforce_server <- function(id) {
     #table title output
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
-      req(input$topic)
-
+      # req(updated_inputs())
+      req(filter_meta())
       # Subset based on the reactive input$topic and convert to character
       title_values <- as.character(filter_meta()$title)
 
@@ -330,14 +433,18 @@ mod_workforce_server <- function(id) {
 
     # Bar Graph Rendering
     output$figure <- highcharter::renderHighchart({
-      req(input$view == "Bar Graph")
+      req(updated_inputs())
+      req(filter_meta())
+      req(input$view == "Bar Graph", input$filter, input$topic)
+
       data <- process_chart_data()
+
       if (input$topic == "jobs_total") {
         max_one <- max(data$left, na.rm = TRUE)
         max_two <- max(data$right, na.rm = TRUE)
         set_bar(
           data,
-          y_label = "# of Jobs",
+          y_label = filter_meta()$y_label,
           max_one = max_one,
           max_two = max_two,
           name_one = "Added",
@@ -349,25 +456,35 @@ mod_workforce_server <- function(id) {
             legend_enable = TRUE,
             legend_title = "# of Jobs...",
             viz_title = "Jobs Lost and Added - Estimated Total",
-            viz_caption = "<b> N: </b>902",
-            tooltip = "<b> {series.name}: </b>{point.y:.0f} <br>",
+            viz_caption = paste("<b> N: </b>902 <br>", source_line),
+            tooltip = filter_meta()$tooltip,
             theme = naccho.viz::butterfly
           ) %>%
           viz_export()
+
+
       } else {
+
         set_column(data) %>%
           viz_options(
             viz_title = filter_meta()$title,
             viz_caption = paste("<b> N: </b>", sum(data$Responses), "<br>", source_line),
-            tooltip = "<b>{point.category}: </b>{point.y:.1f}%"
+            tooltip = filter_meta()$tooltip
           ) %>%
-          viz_export()
+          viz_export()%>%
+          highcharter::hc_yAxis(
+            maxPadding = .09,
+            max = filter_meta()$y_max,
+            endOnTick = FALSE
+          )
       }
     })
 
     # Line Graph Rendering
     output$line <- highcharter::renderHighchart({
-      req(input$view == "Line Graph")
+      # req(updated_inputs())
+      req(filter_meta())
+      req(input$view == "Line Graph", !(input$topic %in% c("FTE_numcat", "employee_numcat")))
 
       data <- process_line_chart_data() %>%
         dplyr::mutate(x_label = NA)
@@ -378,27 +495,70 @@ mod_workforce_server <- function(id) {
         x_group = "legend_label",
         y_variable = "y",
         x_label = NULL,
+        select_theme = naccho.viz::basic,
+        y_max = filter_meta()$y_max,
         y_label = filter_meta()$y_label,
-        title = paste(filter_meta()$title, "Over Time"),
-        tooltip = "In {point.year}, {point.one}{point.two}."
-      )
+        title = filter_meta()$title,
+        tooltip = filter_meta()$tooltip
+      )%>%
+        viz_options(viz_caption = paste(
+          "<b> N: </b>", show_n(data$Responses),
+          "<br>", source_line
+        ),
+        tooltip = filter_meta()$tooltip,
+        )%>%
+        highcharter::hc_title(text = filter_meta()$title)%>%
+        highcharter::hc_yAxis(
+          maxPadding = .09,
+          max = filter_meta()$y_max,
+          endOnTick = FALSE
+        )%>%
+        highcharter::hc_legend(reversed = TRUE)
+      # %>%
+      #   highcharter::hc_chart(style = list(minHeight = "00px"))
     })
 
     # Table Rendering
     output$data_table <- reactable::renderReactable({
+      req(updated_inputs())
       req(input$view == "Table")
       data <- table_data()
       create_non_time_table(data, input$filter, colors(), input$topic)
     })
 
-    # Sidebar content remains unchanged from the earlier refactor
+    # Show Occupation Classifications
+
+    observeEvent(input$get_class, {
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+      shinyjs::show("toggle_get_class")
+
+      output$class_input <- renderUI({
+        renderUI({
+          checkboxGroupInput(
+            inputId = ns("classifications"),
+            label = "",
+            choices = workforce_classifications,  # List of services
+            selected = workforce_classifications[1]
+          )
+
+      })
+
+    })
+    })
+
+
     observeEvent(input$takeaway, {
       shinyjs::show("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
+      shinyjs::hide("toggle_get_class")
       output$show_takeaway <- renderUI({
         notes <- notes %>%
-          dplyr::filter(topic == input$topic) %>%
+          dplyr::filter(topic == input$topic,
+                        filter == input$filter) %>%
+          dplyr::filter(stringr::str_detect(view, input$view)) %>%
           pull(takeaway)
         p(HTML("<b>Key Takeaway(s):</b><br><br>", notes))
       })
@@ -408,9 +568,11 @@ mod_workforce_server <- function(id) {
       shinyjs::hide("toggle_takeaway")
       shinyjs::show("toggle_context")
       shinyjs::hide("toggle_definitions")
+      shinyjs::hide("toggle_get_class")
       output$show_context <- renderUI({
         notes <- notes %>%
-          dplyr::filter(topic == input$topic)
+          dplyr::filter(topic == input$topic,
+                        filter == input$filter)
         p(HTML("<b>Survey Question(s):</b><br>", notes$survey_question, "<br><br>",
                "<b>Survey Response Options:</b>", notes$survey_response))
       })
@@ -420,6 +582,7 @@ mod_workforce_server <- function(id) {
       shinyjs::hide("toggle_takeaway")
       shinyjs::hide("toggle_context")
       shinyjs::show("toggle_definitions")
+      shinyjs::hide("toggle_get_class")
       output$show_definitions <- renderUI({
         definitions <- definitions %>% dplyr::filter(field == input$topic)
         if (nrow(definitions) > 0) {
@@ -435,5 +598,7 @@ mod_workforce_server <- function(id) {
         }
       })
     })
+
+
   })
 }

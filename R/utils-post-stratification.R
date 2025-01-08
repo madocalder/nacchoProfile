@@ -573,7 +573,6 @@ scatter_data <- function(set_filter = "All LHDs",
                          set_service = "Blood Lead Screening") {
 
 
-
   # Step 1: Filter and summarize the data
   data_xy <- services_change_data %>%
     dplyr::select(service_type, group, service_provision, y, Responses, filter, Question) %>%
@@ -588,6 +587,7 @@ scatter_data <- function(set_filter = "All LHDs",
       # group = group, # Keep Responses as is
       # .groups = "drop"  # Drop grouping after summarization
     )
+  View(data_xy)
 
 
 
@@ -637,10 +637,10 @@ scatter_data <- function(set_filter = "All LHDs",
       service_type_short = dplyr::case_when(
         service_type == "Blood Lead Screening" ~ "Blood Lead",
         service_type == "Chronic Disease" ~ "Chronic Disease",
-        service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease Sx/Tx",
-        service_type == "Diabetes Screening" ~ "Diabetes Sx",
-        service_type == "Emergency Preparedness" ~ "Emrgy Preparedness",
-        service_type == "Environmental Health Including Food Safety" ~ "Env Health",
+        service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease",
+        service_type == "Diabetes Screening" ~ "Diabetes",
+        service_type == "Emergency Preparedness" ~ "Emergency Prep.",
+        service_type == "Environmental Health Including Food Safety" ~ "Env. Health",
         service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
         service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
         service_type == "Immunization" ~ "Immunization",
@@ -652,15 +652,16 @@ scatter_data <- function(set_filter = "All LHDs",
     )
 
   # Step 3: Add data label configuration for visualization
-  data <- data_clean %>%
-    dplyr::mutate(
-      dataLabels = purrr::map2(
-        verticalAlign, align,
-        ~ list(enabled = TRUE, verticalAlign = .x, align = .y)
-      )
-    )
-
-View(data)
+  data <- data_clean
+  # %>%
+  #   dplyr::mutate(
+  #     dataLabels = purrr::map2(
+  #       verticalAlign, align,
+  #       ~ list(enabled = TRUE, verticalAlign = .x, align = .y)
+  #     )
+  #   )
+#
+# View(data)
 
   # Return the cleaned and formatted dataset
   return(data)

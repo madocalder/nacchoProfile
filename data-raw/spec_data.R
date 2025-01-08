@@ -61,28 +61,29 @@
 
 global_levels <- c("Medical",
                    "Nursing",
-                   "Public Health")
+                   "Public Health",
+                   "Specialized Degree")
 #popsize
 args1 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "spec_combined"),
   grps = "c0popcat3",
   popcat = "c0popcat7"
 )
 #rurality
 args2 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "spec_combined"),
   grps = "urbanrural2022",
   popcat = "c0popcat7"
 )
 #governance
 args3 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "spec_combined"),
   grps = "c0govcat",
   popcat = "c0popcat7"
 )
 #region
 args4 <- list(
-  c("c4q502a", "c4q502b", "c4q502c"),
+  c("c4q502a", "c4q502b", "c4q502c", "spec_combined"),
   grps = "censusregion",
   popcat = "c0popcat7"
 )
@@ -96,7 +97,8 @@ spec_data_all <- map_dfr(args1[[1]], return_survey_weighted_counts) %>%
     GroupLabel = label_remap[as.character(.data$Group)],
     x = as.numeric(as.factor(AnswerLabel)) -1,
     category = sapply(AnswerLabel, custom_str_to_title),
-    subtitle = paste0("Estimated Across All LHDs")
+    subtitle = paste0("Estimated Across All LHDs"),
+    Responses = 935
     )
 
 
@@ -162,7 +164,8 @@ spec_data <- rbind(
 
 
 spec_data <- spec_data %>%
-  mutate(AnswerLabel = factor(AnswerLabel, levels = global_levels))
+  mutate(AnswerLabel = factor(AnswerLabel, levels = global_levels),
+         Responses = 935)
 
 usethis::use_data(spec_data, overwrite = TRUE)
 usethis::use_data(spec_data_all, overwrite = TRUE)

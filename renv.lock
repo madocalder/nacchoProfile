@@ -1292,8 +1292,8 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "madalder",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "51968a6d427c89594faa9c620a9073aa174f69bb",
+      "RemoteRef": "293a3c8d316ef8261be9700020e3dbb33a56051f",
+      "RemoteSha": "293a3c8d316ef8261be9700020e3dbb33a56051f",
       "Requirements": [
         "R",
         "custom.map",
@@ -1301,7 +1301,7 @@
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "17acde94a1035a3bbaf28cd49897f21b"
+      "Hash": "0c365113b6f6a816c680d9ef609ac646"
     },
     "numDeriv": {
       "Package": "numDeriv",

@@ -15,14 +15,12 @@ mod_services_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
             div(
-              class = "col-sm-6 min-height-150",
-              br(),
+              class = "topic-select",
+
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
@@ -31,16 +29,15 @@ mod_services_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              class = "filter-select",
+
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
+            ),
 
 
           # viz toggles here --------------------------------------------------
@@ -65,10 +62,12 @@ mod_services_ui <- function(id){
             # display when Service Provision and Bar Graph are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
-              div(
-                highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 60vh; width: auto; margin-left: auto !important;
-                        margin-right: auto !important;")
+              # div(
+                highcharter::highchartOutput(ns("figure_bar"), height = "100%")
+
+              #   , #675
+              # style = "height: 60vh; width: auto; margin-left: auto !important;
+              #           margin-right: auto !important;")
             ),
 
 
@@ -81,17 +80,20 @@ mod_services_ui <- function(id){
             # display when Service Changes and Scatter Plot are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
-              div(
-              highcharter::highchartOutput(ns("figure_scatter"), height = "100%"), #775
-              style = "height: 70vh; width: auto;")
+              # div(
+              highcharter::highchartOutput(ns("figure_scatter"), height = "100%")
+              # , #775
+              # style = "height: 70vh; width: auto;")
             ),
 
             # display when Service Changes and Butterfly Graph are selected
             conditionalPanel(
               condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
-              div(
-                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
-                style = "height: 70vh; margin-left: auto !important; margin-right: auto !important;")
+              # div(
+                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%")
+
+                # , #675
+                # style = "height: 70vh; margin-left: auto !important; margin-right: auto !important;")
             ),
 
             # display when view Table is selected
@@ -127,7 +129,7 @@ right = div(
       actionLink(
         ns("get_services"),
         "",
-        icon = tags$i(class = "fa-light fa-filter", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-filter", style = "font-size: calc(30px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Add Services")
@@ -138,7 +140,7 @@ right = div(
       actionLink(
         ns("takeaway"),
         "",
-        icon = tags$i(class = "fa-light fa-key", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-key", style = "font-size: calc(30px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Takeaways")
@@ -149,7 +151,7 @@ right = div(
       actionLink(
         ns("context"),
         "",
-        icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: calc(30px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Notes")
@@ -160,7 +162,7 @@ right = div(
       actionLink(
         ns("definitions"),
         "",
-        icon = tags$i(class = "fa-light fa-list", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-list", style = "font-size: calc(30px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Definitions")
@@ -175,6 +177,7 @@ right = div(
     # Services panel (filter) visible by default
     div(
       id = ns("toggle_get_services"),
+      class = "context-content",
       p(htmltools::HTML("<b>Select Service(s):</b>")),
       uiOutput(ns("services_input"))
     ),
@@ -254,8 +257,8 @@ mod_services_server <- function(id) {
           checkboxGroupInput(
             inputId = ns("services"),
             label = "",
-            choices = service_classifications,  # List of services
-            selected = service_classifications[1]
+            choices = service_cats,  # List of services
+            selected = service_cats[1]
           )
         })
       } else {
@@ -302,11 +305,11 @@ mod_services_server <- function(id) {
       input$services
     }) %>% debounce(100)
 
-    service_change_inputs <- reactive({
-      input$topic
-      input$filter
-      input$services
-    }) %>% debounce(100)
+    # service_change_inputs <- reactive({
+    #   input$topic
+    #   input$filter
+    #   input$services
+    # }) %>% debounce(100)
 
 
     # Metadata Filtering =====================================================
@@ -321,6 +324,7 @@ mod_services_server <- function(id) {
     # Outputs ================================================================
 
     output$table_title <- renderUI({
+      req(updated_inputs())
       req(input$topic)
       title_values <- as.character(filter_meta()$title)
       p(title_values, style = "font-size: 2em; font-weight: bold !important; text-align: center;")
@@ -373,6 +377,12 @@ mod_services_server <- function(id) {
       req(updated_inputs())
       req(input$topic, input$filter, input$services)
 
+
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
       topic <- input$topic
       services <- input$services
       filtering <- input$filter
@@ -416,9 +426,17 @@ mod_services_server <- function(id) {
 
     output$figure_scatter <- highcharter::renderHighchart({
       req(updated_inputs())
-      req(input$services)
+      req(input$topic, input$filter, input$services)
 
-      data <- scatter_data(set_filter = input$filter, set_service = input$services)
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      services <- input$services
+      filtering <- input$filter
+
+
+      data <- scatter_data(set_filter = filtering, set_service = services)
 
       scatter_plot(data, colors = colors())
     })
@@ -427,8 +445,15 @@ mod_services_server <- function(id) {
       req(updated_inputs())
       req(input$services)
 
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      services <- input$services
+
       data <- scatter_data(set_filter = landscape_filters,
-                           set_service = input$services) %>%
+                           set_service = services) %>%
         dplyr::mutate(
           left = x,
           right = y,

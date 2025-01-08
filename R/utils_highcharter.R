@@ -146,13 +146,20 @@ viz_options <- function(hc,
 set_column <- function(data,
                        y_label = "% of LHDs",
                        y_format = "{value}",
-                       data_label = '{point.y:.0f}%') {
+                       data_label = "") {
+
+  data$category <- factor(data$category)
+  # Clean the category column to remove leading/trailing spaces or special characters
+  data$category <- trimws(data$category)
+
+  # Also check for non-printing characters or unusual encodings
+  data$category <- iconv(data$category, "latin1", "UTF-8")
 
   highcharter::hchart(
     data,
-    "column",
+    type = "column",
     id = "All",
-    highcharter::hcaes(
+    mapping = highcharter::hcaes(
       x = x,
       y = y,
       group = group,
@@ -160,29 +167,17 @@ set_column <- function(data,
     ),
     dataLabels = list(
       enabled = TRUE,
-      overflow = "allow",
+      allowOverlap = TRUE,
+      crop = FALSE,
       format = data_label,
-      # formatter = JS(
-      #   "
-      #   function () {
-      #     let roundedValue;
-      #     if (this.y > 0 && this.y < 1) {
-      #       roundedValue = this.y.toFixed(1);
-      #     } else {
-      #       roundedValue = this.y.toFixed(0);
-      #     }
-      #     return roundedValue + '%';
-      #   }
-      #   "
-      # ),
       overflow = TRUE,
       distance = 5,
-      padding = 2,
+      padding = .5,
       style = list(
         color = naccho.viz::grey,
         fontFamily = "Heebo",
-        fontWeight = "500",
-        fontSize = "1.125em"
+        fontWeight = "400",
+        fontSize = "1em"
       )
     )
   ) %>%
@@ -198,6 +193,12 @@ set_column <- function(data,
       labels = list(
         format = y_format
       )
+    ) %>%
+    highcharter::hc_plotOptions(
+      column = list(
+        pointPadding = 0.3,
+        groupPadding = .1
+    )
     )
 }
 
@@ -391,13 +392,9 @@ set_bar <- function(data,
     highcharter::hc_yAxis_multiples(
       list(
         max = max_one,
-        # title = list(
-        #   text = paste0(y_label, " Lost"),
-        #   align = "middle",
-        #   verticalAlign = "top",
-        #   autoRotation = c(0, -45),
-        #   style = list(fontSize = "1.125em")
-        # ),
+        title = list(
+          text = " "
+        ),
         labels = list(
           format = y_format,
           style = list(fontSize = "0.9375em")
@@ -412,16 +409,17 @@ set_bar <- function(data,
       ),
       list(
         max = max_two,
-        # title = list(
-        #   text = paste0(y_label, " Added"),
+        title = list(
+          text = " ",
+          # ,
         #   align = "low",
         #   verticalAlign = "bottom",
         #   autoRotation = c(0, -45),
-        #   style = list(fontSize = "1.125em")
+          style = list(fontSize = "1.125em")
         #   # ,
         #   # y = -5,
         #   # x = -150
-        # ),
+        ),
         labels = list(
           format = y_format,
           style = list(fontSize = "0.9375em")
@@ -653,7 +651,13 @@ scatter_plot <- function(data, colors) {
   # }
   #
   # req(n)
-
+data <- data %>%
+  dplyr::mutate(
+    tt_group = dplyr::case_when(
+    group != "All LHDs" ~ tolower(group),
+    TRUE ~ "all"),
+    name = service_type_short
+    )
 
   highcharter::highchart() %>%
     highcharter::hc_add_series(
@@ -701,7 +705,9 @@ scatter_plot <- function(data, colors) {
     highcharter::hc_tooltip(
       useHTML = TRUE,
       # headerFormat = '<span style="font-size: 1.125em; font-weight: bold">{series.name}</span><br>',
-      pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of LHDS have expanded {point.name} services and {point.x}% have reduced them.</span>',
+      pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of
+      {point.tt_group} LHDS have expanded {point.name} services and {point.x}% have
+      reduced them.</span>',
       style = list(
         fontFamily = "Heebo",
         fontSize = "1.0625em",
@@ -720,13 +726,17 @@ scatter_plot <- function(data, colors) {
         dataLabels = list(
           enabled = TRUE,
           allowOverlap = FALSE,
+          crop = FALSE,
           overflow = "allow",
-          # format = data_label,
-          formatter = highcharter::JS("
-          function() {
-            return this.point.name.length > 12 ? this.point.name.substring(0, 12) + '...' : this.point.name;
-          }
-        "),
+          format = '{point.name}',
+      #     formatter = highcharter::JS("
+      #   function() {
+      #     if (this.point.name) {
+      #       return this.point.name.length > 15 ? this.point.name.substring(0, 15) + '...' : this.point.name;
+      #     }
+      #     return null; // Return null if name is missing
+      #   }
+      # "),
           style = list(
             textOutline = "none",
             fontFamily = "Heebo",
@@ -736,7 +746,8 @@ scatter_plot <- function(data, colors) {
         ),
         marker = list(
           radius = 7,
-          lineWidth = 1
+          lineWidth = 1,
+          color = colors()
         )
       )
     ) %>%
@@ -1166,28 +1177,45 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
 #'
 #' @importFrom dplyr filter mutate case_when
 #' @export
-process_classification_data <- function(topic, classifications, filtering, q_remap) {
+process_classification_data <- function(topic, classifications, filtering) {
 
-  observeEvent(input$classifications, {
-    req(input$classifications, input$filter, input$topic)
+  if (!is.null(classifications) && length(classifications) >= 1) {
+    selected_vars <- paste0(classifications, topic)
+    selected_data <- get(paste0("classification_data_", topic))
 
-    # Process classification data based on user inputs
-    data <- process_classification_data(
-      topic = input$topic,
-      classifications = input$classifications,
-      filtering = input$filter,
-      q_remap = q_remap  # Ensure this is pre-defined
-    )
+    data_all_class <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == "All LHDs") %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
+                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))%>%
+      dplyr::mutate(filter = filtering) %>%
+      dplyr::group_by(group) %>%
+      dplyr::mutate(x = seq_along(category) - 1) %>%
+      dplyr::ungroup()
 
-    # Use `data` for rendering outputs
-    output$classification_chart <- renderHighchart({
-      set_column(data) %>%
-        viz_export()
-    })
-  })
 
+    data_filtered <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::filter(category == "Yes", filter == filtering) %>%
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]))
+
+    data <- bind_rows(data_all_class, data_filtered) %>%
+      dplyr::mutate(filter = filtering) %>%
+      dplyr::group_by(group) %>%
+      dplyr::mutate(x = seq_along(category) - 1) %>%
+      dplyr::ungroup()
+
+    if (filtering == "All LHDs") {
+      return(data_all_class)
+    } else {
+      return(data)
+    }
+
+  } else {
+
+    return(NULL)
+  }
 }
-
 
 #' Single Column Proxy Redraw
 #'

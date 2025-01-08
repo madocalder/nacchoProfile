@@ -15,28 +15,22 @@ mod_overview_ui <- function(id) {
       div(
         openMenu(),
         div(
+          align = "right",
+          actionButton(
+            ns("info_button"),
+            label = NULL,
+            icon = icon("info-circle", class = "fa-solid"),
+            style = "font-size: 2em; color: #3C8A97; background: none; border: none;
+                position: absolute; top: .25rem; right: 1rem; padding: .1em;"
+          )
+        ),
+        div(
           class = "key-findings-head",
-          div(
-            class = "row",
-            div(
-              class = "col-sm-8",
               align = "left",
               h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
               hr(class = "header-hr")
             ),
-            div(
-              class = "col-sm-4",
-              align = "right",
-              actionButton(
-                ns("info_button"),
-                label = NULL,
-                icon = icon("info-circle", class = "fa-solid"),
-                style = "font-size: 3em; color: #3C8A97; background: none; border: none;"
-              )
-            )
-          )
-          )
-        ),
+
         div(
           class = "key-findings-content",
 
@@ -104,9 +98,10 @@ mod_overview_ui <- function(id) {
                       class = "col-sm-7",
                       highcharter::highchartOutput(ns("map"),
                                                    # width = "auto",
-                                                   height = "50vh"),
-                      style = "margin-left: auto !important;
-                              margin-right: auto !important;"
+                                                   height = "50vh")
+                      # ,
+                      # style = "margin-left: auto !important;
+                      #         margin-right: auto !important;"
                     )
                   )
                 )
@@ -155,6 +150,7 @@ mod_overview_ui <- function(id) {
         )
       )
     )
+  )
 
 }
 
@@ -176,12 +172,17 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("all LHDs", "all LHDs", "all LHDs",
-                  "population served by LHDs", "population served by LHDs", "population served by LHDs")
+        group = c("All LHDs", "All LHDs", "All LHDs",
+                  "Population served by LHDs", "Population served by LHDs", "Population served by LHDs"),
+        tt = c("all LHDs are ", "all LHDs are ", "all LHDs are ",
+                  "the population served by LHDs are served by ", "the population served by LHDs are served by ",
+                  "the population served by LHDs are served by ")
       )
 
       data <- data %>%
-        dplyr::mutate(tooltip = paste(y, "% of", group, "are served by", category, "LHDs"))
+            dplyr::mutate(tooltip =
+                      paste0(y,"% of ", tt,
+                            tolower(category), " LHDs."))
 
 
       set_column(data) %>%
@@ -253,6 +254,7 @@ mod_overview_server <- function(id){
       #   highcharter::hc_legend(
       #     margin = "2.5vmin"
       #   )
+
     })
 
 
@@ -277,6 +279,14 @@ mod_overview_server <- function(id){
       # Reorder the category factor
       data$group <- factor(data$group, levels = c("County", "City or Town", "Multi-county", "Other*"))
 
+      data <- data %>%
+        dplyr::mutate(
+          cat_tt = dplyr::case_when(category != "All LHDs" ~ tolower(category),
+                                    TRUE ~ "all"),
+          group_tt = dplyr::case_when(group != "Other*" ~ tolower(group),
+                                      TRUE ~ "other")
+        )
+
       highcharter::hchart(
         data,
         "bar",
@@ -290,7 +300,7 @@ mod_overview_server <- function(id){
         dataLabels = list(
           enabled = TRUE,
           overflow = "allow",
-          format = '{point.value:.0f}%',
+          format = '{point.y:.0f}%',
         #   formatter = JS(
         #     "
         # function () {
@@ -336,7 +346,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y:.0f}% of {this.x} serve {this.group} areas",
+          tooltip = "{point.y:.0f}% of {point.cat_tt} LHDs serve {point.group_tt} areas.",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

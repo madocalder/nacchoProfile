@@ -15,14 +15,12 @@ mod_finance_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
             div(
-              class = "col-sm-6 min-height-400",
-              br(),
+              class = "topic-select",
+
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
@@ -31,16 +29,14 @@ mod_finance_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              class = "filter-select",
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
+            ),
 
 
           # viz toggles here --------------------------------------------------
@@ -65,27 +61,28 @@ mod_finance_ui <- function(id){
             # Line Graph View
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
-              div(
-                highcharter::highchartOutput(ns("figure_line"), height = "100%"),
-                style = "height: 65vh; width: 50vw;"
-              )
+
+                highcharter::highchartOutput(ns("figure_line"), height = "100%")
+
             ),
 
             # Bar Graph View
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Bar Graph\'"),
-              div(
-                highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 65vh; width: 50vw;"
-              )
+              # div(
+                highcharter::highchartOutput(ns("figure"), height = "100%")
+              # ,
+              #   style = "height: 65vh; width: 50vw;"
+              # )
             ),
 
             # Tree Map View
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Tree Map\'"),
-              div(
-                highcharter::highchartOutput(ns("figure_tree"), height = "100%"),
-                style = "height: 65vh; width: 50vw;"
+              # div(
+                highcharter::highchartOutput(ns("figure_tree"), height = "100%")
+              # ,
+              #   style = "height: 65vh; width: 50vw;"
               )
             ),
 
@@ -96,12 +93,11 @@ mod_finance_ui <- function(id){
                 uiOutput(ns("table_title")),
                 reactable::reactableOutput(ns("data_table"), height = "auto"),
                 br(),
-                HTML('<div style="font-size: 1.4em;">', source_line, '
+                HTML('<div style="font-size: 1.8vmin;">', source_line, '
                    <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
               )
-            )
             )
           ),
 
@@ -119,7 +115,7 @@ mod_finance_ui <- function(id){
                 ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Takeaways")
             ),
@@ -132,7 +128,7 @@ mod_finance_ui <- function(id){
                 ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Notes")
             ),
@@ -145,7 +141,7 @@ mod_finance_ui <- function(id){
                 ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
+                              style = "font-size: calc(30px + .2em); text-align: center;"),
                 class = "link-no-underline action-link-3"),
               span(class = "hover-text-content-side", "Definitions")
             ),

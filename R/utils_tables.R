@@ -139,11 +139,11 @@ process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
 #' @import tidyr
 clean_class_data <- function(topic, classifications, filtering) {
   if (!is.null(classifications) && length(classifications) >= 1) {
-    selected_vars <- classifications
+    selected_vars <- paste0(classifications, topic)
     selected_data <- get(paste0("classification_data_", topic))
 
     data_all_class <- selected_data %>%
-      dplyr::filter(Question %in% classifications) %>%
+      dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
                     group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
