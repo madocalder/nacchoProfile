@@ -44,9 +44,9 @@
 partnerships <- data.frame(
   group = c(
     # Healthcare Partners
-    rep("Healthcare Partnerships", 6 * 4),
+    rep("Healthcare Partnerships", 7 * 4),
     # Community-Based Partners
-    rep("Community-Based Partnerships", 7 * 4),
+    rep("Community-Based Partnerships", 8 * 4),
     # Government Partners
     rep("Government Partnerships", 7 * 4)
   ),

@@ -37,8 +37,12 @@ NULL
 
 # Code to prepare `other_topics` dataset ----
 other_topics <- list(
-  "Informatics" = list("Technology Use" = "tech_use",
-                       "Communication Channels" = "comm_channels"),
+  "Informatics" = list("Technology Use" = "tech_use"),
+
+  "Communication Channel Use" = list(
+                       "Emergency Response" = "comm_channels_1",
+                       "General Announcement" = "comm_channels_2",
+                       "Any Use" = "comm_channels_3"),
 
   "Access to Health Care" = list("Medical Services" = "medical",
                                  "Dental Services" = "dental",
@@ -47,7 +51,9 @@ other_topics <- list(
   "Policy & Advocacy" = list("Advocacy by Topic Area" = "c12q260",
                              "New or Revised Ordinances" = "Newc12q502"),
 
-  "Planning & QI" = list("CHA and CHIP" = "chachip",
+  "Planning & QI" = list("CHA" = "c7q147",
+                         "CHIP" = "c7q149",
+                         "CHA and CHIP" = "chachip",
                          "CHIP Activities" = "m9q240"),
 
   "Partnerships" = list(

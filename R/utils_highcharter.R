@@ -24,11 +24,12 @@ viz_export <- function(hc, enabled = TRUE) {
           symbolStrokeWidth = 2,
           symbolFill = naccho.viz::teal,
           symbolStroke = naccho.viz::teal,
-          menuItems = c("printChart",
-                        "separator",
+          menuItems = c(
+            # "printChart",
+                        # "separator",
                         "downloadPDF",
                         "downloadSVG",
-                        "separator",
+                        # "separator",
                         "downloadCSV",
                         "downloadXLS",
                         "openInCloud")
@@ -148,12 +149,20 @@ set_column <- function(data,
                        y_format = "{value}",
                        data_label = "") {
 
-  data$category <- factor(data$category)
+  data$category <- factor(data$category, levels = unique(data$category))
+  data$category <- as.character(data$category)
+
   # Clean the category column to remove leading/trailing spaces or special characters
   data$category <- trimws(data$category)
 
   # Also check for non-printing characters or unusual encodings
   data$category <- iconv(data$category, "latin1", "UTF-8")
+
+  print(data$category)
+
+  x_axis_labels <- as.list(unique(data$category))
+
+  print(x_axis_labels)
 
   highcharter::hchart(
     data,
@@ -183,7 +192,7 @@ set_column <- function(data,
   ) %>%
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
-      categories = unique(data$category)
+      categories = x_axis_labels
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -1029,13 +1038,35 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
 
   # Default handling
   if (topic == "tech_use") {
-    data <- tech_use_data %>%
-      calculate_aggregates(
-        category_col = "tech_type",
-        group_col = "group",
-        extra_cols = c("Question", "subtitle", "y", "filter")
-      ) %>%
+
+
+    tech_data_all <- tech_use_data %>%
+      dplyr::filter(filter == "All LHDs")%>%
+      dplyr::group_by(tech_type) %>%
+      dplyr::mutate(Responses = sum(Responses)) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(category %in% c("Implemented")) %>%
+      dplyr::select(y, group, subtitle, Responses, filter, tech_type ) %>%
       dplyr::rename(category = tech_type)
+
+
+    data_filtered <- tech_use_data %>%
+      dplyr::filter(filter == filtering)%>%
+      dplyr::group_by(tech_type) %>%
+      dplyr::mutate(Responses = sum(Responses)) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(category %in% c("Implemented")) %>%
+      dplyr::select(y, group, subtitle, Responses, filter, tech_type) %>%
+      dplyr::rename(category = tech_type)
+
+    if (topic == "All LHDs") {
+
+      data <- teach_data_all
+    } else {
+
+      data <- dplyr::full_join(tech_data_all, data_filtered)
+    }
+
 
   } else if (topic == "comm_channels") {
     data <- comms_use_data %>%
@@ -1069,12 +1100,12 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
         group_col = "group",
         extra_cols = c("Question", "subtitle", "y", "filter")
       )
-     } else if (topic == "chachip") {
+     } else if (topic %in% c("chachip", "c7q149", "c7q147")) {
 
        if (filtering == "All LHDs" || is.null(filtering)){
-         data <- return_survey_weighted_counts("chachip")
+         data <- return_survey_weighted_counts(topic)
        } else {
-        data <- return_survey_weighted_counts("chachip", filtering)
+        data <- return_survey_weighted_counts(topic, filtering)
        }
 
         # Calculate total responses and 'y_All LHDs'
@@ -1089,12 +1120,39 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
           dplyr::mutate(
             # y = 100 * (Responses / total_responses),
             Responses = show_n(data_n$Responses)
-          ) %>%
-          dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
-          dplyr::mutate(category = dplyr::recode(category,
+          )
+
+        if (topic == "chachip") {
+
+          data <- data %>% dplyr::mutate(
+            category = ordered(category, levels = c("Yes", "No")))%>%
+          dplyr::mutate(category =
+                          dplyr::recode(category,
                                                  "Yes" = "Completed both in past 5 years",
                                                  "No" = " Completed one or none in past 5 years"))
+        } else if (topic == "c7q147") {
 
+          data <- data %>%
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes") ~ "Has completed CHA",
+                              TRUE ~ "Has not yet completed CHA"
+                            ))
+
+        } else {
+
+          data <- data %>%
+
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes") ~ "Has completed CHIP",
+                              TRUE ~ "Has not yet completed CHIP"
+                            ))
+
+        }
+
+        data <- data %>%
+          pivot_data_cat()
 
 
   } else if (topic == "c12q260") {

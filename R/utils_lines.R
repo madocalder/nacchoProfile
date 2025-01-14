@@ -527,31 +527,35 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             dplyr::arrange(year)
         }
 
-      } else if (option == "fte_bypop"){
+      } else if (option %in%  c("fte_bypop", "employee_bypop")){
 
         ###2022 data-----
-        current_data_1 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
-          dplyr::select(Question, category, group, y, Responses )%>%
-          dplyr::mutate(y = round_up(as.numeric(y)),
+        current_data <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+          dplyr::select(Question, category, group, y, Responses ) %>%
+          dplyr::mutate(y = as.numeric(y),
                         year = 2022,
-                        Responses = sum(Responses))
-
-        current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
-          dplyr::select(Question, category, group, y, Responses )%>%
-          dplyr::mutate(year = 2022,
                         Responses = sum(Responses),
-                        y = round_up(as.numeric(y)))
-
-        current_data <- dplyr::full_join(current_data_1, current_data_2)%>%
-          dplyr::mutate(category = "FTEs per 10,000 people",
-                        filter = "All LHDs")
+                        filter = "All LHDs",
+                        category = dplyr::case_when(Question == "fte_bypop" ~ "FTEs per 10,000 people",
+                                                    TRUE ~ "Employees per 10,000 people")
+                        )
+#
+#         current_data_2 <- nacchoProfile::return_survey_weighted_statistics(option) %>%
+#           dplyr::select(Question, category, group, y, Responses )%>%
+#           dplyr::mutate(year = 2022,
+#                         Responses = sum(Responses),
+#                         y = round_up(as.numeric(y)))
+#
+#         current_data <- dplyr::full_join(current_data_1, current_data_2)%>%
+#           dplyr::mutate(category = "FTEs per 10,000 people",
+#                         filter = "All LHDs")
 
 
         ###historical-----
         hist_data <- lines_data %>%
           dplyr::filter(topic == option,
                         filter == "All LHDs") %>%
-          dplyr::mutate(y = round_up(as.numeric(y)))%>%
+          dplyr::mutate(y = as.numeric(y))%>%
           dplyr::select(topic, group, filter, y, year, category, Responses)
 
         ###combine
@@ -564,9 +568,12 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                             "category" = "category",
                                             "Responses" = "Responses"
                                      )) %>%
-          dplyr::mutate(y = round_up(as.numeric(y)),
+          dplyr::mutate(y = as.numeric(y),
                         legend_label = paste(category),
-                        one = paste("the number of FTEs per 10,000 people was "),
+                        tt = dplyr::case_when(Question == "fte_bypop" ~ "FTEs",
+                                            TRUE ~ "employees"),
+                        one = paste(" across all LHDS, the average number of",
+                                    tt,  "per 10,000 people was "),
                         two = paste(y)) %>%
           dplyr::arrange(year)
 
@@ -621,7 +628,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           "Community-Based Partnerships"
 
         } else{
-         " Government Partnerships"
+         "Government Partnerships"
         }
 
         combined <- partnerships %>%
@@ -634,6 +641,10 @@ process_line_data <- function(option, filtering, classifications = NULL) {
       combined <- lines_data %>%
         dplyr::filter(topic == "totexp_percap")
 
+
+      } else if (option == "budget_changes") {
+        combined <- lines_data %>%
+          dplyr::filter(topic == "budget_changes")
 
        } else {
           stop("ERROR: No matching option identified for All LHDs") }
@@ -1220,7 +1231,51 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                           two = paste(y, " employees")) %>%
             dplyr::arrange(year)
         }
-       } else {
+       } else if(option == "fte_bypop"){
+
+         ###2022 data-----
+         current_data <- nacchoProfile::return_survey_weighted_statistics(option, filtering) %>%
+           dplyr::select(Question, category, group, y, Responses)%>%
+           dplyr::mutate(y = as.numeric(y),
+                         year = 2022,
+                         Responses = sum(Responses),
+                         filter = filtering,
+                         group = category)
+
+
+         ###historical-----
+         hist_data <- lines_data %>%
+           dplyr::filter(topic == option,
+                         filter == filtering) %>%
+           dplyr::mutate(y = as.numeric(y),
+                         category = group)%>%
+           dplyr::select(topic, group, filter, y, year, category, Responses)
+
+         ###combine
+         combined <- dplyr::full_join(current_data, hist_data,
+                                      by = c("Question" = "topic",
+                                             "group" = "group",
+                                             "filter" = "filter",
+                                             "y" = "y",
+                                             "year" = "year",
+                                             "category" = "category",
+                                             "Responses" = "Responses"
+                                      )) %>%
+           dplyr::mutate(y = as.numeric(y),
+                         group_mod = dplyr::case_when(
+                           group == "Small (<50,000)" ~ "small",
+                           group == "Medium (50,000-499,999)" ~ "medium",
+                           TRUE ~ "large"
+                         ),
+                         legend_label = paste(category),
+                         one = paste(" across ", group_mod, " LHDs, the average number of FTEs per 10,000 people was "),
+                         two = paste(y)) %>%
+           dplyr::arrange(year)
+
+
+
+
+      } else {
           stop("ERROR: No matching option identified for non-All LHDs")
 
 

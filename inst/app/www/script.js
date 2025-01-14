@@ -5,6 +5,8 @@ $(document).on('shiny:connected', function() {
   $('#landscape_1-takeaway').addClass('clicked-link').click();
   $('#workforce_1-takeaway').addClass('clicked-link').click();
   $('#finance_1-takeaway').addClass('clicked-link').click();
+  $('#services_1-get_services').addClass('clicked-link').click();
+  $('#topic_areas_1-takeaway').addClass('clicked-link').click();
 });
 
 // add and remove class to the right sidebar links when toggling

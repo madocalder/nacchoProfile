@@ -60,7 +60,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0)
 Remotes:
-    madalder/naccho.viz,
+    github::madalder/naccho.viz,
     the-y-company/bsutils,
     the-y-company/flexlayout,
     github::madalder/custom.map

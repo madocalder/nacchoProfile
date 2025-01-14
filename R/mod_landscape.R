@@ -123,7 +123,7 @@ mod_landscape_ui <- function(id) {
                 csvDownloadButton(ns("data_table"), filename = "landscape.csv"),
                 reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
                 br(),
-                HTML('<div style="font-size: 1.8vmin;">', source_line,'
+                HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
@@ -152,7 +152,7 @@ mod_landscape_ui <- function(id) {
                 inputId = ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: calc(30px + .2em); text-align: center;"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
                 class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Takeaways")
             ),
@@ -164,7 +164,7 @@ mod_landscape_ui <- function(id) {
                 inputId = ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: calc(30px + .2em); text-align: center;"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
                 class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Notes")
             ),
@@ -176,7 +176,7 @@ mod_landscape_ui <- function(id) {
                 inputId = ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: calc(30px + .2em); text-align: center;"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
                 class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Definitions")
             ),
@@ -295,13 +295,15 @@ mod_landscape_server <- function(id){
     #table titles-----------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
-      req(input$topic)
-
+      # req(updated_inputs())
+      req(filter_meta())
       # Subset based on the reactive input$topic and convert to character
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 1.5em; font-weight: bold !important; text-align: center;")
+      p(title_values, class = "table-title"
+
+      )
     })
 
     # Dynamic color definitions ---------------------------------------------------
@@ -507,11 +509,12 @@ mod_landscape_server <- function(id){
           maxPadding = .09,
           # tickPositioner = JS("function() { return [0, 25, 50, 75, 100]; }"), # Define custom tick positions
           max = filter_meta()$y_max,
-          endOnTick = FALSE
+          endOnTick = TRUE
           # ,
           # labels = list(
           #   format = "{value}%"
-          )
+          )%>%
+        highcharter::hc_legend(reversed = TRUE)
 
       if (input$topic == "tenure"  & input$filter == "All LHDs" |
           (input$topic == "field" & input$filter != "All LHDs")) {
@@ -736,10 +739,11 @@ mod_landscape_server <- function(id){
           highcharter::hc_yAxis(
             maxPadding = .01,
             max = meta_data$y_max,
-            endOnTick = FALSE
+            endOnTick = TRUE
           ) %>%
           highcharter::hc_legend(reversed = TRUE) %>%
           highcharter::hc_chart(style = list(minHeight = "50vh"))
+
       } else {
         highcharter::highchart()  # Return an empty chart if no data
       }
@@ -870,8 +874,6 @@ mod_landscape_server <- function(id){
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
 
-
-
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
@@ -960,7 +962,10 @@ mod_landscape_server <- function(id){
           }
         )
       })
+
     })
+
+
   })
 }
 ## To be copied in the UI

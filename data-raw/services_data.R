@@ -64,7 +64,7 @@ stringr::str_detect(Question, \"c6q77\") ~ \"Oral Health\",
 stringr::str_detect(Question, \"c6q79\") ~ \"Substance Abuse Services\",
 stringr::str_detect(Question, \"c6q83\") ~ \"Behavioral Risk Factors\",
 stringr::str_detect(Question, \"c6q81\") ~ \"Chronic Disease\",
-stringr::str_detect(Question, \"c6q80\") ~ \"Communicable Infectious Disease\",
+stringr::str_detect(Question, \"c6q80\") ~ \"Communicable/Infectious Disease \",
 stringr::str_detect(Question, \"c6q82\") ~ \"Injury\",
 stringr::str_detect(Question, \"c6q84\") ~ \"Environmental Health\",
 stringr::str_detect(Question, \"c6q86\") ~ \"Maternal and Child Health\",
@@ -72,7 +72,7 @@ stringr::str_detect(Question, \"c6q85\") ~ \"Syndromic Surveillance\",
 stringr::str_detect(Question, \"c6q89\") ~ \"Chronic Disease Programs\",
 stringr::str_detect(Question, \"c6q87\") ~ \"Injury\",
 stringr::str_detect(Question, \"c6q95\") ~ \"Mental Illness\",
-stringr::str_detect(Question, \"c6q90a\") ~ \"Nutrition\",
+stringr::str_detect(Question, \"c6q90\") ~ \"Nutrition\",
 stringr::str_detect(Question, \"c6q145\") ~ \"Opioids\",
 stringr::str_detect(Question, \"c6q91\") ~ \"Physical Activity\",
 stringr::str_detect(Question, \"c6q146\") ~ \"Substance Abuse Other Than Opioids\",
@@ -237,7 +237,7 @@ services_data <- services_data %>%
     stringr::str_detect(Question, "c6q83|c6q81|c6q80|c6q82|c6q84|c6q86|c6q85") ~ "Epidemiology and Surveillance",
 
     # Population-Based Prevention
-    stringr::str_detect(Question, "c6q89|c6q87|c6q95|c6q90a|c6q145|c6q91|c6q146|c6q93") ~ "Population-Based Prevention",
+    stringr::str_detect(Question, "c6q89|c6q87|c6q95|c6q90|c6q145|c6q91|c6q146|c6q93") ~ "Population-Based Prevention",
 
     # Regulation, Inspection, Licensing
     stringr::str_detect(Question, "c6q105|c6q97|c6q103|c6q110|c6q114|c6q115|c6q101|c6q116|c6q109|c6q111|c6q113|c6q112|c6q143|c6q102|c6q100|c6q107") ~ "Regulation, Inspection, Licensing",

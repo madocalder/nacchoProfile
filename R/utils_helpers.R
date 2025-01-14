@@ -237,15 +237,12 @@ csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV")
   # Adjust as needed.
   btn_style <- "
     background-color: #FFFFFF;
-    color: #3C8A97; /* teal text/icon */
-    border: 0px ; /* teal border */
-    padding: 5px 10px;
+    color: #3C8A97;
+    border: 0px;
     cursor: pointer;
-    font-size: 1.6em;
+    font-size: calc(10px + .5em + 1vw);
     font-weight: 400;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    /* display: inline-flex; */
   "
 
   # Embedded CSS for hover effect
@@ -261,7 +258,7 @@ csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV")
   tagList(
     style_tag,
     div(
-      style = "text-align: right;",
+      style = "text-align: end;",
       tags$button(
         class = "hc-export-button",
         style = btn_style,
@@ -271,5 +268,16 @@ csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV")
       )
     )
   )
+}
+
+
+toggle_sidebar_content <- function(active_id, all_ids) {
+  lapply(all_ids, function(id) {
+    if (id == active_id) {
+      shinyjs::show(id)
+    } else {
+      shinyjs::hide(id)
+    }
+  })
 }
 

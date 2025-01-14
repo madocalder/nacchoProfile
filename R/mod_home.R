@@ -16,9 +16,12 @@ mod_home_ui <- function(id){
       div(
         class = "home-content",
         openMenu(),
-        p("welcome to the", style = "font-size: 4vmin; font-weight: 400 !important;"),
-        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 7vmin; text-transform: none !important;"),
-        br(),
+        p("welcome to the", style = "font-size: 4vh; font-weight: 400 !important; margin-bottom: 1vh;"),
+        h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 7vh;
+    text-transform: none !important;
+    line-height: 7.5vh;
+    margin-bottom: 3vh;"),
+        # br(),
         # br(),
         # br(),
         # br(),
@@ -95,7 +98,8 @@ mod_home_ui <- function(id){
             and Territorial Health Officials (ASTHO), building on the initial
             development work led by Lindsay Jorgenson during her tenure at ASTHO.
             Additional contributions were provided by John Coene and
-            Pierre Saoter from the Y Company, and Elizabeth Woods from ASTHO.",
+            Pierre Saoter from the Y Company, and Elizabeth Woods from ASTHO.
+            To see more visit ",
 
             tags$a(href="https://github.com/madalder/nacchoProfile",
                    "the nacchoProfile GitHub repository",

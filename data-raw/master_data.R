@@ -152,31 +152,50 @@ master_data$employee_numcat <- haven::labelled(master_data$employee_numcat,
 # master_data <- dplyr::left_join(master_data, add_revenue_weights, by = "nacchoid")
 
 master_data <- master_data %>%
-  dplyr::mutate(weighted_revenue_total = c3q16,
+  dplyr::mutate(rev_total = c3q16,
                 # non_weighted_revenue_total = rowSums(.[,c("c3q17p", "c3q17c", "c3q17d", "c3q17e",
                 #                                        "c3q17r", "c3q17i", "c3q17j", "c3q17v",
                 #                                        "c3q17h", "c3q17m")], na.rm = TRUE),
                rev_percap = c3q16/totpop)
 
-sum(master_data$weighted_revenue_total, na.rm = TRUE) # check against NACCHO total
+sum(master_data$rev_total, na.rm = TRUE) # check against NACCHO total
 
-master_data$weighted_revenue_total <- dplyr::na_if(master_data$weighted_revenue_total, 0)
-# master_data$non_weighted_revenue_total <- dplyr::na_if(master_data$non_weighted_revenue_total, 0)
-master_data$rev_percap <- dplyr::na_if(master_data$rev_percap, 0)
+# master_data$rev_total <- dplyr::mutate(dplyr::master_data$rev_total, 0)
+# # master_data$non_rev_total <- dplyr::na_if(master_data$non_rev_total, 0)
+# master_data$rev_percap <- dplyr::na_if(master_data$rev_percap, 0)
 
 # Add exp and rev categories for bar --------------------------------------
-# categories loosely based on jenks natural breaks
+
 master_data <- master_data %>%
   dplyr::mutate(exp_total_numcat =
-                  dplyr::case_when(c3q15 < 250000 ~ "Less than $250,000",
+                  dplyr::case_when(c3q15 > 0 & c3q15 < 250000 ~ "Less than $250,000",
                                    c3q15 >= 250000 & c3q15 < 500000 ~ "$250,000 to $499,999",
-                                   c3q15 >= 500000 & c3q15 < 1000000 ~ "$500,000 to $999,999",
-                                   c3q15 >= 1000000 & c3q15 < 2000000 ~ "$1,000,000 to $1,999,999",
-                                   c3q15 >= 2000000 & c3q15 < 5000000 ~ "$2,000,000 to $4,999,999",
+                                   c3q15 >= 500000 & c3q15 < 750000 ~ "$500,000 to $749,999",
+                                   c3q15 >= 750000 & c3q15 < 1000000 ~ "$750,000 to $999,999",
+                                   c3q15 >= 1000000 & c3q15 < 2500000 ~ "$1,000,000 to $2,499,999",
+                                   c3q15 >= 2500000 & c3q15 < 5000000 ~ "$2,500,000 to $5,000,000",
                                    c3q15 >= 5000000 & c3q15 < 10000000 ~ "$5,000,000 to $9,999,999",
-                                   c3q15 >= 10000000 ~ "$10,000,000 or more")) %>%
+                                   c3q15 >= 10000000 & c3q15 < 25000000 ~ "$10,000,000 to $24,999,999",
+                                   c3q15 >= 25000000 ~ "$25,000,000 or more",
+                                   is.na(c3q15) | c3q15 == 0 ~ "Not reported"),
+                exp_total_numcat = factor(
+                  exp_total_numcat,
+                  levels = c(
+                    "Less than $250,000",
+                    "$250,000 to $499,999",
+                    "$500,000 to $749,999",
+                    "$750,000 to $999,999",
+                    "$1,000,000 to $2,499,999",
+                    "$2,500,000 to $5,000,000",
+                    "$5,000,000 to $9,999,999",
+                    "$10,000,000 to $24,999,999",
+                    "$25,000,000 or more",
+                    "Not reported"
+                  ),
+                  ordered = TRUE  # Ensure the factor is ordinal
+                )) %>%
   dplyr::mutate(exp_percap_numcat =
-                  dplyr::case_when(totexp_percap < 10 ~ "Less than $10",
+                  dplyr::case_when(totexp_percap > 0 & totexp_percap < 10 ~ "Less than $10",
                                    totexp_percap >= 10 & totexp_percap < 25 ~ "$10 to $24",
                                    totexp_percap >= 25 & totexp_percap < 50 ~ "$24 to $50",
                                    totexp_percap >= 50 & totexp_percap < 75 ~ "$50 to $74",
@@ -184,15 +203,18 @@ master_data <- master_data %>%
                                    totexp_percap >= 100 & totexp_percap < 150 ~ "$100 to $150",
                                    totexp_percap >= 150 ~ "$150 or more")) %>%
   dplyr::mutate(rev_total_numcat =
-                  dplyr::case_when(weighted_revenue_total < 250000 ~ "Less than $250,000",
-                                    weighted_revenue_total >= 250000 & weighted_revenue_total < 500000 ~ "$250,000 to $499,999",
-                                    weighted_revenue_total >= 500000 & weighted_revenue_total < 1000000 ~ "$500,000 to $999,999",
-                                    weighted_revenue_total >= 1000000 & weighted_revenue_total < 2000000 ~ "$1,000,000 to $1,999,999",
-                                    weighted_revenue_total >= 2000000 & weighted_revenue_total < 5000000 ~ "$2,000,000 to $4,999,999",
-                                    weighted_revenue_total >= 5000000 & weighted_revenue_total < 10000000 ~ "$5,000,000 to $9,999,999",
-                                    weighted_revenue_total >= 10000000 ~ "$10,000,000 or more")) %>%
+                  dplyr::case_when(rev_total > 0 & rev_total < 250000 ~ "Less than $250,000",
+                                   rev_total >= 250000 & rev_total < 500000 ~ "$250,000 to $499,999",
+                                   rev_total >= 500000 & rev_total < 750000 ~ "$500,000 to $749,999",
+                                   rev_total >= 750000 & rev_total < 1000000 ~ "$750,000 to $999,999",
+                                   rev_total >= 1000000 & rev_total < 2500000 ~ "$1,000,000 to $2,499,999",
+                                   rev_total >= 2500000 & rev_total < 5000000 ~ "$2,500,000 to $5,000,000",
+                                   rev_total >= 5000000 & rev_total < 10000000 ~ "$5,000,000 to $9,999,999",
+                                   rev_total >= 10000000 & rev_total < 25000000 ~ "$10,000,000 to $24,999,999",
+                                   rev_total >= 25000000 ~ "$25,000,000 or more",
+                                   is.na(rev_total) ~ "Not reported")) %>%
   dplyr::mutate(rev_percap_numcat =
-                  dplyr::case_when(rev_percap < 10 ~ "Less than $10",
+                  dplyr::case_when(rev_percap > 0 & rev_percap < 10 ~ "Less than $10",
                                    rev_percap >= 10 & rev_percap < 25 ~ "$10 to $24",
                                     rev_percap >= 25 & rev_percap < 50 ~ "$24 to $50",
                                     rev_percap >= 50 & rev_percap < 75 ~ "$50 to $74",
@@ -208,13 +230,17 @@ master_data <- master_data %>%
 
 master_data$exp_total_numcat <- haven::labelled(
   master_data$exp_total_numcat,
-  labels = c("Less than $250,000" = 1,
-             "$250,000 to $499,999" = 2,
-             "$500,000 to $999,999" = 3,
-             "$1,000,000 to $1,999,999" = 4,
-             "$2,000,000 to $4,999,999" = 5,
-             "$5,000,000 to $9,999,999" = 6,
-             "$10,000,000 or more" = 7
+  labels = c(
+          "Less than $250,000" = 1,
+          "$250,000 to $499,999" = 2,
+          "$500,000 to $749,999" = 3,
+          "$750,000 to $999,999" = 4,
+          "$1,000,000 to $2,499,999" = 5,
+          "$2,500,000 to $5,000,000" = 6,
+          "$5,000,000 to $9,999,999" = 7,
+          "$10,000,000 to $24,999,999" = 8,
+          "$25,000,000 or more" = 9,
+          "Not reported" = 10
              ),
   label = "Total expenditures, by group, created by MA"
 )
@@ -222,15 +248,20 @@ master_data$exp_total_numcat <- haven::labelled(
 
 master_data$rev_total_numcat <- haven::labelled(
   master_data$rev_total_numcat,
-  labels = c("Less than $250,000" = 1,
-             "$250,000 to $499,999" = 2,
-             "$500,000 to $999,999" = 3,
-             "$1,000,000 to $1,999,999" = 4,
-             "$2,000,000 to $4,999,999" = 5,
-             "$5,000,000 to $9,999,999" = 6,
-             "$10,000,000 or more" = 7
+  labels = c(
+    "Less than $250,000" = 1,
+    "$250,000 to $499,999" = 2,
+    "$500,000 to $749,999" = 3,
+    "$750,000 to $999,999" = 4,
+    "$1,000,000 to $2,499,999" = 5,
+    "$2,500,000 to $5,000,000" = 6,
+    "$5,000,000 to $9,999,999" = 7,
+    "$10,000,000 to $24,999,999" = 8,
+    "$25,000,000 or more" = 9,
+    "Not reported" = 10
+
   ),
-  label = "Total revenue, by group, created by LJ"
+  label = "Total revenue, by group, created by MA"
 )
 
 
