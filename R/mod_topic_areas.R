@@ -189,8 +189,10 @@ mod_topic_areas_server <- function(id){
     # update inputs based on selections ---------------------------------------
     observe({
       if (input$topic %in% c("comm_channels_1", "comm_channels_2", "comm_channels_3",
-                             "c12q260", "Newc12q502", "m9q240", "chachip",
-                             "c7q147", "c7q149")) {
+                             "c12q260", "Newc12q502", "m9q240"
+                             # , "chachip",
+                             # "c7q147", "c7q149"
+                             )) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-table"></i>')

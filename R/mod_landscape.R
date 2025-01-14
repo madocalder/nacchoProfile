@@ -664,7 +664,7 @@ mod_landscape_server <- function(id){
           TRUE ~ "all"
         ))
 
-      View(combined_data)
+      # View(combined_data)
 
 
       # Dynamically update the bar chart with new data

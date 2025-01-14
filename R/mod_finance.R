@@ -381,7 +381,7 @@ mod_finance_server <- function(id){
 
       data$year <- factor(data$year)
 
-      View(data)
+      # View(data)
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -612,7 +612,7 @@ mod_finance_server <- function(id){
 
       bar_chart <- highcharter::highchart()
 
-      View(data)
+      # View(data)
 
       bar_chart <- set_column(data,
                               y_label = filter_meta()$y_label,
@@ -665,8 +665,8 @@ mod_finance_server <- function(id){
 
       data <- process_bar_chart_data()
 
-
-      View(data)
+#
+#       View(data)
 
       if (input$filter != "All LHDs") {
 
@@ -843,8 +843,8 @@ mod_finance_server <- function(id){
         data <- data %>%
           mutate(color = ifelse(!is.na(parent) & parent == "Overall", color_mapping[id], NA))
 
-
-        View(data)
+#
+#         View(data)
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%

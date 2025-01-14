@@ -553,7 +553,7 @@ mod_workforce_server <- function(id) {
 
       data <- process_chart_data()
 
-      View(data)
+      # View(data)
 
       if (input$filter != "All LHDs") {
 

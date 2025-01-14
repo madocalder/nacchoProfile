@@ -698,7 +698,7 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
         pivot_data_group()%>%
         add_all_ldh_count(data_all = services_data_all)
 
-View(data)
+# View(data)
 
     } else if (topic == "Reduced/Expanded Services") {
 

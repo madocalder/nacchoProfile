@@ -587,7 +587,7 @@ scatter_data <- function(set_filter = "All LHDs",
       # group = group, # Keep Responses as is
       # .groups = "drop"  # Drop grouping after summarization
     )
-  View(data_xy)
+  # View(data_xy)
 
 
 
