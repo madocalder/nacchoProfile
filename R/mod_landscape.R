@@ -119,15 +119,22 @@ mod_landscape_ui <- function(id) {
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
               div(
-                uiOutput(ns("table_title")),
+                div( class = "table-grid",
+
+
+                     div(class = "table-title-grid",
+
+                uiOutput(ns("table_title")) ),
+
                 csvDownloadButton(ns("data_table"), filename = "landscape.csv"),
                 reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
-                br(),
+
                 HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line,'
          <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
                 style = "margin-left: auto !important;
                         margin-right: auto !important;"
               )
+            )
             ),
 
             # view output Line

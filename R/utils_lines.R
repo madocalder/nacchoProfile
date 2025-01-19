@@ -627,7 +627,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
 
           "Community-Based Partnerships"
 
-        } else{
+        } else {
          "Government Partnerships"
         }
 

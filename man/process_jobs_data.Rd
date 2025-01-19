@@ -4,7 +4,7 @@
 \alias{process_jobs_data}
 \title{Helper to process jobs-related data}
 \usage{
-process_jobs_data(jobs_data, is_standardized = FALSE)
+process_jobs_data(jobs_data, filtering = "All LHDs")
 }
 \arguments{
 \item{jobs_data}{A data frame containing jobs data.}

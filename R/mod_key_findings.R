@@ -432,7 +432,7 @@ mod_key_findings_server <- function(id){
             )
 
           )
-        )
+        ) %>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
 
@@ -491,7 +491,7 @@ mod_key_findings_server <- function(id){
               )
             )
           )
-        )
+        )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
 
@@ -525,7 +525,7 @@ mod_key_findings_server <- function(id){
         title_text = "LHDs <span style='color:#AB6143;font-weight:bold;'>expanded</span>
         immunization services in 2022 following prior <span style='color:#80A14E;font-weight:bold;'>decreases</span> in this service.",
         subtitle_text = "In 2022, 65\u0025 of LHDs expanded immunization services, compared to 11\u0025 that expanded immunizations in 2020 and 21\u0025 in 2019. 2020 data are from NACCHO's Forces of Change Survey."
-      )
+      )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
 
@@ -550,7 +550,7 @@ mod_key_findings_server <- function(id){
         subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219.",
         caption_align = "left",
         allow_export = FALSE
-      )
+      )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
 
@@ -592,7 +592,7 @@ mod_key_findings_server <- function(id){
         x_label = "",
         tooltip = "{point.value:.0f}\u0025 of LHDs had implemented <br> {point.type} in {point.year}",
         allow_export = FALSE
-      )
+      )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
 
@@ -669,7 +669,7 @@ mod_key_findings_server <- function(id){
               inside = TRUE
             )
           )
-        )
+        )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
 
     output$finding_eight <- highcharter::renderHighchart({
@@ -798,7 +798,7 @@ mod_key_findings_server <- function(id){
         ) %>%
         highcharter::hc_tooltip(
           pointFormat = "<b>{point.name}:</b> {point.y}%"
-        )
+        )%>% highcharter::hc_add_theme(naccho.viz::basic)
     })
   })
 }

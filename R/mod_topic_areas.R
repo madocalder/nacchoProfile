@@ -188,6 +188,11 @@ mod_topic_areas_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
+      req(!is.null(c(input$topic, input$view, input$filter)))
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- input$filter
+
       if (input$topic %in% c("comm_channels_1", "comm_channels_2", "comm_channels_3",
                              "c12q260", "Newc12q502", "m9q240"
                              # , "chachip",
@@ -205,17 +210,23 @@ mod_topic_areas_server <- function(id){
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Table"))
+                                              choiceValues = c("Bar Graph", "Table"),
+                                              selected = dplyr::case_when(selected_view %in% c("Bar Graph", "Table") ~ selected_view,
+                                                                          TRUE ~ "Bar Graph"))
       }
     })
 
     # Update filter options based on topic and view selection
     observe({
-      req(input$topic, input$view)
+      req(input$topic, input$view, input$filter)
+
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- input$filter
 
       # Restrict filter to "All LHDs" for specific topics and views
-      if (input$topic %in% c("health_part", "comm_part", "gov_part") &&
-          input$view %in% c("Table", "Bar Graph")) {
+      if (input$topic %in% c("health_part", "comm_part", "gov_part", "tech_use") &&
+          input$view %in% c("Bar Graph")) {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1],
                           selected = landscape_filters[1])
@@ -223,7 +234,7 @@ mod_topic_areas_server <- function(id){
         # Restore the full set of filters for other topics
         updateSelectInput(session, "filter",
                           choices = landscape_filters,
-                          selected = landscape_filters[1])
+                          selected = selected_filter)
       }
     })
 
@@ -296,53 +307,28 @@ mod_topic_areas_server <- function(id){
       message("topic =", topic)
       message("filtering =", filtering)
 
-      if (!(input$topic %in% c("health_part", "comm_part", "gov_part"))) {
+
 
       data <- get_bar_data(topic = topic, filter = filtering)
 
-      } else {
 
-         data <- partnerships %>%
-           dplyr::filter(variable == topic)
-
-         data$year <- as.factor(data$year)
-
-         # if(max(data$y, na.rm = TRUE) == 100) {
-         #   y_max_rel <- max(data$y, na.rm = TRUE) + 1
-         # } else {
-         #   y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
-         # }
-         #
-         naccho.viz::create_grouped_line(
-           data = data,
-           x_variable = "year",
-           x_group = "group",
-           y_variable = "y",
-           y_label = "% of LHDs",
-           # y_max = y_max_rel,
-           x_label = "Year",
-           select_theme = naccho.viz::basic,
-           title = "Formal {point.group} Over Time",
-           # subtitle = subtitle,
-           # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
-           tooltip = "In {point.year}, {point.one}{point.two}.",
-           legend_title = NA
-         )
-
-      }
 
 
       # show_n(data$Responses)
 
       # Adjust the bar chart settings for long names
-      set_simple_bar(data) %>%
+      set_simple_bar(data,
+                     # y_label = filter_meta()$y_label,
+                     y_format = filter_meta()$y_format,
+                     data_label = filter_meta()$data_label ) %>%
 
         viz_options(
           theme = naccho.viz::basic,
           viz_title = filter_meta()$title,
           viz_subtitle = filter_meta()$subtitle,
           viz_caption = paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
-          tooltip = "{point.category}: <br> {point.y}%",
+          tooltip = filter_meta()$tooltip,
+
           #,
           # legend_enable = FALSE,
           colors = colors()
@@ -520,11 +506,11 @@ mod_topic_areas_server <- function(id){
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
+
     }) #end of tables output code
 
     # right content ===========================================================
 
-    # takeaway ----------------------------------------------------------------
     # takeaway ----------------------------------------------------------------
     observeEvent(input$takeaway, {
 

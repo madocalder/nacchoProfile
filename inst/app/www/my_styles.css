@@ -647,6 +647,7 @@ label:not(.material-switch label) {
   background-color: #fff !important;
   margin-top: 10px;
   box-shadow: none;
+  display: none;
 }
 
 .card-header {
@@ -719,11 +720,10 @@ label:not(.material-switch label) {
 
 @media (max-width: 1199px) {
   .carousel-indicators {
-    position: relative;
     display: flex;
     justify-content: center;
-    bottom: -3rem;
-    left: auto;
+    position: static;
+    margin: 0px;
   }
 }
 
@@ -1285,26 +1285,74 @@ b, strong {
 
 /* -------------------------------------------------------  Highcharter Things */
 .highcharts-tooltip span {
-    height: fit-content;
-    min-width: 50vw!important;
-    max-width: 80% !important;
+    /* height: fit-content; */
+    min-width: 20vw!important;
+    max-width: 40% !important;
     white-space: normal !important;
     z-index: 29999;
     width: fit-content;
     margin-top: 2% !important;
     vertical-align: middle;
     font-size: calc(0.2em + 10px + 0.1vw) !important;
-    line-height: calc((0.2em + 10px + 0.1vw) * 1.3) !important;
+    line-height: calc((0.2em + 10px + 0.1vw) * 1.5) !important;
     justify-items: center !important;
     width: auto;
 }
 
 .highcharts-legend {
     max-height: 3vmin !important;
-    font-size: 1em !important;
+     font-size: calc(10px + .167em + .625vmin) !important;
     overflow-y: auto !important;
       }
 
+.highcharts-legend-item text {
+    max-height: 3vmin !important;
+     font-size: calc(10px + .167em + .625vmin) !important;
+    overflow-y: auto !important;
+      }
+
+      .highcharts-legend-item .highcharts-point {
+    max-height: 3vmin !important;
+     font-size: calc(10px + .167em + .625vmin) !important;
+    overflow-y: auto !important;
+      }
+
+
+
+.highcharts-title {
+  font-size: calc(12px + .2em + .75vmin) !important;
+  font-family: "Heebo", sans-serif;
+  font-weight: bold;
+  color: #003366; /* Replace with `naccho.viz::navy` equivalent */
+}
+
+.highcharts-subtitle {
+  font-size: calc(10px + .167em + .625vmin) !important;
+  font-family: "Heebo", sans-serif;
+  font-weight: 400;
+  color: #3E4242; /* Replace with `naccho.viz::grey` equivalent */
+}
+
+.highcharts-caption {
+  font-size: calc(7.2px + .12em + .45vmin) !important;
+  font-family: "Heebo", sans-serif;
+  color: #3E4242;
+}
+
+
+.highcharts-data-labels text {
+  font-size: calc(8px + .133em + .5vmin) !important;
+  font-family: "Heebo", sans-serif;
+  font-weight: normal;
+  color: #3E4242;
+}
+
+.highcharts-axis-labels text {
+  font-size: calc(8px + .133em + .5vmin) !important;
+  font-family: "Heebo", sans-serif;
+  font-weight: normal;
+  color: #3E4242;
+}
 .highcharts-container {
   /* min-width: 30vw!important; Minimum width of the chart
   min-height: 50vh!important;  Minimum height of the chart */
@@ -1314,11 +1362,10 @@ b, strong {
 
 
 .carousel-indicators {
-    position: relative;
     display: flex;
     justify-content: center;
-    bottom: -3rem;
-    left: auto;
+    position: static;
+    margin: 0px;
 }
 
 .responsive-select {
@@ -1421,4 +1468,6 @@ b, strong {
   vertical-align: middle;
   margin
 }
+
+
 

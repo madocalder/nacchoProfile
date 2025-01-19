@@ -11,7 +11,7 @@
 #' @import tidyr
 pivot_data_group <- function(data) {
   data %>%
-    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "total_employees", "filter", "comms_use", "comms_type"))) %>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "filter", "comms_use", "comms_type"))) %>%
     tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
     dplyr::rename_with(standardize_column_names)  # Standardize column names
 }
@@ -95,32 +95,32 @@ process_weighted_stats <- function(topic, filtering = NULL) {
 #' processed in a standardized format (as percentages).
 #' @return A processed data frame with job-related statistics.
 #' @import dplyr
-process_jobs_data <- function(jobs_data, is_standardized = FALSE) {
-  if (is_standardized) {
-    jobs_data %>%
-      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
-      dplyr::filter(filter == "All LHDs") %>%
-      dplyr::select(category, group, y, Responses, total_employees) %>%
-      pivot_data_cat() %>%
-      dplyr::mutate(
-        `y_Jobs Added (Standardized)` = round_up((`y_Jobs Added` / total_employees) * 100, 1),
-        `y_Jobs Lost (Standardized)` = round_up((`y_Jobs Lost` / total_employees) * 100, 1),
-        `Responses_Jobs Added (Standardized)` = `Responses_Jobs Added`,
-        `Responses_Jobs Lost (Standardized)` = `Responses_Jobs Lost`
-      ) %>%
-      dplyr::select(
-        category,
-        `y_Jobs Added (Standardized)`, `y_Jobs Lost (Standardized)`,
-        `Responses_Jobs Added (Standardized)`, `Responses_Jobs Lost (Standardized)`
-      ) %>%
-      dplyr::rename_with(standardize_column_names)  # Standardize here
-  } else {
-    jobs_data %>%
+process_jobs_data <- function(jobs_data, filtering = "All LHDs" ) {
+  if (filtering == "All LHDs") {
+
+    data  <- jobs_data %>%
       dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
       dplyr::filter(filter == "All LHDs") %>%
       dplyr::select(category, group, y, Responses, total_employees) %>%
       pivot_data_group() %>%
       dplyr::rename_with(standardize_column_names)  # Standardize here
+
+  } else {
+
+    data_all  <- jobs_data %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
+      dplyr::filter(filter == "All LHDs") %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_group() %>%
+      dplyr::rename_with(standardize_column_names)  # Standardize here
+
+    data  <- jobs_data %>%
+      dplyr::mutate(group = dplyr::case_when(group == "13" ~ "All LHDs", TRUE ~ group)) %>%
+      dplyr::filter(filter == filtering) %>%
+      dplyr::select(category, group, y, Responses, total_employees) %>%
+      pivot_data_group() %>%
+      dplyr::rename_with(standardize_column_names) %>%  # Standardize here
+      dplyr::left_join(data_all, by = "category")
   }
 }
 
@@ -371,29 +371,67 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
          dplyr::group_by(category) %>%
          pivot_data_group()
 
-     } else if (topic == "chachip") {
+     } else if (topic %in% c("chachip", "c7q149", "c7q147")) {
 
-       data <- return_survey_weighted_counts("chachip")
-
-       # Calculate total responses and 'y_All LHDs'
-       data_n <- data %>%
-         dplyr::group_by(Group) %>%
-         dplyr::reframe(
-           Responses = sum(data$Responses, na.rm = TRUE)
-         )
+       data_all <- return_survey_weighted_counts(topic)
 
 
-       data <- data %>%
-         dplyr::mutate(
-           y = 100 * (Responses / total_responses),
-           Responses = total_responses
-         ) %>%
-         dplyr::select(category, group, y, Responses) %>%
-         dplyr::left_join(., add_all_counts_long("chachip"), by = "category")%>%
-         dplyr::mutate(category = ordered(category, levels = c("Yes", "No")))%>%
-         dplyr::mutate(category = dplyr::recode(category,
-                                                "Yes" = "Completed both in past 5 years",
-                                                "No" = " Completed one or none in past 5 years"))
+       if (topic == "chachip") {
+
+         data_all <- data_all %>% dplyr::mutate(
+           category = ordered(category, levels = c("Yes", "No")))%>%
+           dplyr::mutate(category =
+                           dplyr::recode(category,
+                                         "Yes" = "Completed both in past 5 years",
+                                         "No" = " Completed one or none in past 5 years"))
+
+
+       } else if (topic == "c7q147") {
+
+
+
+         data_all <- data_all %>%
+           dplyr::mutate(category =
+                           dplyr::case_when(
+                             stringr::str_detect(category, "Yes, Within") ~
+                               "Completed CHA within last 3 years",
+                             stringr::str_detect(category, "Yes, > 3") ~
+                               "Completed CHA within the last 3 to 5 years",
+                             stringr::str_detect(category, "Yes, > 5") ~
+                               "Completed CHA more than 5 years ago",
+                             TRUE ~ "Has not yet completed CHA"
+                           ))%>%
+           dplyr::group_by(category, group) %>%
+           dplyr::reframe(y = sum(y),
+                          Responses = sum(Responses),
+                          group = unique(group),
+                          category = unique(category))
+
+       } else {
+
+         data_all <- data_all %>%
+           dplyr::mutate(category =
+                           dplyr::case_when(
+                             stringr::str_detect(category, "Yes, Within") ~
+                               "Completed CHIP within last 3 years",
+                             stringr::str_detect(category, "Yes, > 3") ~
+                               "Completed CHIP within the last 3 to 5 years",
+                             stringr::str_detect(category, "Yes, > 5") ~
+                               "Completed CHIP more than 5 years ago",
+                             TRUE ~ "Has not yet completed CHIP"
+                           ))%>%
+           dplyr::group_by(category, group) %>%
+           dplyr::reframe(y = sum(y),
+                          Responses = sum(Responses),
+                          group = unique(group),
+                          category = unique(category))
+       }
+
+       data <- data_all %>%
+         pivot_data_group()
+
+
+
 
 
      } else if (topic == "c12q260") {
@@ -427,10 +465,25 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
      } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
 
        data <- partnerships %>%
-         dplyr::filter(year == "2022",
-                       variable == topic) %>%
-         dplyr::mutate(Responses = "205 - 485") %>%
+         dplyr::filter(partner_type == topic,
+                       filter == "All LHDs",
+                       suffix == "work3"
+
+                       ) %>%
+
+         dplyr::group_by(partner) %>%
+         # dplyr::group_by(Question) %>%
+         dplyr::mutate(Responses = sum(Responses)) %>%
+         dplyr::ungroup() %>%
+         dplyr::mutate(category = dplyr::case_when(
+           category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
+           TRUE ~ "Checked")) %>%
+         dplyr::filter(category == "Checked")   %>%
+         dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
+         dplyr::rename(category = partner) %>%
          pivot_data_group()
+
+
 
 
     } else {
@@ -551,6 +604,13 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
         dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
         tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
         dplyr::rename(category = group)
+
+
+
+
+    } else if (topic == "jobs_total") {
+
+      data <- process_jobs_data(jobs_data, filtering)
 
 
 
@@ -843,57 +903,156 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
     } else if (topic %in% c("chachip", "c7q149", "c7q147")) {
 
-      if (filtering == "All LHDs" || is.null(filtering)){
-        data <- return_survey_weighted_counts(topic)
-      } else {
+        data_all <- return_survey_weighted_counts(topic)
+
+
         data <- return_survey_weighted_counts(topic, filtering)
-      }
-
-      # Calculate total responses and 'y_All LHDs'
-      data_n <- data %>%
-        dplyr::group_by(Group) %>%
-        dplyr::reframe(
-          Responses = sum(data$Responses, na.rm = TRUE)
-        )
 
 
-      data <- data %>%
-        dplyr::mutate(
-          # y = 100 * (Responses / total_responses),
-          Responses = show_n(data_n$Responses)
-        )
 
-      if (topic == "chachip") {
+        if (topic == "chachip") {
 
-        data <- data %>% dplyr::mutate(
-          category = ordered(category, levels = c("Yes", "No")))%>%
-          dplyr::mutate(category =
-                          dplyr::recode(category,
-                                        "Yes" = "Completed both in past 5 years",
-                                        "No" = " Completed one or none in past 5 years"))
-      } else if (topic == "c7q147") {
+          data_all <- data_all %>%
+            dplyr::mutate(category =
+                            dplyr::recode(category,
+                                          "Yes" = "Completed both in past 5 years",
+                                          "No" = " Completed one or none in past 5 years"))
+
+          data <- data %>%
+            dplyr::mutate(category =
+                            dplyr::recode(category,
+                                          "Yes" = "Completed both in past 5 years",
+                                          "No" = "Completed one or none in past 5 years")
+      )
+        } else if (topic == "c7q147") {
+
+          data <- data %>%
+
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes, Within") ~
+                                "Completed CHA within last 3 years",
+                              stringr::str_detect(category, "Yes, > 3") ~
+                                "Completed CHA within the last 3 to 5 years",
+                              stringr::str_detect(category, "Yes, > 5") ~
+                                "Completed CHA more than 5 years ago",
+                              TRUE ~ "Has not yet completed CHA"
+                            ))%>%
+            dplyr::group_by(category, group)%>%
+            dplyr::reframe(y = sum(y),
+                           Responses = sum(Responses),
+                           group = unique(group),
+                           category = unique(category))
+
+          data_all <- data_all %>%
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes, Within") ~
+                                "Completed CHA within last 3 years",
+                              stringr::str_detect(category, "Yes, > 3") ~
+                                "Completed CHA within the last 3 to 5 years",
+                              stringr::str_detect(category, "Yes, > 5") ~
+                                "Completed CHA more than 5 years ago",
+                              TRUE ~ "Has not yet completed CHA"
+                            ))%>%
+            dplyr::group_by(category, group) %>%
+            dplyr::reframe(y = sum(y),
+                           Responses = sum(Responses),
+                           group = unique(group),
+                           category = unique(category))
+
+        } else {
+
+          data <- data %>%
+
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes, Within") ~
+                                "Completed CHIP within last 3 years",
+                              stringr::str_detect(category, "Yes, > 3") ~
+                                "Completed CHIP within the last 3 to 5 years",
+                              stringr::str_detect(category, "Yes, > 5") ~
+                                "Completed CHIP more than 5 years ago",
+                              TRUE ~ "Has not yet completed CHIP"
+                            ))%>%
+            dplyr::group_by(category, group)%>%
+            dplyr::reframe(y = sum(y),
+                           Responses = sum(Responses),
+                           group = unique(group),
+                           category = unique(category))
+
+          data_all <- data_all %>%
+            dplyr::mutate(category =
+                            dplyr::case_when(
+                              stringr::str_detect(category, "Yes, Within") ~
+                                "Completed CHIP within last 3 years",
+                              stringr::str_detect(category, "Yes, > 3") ~
+                                "Completed CHIP within the last 3 to 5 years",
+                              stringr::str_detect(category, "Yes, > 5") ~
+                                "Completed CHIP more than 5 years ago",
+                              TRUE ~ "Has not yet completed CHIP"
+                            ))%>%
+            dplyr::group_by(category, group) %>%
+            dplyr::reframe(y = sum(y),
+                          Responses = sum(Responses),
+                          group = unique(group),
+                          category = unique(category))
+        }
+
+        data_all <- data_all %>%
+          pivot_data_group()
 
         data <- data %>%
-          dplyr::mutate(category =
-                          dplyr::case_when(
-                            stringr::str_detect(category, "Yes") ~ "Has completed CHA",
-                            TRUE ~ "Has not yet completed CHA"
-                          ))
+          pivot_data_group() %>%
+          add_all_ldh_count(data_all = data_all)
 
-      } else {
 
-        data <- data %>%
 
-          dplyr::mutate(category =
-                          dplyr::case_when(
-                            stringr::str_detect(category, "Yes") ~ "Has completed CHIP",
-                            TRUE ~ "Has not yet completed CHIP"
-                          ))
+      } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
 
-      }
 
-      data <- data %>%
-        pivot_data_cat()
+        data_all <- partnerships %>%
+          dplyr::filter(partner_type == topic,
+                        filter == "All LHDs",
+                        suffix == "work3"
+
+          ) %>%
+
+          dplyr::group_by(partner) %>%
+          # dplyr::group_by(Question) %>%
+          dplyr::mutate(Responses = sum(Responses)) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(category = dplyr::case_when(
+            category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
+            TRUE ~ "Checked")) %>%
+          dplyr::filter(category == "Checked")   %>%
+          dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
+          dplyr::rename(category = partner) %>%
+          pivot_data_group()%>%
+          dplyr::select(c("category", "y_All LHDs", "Responses_All LHDs"))
+
+
+        data <- partnerships %>%
+          dplyr::filter(partner_type == topic,
+                        filter == filtering,
+                        suffix == "work3"
+
+          ) %>%
+
+          dplyr::group_by(partner, group) %>%
+          # dplyr::group_by(group) %>%
+          # dplyr::group_by(Question) %>%
+          dplyr::mutate(Responses = sum(Responses)) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(category = dplyr::case_when(
+            category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
+            TRUE ~ "Checked")) %>%
+          dplyr::filter(category == "Checked")   %>%
+          dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
+          dplyr::rename(category = partner) %>%
+          pivot_data_group() %>%
+          dplyr::left_join(data_all, by = "category")
+
 
     } else if (topic == "c12q260") {
 
@@ -1295,7 +1454,8 @@ table_n_count <- function(data, topic, col_name = NULL) {
     "c5q37", "fte_bypop", "c5q36", "employee_bypop",
     "Reduced/Expanded Services", "c3q15", "totexp_percap",
     "rev_percap", "rev_total", "comm_channels_1", "comm_channels_2",
-    "comm_channels_3","tech_use"
+    "comm_channels_3","tech_use", "gov_part", "health_part", "comm_part",
+    "jobs_total"
   )) {
     # Use `show_n` to calculate range or single value
     show_n(data[[paste0(col_name)]])

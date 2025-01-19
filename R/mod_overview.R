@@ -97,8 +97,8 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-7",
                       highcharter::highchartOutput(ns("map"),
-                                                   # width = "auto",
-                                                   height = "50vh")
+                                                   width = "auto",
+                                                   height = "55vh")
                       # ,
                       # style = "margin-left: auto !important;
                       #         margin-right: auto !important;"
@@ -185,7 +185,8 @@ mod_overview_server <- function(id){
                             tolower(category), " LHDs."))
 
 
-      set_column(data) %>%
+      set_column(data,
+                 data_label = "{point.y:,.0f}%") %>%
         viz_options(
           viz_title = "% of U.S. Population Served by LHDs",
           viz_caption = "",
@@ -243,7 +244,7 @@ mod_overview_server <- function(id){
         tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
         caption_text = "",
         accessible_desc = ""
-      )%>%
+      ) %>%
         highcharter::hc_add_theme(naccho.viz::basic)
 
       # %>%
@@ -304,7 +305,6 @@ mod_overview_server <- function(id){
         #   formatter = JS(
         #     "
         # function () {
-        #   let roundedValue;
         #   if (this.y > 0 && this.y < 1) {
         #     roundedValue = this.y.toFixed(1);
         #   } else {

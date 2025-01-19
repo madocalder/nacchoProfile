@@ -4,7 +4,12 @@
 \alias{set_simple_bar}
 \title{Set First Highcharter Column Graph}
 \usage{
-set_simple_bar(data, y_label = "", y_format = "{value}")
+set_simple_bar(
+  data,
+  y_label = "",
+  y_format = "{value}",
+  data_label = "{value}"
+)
 }
 \arguments{
 \item{data}{dataframe; A dataframe with x, y, group, and category columns.}

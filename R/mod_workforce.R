@@ -362,12 +362,21 @@ mod_workforce_server <- function(id) {
     })
 
     observe({
-      req(input$topic)
+      req(input$topic, input$view, input$filter)
       # req(updated_inputs())
+
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- unlist(input$filter)
+
+print(selected_filter)
 
       if (input$topic %in% c("c5q37", "c5q36", "fte_bypop")) {
         updateSelectInput(session, "filter",
-                          choices = c(landscape_filters[1], landscape_filters[4]))
+                          choices = c(landscape_filters[1], landscape_filters[4]),
+                          selected = dplyr::case_when(selected_filter == "All LHDs" ~ landscape_filters[1],
+                                                       selected_filter == "c0popcat3" ~ landscape_filters[4],
+                                                      TRUE ~ landscape_filters[1]))
 
 
       } else if (input$topic %in% c("FTE_numcat", "employee_numcat", "employee_bypop")) {
@@ -375,9 +384,15 @@ mod_workforce_server <- function(id) {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1])
 
+      } else if (input$topic == "jobs_total" & input$view == "Bar Graph") {
+
+        updateSelectInput(session, "filter",
+                          choices = landscape_filters[1])
+
       } else {
         updateSelectInput(session, "filter",
-                          choices = landscape_filters)
+                          choices = landscape_filters,
+                          selected = selected_filter)
       }
     })
 
@@ -817,8 +832,8 @@ observe({
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         p(htmltools::HTML(
           "<b>Key Takeaway(s)</b>: <br><br>",
@@ -837,8 +852,8 @@ observe({
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
@@ -888,11 +903,12 @@ observe({
           )
         })
 
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
           # side right --------------------------------------------------------------
-
 
           if (length(links) == 0) {
             paste("No relevant definitions.")
