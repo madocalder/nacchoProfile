@@ -251,12 +251,12 @@ mod_services_server <- function(id) {
           session, "view",
           choiceNames = list(
             HTML('<i class="fas fa-chart-scatter"></i>'),
-            HTML('<i class="fas fa-chart-bar"></i>'),
+            # HTML('<i class="fas fa-chart-bar"></i>'),
             HTML('<i class="fas fa-table"></i>')
           ),
-          choiceValues = c("Scatter Plot", "Butterfly Graph", "Table"),
+          choiceValues = c("Scatter Plot", "Table"),
           selected = dplyr::case_when(
-            selected_view %in% c("Scatter Plot", "Butterfly Graph", "Table") ~ selected_view,
+            selected_view %in% c("Scatter Plot", "Table") ~ selected_view,
             TRUE ~ "Scatter Plot")
         )
       }
@@ -287,10 +287,13 @@ mod_services_server <- function(id) {
     observe({
       req(input$topic, input$view)
 
-      if (input$topic == "Reduced/Expanded Services" &&
-          input$view == "Scatter Plot") {
+      if (input$topic == "Reduced/Expanded Services") {
+
+
         # Multi-select using checkboxes
         output$services_input <- renderUI({
+
+          if (input$view == "Scatter Plot") {
           checkboxGroupInput(
             inputId = ns("services"),
             label = HTML('<b>Select Service(s):</b>'),
@@ -300,17 +303,40 @@ mod_services_server <- function(id) {
           )
 
 
+        } else {
+
+          selectInput(inputId = ns("services"),
+                      label = HTML('<b>Select Service:</b>'),
+                      multiple = FALSE,
+                      choices = service_cats,  # List of services
+                      selected = service_cats[1],
+                      width = "100%"
+          )
+
+
+        }
         })
+
+
+
+
       } else {
         # Single-select using radio buttons
         output$services_input <- renderUI({
-          radioButtons(
-            inputId = ns("services"),
-            label = HTML('<b>Select Service:</b>'),
-            choices = service_classifications,  # List of services
-            selected = service_classifications[1],  # Default first service
-            width = "100%"
-          )
+          # radioButtons(
+          #   inputId = ns("services"),
+          #   label = HTML('<b>Select Service:</b>'),
+          #   choices = service_classifications,  # List of services
+          #   selected = service_classifications[1],  # Default first service
+          #   width = "100%"
+          # )
+
+          selectInput(inputId = ns("services"),
+                      label = HTML('<b>Select Service:</b>'),
+                      choices =  service_classifications,
+                      multiple = FALSE,
+                      selected =  service_classifications[1]
+                      )
         })
       }
     })
@@ -448,9 +474,42 @@ mod_services_server <- function(id) {
         dplyr::mutate(x = seq_along(category) - 1) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(group_tt = dplyr::case_when(
-          group != "All LHDs" ~ tolower(group),
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+           group == "censusregion" ~ paste0(tolower(group), "ern"),
           TRUE ~ "all"
-        ))
+        ),
+        category_tt = dplyr::case_when(service_type == "Air Polution" ~ "services to address air polution",
+                                       service_type == "COVID-19 Adult Immunizations" ~ "COVID-19 adult immunizations",
+                                       service_type == "COVID-19 Child Immunizations" ~ "COVID-19 child immunizations",
+                                       service_type == "BMI Screening" ~ "BMI screening",
+                                       service_type == "HIV/AIDs Screening" ~ "HIV/AIDs screening",
+                                       service_type == "Other STDs Screening"   ~ "other STD screening" ,
+                                       service_type == "HIV/AIDs Treatment"   ~ "HIV/AIDs treatment" ,
+                                       service_type ==  "Other STD Treatment"   ~  "other STD treatment" ,
+                                       service_type == "EPSDT" ~ "early and periodic screening, diagnostic and treatment (EPSDT)",
+                                       service_type == "WIC" ~ "WIC",
+                                       service_type == "Behavioral Risk Factors" ~ "behavioral risk factor surveillance services",
+                                       service_type == "Chronic Disease"  ~ "chronic disease surveillance services",
+                                       service_type == "Communicable/Infectious Disease "  ~ "communicable/infectious disease surveillance services",
+                                       service_type == "Maternal and Child Health" ~ "maternal and child health surveillance services",
+                                       service_type == "Mental Illness" ~ "mental illness prevention activities",
+                                       service_type == "Nutrition" ~ "nutrition services",
+                                       service_type == "Opioids" ~ "opioid prevention activities",
+                                       service_type == "Injury" ~ "injury prevention activities",
+                                       service_type == "Physical Activity" ~ "physical activity services",
+                                       service_type == "Substance Abuse Other Than Opioids" ~ "substance abuse (other than opioids) prevention activities",
+                                       service_type == "Tobacco" ~ "tobacco prevention activities",
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type != "Lead Inspections"  ~  paste(tolower(service_type), "regulation, inspection, and/or licensing activities"),
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type == "Lead Inspections"  ~  "lead inspection activities",
+                                       service_type == "Hazmat Response" ~ "hazmat response services",
+                                       service_type == "Indoor Air Quality" ~ "indoor air quality control/improvement services",
+                                       service_type == "Noise Pollution"  ~ "noise polution control/improvement services",
+                                       service_type == "Radiation Control"   ~ "radiation control services",
+                                       service_type ==  "Vector Control"    ~ "vector control services",
+                                       TRUE ~ tolower(service_type)
+
+                                       )
+        )
 
       data_n <- services_data %>%
         dplyr::filter(
@@ -566,8 +625,8 @@ mod_services_server <- function(id) {
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         p(htmltools::HTML(
           "<b>Key Takeaway(s)</b>: <br><br>",
@@ -589,8 +648,8 @@ mod_services_server <- function(id) {
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
@@ -616,15 +675,10 @@ mod_services_server <- function(id) {
     #definitions------
 
     observeEvent(input$definitions, {
-      # shinyjs::hide("toggle_get_services")
-      # shinyjs::hide("toggle_takeaway")
-      # shinyjs::hide("toggle_context")
-      # shinyjs::show("toggle_definitions")
 
       toggle_sidebar_content("toggle_definitions",
                              c("toggle_takeaway", "toggle_context",
                                "toggle_definitions", "toggle_get_services"))
-
 
       output$show_definitions <- renderUI({
 
@@ -648,18 +702,17 @@ mod_services_server <- function(id) {
           )
         })
 
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
           # side right --------------------------------------------------------------
 
-
           if (length(links) == 0) {
             paste("No relevant definitions.")
           } else {
-            toggle_sidebar_content("toggle_definitions",
-                                   c("toggle_takeaway", "toggle_context",
-                                     "toggle_definitions", "toggle_get_class"))
+            links
           }
         )
       })

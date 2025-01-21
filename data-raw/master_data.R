@@ -68,8 +68,8 @@ race <- race %>%
          c4q27d == "checked" | c4q27e == "checked" | c4q27f == "checked") &
         (c4q27a == "checked" & (c4q27b == "checked" | c4q27c == "checked" | c4q27d == "checked" |
                                   c4q27e == "checked" | c4q27f == "checked")) ~ "Mixed Identity or Other Race",
-      c4q27g == "checked" & c4q28 == "Prefer not to answer" ~ "NA",
-      TRUE ~ "NA"
+      c4q27g == "checked" & c4q28 == "Prefer not to answer" ~ NA,
+      TRUE ~ NA
     ),
     ethnicity = c4q28
   )%>%
@@ -221,10 +221,19 @@ master_data <- master_data %>%
                                     rev_percap >= 75 & rev_percap < 100 ~ "$75 to $100",
                                     rev_percap >= 100 & rev_percap < 150 ~ "$100 to $150",
                                     rev_percap >= 150 ~ "$150 or more")) %>%
+
+  dplyr::mutate(tenure_numcat = dplyr::case_when(tenure < 2 ~ "Less than 2 years",
+                                                 tenure >= 2 & tenure < 6 ~ "2 - 5 years",
+                                                 tenure >= 6 & tenure < 11 ~ "6 - 10 years",
+                                                 tenure >= 11 ~ "11 or more years" )) %>%
+
   dplyr::mutate(exp_total_numcat = haven::as_factor(exp_total_numcat),
                 exp_percap_numcat = haven::as_factor(exp_percap_numcat),
                 rev_total_numcat = haven::as_factor(rev_total_numcat),
-                rev_percap_numcat = haven::as_factor(rev_percap_numcat))
+                rev_percap_numcat = haven::as_factor(rev_percap_numcat)
+                # ,
+                # tenure_numcat = haven::as_factor(tenure_numcat)
+                )
 
 
 
@@ -292,6 +301,17 @@ master_data$rev_percap_numcat <- haven::labelled(
   label = "Per capita revenue, by group, created by LJ"
 )
 
+# master_data$tenure_numcat <- haven::labelled(
+#   master_data$tenure_numcat,
+#   labels = c("Less than 2 years" = 1,
+#              "2 - 5 years" = 2,
+#              "6 - 10 years" = 3,
+#              "11 or more years" = 4
+#   )
+#
+# )
+
+
 
 master_data <- master_data %>%
   dplyr::mutate(spec_combined = case_when(
@@ -300,6 +320,8 @@ master_data <- master_data %>%
   )) %>%
   # Apply labels to the new variable
   dplyr::mutate(spec_combined = haven::labelled(spec_combined, c("unchecked" = 0, "checked" = 1)))
+
+
 
 
 # print elapsed time

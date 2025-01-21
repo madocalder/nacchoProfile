@@ -240,7 +240,7 @@ csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV")
     color: #3C8A97;
     border: 0px;
     cursor: pointer;
-    font-size: calc(10px + .5em + 1vw);
+    font-size: calc(10px + .5em + .1vw);
     font-weight: 400;
     /* display: inline-flex; */
   "
@@ -263,7 +263,7 @@ csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV")
         class = "hc-export-button",
         style = btn_style,
         title = label,
-        tagList(icon("arrow-down-to-line", style="color:#3C8A97; font-weight: 800;")),
+        tagList(icon("bars", style="color:#3C8A97; font-weight: 800;")),
         onclick = sprintf("Reactable.downloadDataCSV('%s', '%s')", id, filename)
       )
     )

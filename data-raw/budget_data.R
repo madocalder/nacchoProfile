@@ -40,7 +40,8 @@ master_data <- master_data %>%
     c10q301 == 1 ~ "Less Than Previous Year's Budget",
     c10q301 == 2 ~ "The Same as Last Year's Budget",
     c10q301 == 3 ~ "Higher Than Last Year's Budget",
-    c10q301 == 4 ~ "unknown"
+    c10q301 == 4 ~ NA,
+    TRUE ~ NA
   ))
 
 # Set variables and filters

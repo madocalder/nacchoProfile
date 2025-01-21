@@ -68,8 +68,9 @@ classification_data_b <- classification_data_b %>%
   dplyr::mutate(Question = gsub("new", "", Question),
                 category = "Yes",
                 y = Total,
-                group = sapply(Group, custom_str_to_title))%>%
-  dplyr::mutate(y = round_up(y, -2))
+                group = sapply(Group, custom_str_to_title))
+# %>%
+#   dplyr::mutate(y = round_up(y, -2))
 
 
 # print elapsed time

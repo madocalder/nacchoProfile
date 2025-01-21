@@ -1,429 +1,425 @@
 field,page,view,filter,title,tooltip,alt,,y_label,y_max,y_format,x_label,data_label,legend_title,theme,caption
-c3q15,finance,Table,All LHDs,Mean and Median Total Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} total FTEs",,,millions of USD,,${value},,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c3q15,finance,Table,All LHDs,Mean and Median Total Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,millions of USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c3q15,finance,Line Graph,All LHDs,Mean and Median Total Expenditures Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,millions of USD,,${value},,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c3q15,finance,Bar Graph,All LHDs,Mean and Median Total Expenditures Across LHDs ,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,millions of USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c3q15,finance,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Mean and Median Total Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs have between {point.low_bin:.0f} and {point.high_bin:.0f} total FTEs",,,millions of USD,,${value},,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c3q15,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Mean and Median Total Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,millions of USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-exp_total_numcat,finance,Bar Graph,All LHDs,Percent of LHDs by Grouped Total Expenditures,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs had total expenditures between {point.category}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+exp_total_numcat,finance,Bar Graph,All LHDs,Total Annual Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span>  {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-exp_total_numcat,finance,Bar Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Percent of LHDs by Grouped Total Expenditures,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs had total expenditures between {point.category}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+exp_total_numcat,finance,Bar Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Total Annual Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span>  {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-exp_total_numcat,finance,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Percent of LHDs by Grouped Total Expenditures,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+exp_total_numcat,finance,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Total Annual Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span>  {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-exp_total_numcat,finance,Table,All LHDs,Percent of LHDs by Grouped Total Expenditures,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs had total expenditures between {point.category}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+exp_total_numcat,finance,Table,All LHDs,Total Annual Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span>  {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_percap,finance,"Bar Graph, Table",All LHDs,Mean and Median Total Revenue Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+rev_percap,finance,"Bar Graph, Table",All LHDs,Mean and Median Annual Per Capita Revenues Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.y:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_percap,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Mean and Median Total Revenue Across LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+rev_percap,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Mean and Median Per Capita Revenue Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.y:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_percap,finance,"Bar Graph, Table",censusregion,Mean and Median Total Revenue Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+rev_total,finance,"Bar Graph, Table",All LHDs,Mean and Median of Total Annual Revenues Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_total,finance,"Bar Graph, Table",All LHDs,Mean and Median Per Capita Revenue Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f}.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+rev_total,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Mean and Median of Total Annual Revenues Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_total,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Mean and Median Per Capita Revenue Across LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+rev_total,finance,"Bar Graph, Table",censusregion,Mean and Median of Total Annual Revenues Across LHDs,"<span style=""color:{point.color}"">●</span> {point.tt} ${point.mils:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.1f} mil",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-rev_total,finance,"Bar Graph, Table",censusregion,Mean and Median Per Capita Revenue Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f}.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+totexp_percap,finance,"Bar Graph, Table",All LHDs,Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totexp_percap,finance,"Bar Graph, Table",All LHDs,Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+totexp_percap,finance,Line Graph,All LHDs,Mean and Median Per Capita Expenditures Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.tt}   ${point.y:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totexp_percap,finance,Line Graph,All LHDs,Mean and Median Per Capita Expenditures Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+totexp_percap,finance,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Mean and Median Per Capita Expenditures Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.tt}   ${point.y:,.0f}.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totexp_percap,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+totexp_percap,finance,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totexp_percap,finance,"Bar Graph, Table",censusregion,Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,${value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+totexp_percap,finance,"Bar Graph, Table",censusregion,Mean and Median Per Capita Expenditures Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f} LHDs had expenditures between ${point.low_bin:.0f} and ${point.high_bin:.0f} per capita.",,,USD,,"{value:,.0f}",,"${point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,"Bar Graph, Table",All LHDs,Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives are {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,"Bar Graph, Table",All LHDs,Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives are {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,"Bar Graph, Table",censusregion,Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHD top executives are {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,"Bar Graph, Table",censusregion,Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHD top executives are {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHD top executives are {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Age Category of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHD top executives are {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,Line Graph,All LHDs,Age Category of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,Line Graph,All LHDs,Age Category of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,Line Graph,censusregion,LHD Top Executives Under Age 40 Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,Line Graph,censusregion,LHD Top Executives Under Age 40 Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-age_cat,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executives Under Age 40 Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+age_cat,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executives Under Age 40 Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c2q501,landscape,"Bar Graph, Table",All LHDs,LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c2q501,landscape,"Bar Graph, Table",All LHDs,LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c2q501,landscape,"Bar Graph, Table",censusregion,LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c2q501,landscape,"Bar Graph, Table",censusregion,LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c2q501,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c2q501,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs Combined with HHSA,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,"Bar Graph, Table",All LHDs,Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives identify as {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,"Bar Graph, Table",All LHDs,Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives identify as {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,"Bar Graph, Table",censusregion,Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs identify as {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,"Bar Graph, Table",censusregion,Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs identify as {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs identify as {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Gender of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs identify as {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,Line Graph,All LHDs,Gender of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,Line Graph,All LHDs,Gender of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,Line Graph,censusregion,Female Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,Line Graph,censusregion,Female Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q29,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Female Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q29,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Female Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,"Bar Graph, Table",All LHDs,Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives have the following highest degree: {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,"Bar Graph, Table",All LHDs,Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives have the following highest degree: {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,"Bar Graph, Table",censusregion,Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs have the following highest degree: {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,"Bar Graph, Table",censusregion,Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs have the following highest degree: {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have the following highest degree: {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Highest Degree Obtained by LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have the following highest degree: {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,Line Graph,All LHDs,Highest Degree Obtained by LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,Line Graph,All LHDs,Highest Degree Obtained by LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,Line Graph,censusregion,LHD Top Executives with Graduate Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,Line Graph,censusregion,LHD Top Executives with Graduate Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c4q34,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executives with Graduate Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c4q34,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executives with Graduate Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,"Bar Graph, Table",All LHDs,Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives are {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,"Bar Graph, Table",All LHDs,Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,"Bar Graph, Table",censusregion,Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs are {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,"Bar Graph, Table",censusregion,Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of top executives from {point.group_tt} LHDs are {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Ethnicity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of top executives from {point.group_tt} LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,Line Graph,All LHDs,Ethnicity of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,Line Graph,All LHDs,Ethnicity of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,Line Graph,censusregion,Hispanic/Latino Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,Line Graph,censusregion,Hispanic/Latino Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-ethnicity,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Hispanic/Latino Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+ethnicity,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Hispanic/Latino Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,"Bar Graph, Table",All LHDs,Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives have a degree in {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,"Bar Graph, Table",All LHDs,Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have a degree in {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,"Bar Graph, Table",censusregion,Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt}ern LHDs have a degree in {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,"Bar Graph, Table",censusregion,Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have a degree in {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have a degree in {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Educational Specializations of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of Top Executives from {point.group_tt} LHDs have a degree in {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,Line Graph,All LHDs,Educational Specializations of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,Line Graph,All LHDs,Educational Specializations of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,Line Graph,censusregion,Top LHD Executives with Specialized Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,Line Graph,censusregion,Top LHD Executives with Specialized Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-field,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Top LHD Executives with Specialized Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+field,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Top LHD Executives with Specialized Degrees Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,"Bar Graph, Table",All LHDs,LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,"Bar Graph, Table",All LHDs,LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,"Bar Graph, Table",censusregion,LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt}ern LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,"Bar Graph, Table",censusregion,LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt}ern LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt} LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs with a Local Board of Health,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt} LHDs have the following Local Board of Health: {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,Line Graph,All LHDs,LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,Line Graph,All LHDs,LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,Line Graph,censusregion,LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,Line Graph,censusregion,LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-lboh,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+lboh,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHDs with a Local Board of Health Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,"Bar Graph, Table",All LHDs,Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives identify as {point.category} ",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,"Bar Graph, Table",All LHDs,Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHD top executives identify as {point.category} ",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.1f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,"Bar Graph, Table",censusregion,Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHD top executives identify as {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,"Bar Graph, Table",censusregion,Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHD top executives identify as {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHD top executives identify as {point.category}",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Racial Identity of LHD Top Executives,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHD top executives identify as {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,Line Graph,c0popcat3,Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,Line Graph,c0popcat3,Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,Line Graph,All LHDs,Racial Identity of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,Line Graph,All LHDs,Racial Identity of LHD Top Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,Line Graph,censusregion,Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,Line Graph,censusregion,Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-race,landscape,Line Graph,"c( ""urbanrural2022"", ""c0govcat"")",Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Execs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+race,landscape,Line Graph,"c( ""urbanrural2022"", ""c0govcat"")",Non-White Top LHD Executives Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,"Bar Graph, Table",All LHDs,LHD Top Executive Average Tenure,"<span style=""color:{point.color}"">●</span> LHD top executives  have been in their position for an average of {point.y:,.0f} years",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,"Bar Graph, Table",All LHDs,LHD Top Executive Tenure,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,"Bar Graph, Table",censusregion,LHD Top Executive Average Tenure,"<span style=""color:{point.color}"">●</span> LHD top executives at {point.group_tt}ern agencies have been in their position for an average of {point.y:,.0f} years",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,"Bar Graph, Table",censusregion,LHD Top Executive Tenure,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executive Average Tenure,"<span style=""color:{point.color}"">●</span> LHD top executives at {point.group_tt}ern agencies have been in their position for an average of {point.y:,.0f} years",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executive Tenure,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,Line Graph,All LHDs,LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,Line Graph,All LHDs,LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.1f}",,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,Line Graph,censusregion,LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,Line Graph,censusregion,LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.1f}",,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-tenure,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,Years,,{value},,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
+tenure,landscape,Line Graph,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",LHD Top Executive Average Tenure Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.1f}",,"{point.y:,.1f} Years",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-behavioral,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Table,All LHDs,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Table,urbanrural2022,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Table,c0govcat,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Table,c0popcat3,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-behavioral,other topics,Table,censusregion,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_1,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for Emergency Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_1,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for Emergency Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_1,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for Emergency Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_2,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for General Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_2,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for General Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_2,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for General Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_3,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for Any Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_3,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for Any Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels_3,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for Any Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_channels,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for General or Emergency Response Communications,,,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Table,All LHDs,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Table,urbanrural2022,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Table,c0govcat,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Table,c0popcat3,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-dental,other topics,Table,censusregion,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Table,All LHDs,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Table,urbanrural2022,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Table,c0govcat,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Table,c0popcat3,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-medical,other topics,Table,censusregion,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Bar Graph,All LHDs,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Bar Graph,urbanrural2022,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Bar Graph,c0govcat,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Bar Graph,c0popcat3,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Bar Graph,censusregion,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Table,All LHDs,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Table,urbanrural2022,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Table,c0govcat,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Table,c0popcat3,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-tech_use,other topics,Table,censusregion,Current Level of Activity in Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,{value}%,,"{point.y:,.0f}%",,,
-LHD (By Contract),services,"Bar Graph, Table",All LHDs,Percent of LHDs that Provide Selected Services by Contract,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs contract out of the provision of {point.category} in their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+behavioral,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Table,All LHDs,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Table,urbanrural2022,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Table,c0govcat,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Table,c0popcat3,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+behavioral,other topics,Table,censusregion,Engagement in Assuring Access to Behavioral Health Care,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to behavioral health care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_1,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for Emergency Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_1,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for Emergency Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_1,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for Emergency Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_2,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for General Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_2,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for General Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_2,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for General Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_3,other topics,"Bar Graph, Table",All LHDs,Use of Communication Channels for Any Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_3,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Use of Communication Channels for Any Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels_3,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for Any Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_channels,other topics,"Bar Graph, Table",censusregion,Use of Communication Channels for General or Emergency Response Communications,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Table,All LHDs,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Table,urbanrural2022,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Table,c0govcat,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Table,c0popcat3,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+dental,other topics,Table,censusregion,Engagement in Assuring Access to Dental Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to dental care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Bar Graph,All LHDs,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Bar Graph,urbanrural2022,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Bar Graph,c0govcat,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Bar Graph,c0popcat3,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Bar Graph,censusregion,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Table,All LHDs,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Table,urbanrural2022,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Table,c0govcat,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Table,c0popcat3,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+medical,other topics,Table,censusregion,Engagement in Assuring Access to Medical Care ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt} assure access to medical care.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Bar Graph,All LHDs,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Bar Graph,urbanrural2022,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Bar Graph,c0govcat,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Bar Graph,c0popcat3,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Bar Graph,censusregion,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Table,All LHDs,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Table,urbanrural2022,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Table,c0govcat,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Table,c0popcat3,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+tech_use,other topics,Table,censusregion,Current Implementation of Information Technology Systems Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs engage in the following IT system/activity: {point.category}.",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+LHD (By Contract),services,"Bar Graph, Table",All LHDs,Percent of LHDs that Provide Selected Services by Contract,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs contract out of the provision of {point.category_tt} in their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-LHD (By Contract),services,"Bar Graph, Table",censusregion,Percent of LHDs that Provide Selected Services by Contract,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+LHD (By Contract),services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Percent of LHDs that Provide Selected Services by Contract,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs contract out of the provision of {point.category_tt} in their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-LHD (By Contract),services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs that Provide Selected Services by Contract,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs contract out of the provision of {point.category} in their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+LHD (Directly),services,"Bar Graph, Table",All LHDs,Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}  LHDs provide {point.category_tt} in their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-LHD (Directly),services,"Bar Graph, Table",All LHDs,Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs provide {point.category} in their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+LHD (Directly),services,"Bar Graph, Table",censusregion,Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}  LHDs provide {point.category_tt} in their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-LHD (Directly),services,"Bar Graph, Table",censusregion,Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}ern LHDs provide {point.category} in their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+LHD (Directly),services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}  LHDs provide {point.category_tt} in their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-LHD (Directly),services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs that Directly Provide Selected Services,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt}  LHDs provide {point.category} in their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Not Available in Community,services,"Bar Graph, Table",All LHDs,Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs do not have {point.category_tt} available within their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Not Available in Community,services,Bar Graph,All LHDs,Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs reported that {point.category} is not available within their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Not Available in Community,services,"Bar Graph, Table",censusregion,Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs do not have {point.category_tt} available within their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Not Available in Community,services,Line Graph,censusregion,Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Not Available in Community,services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs do not have {point.category_tt} available within their community.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Not Available in Community,services,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs Reporting that Selected Services are Not Available Within Their Community,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs reported that {point.category} is not available within their community.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Other Entity,services,"Bar Graph, Table",All LHDs,Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs reported that another entity within their community provides {point.category_tt}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Other Entity,services,Bar Graph,All LHDs,Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs reported that another entity within their community provides {point.category}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Other Entity,services,"Bar Graph, Table",censusregion,Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs reported that another entity within their community provides {point.category_tt}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Other Entity,services,Line Graph,censusregion,Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Other Entity,services,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.group_tt} LHDs reported that another entity within their community provides {point.category_tt}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Other Entity,services,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs Reporting that Selected Services are Provided by Another Entity,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs reported that another entity within their community provides {point.category}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+Reduced/Expanded Services,services,Butterfly Graph,All LHDs,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Butterfly Graph,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Butterfly Graph,c0govcat,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Butterfly Graph,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Butterfly Graph,censusregion,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Scatter Plot,All LHDs,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Scatter Plot,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Scatter Plot,c0govcat,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Scatter Plot,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Scatter Plot,censusregion,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Table,All LHDs,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Table,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Table,c0govcat,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Table,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Reduced/Expanded Services,services,Table,censusregion,Changes in Provision of Services in the Past Year,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+a,workforce,"Bar Graph, Table",All LHDs,Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-Reduced/Expanded Services,services,Butterfly Graph,All LHDs,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Butterfly Graph,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Butterfly Graph,c0govcat,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Butterfly Graph,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Butterfly Graph,censusregion,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Scatter Plot,All LHDs,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Scatter Plot,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Scatter Plot,c0govcat,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Scatter Plot,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Scatter Plot,censusregion,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Table,All LHDs,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Table,urbanrural2022,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Table,c0govcat,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Table,c0popcat3,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-Reduced/Expanded Services,services,Table,censusregion,Changes in Provision of Services in the Past Year,,,,,,{value}%,,"{point.y:,.0f}%",,,
-a,workforce,"Bar Graph, Table",All LHDs,Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+a,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of   {point.group_tt} LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-a,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of   {point.group_tt} LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+a,workforce,"Bar Graph, Table",censusregion,Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt} LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-a,workforce,"Bar Graph, Table",censusregion,Percent of LHDs that Employ Selected Occupational Classifications,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of  {point.group_tt} LHDs have FTEs classified as {point.category} at their agency",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+b,workforce,"Bar Graph, Table",All LHDs,Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  LHDs.",,,Total FTEs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-b,workforce,"Bar Graph, Table",All LHDs,Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  LHDs.",,,Total FTEs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+b,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  {point.group_tt} LHDs.",,,Total FTEs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-b,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"")",Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  {point.group_tt} LHDs.",,,Total FTEs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+b,workforce,"Bar Graph, Table",censusregion,Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  {point.group_tt} LHDs.",,,Total FTEs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-b,workforce,"Bar Graph, Table",censusregion,Total FTEs in Selected Occupational Classifications Estimated Across All LHDs,"<span style=""color:{point.color}"">●</span> There are an estimated {point.y:,.0f} FTEs classified as {point.category} across  {point.group_tt} LHDs.",,,Total FTEs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q36,workforce,Line Graph,All LHDs,Mean and Median Total Employees Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q36,workforce,Line Graph,All LHDs,Mean and Median Total Employees Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q36,workforce,Line Graph,c0popcat3,Mean Total Employees Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q36,workforce,Line Graph,c0popcat3,Mean Total Employees Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q36,workforce,Table,All LHDs,Mean and Median Total Employees Across LHDs,,,,# of Employees,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q36,workforce,Table,All LHDs,Mean and Median Total Employees Across LHDs,,,,# of Employees,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q36,workforce,Table,c0popcat3,Mean and Median Total Employess Across LHDs,,,,# of Employees,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q36,workforce,Table,c0popcat3,Mean and Median Total Employess Across LHDs,,,,# of Employees,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q37,workforce,Line Graph,All LHDs,Mean and Median Total FTEs Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,"{value:,.0f}",,"{point.y:,.1f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q37,workforce,Line Graph,All LHDs,Mean and Median Total FTEs Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,{value},,"{point.y:,.1f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q37,workforce,Line Graph,c0popcat3,Mean Total FTEs Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,"{value:,.0f}",,"{point.y:,.1f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q37,workforce,Line Graph,c0popcat3,Mean Total FTEs Across LHDs Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,{value},,"{point.y:,.1f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q37,workforce,Table,All LHDs,Mean and Median Total FTEs Across LHDs,,,,# of FTEs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q37,workforce,Table,All LHDs,Mean and Median Total FTEs Across LHDs,,,,# of FTEs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c5q37,workforce,Table,c0popcat3,Mean and Median Total FTEs Across LHDs,,,,# of FTEs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c5q37,workforce,Table,c0popcat3,Mean and Median Total FTEs Across LHDs,,,,# of FTEs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+employee_numcat,workforce,"Bar Graph, Table",All LHDs,Total Employees Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs employ {point.category} employees at their agency.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-employee_numcat,workforce,"Bar Graph, Table",All LHDs,Percent of LHDs within Employee Size Groupings,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs employ {point.category} employees at their agency.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+fte_bypop,workforce,Line Graph,All LHDs,"Mean FTEs Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,"{value:,.0f}","FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-fte_bypop,workforce,Line Graph,All LHDs,"Mean FTEs Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,{value},"FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+fte_bypop,workforce,Table,All LHDs,"Mean and Median  FTEs Per 10,000 Population Across LHDs",,,,# of FTEs,,"{value:,.0f}","FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-fte_bypop,workforce,Table,All LHDs,"Mean and Median  FTEs Per 10,000 Population Across LHDs",,,,# of FTEs,,{value},"FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+fte_bypop,workforce,Line Graph,c0popcat3,"Mean FTEs Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,"{value:,.0f}","FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-fte_bypop,workforce,Line Graph,c0popcat3,"Mean FTEs Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of FTEs,,{value},"FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+fte_bypop,workforce,Table,c0popcat3,"Mean and Median FTEs Per 10,000 Population Across LHDs",,,,# of FTEs,,"{value:,.0f}","FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-fte_bypop,workforce,Table,c0popcat3,"Mean and Median FTEs Per 10,000 Population Across LHDs",,,,# of FTEs,,{value},"FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+employee_bypop,workforce,Line Graph,All LHDs,"Mean Employees Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,"{value:,.0f}","FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-employee_bypop,workforce,Line Graph,All LHDs,"Mean Employees Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,{value},"FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+employee_bypop,workforce,Table,All LHDs,"Mean and Median Employees Per 10,000 Population Across LHDs",,,,# of Employees,,"{value:,.0f}","FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-employee_bypop,workforce,Table,All LHDs,"Mean and Median Employees Per 10,000 Population Across LHDs",,,,# of Employees,,{value},"FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+employee_bypop,workforce,Line Graph,c0popcat3,"Mean Employees Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,"{value:,.0f}","FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-employee_bypop,workforce,Line Graph,c0popcat3,"Mean Employees Per 10,000 Population Across LHDs Over Time","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,# of Employees,,{value},"FTEs per 10,000","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+employee_bypop,workforce,Table,c0popcat3,"Mean and Median Employees Per 10,000 Population Across LHDs",,,,# of Employees,,"{value:,.0f}","FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-employee_bypop,workforce,Table,c0popcat3,"Mean and Median Employees Per 10,000 Population Across LHDs",,,,# of Employees,,{value},"FTEs per 10,000 people","{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+FTE_numcat,workforce,"Bar Graph, Table",All LHDs,Total FTEs Across LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs employ {point.category} FTEs at their agency.",,,% of LHDs,,"{value:,.0f}",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-FTE_numcat,workforce,"Bar Graph, Table",All LHDs,Percent of LHDs within FTE Size Groupings,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs employ {point.category} FTEs at their agency.",,,% of LHDs,,{value},,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+jobs_total,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Jobs Lost and Added - Estimated Total,"<span style=""color:{point.color}"">●</span> <b> {series.name}: </b> {point.y:,.0f} <br>",,,Total Jobs,,"{value:,.0f}",,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-jobs_total,workforce,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Jobs Lost and Added - Estimated Total,"<span style=""color:{point.color}"">●</span> <b> {series.name}: </b> {point.y:,.0f} <br>",,,Total Jobs,,{value},,"{point.y:,.0f}",,,"<b> Source: </b> 2022 National Profile of Local Health
+c0govcatn,,Bar Graph,,Governance of LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c0govcatn,,Bar Graph,,Governance of LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c0govcatn,,Line Graph,,Governance of LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c0govcatn,,Line Graph,,Governance of LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+c0govcatn,,Table,,Governance of LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-c0govcatn,,Table,,Governance of LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+geography,,Bar Graph,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-geography,,Bar Graph,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+geography,,Line Graph,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-geography,,Line Graph,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+geography,,Table,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-geography,,Table,,"Geographic Jurisdictions Served by LHDs,","<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs are {point.category}",,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+totpop,,Bar Graph,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of the U.S. population is served by {point.category} LHDs",,,% of Population,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totpop,,Bar Graph,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of the U.S. population is served by {point.category} LHDs",,,% of Population,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+totpop,,Line Graph,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Population,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totpop,,Line Graph,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.one}{point.two}.",,,% of Population,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
+totpop,,Table,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of the U.S. population is served by {point.category} LHDs",,,% of Population,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-totpop,,Table,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of the U.S. population is served by {point.category} LHDs",,,% of Population,,{value}%,,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
-          Departments. National Association of County and City Health Officials.
-          Washington, DC. (2024)."
-budget_changes,workforce,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",LHD Budget Change in 2022,,,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,
-budget_changes,workforce,Line Graph,All LHDs,LHD Budget Change Over Time,,,,% of LHDs,,{value}%,,"{point.y:,.0f}%",,,
-chachip,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-chachip,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c12q260,other topics,Table,All LHDs,LHD Involvement in Policy Areas ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c12q260,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",LHD Involvement in Policy Areas ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-Newc12q502,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Topic areas of new or revised ordinances in the past two years,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c7q147,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Assessment (CHA),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c7q147,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Assessment (CHA),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c7q149,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-c7q149,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-m9q240,other topics,Table,All LHDs,Actions Taken in the Past  Three Years to Implement or Sustain a Community Health Improvement Plan (CHIP),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-m9q240,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Actions Taken in the Past  Three Years to Implement or Sustain a Community Health Improvement Plan (CHIP),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,{value}%,,"{point.y:,.0f}%",,,
-,other topics,,,,,,,,,{value}%,,"{point.y:,.0f}%",,,
-health_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Healthcare Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,{value}%,,"{point.y:,.0f}%",,,
-comm_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Community Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,{value}%,,"{point.y:,.0f}%",,,
-gov_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Government Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,{value}%,,"{point.y:,.0f}%",,,
-,,,,,,,,,,,,,,,
+budget_changes,workforce,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",LHD Budget Change in 2022,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+budget_changes,workforce,Line Graph,All LHDs,LHD Budget Change Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+chachip,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+chachip,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c12q260,other topics,Table,All LHDs,LHD Involvement in Policy Areas in the Past Two Years,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c12q260,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",LHD Involvement in Policy Areas in the Past Two Years,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+Newc12q502,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",LHD Involvement in Policy Areas in the Past Two Years,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c7q147,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Assessment (CHA),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c7q147,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Assessment (CHA),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c7q149,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+c7q149,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+m9q240,other topics,Table,All LHDs,Actions Taken in the Past  Three Years to Implement or Sustain a Community Health Improvement Plan (CHIP),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+m9q240,other topics,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Actions Taken in the Past  Three Years to Implement or Sustain a Community Health Improvement Plan (CHIP),"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+,other topics,,,,,,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+health_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Healthcare Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+comm_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Community Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+gov_part,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",Formal LHD Government Partnerships,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of LHDs share personnel/resources and/or have written agreements with {point.category}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,

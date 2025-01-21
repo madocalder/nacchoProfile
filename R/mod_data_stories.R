@@ -86,7 +86,7 @@ mod_data_stories_server <- function(id){
               width = "90%",
               height = "90%",
               style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-              max-width: 60vw; max-height: 70vh;"
+             "
             )
           )
       ) , # end of workforce_story list
@@ -101,7 +101,7 @@ mod_data_stories_server <- function(id){
         width = "90%",
         height = "90%",
         style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-              max-width: 800px; max-height: 900px;"
+              "
       )
     )
 ) # , end of list
@@ -152,7 +152,7 @@ mod_data_stories_server <- function(id){
         list(
           thumbnail = card_thumbnail(
             image = "www/workforce_story.png",
-            date = "12/15/2024"
+            date = "1/15/2025"
           ),
           title = actionLink(
             ns("workforce_story_link"),
@@ -171,7 +171,7 @@ mod_data_stories_server <- function(id){
         list(
           thumbnail = card_thumbnail(
             image = "www/harassment_story.png",
-            date = "12/15/2024"
+            date = "1/15/2025"
           ),
           title = actionLink(
             ns("harassment_story_link"),

@@ -224,19 +224,16 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         hist_data <- lines_data %>%
           dplyr::filter(topic == "race",
                         filter == "All LHDs") %>%
-          dplyr::group_by(year, category, group, filter, topic)%>%
+          dplyr::group_by(year, category, group, filter, topic) %>%
           dplyr::mutate(
             y = round_up((100*as.numeric(y)), 1),
             category =dplyr::case_when(
-              category %in% c("Some other race", "American Indian/Alaska Native",
-                              "Black/African American", "Native Hawaiian/Other Pacific Islander",
-             "Asian" ) ~ "Race other than White",
-             category == "White" ~ "White",
-            FALSE ~ category  # Handle any other cases, though we don't expect others
+              category == "White" ~ "White",
+              TRUE ~ "Race other than White"
             ),
             Responses = unique(Responses))%>%
           dplyr::group_by(category, group, filter, topic, year)%>%
-          dplyr::reframe(y = sum(y),
+          dplyr::reframe(y = round_up(sum(y), 1),
                            Responses = unique(Responses))
 
 
@@ -253,7 +250,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             year = 2022,
             filter = "All LHDs")%>%
           dplyr::group_by(category, group, filter, year, Question)%>%
-          dplyr::reframe(y = sum(y),
+          dplyr::reframe(y = round_up(sum(y), 1),
                          Responses = sum(Responses))%>%
           dplyr::mutate(Responses = sum(Responses))
 
@@ -271,9 +268,11 @@ process_line_data <- function(option, filtering, classifications = NULL) {
           arrange(year, category) %>%
           dplyr::filter(category != "Na") %>%
           dplyr::mutate(
+            y = dplyr::case_when(year == 2019 & category == "Race other than White" ~ 8,
+                                 TRUE ~ round_up(y, 1)),
             legend_label = paste(category),
-            one = paste(y),
-            two = paste("% of top LHD executives identified as", category),
+            one = paste(round_up(y, 0)),
+            two = paste("% of top LHD executives identified as", category)
           )
 
         # View(combined)
@@ -320,7 +319,8 @@ process_line_data <- function(option, filtering, classifications = NULL) {
        ###historical data-----------
         hist_data <- lines_data %>%
           dplyr::filter(topic == "tenure",
-                        filter == "All LHDs")
+                        filter == "All LHDs") %>%
+          dplyr::mutate(y = as.numeric(y))
         # %>%
         #   dplyr::group_by(year, category, group, filter, topic)
 
@@ -332,7 +332,9 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             category = "Mean",
             year = 2022,
             filter = "All LHDs",
-            y = as.character(y))
+            y = as.numeric(round_up(y, 1)))
+
+
 
         # Combine data and create more descriptive legend labels
         combined <- full_join(current_data, hist_data,
@@ -344,7 +346,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "category" = "category",
                                      "Responses" = "Responses"
                               )) %>%
-          dplyr::mutate(y = round_up(as.numeric(y)))%>%
+          dplyr::mutate(y = round_up(y, 1))%>%
           arrange(year) %>%
           dplyr::mutate(
             legend_label = paste(category),
@@ -387,7 +389,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             filter = filtering,
             year = 2022,
             Question = "field",
-            y = round_up(as.numeric(y)))
+            y = round_up(as.numeric(y, 1)))
 
 
         # Combine data and create more descriptive legend labels
@@ -869,7 +871,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             year = 2022,
             filter = filtering)%>%
           dplyr::group_by(category, Question, group, filter, year, subtitle)%>%
-          dplyr::reframe(y = sum(y),
+          dplyr::reframe(y = round_up(sum(y), 1),
                            Responses = sum(Responses))%>%
           dplyr::mutate(Responses = sum(Responses)) %>%
           dplyr::filter(category != is.na(category))
@@ -895,7 +897,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             ),
             legend_title = paste("Non-white Top LHD Executives Over Time"),
             legend_label = paste(group),
-            one = paste(y),
+            one = paste(round_up(y, 1)),
             two =
               # dplyr::case_when(
               # category == "White" ~ paste("% of top executives from",
@@ -980,6 +982,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         hist_data <- lines_data %>%
           dplyr::filter(topic == "tenure",
                         filter == filtering) %>%
+          dplyr::mutate(y = as.numeric(y)) %>%
           dplyr::group_by(year, category, group, filter, topic, subtitle)
 
         ### 2022 data-------------
@@ -990,7 +993,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
             category = "Mean",
             year = 2022,
             filter = filtering,
-            y = as.character(y),
+            y = as.numeric(round_up(y,1)),
             Responses = sum(Responses))
 
 
@@ -1005,7 +1008,7 @@ process_line_data <- function(option, filtering, classifications = NULL) {
                                      "subtitle" = "subtitle",
                                      "Responses" = "Responses"
                               )) %>%
-          dplyr::mutate(y = round_up(as.numeric(y)))%>%
+          dplyr::mutate(y = round_up(y, 1))%>%
           arrange(year) %>%
           dplyr::mutate(
           group_mod = dplyr::case_when(

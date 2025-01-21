@@ -361,7 +361,7 @@ label:not(.material-switch label) {
     display: block;
     padding: 4% clamp(30px, 10%, 32px) 4% 8%;
     height: inherit;
-    max-height: 45px;
+    max-height: fit-content;
     font-size: clamp(14px, 1.8vw, 18px);
     background-color: #F9F8F7 !important;
     border: 1.5px solid #008A96 !important;
@@ -377,7 +377,7 @@ label:not(.material-switch label) {
     min-width: 130px;
     text-wrap-style: auto;
     line-height: clamp(13px, 1.7vw, 17px);
-    /* padding-bottom: .5em; */
+    padding-bottom: .5em;
 }
 
 /* Arrow Customization for Dropdowns */
@@ -580,6 +580,7 @@ label:not(.material-switch label) {
 /* ------------------------------------------------------ home page accordion */
 .accordion-body {
   font-weight: 500 !important;
+  font-size: calc(10px + .1vmin + .2em);
 }
 
 .accordion-button {
@@ -1468,6 +1469,10 @@ b, strong {
   vertical-align: middle;
   margin
 }
+
+   .carousel-control-prev, .carousel-control-next {
+    width: 5%;
+   }
 
 
 

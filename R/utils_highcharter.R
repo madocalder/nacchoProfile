@@ -1399,17 +1399,64 @@ process_classification_data <- function(topic, classifications, filtering) {
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
-                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))%>%
-      dplyr::mutate(filter = filtering) %>%
+                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))
+
+    if (topic == "a") {
+
+      data_all_class_n <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::group_by(Question, group)%>%
+        dplyr::reframe(Question = unique(Question),
+                       Responses = sum(Responses),
+                       group = unique(group))%>%
+        dplyr::select(Responses, Question, group)
+
+
+      data_all_class <- data_all_class %>%
+      dplyr::mutate(filter = filtering,
+                    y = round_up(Percentage, 0))%>%
+        dplyr::select(-Responses) %>%
+        dplyr::left_join(data_all_class_n, by = c("Question", "group"))
+
+
+    } else {
+      data_all_class <- data_all_class %>%
+        dplyr::mutate(filter = filtering,
+                      y = round_up(Total, -2))
+
+    }
+
+    data_all_class <- data_all_class %>%
       dplyr::group_by(group) %>%
       dplyr::mutate(x = seq_along(category) - 1) %>%
       dplyr::ungroup()
 
+    if (topic == "a") {
+
+      data_class_n <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::group_by(Question, group)%>%
+        dplyr::reframe(Question = unique(Question),
+                       Responses = sum(Responses),
+                       group = unique(group))%>%
+        dplyr::select(Responses, Question, group)
 
     data_filtered <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == filtering) %>%
-      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]))
+      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                    y = round_up(Percentage, 0)) %>%
+      dplyr::select(-Responses) %>%
+      dplyr::left_join(data_class_n, by = c("Question", "group"))
+
+
+    } else {
+      data_filtered <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::filter(category == "Yes", filter == filtering) %>%
+        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                      y = round_up(Total, -2))
+    }
 
     data <- bind_rows(data_all_class, data_filtered) %>%
       dplyr::mutate(filter = filtering) %>%

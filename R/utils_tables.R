@@ -139,30 +139,116 @@ process_jobs_data <- function(jobs_data, filtering = "All LHDs" ) {
 #' @import tidyr
 clean_class_data <- function(topic, classifications, filtering) {
   if (!is.null(classifications) && length(classifications) >= 1) {
+
     selected_vars <- paste0(classifications, topic)
     selected_data <- get(paste0("classification_data_", topic))
+
+    if (topic == "a") {
+
+    data_all_class_n <- selected_data %>%
+      dplyr::filter(Question %in% selected_vars) %>%
+      dplyr::group_by(Question, group)%>%
+      dplyr::reframe(Question = unique(Question),
+                     Responses = sum(Responses))%>%
+      dplyr::select(Responses, Question, group)
 
     data_all_class <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
       dplyr::filter(category == "Yes", filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
-                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group)) %>%
-      pivot_data_group() %>%
-      dplyr::rename_with(standardize_column_names)  # Standardize here
+                    group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))%>%
+      dplyr::select(-Responses) %>%
+      dplyr::left_join(data_all_class_n, by = c("Question", "group"))
+
+
+      data_all_class <- data_all_class %>%
+        dplyr::mutate(filter = filtering,
+                      y = round_up(Percentage, 0)) %>%
+        dplyr::group_by(group) %>%
+        dplyr::mutate(x = seq_along(category) - 1) %>%
+        dplyr::ungroup()%>%
+        pivot_data_group()
+
+    } else {
+
+      data_all_class <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::filter(category == "Yes", filter == "All LHDs") %>%
+        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
+                      group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))
+      # %>%
+      #   dplyr::left_join(data_all_class_n, by = c("Question", "group"))
+
+      data_all_class <- data_all_class %>%
+        dplyr::mutate(filter = filtering,
+                      y = round_up(Total, -2))
+
+      data_all_class <- data_all_class %>%
+        # dplyr::group_by(group) %>%
+        # dplyr::mutate(x = seq_along(category) - 1) %>%
+        # dplyr::ungroup()%>%
+        pivot_data_group()
+
+    }
+
+
+
+    # %>%
+    #   dplyr::rename_with(standardize_column_names)  # Standardize here
+
+    if (topic == "a") {
+
+      data_class_n <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::group_by(Question, group)%>%
+        dplyr::reframe(Question = unique(Question),
+                       Responses = sum(Responses),
+                       group = unique(group))%>%
+        dplyr::select(Responses, Question, group)
+
+      data_filtered <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::filter(category == "Yes", filter == filtering) %>%
+        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                      y = round_up(Percentage, 0)) %>%
+      dplyr::select(-Responses) %>%
+        dplyr::left_join(data_class_n, by = c("Question", "group"))
+
+    } else {
+      data_filtered <- selected_data %>%
+        dplyr::filter(Question %in% selected_vars) %>%
+        dplyr::filter(category == "Yes", filter == filtering) %>%
+        dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
+                      y = round_up(Total, -2))
+    }
+
+    data <- data_filtered %>%
+      pivot_data_group()  %>%
+      dplyr::left_join(data_all_class, by = c("category", "filter"))
+    # %>%
+    #   dplyr::rename_with(standardize_column_names)  # Standardize here
+
+
+    # data <- bind_rows(data_all_class, data_filtered)
+    #
+    #
+    # %>%
+    #   dplyr::mutate(filter = filtering) %>%
+    #   dplyr::group_by(group) %>%
+    #   dplyr::mutate(x = seq_along(category) - 1) %>%
+    #   dplyr::ungroup()%>%
+    #   pivot_data_group() %>%
+    #   dplyr::rename_with(standardize_column_names)  # Standardize here
+    #
+    # data_all_class <- data_all_class
 
     if (filtering == "All LHDs") {
       return(data_all_class)
+    } else {
+      return(data)
     }
 
-    data <- selected_data %>%
-      dplyr::filter(Question %in% selected_vars) %>%
-      dplyr::filter(category == "Yes", filter == filtering) %>%
-      dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)])) %>%
-      pivot_data_group() %>%
-      add_all_ldh_count(data_all = data_all_class) %>%
-      dplyr::rename_with(standardize_column_names)  # Standardize here
 
-    return(data)
   }
 
   return(NULL)
@@ -210,17 +296,26 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
       data <- process_jobs_data(jobs_data)
 
     } else if (topic == "field") {
+
       data <- spec_data_all %>%
         dplyr::select(category, y, subtitle, Responses) %>%
-        dplyr::summarise(category = category,
+        dplyr::mutate(category = category,
                          'y_All LHDs' = y,
-                         'Responses_All LHDs' = sum(Responses),
+                         'Responses_All LHDs' = Responses,
                          subtitle = subtitle)
 
     } else if (topic == "tenure") {
 
-      data <- return_survey_weighted_statistics("tenure")%>%
-        pivot_data_cat()
+      data <- return_survey_weighted_counts("tenure_numcat") %>%
+        pivot_data_group()
+
+      data$category <- factor(data$category,
+                              levels = c("Less Than 2 Years", "2 - 5 Years",
+                                         "6 - 10 Years", "11 Or More Years"),
+                              ordered = TRUE)
+
+
+
 
      } else if (topic == "a") {
 
@@ -436,29 +531,52 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
      } else if (topic == "c12q260") {
 
+       data_n <- advocacy_data %>%
+         dplyr::filter(filter == "All LHDs") %>%
+         dplyr::group_by(advocacy_type)%>%
+         dplyr::reframe(Responses = sum(Responses))
+
        data <- advocacy_data %>%
          dplyr::filter(filter == "All LHDs",
                        category %in% "Checked") %>%
          dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
          dplyr::rename(category = advocacy_type) %>%
+         dplyr::mutate(Responses = data_n$Responses) %>%
          pivot_data_group()
 
+
+
      } else if (topic == "Newc12q502") {
+
+       data_n <- new_advocacy_data %>%
+         dplyr::filter(filter == "All LHDs") %>%
+         dplyr::group_by(new_advocacy_type)%>%
+         dplyr::reframe(Responses = sum(Responses))
+
 
        data <- new_advocacy_data %>%
          dplyr::filter(filter == "All LHDs",
                        category %in% "Checked") %>%
          dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
          dplyr::rename(category = new_advocacy_type) %>%
+         dplyr::mutate(Responses = data_n$Responses) %>%
          pivot_data_group()
 
+
+
      } else if (topic == "m9q240") {
+
+       data_n <- chip_data %>%
+         dplyr::filter(filter == "All LHDs") %>%
+         dplyr::group_by(action)%>%
+         dplyr::reframe(Responses = sum(Responses))
 
        data <- chip_data %>%
          dplyr::filter(filter == "All LHDs",
                        category %in% "Checked") %>%
          dplyr::select(y, group, subtitle, Responses, filter, action)%>%
          dplyr::rename(category = action) %>%
+         dplyr::mutate(Responses = data_n$Responses) %>%
          pivot_data_group()
 
 
@@ -583,27 +701,29 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
         tidyr::pivot_wider(names_from = group, values_from = c(y, Responses))
 
       # Calculate overall y and Responses for "All LHDs"
-      overall_data <- spec_data %>%
-        dplyr::filter(filter == filtering) %>%
-        dplyr::group_by(category) %>%
-        dplyr::summarise(
-          'y_All LHDs' = sum(y * Responses, na.rm = TRUE) / sum(Responses, na.rm = TRUE),
-          'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
-        )
+      overall_data <- spec_data_all %>%
+        dplyr::select(category, y, Responses) %>%
+        dplyr::mutate(category = category,
+                      'y_All LHDs' = y,
+                      'Responses_All LHDs' = Responses)
 
       # Join the overall data to the pivoted data
       data <- data %>%
         dplyr::left_join(overall_data, by = "category")
 
     } else if (topic == "tenure") {
-      data <- return_survey_weighted_statistics("tenure", filtering) %>%
-        dplyr::mutate(
-          'y_All LHDs' = round_up(y = mean(y, na.rm = TRUE), 1),  # Adjust calculation as needed
-          'Responses_All LHDs' = sum(Responses, na.rm = TRUE)
-        )  %>%
-        dplyr::select(category, group, y, subtitle, Responses, 'y_All LHDs', 'Responses_All LHDs') %>%
-        tidyr::pivot_wider(names_from = category, values_from = c(y, Responses)) %>%
-        dplyr::rename(category = group)
+
+      data_all <- return_survey_weighted_counts("tenure_numcat") %>%
+        pivot_data_group()
+
+      data <- return_survey_weighted_counts("tenure_numcat", filtering) %>%
+        pivot_data_group() %>%
+        dplyr::left_join(data_all, by = "category")
+
+      data$category <- factor(data$category,
+                              levels = c("Less Than 2 Years", "2 - 5 Years",
+                                         "6 - 10 Years", "11 Or More Years"),
+                              ordered = TRUE)
 
 
 
@@ -1056,11 +1176,23 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
     } else if (topic == "c12q260") {
 
+      data_all_n <- advocacy_data %>%
+        dplyr::filter(filter == "All LHDs") %>%
+        dplyr::group_by(advocacy_type)%>%
+        dplyr::reframe(Responses = sum(Responses))
+
+      data_n <- advocacy_data %>%
+        dplyr::filter(filter == filtering) %>%
+        dplyr::group_by(advocacy_type, group)%>%
+        dplyr::reframe(Responses = sum(Responses))
+
+
       advocacy_data_all <- advocacy_data %>%
         dplyr::filter(filter == "All LHDs",
                       category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
         dplyr::rename(category = advocacy_type) %>%
+        dplyr::mutate(Responses = data_all_n$Responses) %>%
         pivot_data_group()
 
       data <- advocacy_data %>%
@@ -1068,21 +1200,33 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
                       category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, advocacy_type)%>%
         dplyr::rename(category = advocacy_type) %>%
+        dplyr::mutate(Responses = data_n$Responses) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = advocacy_data_all)
 
     } else if (topic == "Newc12q502") {
+
+
+
+      data_n <- new_advocacy_data %>%
+        dplyr::filter(filter == filtering) %>%
+        dplyr::group_by(new_advocacy_type, group)%>%
+        dplyr::reframe(Responses = sum(Responses))
 
       new_advocacy_data_all <- new_advocacy_data %>%
         dplyr::filter(filter == "All LHDs",
                       category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
         dplyr::rename(category = new_advocacy_type) %>%
+        dplyr::mutate(Responses = 923) %>%
         pivot_data_group()
 
       data <- new_advocacy_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
+        dplyr::filter(filter == filtering) %>%
+      dplyr::group_by(new_advocacy_type, group)%>%
+        dplyr::mutate(Responses = sum(Responses))%>%
+        dplyr::ungroup()%>%
+        dplyr::filter(category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
         dplyr::rename(category = new_advocacy_type) %>%
         pivot_data_group()%>%
@@ -1090,16 +1234,25 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
     } else if (topic == "m9q240") {
 
+      data_n <- chip_data %>%
+        dplyr::filter(filter == "All LHDs") %>%
+        dplyr::group_by(action)%>%
+        dplyr::reframe(Responses = sum(Responses))
+
       chip_data_all <- chip_data %>%
         dplyr::filter(filter == "All LHDs",
                       category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, action)%>%
         dplyr::rename(category = action) %>%
+        dplyr::mutate(Responses = data_n$Responses) %>%
         pivot_data_group()
 
       data <- chip_data %>%
-        dplyr::filter(filter == filtering,
-                      category %in% "Checked") %>%
+        dplyr::filter(filter == filtering) %>%
+        dplyr::group_by(action, group)%>%
+        dplyr::mutate(Responses = sum(Responses))%>%
+        dplyr::ungroup()%>%
+        dplyr::filter(category %in% "Checked") %>%
         dplyr::select(y, group, subtitle, Responses, filter, action)%>%
         dplyr::rename(category = action) %>%
         pivot_data_group()%>%
@@ -1173,12 +1326,13 @@ create_non_time_table <- function(data, category, colors, topic) {
 
     }
 
-    if (topic == "tenure") {
-      paste0(rounded_value, " years")
-    } else if (topic == "jobs_total") {
+
+    # rounded_value <- scales::label_comma()(rounded_value)
+
+    if (topic == "jobs_total") {
       scales::label_comma()(rounded_value)
     } else if (topic == "b") {
-      paste0(rounded_value, " FTEs")
+      paste0(scales::label_comma()(rounded_value), " FTEs")
     } else if (topic == "fte_bypop") {
       paste0(rounded_value, " FTEs")
     } else if (topic == "c5q37") {
@@ -1205,11 +1359,13 @@ create_non_time_table <- function(data, category, colors, topic) {
       cell = reactablefmtr::data_bars(
         data,
         text_position = "outside-end",
-        max_value = ifelse(topic == "tenure", 8,
-                           ifelse(topic == "c3q15", 125000000,
+        max_value = ifelse(topic == "c3q15", 125000000,
+                           ifelse(topic == "c5q37", 600,
+                            ifelse(topic == "c5q36", 700,
+                            ifelse(topic %in% c("totexp_percap", "rev_percap"), 200,
                                   ifelse(topic == "rev_total", 150000000,
                                          ifelse(topic == "jobs_total", 15000,
-                                                ifelse(topic == "b", 21000, 100))))),
+                                                ifelse(topic == "b", 21000, 100))))))),
         fill_color = naccho.viz::green,  # Always use naccho.viz::green
         background = 'none',
         number_fmt = num_format
@@ -1330,11 +1486,13 @@ create_non_time_table <- function(data, category, colors, topic) {
           cell = reactablefmtr::data_bars(
             data,
             text_position = "outside-end",
-            max_value = ifelse(topic == "tenure", 8,
-                               ifelse(topic == "c3q15", 125000000,
-                                      ifelse(topic == "rev_total", 150000000,
-                                             ifelse(topic == "jobs_total", 15000,
-                                                    ifelse(topic == "b", 21000, 100))))),
+            max_value = ifelse(topic == "c3q15", 125000000,
+                               ifelse(topic == "c5q37", 600,
+                                      ifelse(topic == "c5q36", 700,
+                                             ifelse(topic %in% c("totexp_percap", "rev_percap"), 200,
+                                                    ifelse(topic == "rev_total", 150000000,
+                                                           ifelse(topic == "jobs_total", 15000,
+                                                                  ifelse(topic == "b", 21000, 100))))))),
             fill_color = ifelse(col == all_lhds_col_name, naccho.viz::green, colors[i]),
             background = 'none',
             number_fmt = num_format
@@ -1455,7 +1613,7 @@ table_n_count <- function(data, topic, col_name = NULL) {
     "Reduced/Expanded Services", "c3q15", "totexp_percap",
     "rev_percap", "rev_total", "comm_channels_1", "comm_channels_2",
     "comm_channels_3","tech_use", "gov_part", "health_part", "comm_part",
-    "jobs_total"
+    "jobs_total", "field", "Newc12q502", "c12q260", "m9q240", "a", "b"
   )) {
     # Use `show_n` to calculate range or single value
     show_n(data[[paste0(col_name)]])

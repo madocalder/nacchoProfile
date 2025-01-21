@@ -323,7 +323,7 @@ mod_workforce_server <- function(id) {
 
 
       # Define views based on the topic
-      if (topic %in% c("FTE_numcat", "employee_numcat", "jobs_total", "a", "b")) {
+      if (topic %in% c("FTE_numcat", "employee_numcat",  "a", "b")) {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
           choiceNames = list(
@@ -335,6 +335,17 @@ mod_workforce_server <- function(id) {
             selected_view %in% c("Bar Graph", "Table") ~ selected_view,
             TRUE ~ "Bar Graph")
         )
+      } else if (topic == "jobs_total") {
+        shinyWidgets::updateRadioGroupButtons(
+          session, "view",
+          choiceNames = list(
+            # HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
+            HTML('<i class="fas fa-table"></i>')         # Table icon
+          ),
+          choiceValues = "Table",
+          selected = "Table" )
+
+
       } else if (topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop")) {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
@@ -913,9 +924,7 @@ observe({
           if (length(links) == 0) {
             paste("No relevant definitions.")
           } else {
-            toggle_sidebar_content("toggle_definitions",
-                                   c("toggle_takeaway", "toggle_context",
-                                     "toggle_definitions", "toggle_get_class"))
+            links
           }
         )
       })

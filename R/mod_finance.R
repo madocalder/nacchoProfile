@@ -243,14 +243,24 @@ mod_finance_server <- function(id){
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-chart-tree-map"></i>'),
+
                                                 HTML('<i class="fas fa-table"></i>')
 
                                               ),
-                                              choiceValues = c("Bar Graph", "Tree Map", "Table"),
+                                              choiceValues = c("Bar Graph", "Table"),
                                               selected = dplyr::case_when(
-                                                selected_view %in% c("Bar Graph", "Tree Map", "Table") ~ selected_view,
+                                                selected_view %in% c("Bar Graph", "Table") ~ selected_view,
                                                 TRUE ~ "Tree Map"))
+
+      } else if (input$topic == "rev_total_tree") {
+
+        shinyWidgets::updateRadioGroupButtons(session, "view",
+                                              choiceNames = list(
+                                                HTML('<i class="fas fa-chart-tree-map"></i>')
+
+                                              ),
+                                              choiceValues = c("Tree Map"),
+                                              selected = "Tree Map")
 
       } else if (input$topic %in% c("totexp_percap", "budget_changes")) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
@@ -300,8 +310,12 @@ mod_finance_server <- function(id){
       selected_view <- input$view
       selected_filter <- input$filter
 
-      if (selected_view == "Line Graph" &
-          topic %in% c("totexp_percap", "budget_changes")) {
+      if ( (selected_view == "Line Graph" &
+          topic %in% c("totexp_percap", "budget_changes")) |
+          (selected_view == "Bar Graph" &
+           topic == "exp_total_numcat") | topic == "rev_total_tree" |
+          topic == "exp_total_numcat" & selected_view == "Table"
+          ) {
 
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1],
@@ -345,6 +359,7 @@ mod_finance_server <- function(id){
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
+
       meta %>%
         dplyr::filter(field == input$topic,
                       stringr::str_detect(view, input$view),
@@ -362,8 +377,10 @@ mod_finance_server <- function(id){
       req(!is.null(input$topic), !is.null(input$filter))
       req(filter_meta())
       req(input$view == "Line Graph")
-      req(input$topic == "totexp_percap")
+      # req(input$topic == "totexp_percap")
       req(input$filter == "All LHDs")
+
+      print(head(filter_meta()))
 
       topic <- input$topic
       filtering <- input$filter
@@ -377,16 +394,30 @@ mod_finance_server <- function(id){
 
       data <- process_line_data(topic, filtering, classifications)%>%
         dplyr::mutate(x_label = NA,
-                      legend_label = category)
+                      legend_label = category,
+                      y = as.numeric(y))
+
+      if (topic == "totexp_percap") {
+        data <- data %>%
+          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita revenue across all LHDs was "))
+      } else {
+
+        data <- data %>%
+          dplyr::mutate(tt = dplyr::case_when(
+            category == "Lower Budget" ~ "reported that their current budget was lower than the previous fiscal year's.",
+            TRUE ~ "reported that their current budget was higher than the previous fiscal year's." ))
+      }
+
 
       data$year <- factor(data$year)
 
       # View(data)
 
+
       naccho.viz::create_grouped_line(
         data = data,
         x_variable = "year",
-        x_group = "legend_label",
+        x_group = "category",
         y_variable = "y",
         x_label = NULL,
         select_theme = naccho.viz::basic,
@@ -414,6 +445,9 @@ mod_finance_server <- function(id){
 
     })
 
+
+
+
     proxy_line <- highcharter::highchartProxy(ns("figure_line"))
 
     observe({
@@ -435,7 +469,20 @@ mod_finance_server <- function(id){
 
       data <- process_line_data(topic, filtering, classifications)%>%
         dplyr::mutate(x_label = NA,
-                      legend_label = category)
+                      legend_label = category,
+                      y = as.numeric(y))
+
+      if (topic == "totexp_percap") {
+        data <- data %>%
+          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita revenue across all LHDs was "))
+      } else {
+
+        data <- data %>%
+          dplyr::mutate(tt = dplyr::case_when(
+            category == "Lower Budget" ~ "reported that their current budget was lower than the previous fiscal year's.",
+            TRUE ~ "reported that their current budget was higher than the previous fiscal year's." ))
+      }
+
 
       proxy_line %>%
         highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
@@ -451,7 +498,7 @@ mod_finance_server <- function(id){
           highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
           highcharter::hcpxy_add_series(
             id = "all_lhds_line_series",
-            name = input$filter,
+            name = filtering,
             data = data,
             type = "line"
           )
@@ -484,54 +531,78 @@ mod_finance_server <- function(id){
                           Mean = y)%>%
             tidyr::pivot_longer(cols = c("Mean", "Median"),
                                 names_to = "category",
-                                values_to = "y")
+                                values_to = "y")%>%
+            dplyr::mutate(x = dplyr::case_when(category == "Mean" ~ 0,
+                                               TRUE ~ 1))
 
-          if (topic == "rev_total") {
+          if (topic %in% c("rev_total", "c3q15")) {
 
             data <- data %>%
               dplyr::mutate(x = dplyr::case_when(category == "Mean" ~ 0,
                                                  TRUE ~ 1),
-                            y = dplyr::case_when(
+                            mils = dplyr::case_when(
                               (y >= 10000000) ~ round_up(y, -5),
                               (9999999 > y & y >= 100000) ~ round_up(y, -4),
                               (99999 > y & y >= 10000) ~  round_up(y, -3),
                               TRUE ~ round_up(y, 0)
-                            )
+                            ),
+                            y = (mils / 1e6),
+                            tt = dplyr::case_when(
+                              topic == "rev_total" ~ paste0("The ",
+                                                            tolower(category),
+                                                            " total revenue across all LHDs is "),
+                              TRUE ~ paste0("The ",
+                                            tolower(category),
+                                            " total expenditures across all LHDs is ")
+                                                  )
               )
-          } else if (topic == "c3q15") {
-            data <- data %>%
-              dplyr::mutate(x = as.numeric(factor(category, levels = unique(category))) - 1,
-                            y = dplyr::case_when(
-                              (y >= 10000000) ~ round_up(y, -5),
-                              (9999999 > y & y >= 100000) ~ round_up(y, -4),
-                              (99999 > y & y >= 10000) ~  round_up(y, -3),
-                              TRUE ~ round_up(y, 0)
-                            )  )
+
 
           } else {
             data <- data %>%
-              dplyr::mutate(x = as.numeric(factor(category, levels = unique(category))) - 1,
+              dplyr::mutate(x = dplyr::case_when(category == "Mean" ~ 0,
+                                                     TRUE ~ 1),
                             y = dplyr::case_when(
                               (y >= 10000000) ~ round_up(y, -5),
                               (9999999 > y & y >= 100000) ~ round_up(y, -4),
                               (99999 > y & y >= 10000) ~  round_up(y, -3),
                               TRUE ~ round_up(y, 0)
-                            )
+                            ),
+                            tt = paste0("The ", tolower(category),  " per capita revenue across all LHDs is ")
+
               )
           }
 
 
 
-        } else if (topic %in% c("exp_total_numcat", "budget_changes")) {
+        } else if (topic == "exp_total_numcat") {
 
           data <- return_survey_weighted_counts(topic) %>%
             dplyr::mutate(Responses = sum(Responses),
                           # category_old = category,
                           # category = group,
                           # group = category_old,
-                          x = as.numeric(factor(category, levels = unique(category))) - 1
+                          x = as.numeric(factor(category, levels = unique(category))) - 1,
+                          tt = dplyr::case_when(category == "Less than $250,000" ~ "had total expenditures less than $250,000.",
+                                                category ==  "$250,000 to $499,999" ~ "had total expenditures between $250,000 and $499,999.",
+                                                category == "$500,000 to $749,999" ~  "had total expenditures between $500,000 and $749,999.",
+                                                category == "$750,000 to $999,999"  ~ "had total expenditures between $750,000 and $999,999.",
+                                                category == "$1,000,000 to $2,499,999" ~  "had total expenditures between $1,000,000 and $2,499,999.",
+                                                category == "$2,500,000 to $5,000,000"  ~ "had total expenditures between $250,000,000 and $499,999,999.",
+                                                category == "$5,000,000 to $9,999,999" ~  "had total expenditures between $500,000,000 and $9,999,999.",
+                                                category == "$10,000,000 to $24,999,999" ~ "had total expenditures between $10,000,000 and $24,999,999.",
+                                                category == "$25,000,000 or more" ~  "had total expenditures equal to or greater than $25,000,000.",
+                                                TRUE ~ "did not report their total expenditures"
+                                                  )
             )
 
+        } else if (topic == "budget_changes") {
+
+          data <- budget_data %>%
+            dplyr::filter(filter == "All LHDs") %>%
+            dplyr::group_by(group) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup()
 
         } else {
           data <- return_survey_weighted_counts(topic)%>%
@@ -566,11 +637,64 @@ mod_finance_server <- function(id){
                           )
             )
 
-        } else if (topic %in% c("exp_total_numcat", "budget_changes")) {
+          if (topic %in% c("rev_total", "c3q15")) {
+
+            data <- data %>%
+              dplyr::mutate(x = dplyr::case_when(category == "Mean" ~ 0,
+                                                 TRUE ~ 1),
+                            mils = dplyr::case_when(
+                              (y >= 10000000) ~ round_up(y, -5),
+                              (9999999 > y & y >= 100000) ~ round_up(y, -4),
+                              (99999 > y & y >= 10000) ~  round_up(y, -3),
+                              TRUE ~ round_up(y, 0)
+                            ),
+                            y = (mils / 1e6),
+                            tt = dplyr::case_when(
+                              topic == "rev_total" & filtering != "censusregion"
+                              ~ paste0("The ", tolower(category), " total revenue across ", tolower(group), " LHDs is "),
+
+                              topic == "c3q15" & filtering != "censusregion" ~
+                                paste0("The ", tolower(category)," total expenditures across ", tolower(group), " LHDs is "),
+
+                              topic == "rev_total" & filtering == "censusregion"
+                              ~ paste0("The ", tolower(category), " total revenue across ", tolower(group), "ern LHDs is "),
+
+                              topic == "c3q15" & filtering == "censusregion" ~
+                                paste0("The ", tolower(category)," total expenditures across ", tolower(group), "ern LHDs is "),
+
+                            )
+              )
+
+
+          } else {
+             data <- data %>%
+               dplyr::mutate( tt = dplyr::case_when(
+                 topic == "rev_percap" & filtering != "censusregion"
+                 ~ paste0("The ", tolower(category), " per capita revenue across ", tolower(group), " LHDs is "),
+
+                 topic == "rev_percap" & filtering == "censusregion" ~
+                   paste0("The ", tolower(category)," per capita expenditures across ", tolower(group), "ern LHDs is "),
+
+               ))
+          }
+
+        } else if (topic %in% c("exp_total_numcat")) {
 
           data <- return_survey_weighted_counts(topic, filtering)%>%
             dplyr::mutate(Responses = sum(Responses)) %>%
               dplyr::mutate(x = as.numeric(factor(category, levels = unique(category))) - 1)
+
+        } else if (topic == "budget_changes") {
+
+
+
+          data <- budget_data %>%
+            dplyr::filter(filter %in% c(filtering, "All LHDs")) %>%
+            dplyr::group_by(group) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup()
+
+
 
         } else {
           data <- return_survey_weighted_counts(topic, filtering)%>%
@@ -743,7 +867,7 @@ mod_finance_server <- function(id){
 
     # used for the tree map
     output$figure_tree <- highcharter::renderHighchart({
-      req(input$topic == "rev_total")
+      req(input$topic == "rev_total_tree")
 
       if (input$filter == "All LHDs") {
 
@@ -1066,8 +1190,8 @@ mod_finance_server <- function(id){
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         p(htmltools::HTML(
           "<b>Key Takeaway(s)</b>: <br><br>",
@@ -1086,8 +1210,8 @@ mod_finance_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
@@ -1113,7 +1237,7 @@ mod_finance_server <- function(id){
 
       toggle_sidebar_content("toggle_definitions",
                              c("toggle_takeaway", "toggle_context",
-                               "toggle_definitions", "toggle_get_class"))
+                               "toggle_definitions"))
 
       output$show_definitions <- renderUI({
 
@@ -1137,18 +1261,17 @@ mod_finance_server <- function(id){
           )
         })
 
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
           # side right --------------------------------------------------------------
 
-
           if (length(links) == 0) {
             paste("No relevant definitions.")
           } else {
-            toggle_sidebar_content("toggle_definitions",
-                                   c("toggle_takeaway", "toggle_context",
-                                     "toggle_definitions", "toggle_get_class"))
+           links
           }
         )
       })

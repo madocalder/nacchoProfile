@@ -130,7 +130,7 @@ mod_overview_ui <- function(id) {
                           to serve multiple counties than
                           small LHDs. </span> <br> <br>
                           <span style = 'font-size: 1.8vmin;'>
-                          *Other includes LHDs serving multiple cities or towns.
+                          *County includes city-counties.
                           <br>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
@@ -172,11 +172,11 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("All LHDs", "All LHDs", "All LHDs",
-                  "Population served by LHDs", "Population served by LHDs", "Population served by LHDs"),
-        tt = c("all LHDs are ", "all LHDs are ", "all LHDs are ",
-                  "the population served by LHDs are served by ", "the population served by LHDs are served by ",
-                  "the population served by LHDs are served by ")
+        group = c("Population served by LHDs", "Population served by LHDs", "Population served by LHDs",
+                  "All LHDs", "All LHDs", "All LHDs"),
+        tt = c("the population served by LHDs are served by ", "the population served by LHDs are served by ",
+                  "the population served by LHDs are served by ",
+               "all LHDs are ", "all LHDs are ", "all LHDs are ")
       )
 
       data <- data %>%
@@ -210,7 +210,7 @@ mod_overview_server <- function(id){
         fips = c(33, 10, 44, 02, 11),
         state_name = c("New Hampshire", "Deleware", "Rhode Island",
                        "Alaska", "District of Columbia"),
-        grouping = c("Local", "State", "State", "Local", "State")
+        grouping = c("Local", "State", "NA" , "Local", "State")
       )
 
       data <- master_data %>%
@@ -223,6 +223,8 @@ mod_overview_server <- function(id){
                             "Oklahoma", "Tennessee", "Texas", "Alabama",
                             "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
           state_name == "Delaware" ~ "Shared",
+          state_name == "District of Columbia" ~ "State",
+          state_name == "Rhode Island" ~ "NA",
           grouping == "shared" ~ "Shared",
           grouping == "local" ~ "Local",
           grouping == "state" ~ "State",
@@ -230,8 +232,21 @@ mod_overview_server <- function(id){
           TRUE ~ grouping))
 
       data <-  dplyr::bind_rows(data, join)
-      #%>%
-      #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
+
+      data$value_tt <-  dplyr::case_when(data$state_name == "Rhode Island" ~ "NA. Rhode Island was excluded from the study because the state health agency operates on behalf of local public health and has no sub-state units",
+                      TRUE ~ paste(tolower(data$grouping)))
+
+
+      data$grouping <- factor(data$grouping, levels = c("Local", "State", "Shared", "Mixed", "NA"))
+
+      # Add the color mapping, explicitly defining colors for each category
+      colors <- c(
+        "Local" = naccho.viz::green,
+        "State" = naccho.viz::navy,
+        "Shared" = naccho.viz::terracotta,
+        "Mixed" = naccho.viz::teal,
+        "NA" = naccho.viz::grey  # Define "NA" as grey
+      )
 
       # View(data)
       # uses a function from the naccho.viz package
@@ -241,12 +256,18 @@ mod_overview_server <- function(id){
         selected_value = "grouping",
         title_text = "Governance of LHDs",
         subtitle_text = "",
-        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value_tt}.",
         caption_text = "",
         accessible_desc = ""
-      ) %>%
-        highcharter::hc_add_theme(naccho.viz::basic)
-
+      )%>%
+        highcharter::hc_colorAxis(
+          dataClasses = lapply(names(colors), function(grouping) {
+            list(
+              name = grouping,
+              color = colors[[grouping]]
+            )
+          })
+        )
       # %>%
       #   highcharter::hc_chart(
       #     spacing = "1vmin 1vmin 1vmin 1vmin"
@@ -264,28 +285,27 @@ mod_overview_server <- function(id){
 
       data <- data.frame(
         y = c(69, 21, 8, 3,
-              69, 26, 3, 1,
+              69, 26.7, 2.9, 1.4,
               68, 12, 14, 6,
               69, 7, 23, 1),
         category = c("All LHDs", "All LHDs", "All LHDs", "All LHDs",
                      "Small", "Small", "Small", "Small",
                      "Medium", "Medium", "Medium", "Medium",
                      "Large", "Large", "Large", "Large"),
-        group = c("County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*")
+        group = c("County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town")
       )
 
-      # Reorder the category factor
-      data$group <- factor(data$group, levels = c("County", "City or Town", "Multi-county", "Other*"))
+      data$group <- factor(data$group, levels = c("County*", "City or Town", "Multi-county", "Multi-city/town"))
 
       data <- data %>%
         dplyr::mutate(
           cat_tt = dplyr::case_when(category != "All LHDs" ~ tolower(category),
                                     TRUE ~ "all"),
-          group_tt = dplyr::case_when(group != "Other*" ~ tolower(group),
-                                      TRUE ~ "other")
+          group_tt = dplyr::case_when(group != "County*" ~ tolower(group),
+                                      TRUE ~ "county")
         )
 
       highcharter::hchart(
@@ -332,13 +352,17 @@ mod_overview_server <- function(id){
           categories = levels(unique(data$category))
         ) %>%
         highcharter::hc_yAxis(
+          reserveSpace = TRUE,
+          overflow = "allow",
           reversedStacks = FALSE,
           title = list(
-            text = "% of LHDs",
+            text = "",
             y = 20
           ), # y-axis label
           min = 0,
           max = 100,
+          endOnTick = TRUE,
+          maxPadding = .1,
           labels = list(
             format = "{value}%"
           )

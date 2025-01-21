@@ -46,6 +46,7 @@ mod_home_ui <- function(id){
                 Profile Study."
           ),
 
+
           bslib::accordion_panel(
             title = h2("Methods"),
             value = "cord_methods",
@@ -75,6 +76,23 @@ mod_home_ui <- function(id){
                    "ICPSR's website.",
                    style = "text-decoration: underline !important;")
           ),
+
+          bslib::accordion_panel(
+            title = h2("About the Dashboard"),
+            value = "cord_about_dash",
+           "To navigate this dashboard, start by selecting a page from the left sidebar. Once on the selected page, choose a relevant topic from the 'Topic' dropdown menu to display an interactive visualization. The ‘Filter’ dropdown menu defaults to “All LHDs,” but when available, you can refine results by filtering for LHD characteristics such as Rurality, LHD Size, Region, or Governance.",
+           br(),
+
+"Topics may include various views, such as bar/column charts, line graphs, or tables. You can switch between these views by selecting the corresponding icons located underneath the 'Topic' and 'Filter' dropdown menus. Key takeaways, notes, and definitions are displayed in the right sidebar. On smaller screens, this sidebar may be hidden and can be shown by clicking the 'i' icon at the top-right of the screen. For some topics, additional input options may appear in the right sidebar and will toggle visible automatically.",
+br(),
+
+"Visualizations are interactive, allowing you to adjust filters directly by selecting or deselecting items within the legend at the bottom of a view. You can also download visualizations or their data by clicking the three lines in the top-right corner of each visualization. Options include exporting as a PDF, image, CSV, or XLS file, while tables export as CSV files.",
+br(),
+
+"To maximize the visualization area, you can hide the left sidebar by clicking the small arrow at the top-left of the screen."
+
+          ),
+
 
           bslib::accordion_panel(
             title = h2("Funding and Development Acknowledgments"),
@@ -116,6 +134,7 @@ mod_home_ui <- function(id){
                    "profile@naccho.org.",
                    style = "text-decoration: underline !important;")
           )
+
         )
       )
     )

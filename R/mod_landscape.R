@@ -118,23 +118,27 @@ mod_landscape_ui <- function(id) {
             # display when Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              div(
+
                 div( class = "table-grid",
 
 
                      div(class = "table-title-grid",
 
-                uiOutput(ns("table_title")) ),
 
-                csvDownloadButton(ns("data_table"), filename = "landscape.csv"),
-                reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
+                         uiOutput(ns("table_title")),
+                         csvDownloadButton(ns("data_table"), filename = "landscapeNACCHO.csv")
+                     ),
 
-                HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line,'
-         <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
-                style = "margin-left: auto !important;
-                        margin-right: auto !important;"
+                     reactable::reactableOutput(ns("data_table"),
+                                                height = "100%",
+                                                width = "auto"
+                     ),
+
+                     HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+
+
               )
-            )
+
             ),
 
             # view output Line
@@ -404,8 +408,16 @@ mod_landscape_server <- function(id){
 
         } else if (input$topic == "tenure"){
 
-          return_survey_weighted_statistics("tenure")%>%
-            dplyr::mutate(category = "")
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$category <- factor(data$category,
+                                  levels = c("Less Than 2 Years", "2 - 5 Years",
+                                             "6 - 10 Years", "11 Or More Years"),
+                                  ordered = TRUE)
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")
+
+          data
 
         } else {
           return_survey_weighted_counts(input$topic)
@@ -414,13 +426,21 @@ mod_landscape_server <- function(id){
         all_data <- if (input$topic == "field") {
 
           spec_data_all%>%
-            dplyr::filter(Question == "spec_combined")
+            dplyr::filter(Question != "spec_combined")
 
         } else if  (input$topic == "tenure"){
 
-          return_survey_weighted_statistics("tenure")
-          # %>%
-          #   dplyr::mutate(category = "Mean")
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")
+
+          data
 
         } else {
           return_survey_weighted_counts(input$topic)
@@ -430,11 +450,26 @@ mod_landscape_server <- function(id){
 
           spec_data %>%
             dplyr::filter(filter == input$filter)%>%
-            dplyr::filter(Question == "spec_combined")
+            dplyr::filter(Question != "spec_combined")
+
 
         } else if (input$topic == "tenure") {
 
-          return_survey_weighted_statistics("tenure", input$filter)
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = dplyr::case_when(
+              input$filter != "censusregion" ~
+                paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
+              TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
+            ))
+
+          data
 
         } else {
           return_survey_weighted_counts(input$topic, input$filter)
@@ -445,13 +480,13 @@ mod_landscape_server <- function(id){
           filtered_data
         )
 
-        if (input$topic == "tenure"){
-
-          combined <- combined %>%
-            dplyr::mutate(x = seq_along(category)-1,
-                          group = category)
-
-        }
+        # if (input$topic == "tenure"){
+        #
+        #   combined <- combined %>%
+        #     dplyr::mutate(x = seq_along(category)-1,
+        #                   group = category)
+        #
+        # }
 
 
           combined
@@ -493,7 +528,8 @@ mod_landscape_server <- function(id){
 
       combined_data <- combined_data %>%
         dplyr::mutate(group_tt = dplyr::case_when(
-          group != "All LHDs" ~ tolower(group),
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+          group == "censusregion" ~ paste0(tolower(group), "ern"),
           TRUE ~ "all"
         ))
 
@@ -521,24 +557,26 @@ mod_landscape_server <- function(id){
           # labels = list(
           #   format = "{value}%"
           )%>%
-        highcharter::hc_legend(reversed = TRUE)
+        highcharter::hc_legend(reversed = TRUE)%>%
+        viz_export()
 
-      if (input$topic == "tenure"  & input$filter == "All LHDs" |
-          (input$topic == "field" & input$filter != "All LHDs")) {
-        bar_chart <- bar_chart %>%
-          highcharter::hc_xAxis(
-            labels = list(enabled = FALSE),
-            title = list(text = NULL),
-            categories = unique(combined_data$group)
-          )
-      } else if (input$topic == "tenure"  & input$filter != "All LHDs"){
+      # if (input$topic == "field" & input$filter != "All LHDs") {
+      #   bar_chart <- bar_chart %>%
+      #     highcharter::hc_xAxis(
+      #       labels = list(enabled = FALSE),
+      #       title = list(text = NULL),
+      #       categories = unique(combined_data$group)
+      #     )
+      # }
 
-        bar_chart <- bar_chart %>%
-          highcharter::hc_xAxis(
-            labels = list(enabled = FALSE),
-            title = list(text = NULL)
-          )
-      }
+      # else if (input$topic == "tenure"  & input$filter != "All LHDs"){
+      #
+      #   bar_chart <- bar_chart %>%
+      #     highcharter::hc_xAxis(
+      #       labels = list(enabled = FALSE),
+      #       title = list(text = NULL)
+      #     )
+      # }
 
 
       bar_chart
@@ -553,7 +591,7 @@ mod_landscape_server <- function(id){
     observe({
 
       req(input$topic, input$filter)  # Ensure inputs are available
-
+      req(input$view == "Bar Graph")
       # Remove all old series (to prevent overlap)
       proxy_bar %>%
         highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
@@ -567,9 +605,18 @@ mod_landscape_server <- function(id){
 
         } else if (input$topic == "tenure"){
 
-          return_survey_weighted_statistics("tenure")
-          # %>%
-          #   dplyr::mutate(category = "Mean")
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category), "."))
+
+
+          data
 
         } else {
           return_survey_weighted_counts(input$topic)
@@ -582,23 +629,40 @@ mod_landscape_server <- function(id){
             dplyr::filter(Question == "spec_combined")
 
         } else if (input$topic == "tenure") {
-          return_survey_weighted_statistics("tenure")
-          # %>%
-          #   dplyr::mutate(category = "Mean")
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = dplyr::case_when(
+            input$filter != "censusregion" ~
+              paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
+            TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
+          ))
+
+          data
 
         } else {
           return_survey_weighted_counts(input$topic)
         }
 
         filtered_data <- if (input$topic == "field") {
-        spec_data %>% dplyr::filter(filter == "urbanrural2022",
+        spec_data %>% dplyr::filter(filter == input$filter,
                                       category == group)
 
         } else if (input$topic == "tenure"){
 
-          return_survey_weighted_statistics("tenure", input$filter)
-          # %>%
-          #   dplyr::mutate(category = "Mean")
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data
 
 
         } else {
@@ -610,13 +674,13 @@ mod_landscape_server <- function(id){
           filtered_data
         )
 
-        if (input$topic == "tenure"){
-
-          combined <- combined %>%
-            dplyr::mutate(x = seq_along(category)-1,
-                          group = category)
-
-        }
+        # if (input$topic == "tenure"){
+        #
+        #   combined <- combined %>%
+        #     dplyr::mutate(x = seq_along(category)-1,
+        #                   group = category)
+        #
+        # }
 
           combined
 
@@ -642,6 +706,7 @@ mod_landscape_server <- function(id){
               TRUE ~ Responses),
               N = sum(Responses)
             )
+
         } else {
           combined_data <- combined_data %>%
             dplyr::mutate(N = Responses)
@@ -684,8 +749,8 @@ mod_landscape_server <- function(id){
           selected = TRUE
         )
 
-      if ((input$topic == "tenure" & input$filter == "All LHDs") |
-          (input$topic == "field" & input$filter != "All LHDs")) {
+      if (input$topic == "field" & input$filter != "All LHDs") {
+
         proxy_bar %>%
           highcharter::hcpxy_update(
             xAxis = list(
@@ -697,17 +762,18 @@ mod_landscape_server <- function(id){
 
 
 
-      } else if (input$topic == "tenure" & input$filter != "All LHDs") {
-
-        proxy_bar %>%
-          highcharter::hcpxy_update(
-            xAxis = list(
-              labels = list(enabled = FALSE),
-              title = list(text = NULL)),
-              categories = unique(combined_data$group)
-             )
-
       }
+      #  else if (input$topic == "tenure" & input$filter != "All LHDs") {
+      #
+      #   proxy_bar %>%
+      #     highcharter::hcpxy_update(
+      #       xAxis = list(
+      #         labels = list(enabled = FALSE),
+      #         title = list(text = NULL)),
+      #         categories = unique(combined_data$group)
+      #        )
+      #
+      # }
 
    })
 
@@ -749,7 +815,8 @@ mod_landscape_server <- function(id){
             endOnTick = TRUE
           ) %>%
           highcharter::hc_legend(reversed = TRUE) %>%
-          highcharter::hc_chart(style = list(minHeight = "50vh"))
+          highcharter::hc_chart(style = list(minHeight = "50vh"))%>%
+         viz_export()
 
       } else {
         highcharter::highchart()  # Return an empty chart if no data
@@ -764,32 +831,24 @@ mod_landscape_server <- function(id){
 
     observe({
       req(input$topic, input$filter)
-      req(filter_meta())
-      data <- process_line_data(input$topic, input$filter)
-      # meta_data <- filter_meta()
 
-      if (nrow(data) > 0) {
-        proxy_line %>%
-          highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
-          highcharter::hcpxy_add_series(
-            id = "filtered_line_series",
-            name = input$filter,
-            data = data,
-            type = "line"
+      line_data <- process_line_data(input$topic, input$filter)
+
+      if (is.null(line_data) || nrow(line_data) == 0) {
+        showNotification("No data available for line chart.", type = "warning")
+        return()
+      }
+
+      proxy_line %>%
+        highcharter::hcpxy_update(
+          series = list(
+            id = "line_series",
+            data = line_data,
+            name = paste("Line for", input$filter)
           )
-      } else {
-        message("No data for line graph update.")
-      }
+        )
     })
 
-    observe({
-      meta_data <- filter_meta()
-      if (is.null(meta_data) || nrow(meta_data) == 0) {
-        message("filter_meta returned NULL or no rows")
-      } else {
-        message("filter_meta working correctly. Rows: ", nrow(meta_data))
-      }
-    })
 
 
     # # Update bar graph and line graph when topic or filter changes
@@ -884,8 +943,9 @@ mod_landscape_server <- function(id){
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
+
 
         p(htmltools::HTML(
           "<b>Key Takeaway(s)</b>: <br><br>",
@@ -904,8 +964,8 @@ mod_landscape_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)%>%
-          dplyr::filter(stringr::str_detect(view, input$view))
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
@@ -931,9 +991,9 @@ mod_landscape_server <- function(id){
     # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
 
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::show("toggle_definitions")
+      toggle_sidebar_content("toggle_definitions",
+                             c("toggle_takeaway", "toggle_context",
+                               "toggle_definitions"))
 
       output$show_definitions <- renderUI({
 
@@ -956,11 +1016,13 @@ mod_landscape_server <- function(id){
             )
           )
         })
+
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
-# side right --------------------------------------------------------------
-
+          # side right --------------------------------------------------------------
 
           if (length(links) == 0) {
             paste("No relevant definitions.")
@@ -969,7 +1031,6 @@ mod_landscape_server <- function(id){
           }
         )
       })
-
     })
 
 
