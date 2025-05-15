@@ -15,14 +15,12 @@ mod_services_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
             div(
-              class = "col-sm-6 min-height-150",
-              br(),
+              class = "topic-select",
+
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
@@ -31,16 +29,15 @@ mod_services_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              class = "filter-select",
+
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
+            ),
 
 
           # viz toggles here --------------------------------------------------
@@ -53,7 +50,8 @@ mod_services_ui <- function(id){
                 HTML('<i class="fas fa-chart-simple"></i>'),
                 HTML('<i class="fas fa-table"></i>')
               ),
-              choiceValues = c("Bar Graph", "Table")
+              choiceValues = c("Bar Graph", "Table"),
+              selected = "Table"
             )
           ),
 
@@ -64,11 +62,14 @@ mod_services_ui <- function(id){
 
             # display when Service Provision and Bar Graph are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Bar Graph'"),
-              div(
-                highcharter::highchartOutput(ns("figure_bar"), height = "100%"), #675
-              style = "height: 60vh; width: auto; margin-left: auto !important;
-                        margin-right: auto !important;")
+              condition = paste0('input[\'', ns('topic'), "\'] != 'Reduced/Expanded Services' &&
+                                 input['", ns('view'), "\'] == 'Bar Graph'"),
+              # div(
+                highcharter::highchartOutput(ns("figure_bar"), height = "100%")
+
+              #   , #675
+              # style = "height: 60vh; width: auto; margin-left: auto !important;
+              #           margin-right: auto !important;")
             ),
 
 
@@ -80,35 +81,44 @@ mod_services_ui <- function(id){
 
             # display when Service Changes and Scatter Plot are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Scatter Plot'"),
-              div(
-              highcharter::highchartOutput(ns("figure_scatter"), height = "100%"), #775
-              style = "height: 70vh; width: auto;")
+              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services'
+                                 && input['", ns('view'), "\'] == 'Scatter Plot'"),
+              # div(
+              highcharter::highchartOutput(ns("figure_scatter"), height = "100%")
+              # , #775
+              # style = "height: 70vh; width: auto;")
             ),
 
             # display when Service Changes and Butterfly Graph are selected
             conditionalPanel(
-              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services' && input['", ns('view'), "\'] == 'Butterfly Graph'"),
-              div(
-                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"), #675
-                style = "height: 70vh; margin-left: auto !important; margin-right: auto !important;")
+              condition = paste0('input[\'', ns('topic'), "\'] == 'Reduced/Expanded Services'
+                                 && input['", ns('view'), "\'] == 'Butterfly Graph'"),
+              # div(
+                highcharter::highchartOutput(ns("figure_butterfly"), height = "100%"),
+              style = "height: 100%"
             ),
 
             # display when view Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              div(
-                uiOutput(ns("table_title")),
-              reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
-              br(),
-              HTML('<div style="font-size: 1.8vmin;">', source_line,'
-                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+              div( class = "table-grid",
 
-            style = "min-width: 50vw; min-height: 45vh; margin-left: auto !important;
-                        margin-right: auto !important;"
-            ),
+                div(class = "table-title-grid",
 
-            # br(),
+                    uiOutput(ns("table_title")),
+                    csvDownloadButton(ns("data_table"), filename = "servicesNACCHO.csv")
+                ),
+
+                reactable::reactableOutput(ns("data_table"),
+                                           height = "100%",
+                                           width = "auto"
+                                           ),
+
+                HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+
+              ),
+              style = "height: 100%"
+
 )
 )
 
@@ -119,15 +129,17 @@ mod_services_ui <- function(id){
 right = div(
   div(
     class = "row color-block-header",
-    id = ns("dynamic_row"),
+
     # Define the default state with all panels hidden
     div(
       class = "col hover-text-side",
       align = "center",
+      br(),
       actionLink(
         ns("get_services"),
         "",
-        icon = tags$i(class = "fa-light fa-filter", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-filter",
+                      style = "font-size: calc(28px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Add Services")
@@ -135,10 +147,12 @@ right = div(
     div(
       class = "col hover-text-side",
       align = "center",
+      br(),
       actionLink(
         ns("takeaway"),
         "",
-        icon = tags$i(class = "fa-light fa-key", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-key",
+                      style = "font-size: calc(28px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Takeaways")
@@ -146,21 +160,23 @@ right = div(
     div(
       class = "col hover-text-side",
       align = "center",
+      br(),
       actionLink(
         ns("context"),
         "",
-        icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-circle-info", style = "font-size: calc(28px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
-      span(class = "hover-text-content-side", "Notes")
+      span(class = "hover-text-content-side", "Context")
     ),
     div(
       class = "col hover-text-side",
       align = "center",
+      br(),
       actionLink(
         ns("definitions"),
         "",
-        icon = tags$i(class = "fa-light fa-list", style = "font-size: 1.85em; margin-top: 2vmin; text-align: center;"),
+        icon = tags$i(class = "fa-light fa-list", style = "font-size: calc(28px + .2em); text-align: center;"),
         class = "link-no-underline action-link-2"
       ),
       span(class = "hover-text-content-side", "Definitions")
@@ -175,7 +191,8 @@ right = div(
     # Services panel (filter) visible by default
     div(
       id = ns("toggle_get_services"),
-      p(htmltools::HTML("<b>Select Service(s):</b>")),
+      class = "context-content",
+      # p(htmltools::HTML("<b>Select Service(s):</b>")),
       uiOutput(ns("services_input"))
     ),
     shinyjs::hidden(
@@ -211,7 +228,12 @@ mod_services_server <- function(id) {
 
     # Input Updates ==========================================================
     observe({
-      req(input$topic)
+      req(input$topic, input$view)
+
+      topic <- input$topic
+      selected_view <- input$view
+
+
       if (input$topic != "Reduced/Expanded Services") {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
@@ -219,54 +241,103 @@ mod_services_server <- function(id) {
             HTML('<i class="fas fa-chart-simple"></i>'),
             HTML('<i class="fas fa-table"></i>')
           ),
-          choiceValues = c("Bar Graph", "Table")
+          choiceValues = c("Bar Graph", "Table"),
+          selected = dplyr::case_when(
+            selected_view %in% c("Bar Graph", "Table") ~ selected_view,
+            TRUE ~ "Bar Graph")
         )
       } else {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
           choiceNames = list(
             HTML('<i class="fas fa-chart-scatter"></i>'),
-            HTML('<i class="fas fa-chart-bar"></i>'),
+            # HTML('<i class="fas fa-chart-bar"></i>'),
             HTML('<i class="fas fa-table"></i>')
           ),
-          choiceValues = c("Scatter Plot", "Butterfly Graph", "Table")
+          choiceValues = c("Scatter Plot", "Table"),
+          selected = dplyr::case_when(
+            selected_view %in% c("Scatter Plot", "Table") ~ selected_view,
+            TRUE ~ "Scatter Plot")
         )
       }
     })
 
     observe({
-      req(input$topic, input$view)
-      if (input$topic == "Reduced/Expanded Services" && input$view == "Butterfly Graph") {
+      req(input$topic, input$view, input$filter)
+
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- input$filter
+
+      if (topic == "Reduced/Expanded Services") {
         updateSelectInput(
           session, "filter",
           choices = landscape_filters[1]
+        )
+      }
+      else {
+        updateSelectInput(
+          session, "filter",
+          choices = landscape_filters,
+          selected = selected_filter
         )
       }
     })
 
     # Dynamically switch between single-select and multi-select
     observe({
-      req(input$topic)
+      req(input$topic, input$view)
 
       if (input$topic == "Reduced/Expanded Services") {
+
+
         # Multi-select using checkboxes
         output$services_input <- renderUI({
+
+          if (input$view == "Scatter Plot") {
           checkboxGroupInput(
             inputId = ns("services"),
-            label = "",
-            choices = service_classifications,  # List of services
-            selected = service_classifications[1]
+            label = HTML('<b>Select Service(s):</b>'),
+            choices = service_cats,  # List of services
+            selected = service_cats[1],
+            width = "100%"
           )
+
+
+        } else {
+
+          selectInput(inputId = ns("services"),
+                      label = HTML('<b>Select Service:</b>'),
+                      multiple = FALSE,
+                      choices = service_cats,  # List of services
+                      selected = service_cats[1],
+                      width = "100%"
+          )
+
+
+        }
         })
+
+
+
+
       } else {
         # Single-select using radio buttons
         output$services_input <- renderUI({
-          radioButtons(
-            inputId = ns("services"),
-            label = "",
-            choices = service_classifications,  # List of services
-            selected = service_classifications[1]  # Default first service
-          )
+          # radioButtons(
+          #   inputId = ns("services"),
+          #   label = HTML('<b>Select Service:</b>'),
+          #   choices = service_classifications,  # List of services
+          #   selected = service_classifications[1],  # Default first service
+          #   width = "100%"
+          # )
+
+          selectInput(inputId = ns("services"),
+                      label = HTML('<b>Select Service:</b>'),
+                      choices =  service_classifications,
+                      multiple = FALSE,
+                      selected =  service_classifications[1]
+                      )
         })
       }
     })
@@ -275,12 +346,12 @@ mod_services_server <- function(id) {
 
 
 
-    observe({
-      updateSelectInput(session, "view", selected = "Table")
-      updateSelectInput(session, "filter", selected = landscape_filters[1])
-      updateSelectInput(session, "services", selected = service_classifications[1])
-      updateSelectInput(session, "topic", selected = service_topics[[1]][1])
-    })
+    # observe({
+    #   updateSelectInput(session, "view", selected = "Table")
+    #   updateSelectInput(session, "filter", selected = landscape_filters[1])
+    #   updateSelectInput(session, "services", selected = service_classifications[1])
+    #   updateSelectInput(session, "topic", selected = service_topics[[1]][1])
+    # })
 
     # Reactive Color Definitions =============================================
     colors <- reactive({
@@ -302,30 +373,38 @@ mod_services_server <- function(id) {
       input$services
     }) %>% debounce(100)
 
-    service_change_inputs <- reactive({
-      input$topic
-      input$filter
-      input$services
-    }) %>% debounce(100)
+    # service_change_inputs <- reactive({
+    #   input$topic
+    #   input$filter
+    #   input$services
+    # }) %>% debounce(100)
 
 
     # Metadata Filtering =====================================================
     filter_meta <- reactive({
+      # req(updated_inputs())
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
       meta %>%
         dplyr::filter(field == input$topic,
-                      stringr::str_detect(view, paste0("'", input$view, "'")),
-                      stringr::str_detect(filter, paste0("'", input$filter, "'")))
+                      stringr::str_detect(view, input$view),
+                      stringr::str_detect(filter, input$filter))
+
     })
 
     # Outputs ================================================================
 
     output$table_title <- renderUI({
-      req(input$topic)
+      # Ensure input$topic exists before using it
+      # req(updated_inputs())
+      req(filter_meta())
+      # Subset based on the reactive input$topic and convert to character
       title_values <- as.character(filter_meta()$title)
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
-    })
 
+      # Render the HTML
+      p(title_values, class = "table-title"
+
+      )
+    })
 
     # Data Table Output
     output$data_table <- reactable::renderReactable({
@@ -370,8 +449,15 @@ mod_services_server <- function(id) {
     })
 
     output$figure_bar <- highcharter::renderHighchart({
-      req(updated_inputs())
+      # req(updated_inputs())
       req(input$topic, input$filter, input$services)
+      req(filter_meta())
+
+
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
 
       topic <- input$topic
       services <- input$services
@@ -387,7 +473,44 @@ mod_services_server <- function(id) {
         dplyr::mutate(category = service_type) %>%
         dplyr::group_by(Group) %>%
         dplyr::mutate(x = seq_along(category) - 1) %>%
-        dplyr::ungroup()
+        dplyr::ungroup() %>%
+        dplyr::mutate(group_tt = dplyr::case_when(
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+           group == "censusregion" ~ paste0(tolower(group), "ern"),
+          TRUE ~ "all"
+        ),
+        category_tt = dplyr::case_when(service_type == "Air Polution" ~ "services to address air polution",
+                                       service_type == "COVID-19 Adult Immunizations" ~ "COVID-19 adult immunizations",
+                                       service_type == "COVID-19 Child Immunizations" ~ "COVID-19 child immunizations",
+                                       service_type == "BMI Screening" ~ "BMI screening",
+                                       service_type == "HIV/AIDs Screening" ~ "HIV/AIDs screening",
+                                       service_type == "Other STDs Screening"   ~ "other STD screening" ,
+                                       service_type == "HIV/AIDs Treatment"   ~ "HIV/AIDs treatment" ,
+                                       service_type ==  "Other STD Treatment"   ~  "other STD treatment" ,
+                                       service_type == "EPSDT" ~ "early and periodic screening, diagnostic and treatment (EPSDT)",
+                                       service_type == "WIC" ~ "WIC",
+                                       service_type == "Behavioral Risk Factors" ~ "behavioral risk factor surveillance services",
+                                       service_type == "Chronic Disease"  ~ "chronic disease surveillance services",
+                                       service_type == "Communicable/Infectious Disease "  ~ "communicable/infectious disease surveillance services",
+                                       service_type == "Maternal and Child Health" ~ "maternal and child health surveillance services",
+                                       service_type == "Mental Illness" ~ "mental illness prevention activities",
+                                       service_type == "Nutrition" ~ "nutrition services",
+                                       service_type == "Opioids" ~ "opioid prevention activities",
+                                       service_type == "Injury" ~ "injury prevention activities",
+                                       service_type == "Physical Activity" ~ "physical activity services",
+                                       service_type == "Substance Abuse Other Than Opioids" ~ "substance abuse (other than opioids) prevention activities",
+                                       service_type == "Tobacco" ~ "tobacco prevention activities",
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type != "Lead Inspections"  ~  paste(tolower(service_type), "regulation, inspection, and/or licensing activities"),
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type == "Lead Inspections"  ~  "lead inspection activities",
+                                       service_type == "Hazmat Response" ~ "hazmat response services",
+                                       service_type == "Indoor Air Quality" ~ "indoor air quality control/improvement services",
+                                       service_type == "Noise Pollution"  ~ "noise polution control/improvement services",
+                                       service_type == "Radiation Control"   ~ "radiation control services",
+                                       service_type ==  "Vector Control"    ~ "vector control services",
+                                       TRUE ~ tolower(service_type)
+
+                                       )
+        )
 
       data_n <- services_data %>%
         dplyr::filter(
@@ -399,35 +522,191 @@ mod_services_server <- function(id) {
         dplyr::summarize(Responses = sum(Responses, na.rm = TRUE)) %>%
         dplyr::ungroup()
 
-      set_column(data,
+     bar_chart <- set_column(data,
                  y_label = filter_meta()$y_label,
                  y_format = filter_meta()$y_format,
                  data_label = filter_meta()$data_label) %>%
         viz_options(
-          viz_title = "",
-          viz_subtitle = "",
+          viz_title = filter_meta()$title,
+          viz_subtitle = filter_meta()$subtitle,
           viz_caption = paste0("<b> N: </b>", show_n(data_n$Responses), "<br>", source_line),
           caption_align = "center",
           colors = colors(),
           theme = naccho.viz::basic,
           tooltip = filter_meta()$tooltip
-        )
+        )%>%
+        viz_export()
+
+     if (services ==  "Epidemiology and Surveillance") {
+       bar_chart <- bar_chart %>%
+         highcharter::hc_xAxis(
+           labels = list(
+             rotation = -45,
+             overflow = "allow"
+           )
+         )
+     }
+
+     bar_chart
     })
+
+
+    proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
+
+    observeEvent(list(input$topic, input$filter, input$services), {
+      req(input$topic, input$filter, input$services, input$view == "Bar Graph")
+
+      req(input$topic, input$filter, input$services)
+      req(filter_meta())
+
+
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      topic <- input$topic
+      services <- input$services
+      filtering <- input$filter
+
+      data <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic,
+          Answer == "checked"
+        ) %>%
+        dplyr::mutate(category = service_type) %>%
+        dplyr::group_by(Group) %>%
+        dplyr::mutate(x = seq_along(category) - 1) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(group_tt = dplyr::case_when(
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+          group == "censusregion" ~ paste0(tolower(group), "ern"),
+          TRUE ~ "all"
+        ),
+        category_tt = dplyr::case_when(service_type == "Air Polution" ~ "services to address air polution",
+                                       service_type == "COVID-19 Adult Immunizations" ~ "COVID-19 adult immunizations",
+                                       service_type == "COVID-19 Child Immunizations" ~ "COVID-19 child immunizations",
+                                       service_type == "BMI Screening" ~ "BMI screening",
+                                       service_type == "HIV/AIDs Screening" ~ "HIV/AIDs screening",
+                                       service_type == "Other STDs Screening"   ~ "other STD screening" ,
+                                       service_type == "HIV/AIDs Treatment"   ~ "HIV/AIDs treatment" ,
+                                       service_type ==  "Other STD Treatment"   ~  "other STD treatment" ,
+                                       service_type == "EPSDT" ~ "early and periodic screening, diagnostic and treatment (EPSDT)",
+                                       service_type == "WIC" ~ "WIC",
+                                       service_type == "Behavioral Risk Factors" ~ "behavioral risk factor surveillance services",
+                                       service_type == "Chronic Disease"  ~ "chronic disease surveillance services",
+                                       service_type == "Communicable/Infectious Disease "  ~ "communicable/infectious disease surveillance services",
+                                       service_type == "Maternal and Child Health" ~ "maternal and child health surveillance services",
+                                       service_type == "Mental Illness" ~ "mental illness prevention activities",
+                                       service_type == "Nutrition" ~ "nutrition services",
+                                       service_type == "Opioids" ~ "opioid prevention activities",
+                                       service_type == "Injury" ~ "injury prevention activities",
+                                       service_type == "Physical Activity" ~ "physical activity services",
+                                       service_type == "Substance Abuse Other Than Opioids" ~ "substance abuse (other than opioids) prevention activities",
+                                       service_type == "Tobacco" ~ "tobacco prevention activities",
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type != "Lead Inspections"  ~  paste(tolower(service_type), "regulation, inspection, and/or licensing activities"),
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type == "Lead Inspections"  ~  "lead inspection activities",
+                                       service_type == "Hazmat Response" ~ "hazmat response services",
+                                       service_type == "Indoor Air Quality" ~ "indoor air quality control/improvement services",
+                                       service_type == "Noise Pollution"  ~ "noise polution control/improvement services",
+                                       service_type == "Radiation Control"   ~ "radiation control services",
+                                       service_type ==  "Vector Control"    ~ "vector control services",
+                                       TRUE ~ tolower(service_type)
+
+        )
+        )
+
+      data_n <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic
+        ) %>%
+        dplyr::group_by(service_type) %>%
+        dplyr::summarize(Responses = sum(Responses, na.rm = TRUE)) %>%
+        dplyr::ungroup()
+
+      proxy_bar %>%
+        highcharter::hcpxy_update(data = data)
+
+      if (services ==  "Epidemiology and Surveillance") {
+        proxy_bar %>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+            labels = list(
+              rotation = -45,
+              overflow = "allow"
+            )
+            )
+          )
+      }
+
+
+
+
+    })
+
 
     output$figure_scatter <- highcharter::renderHighchart({
       req(updated_inputs())
-      req(input$services)
+      req(input$topic, input$filter, input$services)
 
-      data <- scatter_data(set_filter = input$filter, set_service = input$services)
-      scatter_plot(data, colors = colors())
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      services <- input$services
+      filtering <- input$filter
+
+
+      data <- scatter_data(set_filter = filtering, set_service = services)
+
+      scatter_plot(data, colors = colors())%>%
+        viz_export()
+
+    })
+
+    proxy_scatter <- highcharter::highchartProxy(ns("figure_scatter"))
+
+    observeEvent(list(input$topic, input$filter, input$services), {
+      req(input$topic, input$filter, input$services, input$view == "Scatter Plot")
+
+      # Debug messages for tracking input values
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      # Extract inputs
+      services <- input$services
+      filtering <- input$filter
+
+      # Update the scatter plot
+      data <- scatter_data(set_filter = filtering, set_service = services)
+
+      # Send updated data to the scatter plot
+      proxy_scatter %>%
+        highcharter::hcpxy_update(
+        id = "figure_scatter", # The ID of the highchart proxy
+        data = data
+      )
+
     })
 
     output$figure_butterfly <- highcharter::renderHighchart({
       req(updated_inputs())
       req(input$services)
 
-      data <- scatter_data(set_filter = c(landscape_filters),
-                           set_service = input$services) %>%
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      services <- input$services
+
+      data <- scatter_data(set_filter = landscape_filters,
+                           set_service = services) %>%
         dplyr::mutate(
           left = x,
           right = y,
@@ -457,7 +736,8 @@ mod_services_server <- function(id) {
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>{point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
-        )
+        )%>%
+        viz_export()
     })
 
     # Event Handling =========================================================
@@ -474,72 +754,61 @@ mod_services_server <- function(id) {
 
     #takeaway ----
     observeEvent(input$takeaway, {
-      shinyjs::hide("toggle_get_services")
-      shinyjs::show("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::hide("toggle_definitions")
+      # shinyjs::hide("toggle_get_services")
+      # shinyjs::show("toggle_takeaway")
+      # shinyjs::hide("toggle_context")
+      # shinyjs::hide("toggle_definitions")
+
+      toggle_sidebar_content("toggle_takeaway",
+                            c("toggle_takeaway", "toggle_context",
+                              "toggle_definitions", "toggle_get_services"))
+
 
       output$show_takeaway <- renderUI({
-        req(input$topic, input$filter)  # Ensure inputs are not NULL
-        req(notes)  # Ensure `notes` is not NULL
-
-        # Filter notes for key takeaways
-        filtered_notes <- notes %>%
+        notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
-        if (nrow(filtered_notes) == 0) {
-          p("No key takeaways available for the selected filters.")
-        } else {
-          # Check if takeaway is available
-          if (is.na(filtered_notes$takeaway)) {
-            p("No specific takeaways for this selection.")
-          } else {
-            p(htmltools::HTML(
-              "<b>Key Takeaway(s)</b>: <br><br>",
-              filtered_notes$takeaway
-            ))
-          }
-        }
+        p(htmltools::HTML(
+          "<b>Key Takeaway(s)</b>: <br><br>",
+          notes$takeaway))
       })
-    })
+    }, ignoreNULL = FALSE)
 
     #context ----
 
     observeEvent(input$context, {
-      shinyjs::hide("toggle_get_services")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::show("toggle_context")
-      shinyjs::hide("toggle_definitions")
+      # shinyjs::hide("toggle_get_services")
+      # shinyjs::hide("toggle_takeaway")
+      # shinyjs::show("toggle_context")
+      # shinyjs::hide("toggle_definitions")
+      toggle_sidebar_content("toggle_context",
+                             c("toggle_takeaway", "toggle_context",
+                               "toggle_definitions", "toggle_get_services"))
 
       output$show_context <- renderUI({
-        req(input$topic, input$filter)  # Ensure inputs are not NULL
-        req(notes)  # Ensure `notes` is not NULL
-
-        filtered_notes <- notes %>%
+        notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        filter == input$filter)
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
-        if (nrow(filtered_notes) == 0) {
-          p("No relevant notes available.")
+        if (is.na(notes$notes)) {
+          p(htmltools::HTML(
+            "<b>Survey Question(s)</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response))
+
         } else {
-          if (is.na(filtered_notes$notes)) {
-            p(htmltools::HTML(
-              "<b>Survey Question(s)</b>: <br>",
-              filtered_notes$survey_question,
-              "<br> <br> <b> Survey Response Options: </b>",
-              filtered_notes$survey_response
-            ))
-          } else {
-            p(htmltools::HTML(
-              "<b>Survey Question(s)</b>: <br>",
-              filtered_notes$survey_question,
-              "<br> <br> <b> Survey Response Options: </b>",
-              filtered_notes$survey_response,
-              "<br> <br> <b> Notes: </b>",
-              filtered_notes$notes
-            ))
-          }
+          p(htmltools::HTML(
+            "<b>Survey Question(s)</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            notes$notes
+          ))
         }
       })
     })
@@ -548,10 +817,10 @@ mod_services_server <- function(id) {
     #definitions------
 
     observeEvent(input$definitions, {
-      shinyjs::hide("toggle_get_services")
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::show("toggle_definitions")
+
+      toggle_sidebar_content("toggle_definitions",
+                             c("toggle_takeaway", "toggle_context",
+                               "toggle_definitions", "toggle_get_services"))
 
       output$show_definitions <- renderUI({
 
@@ -574,11 +843,13 @@ mod_services_server <- function(id) {
             )
           )
         })
+
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
           # side right --------------------------------------------------------------
-
 
           if (length(links) == 0) {
             paste("No relevant definitions.")
@@ -588,6 +859,8 @@ mod_services_server <- function(id) {
         )
       })
     })
+
+
 
 
   })

@@ -4,12 +4,7 @@
 \alias{set_column}
 \title{Set First Highcharter Column Graph}
 \usage{
-set_column(
-  data,
-  y_label = "\% of LHDs",
-  y_format = "{value}",
-  data_label = "{point.y:.0f}\%"
-)
+set_column(data, y_label = "\% of LHDs", y_format = "{value}", data_label = "")
 }
 \arguments{
 \item{data}{dataframe; A dataframe with x, y, group, and category columns.}

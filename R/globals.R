@@ -63,6 +63,7 @@ q_remap <- c(
     "c4q502b" = "Nursing",
     "c4q502c" = "Public Health",
     "c4q502d" = "Other Field",
+    "spec_combined" = "Specialized Degree",
     "c5q36" = "Number of employees",
     "c5q37" = "Number of FTEs",
     "fte_bypop" = "Change in FTEs",

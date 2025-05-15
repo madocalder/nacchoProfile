@@ -15,14 +15,12 @@ mod_topic_areas_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
             div(
-              class = "col-sm-6 min-height-400",
-              br(),
+              class = "topic-select",
+
               selectInput(
                 inputId = ns("topic"),
                 strong("Topic"),
@@ -31,16 +29,15 @@ mod_topic_areas_ui <- function(id){
               )
             ),
             div(
-              class = "col-sm-6",
-              br(),
+              class = "filter-select",
+
               selectInput(
                 inputId = ns("filter"),
                 strong("Filter"),
-                choices = landscape_filters
+                choices = landscape_filters,
+                selectize = TRUE
               )
-            )
-          ),
-          hr(),
+            ),
 
 
           # viz toggles here --------------------------------------------------
@@ -53,7 +50,8 @@ mod_topic_areas_ui <- function(id){
                 HTML('<i class="fas fa-chart-simple"></i>'), # Chart icon
                 HTML('<i class="fas fa-table"></i>') # Map icon
               ),
-              choiceValues = c("Bar Graph", "Table")
+              choiceValues = c("Bar Graph", "Table"),
+              selected = "Table"
             )
           ),
 
@@ -65,27 +63,36 @@ mod_topic_areas_ui <- function(id){
 
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] != \'Table\'"),
-              div(
+              # div(
               highcharter::highchartOutput(ns("figure_bar"), height = "100%"),
-              style = "height: 65vh; width: 52vw;")
+              style = "height: 100%"
               ),
 
             # display when view Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              div(
-                uiOutput(ns("table_title")),
-                reactable::reactableOutput(ns("data_table"), height = "auto"),
-                br(),
-                HTML('<div style="font-size: 2vmin;">', source_line,'
-                   <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
+              div( class = "table-grid",
 
-                style = "margin-left: auto !important;
-                        margin-right: auto !important;")
+
+                   div(class = "table-title-grid",
+
+
+                       uiOutput(ns("table_title")),
+                       csvDownloadButton(ns("data_table"), filename = "topicsNACCHO.csv")
+                   ),
+
+                   reactable::reactableOutput(ns("data_table"),
+                                              height = "100%",
+                                              width = "auto"
+                   ),
+
+                   HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+
+              )
             ),
-            br(),
+
           )
-        ),
+          ),
 
         # end of main content -----------------------------------------------------
 
@@ -93,41 +100,39 @@ mod_topic_areas_ui <- function(id){
           div(
             class = "row color-block-header",
             div(
-              class = "col hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                ns("takeaway"), # key takeaway
+                inputId = ns("takeaway"), # key takeaway
                 "",
                 icon = tags$i(class = "fa-light fa-key",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-3"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Takeaways")
             ),
-
             div(
-              class = "col hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                ns("context"), # survey questions and responses
+                inputId = ns("context"), # survey questions and responses
                 "",
                 icon = tags$i(class = "fa-light fa-circle-info",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-3"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Notes")
             ),
-
             div(
-              class = "col hover-text-side",
+              class = "col-sm-4 hover-text-side",
               align = "center",
               br(),
               actionLink(
-                ns("definitions"), # related definitions
+                inputId = ns("definitions"), # related definitions
                 "",
                 icon = tags$i(class = "fa-light fa-list",
-                              style = "font-size: 30px; text-align: center;"),
-                class = "link-no-underline action-link-3"),
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
               span(class = "hover-text-content-side", "Definitions")
             ),
             hr(class = "right-hr")
@@ -135,30 +140,22 @@ mod_topic_areas_ui <- function(id){
 
           div(
             class = "row color-block-content",
-
-
-            # toggle side content -----------------------------------------------------
             shinyjs::hidden(
-              div(
-                id = ns("toggle_takeaway"),
-                class = "context-content",
-                # uiOutput(ns("show_takeaway"))
+              div(id = ns("toggle_takeaway"),
+                  class = "context-content",
+                  uiOutput(ns("show_takeaway"))
               )
             ),
-
             shinyjs::hidden(
-              div(
-                id = ns("toggle_context"),
-                class = "context-content",
-                # uiOutput(ns("show_context"))
+              div(id = ns("toggle_context"),
+                  class = "context-content",
+                  uiOutput(ns("show_context"))
               )
             ),
-
             shinyjs::hidden(
-              div(
-                id = ns("toggle_definitions"),
-                class = "context-content",
-                # uiOutput(ns("show_definitions"))
+              div(id = ns("toggle_definitions"),
+                  class = "context-content",
+                  uiOutput(ns("show_definitions"))
               )
             )
           ),
@@ -175,7 +172,10 @@ mod_topic_areas_ui <- function(id){
 
       )
     )
+
   )
+
+
 }
 
 #' topic_areas Server Functions
@@ -188,14 +188,21 @@ mod_topic_areas_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("tech_use", "comm_channels", "medical", "dental", "behavioral")) {
+      req(!is.null(c(input$topic, input$view, input$filter)))
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- input$filter
+
+      if (input$topic %in% c("comm_channels_1", "comm_channels_2", "comm_channels_3",
+                             "c12q260", "Newc12q502", "m9q240", "formal_part", "any_part"
+                             # , "chachip",
+                             # "c7q147", "c7q149"
+                             )) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
-                                                HTML('<i class="fas fa-chart-simple"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Table"))
-
+                                              choiceValues = c("Table"))
 
       } else {
         shinyWidgets::updateRadioGroupButtons(session, "view",
@@ -203,17 +210,24 @@ mod_topic_areas_server <- function(id){
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
                                                 HTML('<i class="fas fa-table"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Table"))
+                                              choiceValues = c("Bar Graph", "Table"),
+                                              selected = dplyr::case_when(selected_view %in% c("Bar Graph", "Table") ~ selected_view,
+                                                                          TRUE ~ "Bar Graph"))
       }
     })
 
     # Update filter options based on topic and view selection
     observe({
-      req(input$topic, input$view)
+      req(input$topic, input$view, input$filter)
+
+      topic <- input$topic
+      selected_view <- input$view
+      selected_filter <- input$filter
 
       # Restrict filter to "All LHDs" for specific topics and views
-      if (input$topic %in% c("health_part", "comm_part", "gov_part") &&
-          input$view %in% c("Table", "Bar Graph")) {
+      if ((input$topic %in% c("tech_use",
+                             "medical", "dental", "behavioral")) &
+          input$view %in% c("Bar Graph")) {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1],
                           selected = landscape_filters[1])
@@ -221,7 +235,7 @@ mod_topic_areas_server <- function(id){
         # Restore the full set of filters for other topics
         updateSelectInput(session, "filter",
                           choices = landscape_filters,
-                          selected = landscape_filters[1])
+                          selected = selected_filter)
       }
     })
 
@@ -258,25 +272,27 @@ mod_topic_areas_server <- function(id){
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
     filter_meta <- reactive({
+      # req(updated_inputs())
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
       meta %>%
         dplyr::filter(field == input$topic,
                       stringr::str_detect(view, input$view),
                       stringr::str_detect(filter, input$filter))
-    })
 
+    })
     #table titles---------------------------------------------------------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
-      req(input$topic)
-
+      # req(updated_inputs())
+      req(filter_meta())
       # Subset based on the reactive input$topic and convert to character
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
-    })
+      p(title_values, class = "table-title"
 
+      )
+    })
     # main content ============================================================
 
 
@@ -292,59 +308,40 @@ mod_topic_areas_server <- function(id){
       message("topic =", topic)
       message("filtering =", filtering)
 
-      if (!(input$topic %in% c("health_part", "comm_part", "gov_part"))) {
+
 
       data <- get_bar_data(topic = topic, filter = filtering)
 
-      } else {
 
-         data <- partnerships %>%
-           dplyr::filter(variable == topic)
-
-         data$year <- as.factor(data$year)
-
-         # if(max(data$y, na.rm = TRUE) == 100) {
-         #   y_max_rel <- max(data$y, na.rm = TRUE) + 1
-         # } else {
-         #   y_max_rel <- max(data$y, na.rm = TRUE) * 1.01
-         # }
-         #
-         naccho.viz::create_grouped_line(
-           data = data,
-           x_variable = "year",
-           x_group = "group",
-           y_variable = "y",
-           y_label = "% of LHDs",
-           # y_max = y_max_rel,
-           x_label = "Year",
-           select_theme = naccho.viz::basic,
-           title = "Formal {point.group} Over Time",
-           # subtitle = subtitle,
-           # caption_text = paste0("<b> N: </b>", responses, "<br>", meta$caption),
-           tooltip = "In {point.year}, {point.one}{point.two}.",
-           legend_title = NA
-         )
-
-      }
 
 
       # show_n(data$Responses)
 
+      caption <- dplyr::case_when(
+        topic %in% c("formal_part", "any_part") ~ paste0("<b> N: </b> 205 to 485 <br>", source_line),
+        TRUE ~ paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line)
+      )
+
+
+
       # Adjust the bar chart settings for long names
-      set_simple_bar(data) %>%
-        # highcharter::hc_add_theme(naccho.viz::minimal)%>%
+      set_simple_bar(data,
+                     # y_label = filter_meta()$y_label,
+                     y_format = filter_meta()$y_format,
+                     data_label = filter_meta()$data_label ) %>%
+
         viz_options(
           theme = naccho.viz::basic,
-          # ,
-          # viz_title = "Percent of LHDs that Have Implemented the Following Communication Channels",
-          # viz_subtitle = unique(data$subtitle),
-          # viz_caption = paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
-          tooltip = "{point.category}: <br> {point.y}%"
+          viz_title = filter_meta()$title,
+          viz_subtitle = filter_meta()$subtitle,
+          viz_caption = caption,
+          tooltip = filter_meta()$tooltip,
+
           #,
           # legend_enable = FALSE,
-          # colors = colors()
+          colors = c(naccho.viz::green, colors())
         ) %>%
-        viz_export()
+        viz_export()%>%
 
         # highcharter::hc_chart(type = "column") %>%  # Specify bar type explicitly
         # highcharter::hc_xAxis(
@@ -359,10 +356,10 @@ mod_topic_areas_server <- function(id){
         #                  )      # Set width to manage label length
         #   )
         # ) %>%
-        # # highcharter::hc_plotOptions(bar = list(
-        # #   pointPadding = 0.2,  # Space between bars within a category
-        # #   groupPadding = 0.2   # Space between different categories
-        # # )) %>%
+        highcharter::hc_plotOptions(bar = list(
+          pointPadding = 0.2,  # Space between bars within a category
+          groupPadding = 0.1   # Space between different categories
+        ))
 
     })
 
@@ -517,7 +514,108 @@ mod_topic_areas_server <- function(id){
 
       # Call the table creation function with the appropriate data and parameters
       create_non_time_table(data, category, colors, topic)
+
     }) #end of tables output code
+
+    # right content ===========================================================
+
+    # takeaway ----------------------------------------------------------------
+    observeEvent(input$takeaway, {
+
+      shinyjs::show("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_takeaway <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        stringr::str_detect(filter, input$filter))%>%
+          dplyr::filter(stringr::str_detect(view, input$view))
+
+        p(htmltools::HTML(
+          "<b>Key Takeaway(s)</b>: <br><br>",
+          notes$takeaway))
+      })
+    }, ignoreNULL = FALSE)
+
+
+    # survey questions, responses, and notes ----------------------------------
+    observeEvent(input$context, {
+
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::show("toggle_context")
+      shinyjs::hide("toggle_definitions")
+
+      output$show_context <- renderUI({
+        notes <- notes %>%
+          dplyr::filter(topic == input$topic,
+                        stringr::str_detect(filter, input$filter))%>%
+          dplyr::filter(stringr::str_detect(view, input$view))
+
+        if (is.na(notes$notes)) {
+          p(htmltools::HTML(
+            "<b>Survey Question(s)</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response))
+
+        } else {
+          p(htmltools::HTML(
+            "<b>Survey Question(s)</b>: <br>",
+            notes$survey_question,
+            "<br> <br> <b> Survey Response Options: </b>",
+            notes$survey_response,
+            "<br> <br> <b> Notes: </b>",
+            notes$notes
+          ))
+        }
+      })
+    })
+
+
+    # definitions -------------------------------------------------------------
+    observeEvent(input$definitions, {
+
+      shinyjs::hide("toggle_takeaway")
+      shinyjs::hide("toggle_context")
+      shinyjs::show("toggle_definitions")
+
+      output$show_definitions <- renderUI({
+
+        definitions <- definitions %>%
+          dplyr::filter(field %in% c(input$topic, input$filter))
+
+        links <- lapply(seq_along(definitions$item), function(i) {
+          div(
+            tags$a(
+              class = "def-link",
+              `data-bs-toggle` = "collapse",
+              href = paste0("#collapseExample", i),
+              tags$i(class = "fa fa-plus"),
+              paste(definitions$item[[i]])
+            ),
+            div(
+              class= "collapse",
+              id= paste0("collapseExample", i),
+              HTML(definitions$definition[[i]], "<br> <br>")
+            )
+          )
+        })
+        div(
+          p(htmltools::HTML("<b>Definitions</b>: <br>")),
+
+          # side right --------------------------------------------------------------
+
+
+          if (length(links) == 0) {
+            paste("No relevant definitions.")
+          } else {
+            links
+          }
+        )
+      })
+
+    })
 
 
 

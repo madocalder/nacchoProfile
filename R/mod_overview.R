@@ -15,28 +15,22 @@ mod_overview_ui <- function(id) {
       div(
         openMenu(),
         div(
+          align = "right",
+          actionButton(
+            ns("info_button"),
+            label = NULL,
+            icon = icon("info-circle", class = "fa-solid"),
+            style = "font-size: 2em; color: #3C8A97; background: none; border: none;
+                position: absolute; top: .25rem; right: 1rem; padding: .1em;"
+          )
+        ),
+        div(
           class = "key-findings-head",
-          div(
-            class = "row",
-            div(
-              class = "col-sm-8",
               align = "left",
               h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
               hr(class = "header-hr")
             ),
-            div(
-              class = "col-sm-4",
-              align = "right",
-              actionButton(
-                ns("info_button"),
-                label = NULL,
-                icon = icon("info-circle", class = "fa-solid"),
-                style = "font-size: 3em; color: #3C8A97; background: none; border: none;"
-              )
-            )
-          )
-          )
-        ),
+
         div(
           class = "key-findings-content",
 
@@ -103,10 +97,11 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-7",
                       highcharter::highchartOutput(ns("map"),
-                                                   # width = "auto",
-                                                   height = "50vh"),
-                      style = "margin-left: auto !important;
-                              margin-right: auto !important;"
+                                                   width = "auto",
+                                                   height = "55vh")
+                      # ,
+                      # style = "margin-left: auto !important;
+                      #         margin-right: auto !important;"
                     )
                   )
                 )
@@ -135,7 +130,7 @@ mod_overview_ui <- function(id) {
                           to serve multiple counties than
                           small LHDs. </span> <br> <br>
                           <span style = 'font-size: 1.8vmin;'>
-                          *Other includes LHDs serving multiple cities or towns.
+                          *County includes city-counties.
                           <br>
                            <b> N: </b>2,512 <br>", source_line, "</span>")
                     ),
@@ -155,6 +150,7 @@ mod_overview_ui <- function(id) {
         )
       )
     )
+  )
 
 }
 
@@ -176,15 +172,22 @@ mod_overview_server <- function(id){
         y = c(9, 37, 53, 62, 32, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
-        group = c("all LHDs", "all LHDs", "all LHDs",
-                  "population served by LHDs", "population served by LHDs", "population served by LHDs")
+        group = c("Population served by LHDs", "Population served by LHDs", "Population served by LHDs",
+                  "All LHDs", "All LHDs", "All LHDs"),
+        tt = c("the population served by LHDs are served by ", "the population served by LHDs are served by ",
+                  "the population served by LHDs are served by ",
+               "all LHDs are ", "all LHDs are ", "all LHDs are ")
       )
 
       data <- data %>%
-        dplyr::mutate(tooltip = paste(y, "% of", group, "are served by", category, "LHDs"))
+            dplyr::mutate(tooltip =
+                      paste0(y,"% of ", tt,
+                            tolower(category), " LHDs."))
 
 
-      set_column(data) %>%
+      set_column(data,
+                 data_label = "{point.y:,.0f}%",
+                 y_label = "%") %>%
         viz_options(
           viz_title = "% of U.S. Population Served by LHDs",
           viz_caption = "",
@@ -208,7 +211,7 @@ mod_overview_server <- function(id){
         fips = c(33, 10, 44, 02, 11),
         state_name = c("New Hampshire", "Deleware", "Rhode Island",
                        "Alaska", "District of Columbia"),
-        grouping = c("Local", "State", "State", "Local", "State")
+        grouping = c("Local", "State", "NA" , "Local", "State")
       )
 
       data <- master_data %>%
@@ -221,6 +224,8 @@ mod_overview_server <- function(id){
                             "Oklahoma", "Tennessee", "Texas", "Alabama",
                             "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
           state_name == "Delaware" ~ "Shared",
+          state_name == "District of Columbia" ~ "State",
+          state_name == "Rhode Island" ~ "NA",
           grouping == "shared" ~ "Shared",
           grouping == "local" ~ "Local",
           grouping == "state" ~ "State",
@@ -228,8 +233,21 @@ mod_overview_server <- function(id){
           TRUE ~ grouping))
 
       data <-  dplyr::bind_rows(data, join)
-      #%>%
-      #   dplyr::mutate(tooltip = paste("In 2022,", state_name,"'s governance structure was", grouping, "."))
+
+      data$value_tt <-  dplyr::case_when(data$state_name == "Rhode Island" ~ "NA. Rhode Island was excluded from the study because the state health agency operates on behalf of local public health and has no sub-state units",
+                      TRUE ~ paste(tolower(data$grouping)))
+
+
+      data$grouping <- factor(data$grouping, levels = c("Local", "State", "Shared", "Mixed", "NA"))
+
+      # Add the color mapping, explicitly defining colors for each category
+      colors <- c(
+        "Local" = naccho.viz::green,
+        "State" = naccho.viz::navy,
+        "Shared" = naccho.viz::terracotta,
+        "Mixed" = naccho.viz::teal,
+        "NA" = naccho.viz::grey  # Define "NA" as grey
+      )
 
       # View(data)
       # uses a function from the naccho.viz package
@@ -239,12 +257,18 @@ mod_overview_server <- function(id){
         selected_value = "grouping",
         title_text = "Governance of LHDs",
         subtitle_text = "",
-        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value}.",
+        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value_tt}.",
         caption_text = "",
         accessible_desc = ""
       )%>%
-        highcharter::hc_add_theme(naccho.viz::basic)
-
+        highcharter::hc_colorAxis(
+          dataClasses = lapply(names(colors), function(grouping) {
+            list(
+              name = grouping,
+              color = colors[[grouping]]
+            )
+          })
+        )
       # %>%
       #   highcharter::hc_chart(
       #     spacing = "1vmin 1vmin 1vmin 1vmin"
@@ -253,6 +277,7 @@ mod_overview_server <- function(id){
       #   highcharter::hc_legend(
       #     margin = "2.5vmin"
       #   )
+
     })
 
 
@@ -261,21 +286,28 @@ mod_overview_server <- function(id){
 
       data <- data.frame(
         y = c(69, 21, 8, 3,
-              69, 26, 3, 1,
+              69, 26.7, 2.9, 1.4,
               68, 12, 14, 6,
               69, 7, 23, 1),
         category = c("All LHDs", "All LHDs", "All LHDs", "All LHDs",
                      "Small", "Small", "Small", "Small",
                      "Medium", "Medium", "Medium", "Medium",
                      "Large", "Large", "Large", "Large"),
-        group = c("County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*",
-                  "County", "City or Town", "Multi-county", "Other*")
+        group = c("County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town",
+                  "County*", "City or Town", "Multi-county", "Multi-city/town")
       )
 
-      # Reorder the category factor
-      data$group <- factor(data$group, levels = c("County", "City or Town", "Multi-county", "Other*"))
+      data$group <- factor(data$group, levels = c("County*", "City or Town", "Multi-county", "Multi-city/town"))
+
+      data <- data %>%
+        dplyr::mutate(
+          cat_tt = dplyr::case_when(category != "All LHDs" ~ tolower(category),
+                                    TRUE ~ "all"),
+          group_tt = dplyr::case_when(group != "County*" ~ tolower(group),
+                                      TRUE ~ "county")
+        )
 
       highcharter::hchart(
         data,
@@ -290,11 +322,10 @@ mod_overview_server <- function(id){
         dataLabels = list(
           enabled = TRUE,
           overflow = "allow",
-          format = '{point.value:.0f}%',
+          format = '{point.y:.0f}%',
         #   formatter = JS(
         #     "
         # function () {
-        #   let roundedValue;
         #   if (this.y > 0 && this.y < 1) {
         #     roundedValue = this.y.toFixed(1);
         #   } else {
@@ -322,13 +353,17 @@ mod_overview_server <- function(id){
           categories = levels(unique(data$category))
         ) %>%
         highcharter::hc_yAxis(
+          reserveSpace = TRUE,
+          overflow = "allow",
           reversedStacks = FALSE,
           title = list(
-            text = "% of LHDs",
+            text = "",
             y = 20
           ), # y-axis label
           min = 0,
           max = 100,
+          endOnTick = TRUE,
+          maxPadding = .1,
           labels = list(
             format = "{value}%"
           )
@@ -336,7 +371,7 @@ mod_overview_server <- function(id){
         viz_options(
           viz_title = "Geographic Jurisdictions Served by LHDs, by Size of Population Served",
           viz_caption = "",
-          tooltip = "{point.y:.0f}% of {this.x} serve {this.group} areas",
+          tooltip = "{point.y:.0f}% of {point.cat_tt} LHDs serve {point.group_tt} areas.",
           viz_subtitle = "",
           legend_align = "center"
         ) %>%

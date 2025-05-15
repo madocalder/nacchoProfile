@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_landscape_ui <- function(id){
+mod_landscape_ui <- function(id) {
   ns <- NS(id)
   tagList(
     conditionalPanel(
@@ -15,150 +15,187 @@ mod_landscape_ui <- function(id){
       flexlayout::flexlayout(
         left = NULL,
         center = div(
-          class = "col-pad",
+          class = "main-content",
+          style = "display: grid !important;
+    grid-template-rows: minmax(75px, 8%) minmax(40px, 4%) minmax(350px, 75vh);
+    grid-template-columns: minmax(40%, auto) minmax(40%, auto);
+    gap: clamp(3px, 2.5vh, 30px) 5%;
+    width: clamp(50vw, 100%, 95vw);
+    height: calc(100vh - 4rem);
+    padding-left: 4vw;
+   /*  padding-bottom: 3em; */
+    padding-right: 1vw;
+    min-width: 70%;
+    max-width: 95%;
+    align-items: start;
+    /* justify-content: center !important;  */
+    /* padding-top: 1em; */
+    max-height: calc(100vh - 4rem);
+    /* margin-top: -10px; */;
+          ",
           openMenu(),
-          div(
-            class = "row",
-            align = "center",
+
+              div( class = "topic-select",
+                style = "grid-area: 1 / 1 / 2 / 2;
+              justify-self: center;
+              display: block;
+              /* align-self: end; */
+              /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
+                selectInput(
+                  inputId = ns("topic"),
+                  strong("Topic"),
+                  choices = landscape_topics,
+                  selectize = TRUE,
+                  selected = landscape_topics[2]
+                )
+              ),
+              div( class = "filter-select",
+                style = "grid-area: 1 / 2 / 2 / 3;
+              justify-self: center;
+              display: block;
+              /* align-self: end; */
+              /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
+                selectInput(
+                  inputId = ns("filter"),
+                  strong("Filter"),
+                  choices = landscape_filters
+                )
+              ),
+
+
+            # Visualization Toggles
             div(
-              class = "col-sm-6 min-height-400",
-              br(),
-              selectInput(
-                inputId = ns("topic"),
-                strong("Topic"),
-                choices = landscape_topics,
-                selectize = TRUE,
-                selected = landscape_topics[2]
+              class = "viz-view",
+              style = "grid-area: 2 / 1 / 3 / 3;
+    /* justify-self: center; */
+    /* align-self: start; */
+    display: unset !important;
+    position: relative;
+    background: linear-gradient(to right, #008A96 100%, transparent 0%)
+             no-repeat center / 100% 1.5px;
+    padding-right: 30%;
+    padding-left: 30%;
+    justify-self: center;
+    align-self: center;
+    /* margin-bottom: clamp(5px, 3%, 30px); */
+    margin-top: clamp(-2px, -2.5%, -8px);",
+              shinyWidgets::radioGroupButtons(
+                ns("view"),
+                "",
+                choiceNames = list(
+                  HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
+                  HTML('<i class="fas fa-chart-line"></i>'),    # Line graph icon
+                  HTML('<i class="fas fa-table"></i>')         # Table icon
+                ),
+                choiceValues = c('Bar Graph', 'Line Graph', 'Table'),
+                selected = 'Bar Graph'
               )
             ),
-            div(
-              class = "col-sm-6",
-              br(),
-              selectInput(
-                inputId = ns("filter"),
-                strong("Filter"),
-                choices = landscape_filters
-              )
-            )
-          ),
 
-          hr(),
-
-          # viz toggles here --------------------------------------------------
-          div(
-            class = "viz-view",
-            shinyWidgets::radioGroupButtons(
-              ns("view"),
-              "",
-              choiceNames = list(
-                HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
-                HTML('<i class="fas fa-chart-line"></i>'), # Line graph icon
-                HTML('<i class="fas fa-table"></i>')         # Map icon
-              ),
-              choiceValues = c('Bar Graph', 'Line Graph', 'Table'),
-              selected = 'Bar Graph'
-            )
-          ),
-
-
-          # add main page content here ----------------------------------------
+          # Bottom Section: Visualization content
           div(
             class = "viz-content",
+            style = "grid-area: 3 / 1 / 3 / 3;
+    justify-self: center;
+    align-self: start;
+    overflow-y: visible;
+    overflow-x: clip;
+    width: clamp(50vw, 100%, 90vw);
+    height: clamp(375px, 100%, 70vh);
+    padding-bottom: 1em;
+    /* margin-top: 1%; */",
 
-            # display when Map is selected
-            conditionalPanel(
-              condition = paste0('input[\'', ns('view'), "\'] == \'Map\'"),
-              div(
-                highcharter::highchartOutput(ns("map"), height = "100%"),
-                style = "height: 60vh; width: auto;"
-              )
-            ),
 
             # display when Bar is selected and not Map, Table, or Line
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\' && input[\'', ns('view'), "\'] != \'Line Graph\'"),
-              div(
+              # div(
                 highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 58vh; width: auto;"
-              )
+                style = "height: 100%"
+              # )
             ),
 
             # display when Table is selected
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
-              div(
-                uiOutput(ns("table_title")),
-                reactable::reactableOutput(ns("data_table"), height = "auto", width = "auto"),
-                br(),
-                HTML('<div style="font-size: 1.8vmin;">', source_line,'
-         <br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'),
-                style = "margin-left: auto !important;
-                        margin-right: auto !important;"
+
+                div( class = "table-grid",
+
+
+                     div(class = "table-title-grid",
+
+
+                         uiOutput(ns("table_title")),
+                         csvDownloadButton(ns("data_table"), filename = "landscapeNACCHO.csv")
+                     ),
+
+                     reactable::reactableOutput(ns("data_table"),
+                                                height = "100%",
+                                                width = "auto"
+                     ),
+
+                     HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+
+
               )
+
             ),
 
             # view output Line
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Line Graph\'"),
               div(
-                highcharter::highchartOutput(ns("line"), height = "60vh"),
-                br(),
-                # HTML('<div style="font-size: 2vmin;">', source_line,'</div>'),
-                style = "height: 60vh; width: auto;"
+                highcharter::highchartOutput(ns("line"), height = "100%"),
+                style = "height: 100%"
               )
             )
           )
-        ),
-
-          # end of main content -----------------------------------------------------
+        ), #end center content
 
         right = div(
+          div(
+            class = "row color-block-header",
             div(
-              class = "row color-block-header",
-              div(
-                class = "col-sm-4 hover-text-side",
-                align = "center",
-                br(),
-                actionLink(
-                  inputId = ns("takeaway"), # key takeaway
-                  "",
-                  icon = tags$i(class = "fa-light fa-key",
-                                style = "font-size: 4vmin; text-align: center;"),
-                  class = "link-no-underline action-link"),
-                span(class = "hover-text-content-side", "Takeaways")
-              ),
-              div(
-                class = "col-sm-4 hover-text-side",
-                align = "center",
-                br(),
-                actionLink(
-                  inputId = ns("context"), # survey questions and responses
-                  "",
-                  icon = tags$i(class = "fa-light fa-circle-info",
-                                style = "font-size: 4vmin; text-align: center;"),
-                  class = "link-no-underline action-link"),
-                span(class = "hover-text-content-side", "Notes")
-              ),
-              div(
-                class = "col-sm-4 hover-text-side",
-                align = "center",
-                br(),
-                actionLink(
-                  inputId = ns("definitions"), # related definitions
-                  "",
-                  icon = tags$i(class = "fa-light fa-list",
-                                style = "font-size: 4vmin; text-align: center;"),
-                  class = "link-no-underline action-link"),
-                span(class = "hover-text-content-side", "Definitions")
-              ),
-              hr(class = "right-hr")
+              class = "col-sm-4 hover-text-side",
+              align = "center",
+              br(),
+              actionLink(
+                inputId = ns("takeaway"), # key takeaway
+                "",
+                icon = tags$i(class = "fa-light fa-key",
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
+              span(class = "hover-text-content-side", "Takeaways")
             ),
-
+            div(
+              class = "col-sm-4 hover-text-side",
+              align = "center",
+              br(),
+              actionLink(
+                inputId = ns("context"), # survey questions and responses
+                "",
+                icon = tags$i(class = "fa-light fa-circle-info",
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
+              span(class = "hover-text-content-side", "Notes")
+            ),
+            div(
+              class = "col-sm-4 hover-text-side",
+              align = "center",
+              br(),
+              actionLink(
+                inputId = ns("definitions"), # related definitions
+                "",
+                icon = tags$i(class = "fa-light fa-list",
+                              style = "font-size: calc(28px + .2em); text-align: center;"),
+                class = "link-no-underline action-link"),
+              span(class = "hover-text-content-side", "Definitions")
+            ),
+            hr(class = "right-hr")
+          ),
 
           div(
             class = "row color-block-content",
-
-            # toggle side content -----------------------------------------------------
             shinyjs::hidden(
               div(id = ns("toggle_takeaway"),
                   class = "context-content",
@@ -192,6 +229,7 @@ mod_landscape_ui <- function(id){
   )
 }
 
+
 #' landscape Server Functions
 #'
 #' @noRd
@@ -202,7 +240,7 @@ mod_landscape_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("c2q501")) {
+      if (input$topic %in% c("c2q501", "lboh")) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
@@ -238,15 +276,26 @@ mod_landscape_server <- function(id){
 
     # filter meta data --------------------------------------------------------
     # used to display the correct title, caption, labels, etc...
+
     filter_meta <- reactive({
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
-      meta %>%
-        dplyr::filter(field == input$topic,
-                      stringr::str_detect(view, input$view),
-                      stringr::str_detect(filter, input$filter))
-
-
+      message("filter_meta inputs: ", input$topic, ", ", input$filter, ", ", input$view)
+      tryCatch({
+        result <- meta %>%
+          dplyr::filter(
+            field == input$topic,
+            stringr::str_detect(view, input$view),
+            stringr::str_detect(filter, input$filter)
+          )
+        message("filter_meta output rows: ", nrow(result))
+        result
+      }, error = function(e) {
+        message("filter_meta error: ", e$message)
+        NULL
+      })
     })
+
+
 
 
 
@@ -257,13 +306,15 @@ mod_landscape_server <- function(id){
     #table titles-----------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
-      req(input$topic)
-
+      # req(updated_inputs())
+      req(filter_meta())
       # Subset based on the reactive input$topic and convert to character
       title_values <- as.character(filter_meta()$title)
 
       # Render the HTML
-      p(title_values, style = "font-size: 3vmin; font-weight: bold !important; text-align: center;")
+      p(title_values, class = "table-title"
+
+      )
     })
 
     # Dynamic color definitions ---------------------------------------------------
@@ -351,50 +402,188 @@ mod_landscape_server <- function(id){
       # Combine data for "All LHDs" and filtered LHDs
       combined_data <- if (input$filter == "All LHDs") {
         if (input$topic == "field") {
-          spec_data_all
+
+          spec_data_all%>%
+            dplyr::filter(Question != "spec_combined")
+
+        } else if (input$topic == "tenure"){
+
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$category <- factor(data$category,
+                                  levels = c("Less Than 2 Years", "2 - 5 Years",
+                                             "6 - 10 Years", "11 Or More Years"),
+                                  ordered = TRUE)
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")
+
+          data
+
         } else {
           return_survey_weighted_counts(input$topic)
         }
       } else {
         all_data <- if (input$topic == "field") {
-          spec_data_all
+
+          spec_data_all%>%
+            dplyr::filter(Question != "spec_combined")
+
+        } else if  (input$topic == "tenure"){
+
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")%>%
+            dplyr::arrange(tenure_numcat)
+
+          data
+
         } else {
           return_survey_weighted_counts(input$topic)
         }
 
         filtered_data <- if (input$topic == "field") {
-          spec_data %>% dplyr::filter(filter == input$filter)
+
+          spec_data %>%
+            dplyr::filter(filter == input$filter)%>%
+            dplyr::filter(Question != "spec_combined")
+
+
+        } else if (input$topic == "tenure") {
+
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = dplyr::case_when(
+              input$filter != "censusregion" ~
+                paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
+              TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
+            )) %>%
+            dplyr::arrange(tenure_numcat)
+
+          data
+
         } else {
           return_survey_weighted_counts(input$topic, input$filter)
         }
 
-        dplyr::bind_rows(
+        combined <- dplyr::bind_rows(
           all_data %>% dplyr::mutate(filter = "All LHDs"),
           filtered_data
         )
+
+
+
+          combined
+
+
       }
 
+
+      if (input$filter != "All LHDs"){
+        if(input$topic != "field") {
+        combined_data <- combined_data %>%
+          dplyr::mutate(Responses = dplyr::case_when(
+            group == "All LHDs" ~ 0,
+            TRUE ~ Responses),
+            N = sum(Responses)
+            )
+        } else {
+          combined_data <- combined_data %>%
+            dplyr::mutate(N = Responses)
+        }
+      }
+
+      if (input$filter == "All LHDs"){
+        if(input$topic != "field") {
+        combined_data <- combined_data %>%
+          dplyr::mutate(
+            N = sum(Responses)
+          )
+        } else {
+          combined_data <- combined_data %>%
+            dplyr::mutate(N = Responses)
+        }
+      }
+
+      if (input$topic == "c4q29"){
+        combined_data<- combined_data%>%
+          dplyr::filter(category %in% c("Male", "Female"))
+      }
+
+      combined_data <- combined_data %>%
+        dplyr::mutate(group_tt = dplyr::case_when(
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+          group == "censusregion" ~ paste0(tolower(group), "ern"),
+          TRUE ~ "all"
+        ))
+
+      # View(combined_data)
+
       # Generate the bar chart (no series yet)
-      bar_chart <- set_column(combined_data, y_format = filter_meta()$y_format) %>%
+      bar_chart <- set_column(combined_data,
+                              y_format = filter_meta()$y_format,
+                              y_label =filter_meta()$y_label,
+                              data_label = filter_meta()$data_label) %>%
         viz_options(
           viz_title = filter_meta()$title,
           viz_caption = paste(
-            "<b> N: </b>", sum(unique(combined_data$Responses), na.rm = TRUE),
+            "<b> N: </b>", show_n(combined_data$N),
             "<br>", source_line
           ),
           tooltip = filter_meta()$tooltip
-        )
+        )%>%
+        highcharter::hc_yAxis(
+          maxPadding = .09,
+          # tickPositioner = JS("function() { return [0, 25, 50, 75, 100]; }"), # Define custom tick positions
+          max = filter_meta()$y_max,
+          endOnTick = TRUE
+          # ,
+          # labels = list(
+          #   format = "{value}%"
+          )%>%
+        highcharter::hc_legend(reversed = TRUE)%>%
+        viz_export()
+
+      # if (input$topic == "field" & input$filter != "All LHDs") {
+      #   bar_chart <- bar_chart %>%
+      #     highcharter::hc_xAxis(
+      #       labels = list(enabled = FALSE),
+      #       title = list(text = NULL),
+      #       categories = unique(combined_data$group)
+      #     )
+      # }
+
+     if (input$topic == "tenure"){
+
+        bar_chart <- bar_chart %>%
+          highcharter::hc_xAxis(categories = data$tenure_numcat)
+      }
+
 
       bar_chart
     })
+
+
 
     # Proxy for the Bar Chart
     proxy_bar <- highcharter::highchartProxy(ns("figure"))
 
     # Update the bar chart with new data when inputs change
     observe({
-      req(input$topic, input$filter)  # Ensure inputs are available
 
+      req(input$topic, input$filter)  # Ensure inputs are available
+      req(input$view == "Bar Graph")
       # Remove all old series (to prevent overlap)
       proxy_bar %>%
         highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
@@ -403,31 +592,147 @@ mod_landscape_server <- function(id){
       # Combine the updated data based on input$topic and input$filter
       combined_data <- if (input$filter == "All LHDs") {
         if (input$topic == "field") {
-          spec_data_all
+          spec_data_all%>%
+            dplyr::filter(Question != "spec_combined")
+
+        } else if (input$topic == "tenure"){
+
+          data <- return_survey_weighted_counts("tenure_numcat")
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category), "."))
+
+
+          data
+
         } else {
           return_survey_weighted_counts(input$topic)
         }
+
       } else {
         all_data <- if (input$topic == "field") {
-          spec_data_all
+
+         all_data <- spec_data_all%>%
+            dplyr::filter(Question == "spec_combined")
+
+        } else if (input$topic == "tenure") {
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data <- data %>%
+            dplyr::mutate(tt = dplyr::case_when(
+            input$filter != "censusregion" ~
+              paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
+            TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
+          ))
+
+          data
+
         } else {
           return_survey_weighted_counts(input$topic)
         }
 
         filtered_data <- if (input$topic == "field") {
-          spec_data %>% dplyr::filter(filter == input$filter)
+        spec_data %>% dplyr::filter(filter == input$filter,
+                                      category == group)
+
+        } else if (input$topic == "tenure"){
+
+          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+
+          data$tenure_numcat <- factor(data$tenure_numcat,
+                                       levels = c("Less Than 2 Years", "2 - 5 Years",
+                                                  "6 - 10 Years", "11 Or More Years"),
+                                       ordered = TRUE)
+
+          data
+
+
         } else {
           return_survey_weighted_counts(input$topic, input$filter)
         }
 
-        dplyr::bind_rows(
+        combined <- dplyr::bind_rows(
           all_data %>% dplyr::mutate(filter = "All LHDs"),
           filtered_data
         )
+
+        # if (input$topic == "tenure"){
+        #
+        #   combined <- combined %>%
+        #     dplyr::mutate(x = seq_along(category)-1,
+        #                   group = category)
+        #
+        # }
+
+          combined
+
       }
 
+      if (input$filter != "All LHDs"){
+        if(input$topic != "field") {
+          combined_data <- combined_data %>%
+            dplyr::mutate(Responses = dplyr::case_when(
+              group == "All LHDs" ~ 0,
+              TRUE ~ Responses),
+              N = sum(Responses)
+            )
+        } else {
+          combined_data <- combined_data %>%
+            dplyr::mutate(N = Responses)
+        }
+
+        if(input$topic != "field") {
+          combined_data <- combined_data %>%
+            dplyr::mutate(Responses = dplyr::case_when(
+              group == "All LHDs" ~ 0,
+              TRUE ~ Responses),
+              N = sum(Responses)
+            )
+
+        } else {
+          combined_data <- combined_data %>%
+            dplyr::mutate(N = Responses)
+        }
+      }
+
+      if (input$filter == "All LHDs"){
+        if(input$topic != "field") {
+          combined_data <- combined_data %>%
+            dplyr::mutate(
+              N = sum(Responses)
+            )
+        } else {
+          combined_data <- combined_data %>%
+            dplyr::mutate(N = Responses)
+        }
+      }
+
+      if (input$topic == "c4q29"){
+        combined_data<- combined_data%>%
+          dplyr::filter(category %in% c("Male", "Female"))
+      }
+
+      combined_data <- combined_data %>%
+        dplyr::mutate(group_tt = dplyr::case_when(
+          group != "All LHDs" ~ tolower(group),
+          TRUE ~ "all"
+        ))
+
+      # View(combined_data)
+
+
       # Dynamically update the bar chart with new data
-      proxy_bar %>%
+       proxy_bar %>%
         highcharter::hcpxy_add_series(
           id = "filtered_bar_series",
           name = input$filter,
@@ -435,65 +740,107 @@ mod_landscape_server <- function(id){
           type = "column",  # Ensure this is a column chart (bar graph)
           selected = TRUE
         )
-    })
+
+      if (input$topic == "field" & input$filter != "All LHDs") {
+
+        proxy_bar %>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+              labels = list(enabled = FALSE),
+              title = list(text = NULL),
+              categories = unique(combined_data$group)
+            )
+          )
+
+
+
+      }
+      #  else if (input$topic == "tenure" & input$filter != "All LHDs") {
+      #
+      #   proxy_bar %>%
+      #     highcharter::hcpxy_update(
+      #       xAxis = list(
+      #         labels = list(enabled = FALSE),
+      #         title = list(text = NULL)),
+      #         categories = unique(combined_data$group)
+      #        )
+      #
+      # }
+
+   })
 
 
     # Line Output-------------------
     # Line Graph output with proxy
     output$line <- highcharter::renderHighchart({
       req(input$view == "Line Graph", input$topic != "c2q501", input$filter)
-
-      # Create an empty line chart for setup
-      line_chart <- highcharter::highchart()
+      req(filter_meta())
+      meta_data <- filter_meta()
+      req(meta_data, nrow(meta_data) > 0) # Ensure there is valid metadata
 
       # Process data for the line graph
       data <- process_line_data(input$topic, input$filter)
+      req(data, nrow(data) > 0)
 
-      # If data is empty, return an empty chart
-      if (nrow(data) > 0) {
-        line_chart <- naccho.viz::create_grouped_line(
+      message("Line graph data rows: ", nrow(data))
+
+     line_graph <-  if (nrow(data) > 0) {
+        naccho.viz::create_grouped_line(
           data = data,
           x_variable = "year",
           x_group = "legend_label",
           y_variable = "y",
-          y_label = filter_meta()$y_label,
-          y_max = max(data$y, na.rm = TRUE) * 1.1,
+          y_label = meta_data$y_label,
+          y_max = meta_data$y_max,
           x_label = "Year",
           select_theme = naccho.viz::basic,
-          title = filter_meta()$title,
-          tooltip = filter_meta()$tooltip
-        )
+          tooltip = meta_data$tooltip
+        ) %>%
+          viz_options(
+            viz_caption = paste("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
+            tooltip = meta_data$tooltip
+          ) %>%
+          highcharter::hc_title(text = meta_data$title) %>%
+          highcharter::hc_yAxis(
+            maxPadding = .01,
+            max = meta_data$y_max,
+            endOnTick = TRUE
+          ) %>%
+          highcharter::hc_legend(reversed = TRUE) %>%
+          highcharter::hc_chart(style = list(minHeight = "50vh"))%>%
+         viz_export()
+
       } else {
-        line_chart <- highcharter::highchart()  # Empty chart for no data
+        highcharter::highchart()  # Return an empty chart if no data
       }
 
-      line_chart
+     line_graph
     })
+
 
     # Proxy for the Line Chart
     proxy_line <- highcharter::highchartProxy(ns("line"))
 
-    # Update the line chart with new data when inputs change
     observe({
-      req(input$topic, input$filter)  # Ensure inputs are available
+      req(input$topic, input$filter)
 
-      # Remove old series to prevent overlap
+      line_data <- process_line_data(input$topic, input$filter)
+
+      if (is.null(line_data) || nrow(line_data) == 0) {
+        showNotification("No data available for line chart.", type = "warning")
+        return()
+      }
+
       proxy_line %>%
-        highcharter::hcpxy_remove_series(id = "filtered_line_series")
-
-      # Process and generate the updated data for the line graph
-      data <- process_line_data(input$topic, input$filter)
-
-      # Dynamically update the line chart with new data
-      proxy_line %>%
-        highcharter::hcpxy_add_series(
-          id = "filtered_line_series",
-          name = input$filter,
-          data = data,
-          type = "line",  # Ensure this is a line chart
-          selected = TRUE
+        highcharter::hcpxy_update(
+          series = list(
+            id = "line_series",
+            data = line_data,
+            name = paste("Line for", input$filter)
+          )
         )
     })
+
 
 
     # # Update bar graph and line graph when topic or filter changes
@@ -585,13 +932,12 @@ mod_landscape_server <- function(id){
       shinyjs::hide("toggle_context")
       shinyjs::hide("toggle_definitions")
 
-
-
       output$show_takeaway <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        view == input$view, # fix
-                        filter == input$filter)
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
+
 
         p(htmltools::HTML(
           "<b>Key Takeaway(s)</b>: <br><br>",
@@ -610,8 +956,8 @@ mod_landscape_server <- function(id){
       output$show_context <- renderUI({
         notes <- notes %>%
           dplyr::filter(topic == input$topic,
-                        # view == input$view, # fix
-                        filter == input$filter)
+                        stringr::str_detect(view, input$view),
+                        stringr::str_detect(filter, input$filter))
 
         if (is.na(notes$notes)) {
           p(htmltools::HTML(
@@ -637,9 +983,9 @@ mod_landscape_server <- function(id){
     # definitions -------------------------------------------------------------
     observeEvent(input$definitions, {
 
-      shinyjs::hide("toggle_takeaway")
-      shinyjs::hide("toggle_context")
-      shinyjs::show("toggle_definitions")
+      toggle_sidebar_content("toggle_definitions",
+                             c("toggle_takeaway", "toggle_context",
+                               "toggle_definitions"))
 
       output$show_definitions <- renderUI({
 
@@ -662,11 +1008,13 @@ mod_landscape_server <- function(id){
             )
           )
         })
+
+        print(length(links))
+
         div(
           p(htmltools::HTML("<b>Definitions</b>: <br>")),
 
-# side right --------------------------------------------------------------
-
+          # side right --------------------------------------------------------------
 
           if (length(links) == 0) {
             paste("No relevant definitions.")
@@ -676,6 +1024,8 @@ mod_landscape_server <- function(id){
         )
       })
     })
+
+
   })
 }
 ## To be copied in the UI

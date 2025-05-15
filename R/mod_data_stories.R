@@ -10,6 +10,9 @@
 #'
 mod_data_stories_ui <- function(id){
   ns <- NS(id)
+
+
+
   tagList(
     conditionalPanel(
       condition = "input.tabs == 'data_stories_tab'",
@@ -23,13 +26,13 @@ mod_data_stories_ui <- function(id){
           div(
             class = "row",
             div(
-              class = "col-sm-8",
+              class = "col-sm-7",
               align = "left",
               h1("Data Stories"),
               hr(class = "header-hr")
             ),
             div(
-              class = "col-sm-4 findings-align",
+              class = "col-sm-5 findings-align",
               div(class = "search-input",
                   textInput(ns("search"), NULL, placeholder = "Search tags"),
                   style = "margin-right: 2vw;"
@@ -69,6 +72,7 @@ mod_data_stories_server <- function(id){
     shiny::addResourcePath("www", system.file("app/www", package = "nacchoProfile"))
 
 
+
     ############################## CARD SCRIPTS HERE ###############################
 
     # card list ---------------------------------------------------------------
@@ -82,7 +86,7 @@ mod_data_stories_server <- function(id){
               width = "90%",
               height = "90%",
               style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-              max-width: 800px; max-height: 900px;"
+             "
             )
           )
       ) , # end of workforce_story list
@@ -97,7 +101,7 @@ mod_data_stories_server <- function(id){
         width = "90%",
         height = "90%",
         style = "border: none; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-              max-width: 800px; max-height: 900px;"
+              "
       )
     )
 ) # , end of list
@@ -116,11 +120,15 @@ mod_data_stories_server <- function(id){
     card_content <- reactiveVal(NULL)
 
     # open card content -------------------------------------------------------
-    selected_card <- function(input_id, card) {
-      card_content(card_data[[input_id]]$content)
-      updateNavbarPage(inputId = "tabs",
-                       selected = "data_stories_tab")
+    selected_card <- function(input_id) {
+      if (!is.null(card_data[[input_id]])) {
+        card_content(card_data[[input_id]]$content)
+        updateNavbarPage(inputId = "tabs", selected = "data_stories_tab")
+      } else {
+        card_content(NULL) # Reset in case of invalid input
+      }
     }
+
 
     # back button scroll to top -----------------------------------------------
     # observeEvent(input$back_btn, {
@@ -130,69 +138,66 @@ mod_data_stories_server <- function(id){
     ############################# ADD NEW CARDS HERE ###############################
 
     # events to "open" the card -----------------------------------------------
-    observeEvent(input$story_link, selected_card("workforce_story"))
-    observeEvent(input$story_link, selected_card("harassment_story"))
+    observeEvent(input$workforce_story_link, {selected_card("workforce_story")})
+
+    observeEvent(input$harassment_story_link, {selected_card("harassment_story")})
+
 
     # when you want to add a new card, you need to add the line of code above,
     # which causes the card to open when the link is selected
 
     cards_displayed <- reactive({
       list(
-
-        #Workforce Story
+        # Workforce Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/workforce_story.png",
-            date = "12/15/2024"
+            image = "www/Workforce.jpg",
+            date = "1/15/2025"
           ),
-          title = actionLink(ns("story_link"), strong("A Workforce on the Rise:", style = "font-size: 3vmin;")),
+          title = actionLink(
+            ns("workforce_story_link"),
+            strong("A Workforce on the Rise:", style = "font-size: 3vmin;")
+          ),
           description =
             div(
               "How Pandemic-Era Support Shaped the Local Health Department Workforce",
-              style = "font-size: 2vmin;"  # Define the font size for the description here
+              style = "font-size: 2vmin;"
             ),
           tags = list(
-            actionButton(ns("tag"), "workforce", class = "my-button")
+            actionButton(ns("workforce_tag"), "workforce", class = "my-button")
           )
         ),
-
-        #Harassment Story
+        # Harassment Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/harassment_story.png",
-            date = "12/15/2024"
+            image = "www/Harassment.jpg",
+            date = "1/15/2025"
           ),
-          title = actionLink(ns("story_link"), strong("On the Front Lines:", style = "font-size: 3vmin;")),
+          title = actionLink(
+            ns("harassment_story_link"),
+            strong("On the Front Lines:", style = "font-size: 3vmin;")
+          ),
           description = div(
             "The Threat of Harassment on Local Public Health During the COVID-19 Pandemic.",
-            style = "font-size: 2vmin;"),
+            style = "font-size: 2vmin;"
+          ),
           tags = list(
-            actionButton(ns("tag"), "harassment", class = "my-button"),
-            actionButton(ns("tag"), "COVID-19", class = "my-button"),
-            actionButton(ns("tag"), "workforce", class = "my-button")
+            actionButton(ns("harassment_tag"), "harassment", class = "my-button"),
+            actionButton(ns("harassment_tag_covid"), "COVID-19", class = "my-button"),
+            actionButton(ns("harassment_tag_workforce"), "workforce", class = "my-button")
           )
         )
-        # ,
-        # list(
-        #   thumbnail = card_thumbnail(
-        #     image = "www/small_town.jpeg",
-        #     date = "08/01/2024"
-        #   ),
-        #   title = actionLink(ns("story_link"), strong("This is the title of the third story", style = "font-size: 3vmin;")),
-        #   description = div(
-        #     "Oh boy, this is a really good story about some things and
-        #     you should read it.", style = "font-size: 2vmin;"),
-        #   tags = list(
-        #     actionButton(ns("tag"), "workforce", class = "my-button")
-        #   )
-        # )
       )
     })
 
     # Extract unique tags for the dropdown menu
     observe({
       unique_tags <- unique(unlist(lapply(cards_displayed(), function(card) {
-        sapply(card$tags, function(tag) tag$children[[1]])
+        if (!is.null(card$tags)) {
+          sapply(card$tags, function(tag) tag$children[[1]])
+        } else {
+          NULL
+        }
       })))
       updateSelectInput(session, "search", choices = c("All", unique_tags))
     })
@@ -203,21 +208,23 @@ mod_data_stories_server <- function(id){
       } else {
         search_term <- tolower(input$search)
         card_list <- lapply(cards_displayed(), function(card) {
-          if (any(sapply(card$tags, function(tag) grepl(search_term, tolower(tag$children[[1]]))))) {
-            return(card)
-          } else {
-            return(NULL)
+          if (!is.null(card$tags)) {
+            if (any(sapply(card$tags, function(tag) tryCatch(grepl(search_term, tolower(tag$children[[1]])), error = function(e) FALSE)))) {
+              return(card)
+            }
           }
+          return(NULL)
         })
         card_list[!sapply(card_list, is.null)]
       }
     })
 
+
+
     # display the cards -------------------------------------------------------
     output$cards_output <- renderUI({
       card_list <- filtered_cards()
 
-      # if no card is selected, the "cards" will display
       if (is.null(card_content())) {
         if (length(card_list) == 0) {
           return(h3("No stories with this tag"))
@@ -225,15 +232,18 @@ mod_data_stories_server <- function(id){
 
         lapply(card_list, function(card) {
           div(class = "col-xl-4 col-lg-6 col-md-6 col-sm-12",
-              style = "padding: 5vh; margin-bottom: 50vmin; height: 20vh",  # Adding padding between cards
+              style = "padding: 2vh 7vw 2vh 7vw; height: fit-content;",  # Adding padding between cards
               div(
-                style = "height: 20vh;",  # Define card height and padding
+                style = "height: fit-content; width: fit-content;",  # Define card height and padding
                 card$thumbnail,
                 card$title,
                 div(
                   p(card$description),
                   class = "scroll-desc",
-                  style = "width: 25vw;"
+                  style = "width: 100%;
+                          min-height: fit-content;
+                          max-height: 100%;
+                          margin-bottom: 1.5%;"
                 ),
                 do.call(tagList, card$tags)
               )

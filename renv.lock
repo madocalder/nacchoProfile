@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.1",
+    "Version": "4.2.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -103,14 +103,14 @@
     },
     "Rcpp": {
       "Package": "Rcpp",
-      "Version": "1.0.13",
+      "Version": "1.0.13-1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "methods",
         "utils"
       ],
-      "Hash": "f27411eb6d9c3dada5edd444b8416675"
+      "Hash": "6b868847b365672d6c1677b1608da9ed"
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
@@ -548,13 +548,13 @@
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "custom.map",
-      "RemoteUsername": "lindsayjorgenson",
+      "RemoteUsername": "madalder",
       "RemoteRef": "HEAD",
       "RemoteSha": "9b73b83528788f190551bf1ef0af167038636b16",
       "Requirements": [
         "R"
       ],
-      "Hash": "48194380729f9b80cfffb3de7a10281e"
+      "Hash": "3b08ea69ebe88c013c9dca6235176092"
     },
     "data.table": {
       "Package": "data.table",
@@ -846,15 +846,15 @@
     },
     "git2r": {
       "Package": "git2r",
-      "Version": "0.33.0",
+      "Version": "0.35.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "graphics",
         "utils"
       ],
-      "Hash": "cdec9964efeda730d1b2cd3d5dd27747"
+      "Hash": "8828605664949b92d0bf3f931e7c431b"
     },
     "gitcreds": {
       "Package": "gitcreds",
@@ -1287,13 +1287,13 @@
       "Package": "naccho.viz",
       "Version": "0.0.0.9000",
       "Source": "GitHub",
-      "Remotes": "lindsayjorgenson/custom.map",
+      "Remotes": "madalder/custom.map",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "naccho.viz",
-      "RemoteUsername": "lindsayjorgenson",
+      "RemoteUsername": "madalder",
       "RemoteRef": "HEAD",
-      "RemoteSha": "0d5ceefffb593f13cbdb488cebcd4a892ae54493",
+      "RemoteSha": "05754c5a97a9c403a41de2c3c476a13263874229",
       "Requirements": [
         "R",
         "custom.map",
@@ -1301,7 +1301,7 @@
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "ba20e8792b78c1309a1d4caf8c6fe32e"
+      "Hash": "f173bc85bfe7fd45ff3c9902df13f364"
     },
     "numDeriv": {
       "Package": "numDeriv",

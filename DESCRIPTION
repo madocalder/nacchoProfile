@@ -10,8 +10,8 @@ Authors@R: c(
 Description: A Shiny application that visualizes findings from NACCHO's
     National Profile of Local Health Departments.
 License: GPL (>= 3)
-URL: https://github.com/lindsayjorgenson/nacchoProfile
-BugReports: https://github.com/lindsayjorgenson/nacchoProfile/issues
+URL: https://github.com/madalder/nacchoProfile
+BugReports: https://github.com/madalder/nacchoProfile/issues
 Depends: 
     R (>= 2.10)
 Imports: 
@@ -20,6 +20,7 @@ Imports:
     bsutils,
     config (>= 0.3.2),
     covrpage,
+    custom.map,
     desc,
     devtools,
     dplyr,
@@ -59,10 +60,10 @@ Suggests:
     spelling,
     testthat (>= 3.0.0)
 Remotes:
-    lindsayjorgenson/naccho.viz,
+    github::madalder/naccho.viz,
     the-y-company/bsutils,
     the-y-company/flexlayout,
-    lindsayjorgenson/custom.map
+    github::madalder/custom.map
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US

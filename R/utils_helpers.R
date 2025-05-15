@@ -133,7 +133,7 @@ custom_str_to_title <- function(text) {
 right_button <- flexlayout::offcanvas_button(
   tags$i(
     class = "fa-solid fa-info", # Font Awesome info icon
-    style = "font-size: 3em; color: #3C8A97;"
+    style = "font-size: 2em; color: #3C8A97;"
   )
 )
 
@@ -204,3 +204,80 @@ reorder_factor_levels <- function(data, var_name, levels_order) {
   }
   return(data)
 }
+
+
+#' Create a CSV Download Button with Highcharts-Style Appearance
+#'
+#' This function creates an HTML button element styled to resemble the Highcharts
+#' export button. It triggers the download of data from a specified reactable output
+#' element as a CSV file.
+#'
+#' @param id A character string specifying the \code{outputId} of the reactable table
+#'   whose data should be downloaded.
+#' @param filename A character string specifying the default filename for the
+#'   downloaded CSV file. Defaults to \code{"data.csv"}.
+#' @param label A character string specifying the text to display on the button.
+#'   Defaults to \code{"Download CSV"}.
+#'
+#' @return An HTML button tag styled similarly to a Highcharts export button that,
+#'   when included in a Shiny UI, will prompt the user to download the underlying
+#'   reactable data as a CSV file.
+#'
+#' @examples
+#' # In your Shiny UI:
+#' # ui <- fluidPage(
+#' #   reactableOutput("mytable"),
+#' #   csvDownloadButton("mytable", filename = "mydata.csv", label = "Download CSV")
+#' # )
+#'
+#' @export
+csvDownloadButton <- function(id, filename = "data.csv", label = "Download CSV") {
+
+  # Inline CSS to mimic Highcharts export button style
+  # Adjust as needed.
+  btn_style <- "
+    background-color: #FFFFFF;
+    color: #3C8A97;
+    border: 0px;
+    cursor: pointer;
+    font-size: calc(10px + .5em + .1vw);
+    font-weight: 400;
+    /* display: inline-flex; */
+  "
+
+  # Embedded CSS for hover effect
+  hover_style <- "
+    .hc-export-button:hover {
+      background-color: #202D57;
+    }
+  "
+
+  style_tag <- tags$style(HTML(hover_style))
+
+
+  tagList(
+    style_tag,
+    div(
+      style = "text-align: end;",
+      tags$button(
+        class = "hc-export-button",
+        style = btn_style,
+        title = label,
+        tagList(icon("bars", style="color:#3C8A97; font-weight: 800;")),
+        onclick = sprintf("Reactable.downloadDataCSV('%s', '%s')", id, filename)
+      )
+    )
+  )
+}
+
+
+toggle_sidebar_content <- function(active_id, all_ids) {
+  lapply(all_ids, function(id) {
+    if (id == active_id) {
+      shinyjs::show(id)
+    } else {
+      shinyjs::hide(id)
+    }
+  })
+}
+

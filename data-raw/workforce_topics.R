@@ -1,12 +1,12 @@
 ## code to prepare `workforce_topics` dataset goes here
 workforce_topics <- list(
-  "Full-Time Equivalents" = list("Total FTEs" = "c5q37",
+  "Full-Time Equivalents" = list("Mean/Median FTEs" = "c5q37",
                                  "FTEs by Population" = "fte_bypop",
-                                 "FTE Groups" = "FTE_numcat"),
+                                 "Total FTEs" = "FTE_numcat"),
 
-  "Employees" = list("Total Employees" = "c5q36",
+  "Employees" = list("Mean/Median Employees" = "c5q36",
                      "Employees by Population" = "employee_bypop",
-                     "Employee Groups" = "employee_numcat"),
+                     "Total Employees" = "employee_numcat"),
 
   "Jobs Lost and Added" = list("Total Jobs Lost/Added" = "jobs_total"),
 

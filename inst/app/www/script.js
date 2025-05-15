@@ -1,32 +1,47 @@
 // Have the correct action links click upon load of app
 // =============================================================================
-// this is for the right sidebar
+
 $(document).on('shiny:connected', function() {
-  $('#landscape_1-takeaway').addClass('clicked-link').click();
-  $('#workforce_1-takeaway').addClass('clicked-link').click();
-  $('#finance_1-takeaway').addClass('clicked-link').click();
+  // Set up a polling mechanism to ensure all elements are ready
+  const waitForElements = setInterval(function() {
+    const landscape = $('#landscape_1-takeaway');
+    const workforce = $('#workforce_1-takeaway');
+    const finance = $('#finance_1-takeaway');
+    const services = $('#services_1-get_services');
+    const topics = $('#topic_areas_1-takeaway');
+
+    // Check if all elements exist and are visible
+    if (landscape.length && workforce.length && finance.length && services.length && topics.length) {
+      clearInterval(waitForElements); // Stop polling once all elements are found
+
+      // Trigger clicks for each element
+      landscape.addClass('clicked-link')[0].click();
+      workforce.addClass('clicked-link')[0].click();
+      finance.addClass('clicked-link')[0].click();
+      services.addClass('clicked-link')[0].click();
+      topics.addClass('clicked-link')[0].click();
+
+      console.log('Auto-clicks triggered for all elements.');
+    }
+  }, 100); // Check every 100ms
 });
 
-// add and remove class to the right sidebar links when toggling
-// between the three
+
+// Add and remove class when toggling links
 $(document).on('click', '.action-link', function() {
-  $('.action-link').removeClass('clicked-link'); // Remove class from all links
-  $(this).addClass('clicked-link'); // Add class to the clicked link
+  $('.action-link').removeClass('clicked-link');
+  $(this).addClass('clicked-link');
 });
-
 
 $(document).on('click', '.action-link-2', function() {
-  $('.action-link-2').removeClass('clicked-link'); // Remove class from all links
-  $(this).addClass('clicked-link'); // Add class to the clicked link
+  $('.action-link-2').removeClass('clicked-link');
+  $(this).addClass('clicked-link');
 });
-
 
 $(document).on('click', '.action-link-3', function() {
-  $('.action-link-3').removeClass('clicked-link'); // Remove class from all links
-  $(this).addClass('clicked-link'); // Add class to the clicked link
+  $('.action-link-3').removeClass('clicked-link');
+  $(this).addClass('clicked-link');
 });
-
-
 
 
 // triggers the occupational classifications to click
