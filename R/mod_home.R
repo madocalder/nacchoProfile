@@ -72,7 +72,7 @@ mod_home_ui <- function(id){
                 publicly available through ICSPR's data repository in late
                 2024. For access to prior years' Profile data and data use
                 policies for Profile data, please visit",
-            tags$a(href="icpsr.umich.edu/web/pages/ICPSR/index.html",
+            tags$a(href="https://url.us.m.mimecastprotect.com/s/kfg8C4xLl4IJ943rfxh9T4mqza?domain=icpsr.umich.edu",
                    "ICPSR's website.",
                    style = "text-decoration: underline !important;")
           ),

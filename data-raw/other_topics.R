@@ -56,11 +56,9 @@ other_topics <- list(
                          "CHA and CHIP" = "chachip",
                          "CHIP Activities" = "m9q240"),
 
-  "Formal Partnerships with..." = list(
-                        "Healthcare" = "health_part",
-                        "Community" = "comm_part",
-                        "Government" = "gov_part"
-                        # "Formal/Informal" = "work",
+  "Partnerships" = list(
+                        "Formal" = "formal_part",
+                        "Any" = "any_part"
                         )
 )
 

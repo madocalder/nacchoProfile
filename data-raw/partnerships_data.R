@@ -265,12 +265,12 @@ partnerships <- collab_data %>%
     partner_type = dplyr::case_when(base_variable %in% c("m13q268", "m13q263",
                                                          "m13q264", "m13q265",
                                                         "m13q288", "m13q289",
-                                                        "m13q267") ~ "health_part",
+                                                        "m13q267") ~ "Healthcare",
                                     base_variable %in% c("m13q275", "m13q286",
                                                          "m13q282", "m13q281",
                                                          "m13q278",  "m13q280",
-                                                         "m13q279", "m13q274") ~ "comm_part",
-                                    TRUE ~ "gov_part"
+                                                         "m13q279", "m13q274") ~ "Community",
+                                    TRUE ~ "Government"
                                     ),
     partner = dplyr::case_when(
       base_variable == "m13q281" ~ "Business (community-based)",

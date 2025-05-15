@@ -8,7 +8,7 @@ finance_topics <- list(
                         # "Grouped Per Capita Exp." = "exp_percap_numcat"
                         ),
 
-  "Revenues" = list("Total Annual Revenue"  = "rev_total_tree",
+  "Revenues" = list("Total Annual Revenues"  = "rev_total_tree",
                     "Mean/Median Revenues" = "rev_total",
                     "Per Capita Revenues" = "rev_percap"
                     # ,

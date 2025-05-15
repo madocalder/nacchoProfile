@@ -39,6 +39,27 @@ app_ui <- function(request) {
       tags$script(src = "www/script.js") # Correct path if the file is in inst/app/www/
     ),
 
+    tags$head(
+      # Add the Google Analytics script
+      tags$script(async = NA, src = "https://www.googletagmanager.com/gtag/js?id=G-C3G1MK7X28"),
+      tags$script(HTML("
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-C3G1MK7X28');
+    "))
+    ),
+
+    tags$script(HTML("
+  $(document).on('click', 'button', function() {
+    var label = $(this).text().trim();
+    gtag('event', 'button_click', {
+      'event_category': 'Button',
+      'event_label': label
+    });
+  });
+")),
+
     waiter::useWaiter(),
 
     waiter::waiterPreloader(

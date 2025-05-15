@@ -1293,7 +1293,7 @@
       "RemoteRepo": "naccho.viz",
       "RemoteUsername": "madalder",
       "RemoteRef": "HEAD",
-      "RemoteSha": "c506ea00dc82090d0d20ad0c7e5edb423aecb26e",
+      "RemoteSha": "05754c5a97a9c403a41de2c3c476a13263874229",
       "Requirements": [
         "R",
         "custom.map",
@@ -1301,7 +1301,7 @@
         "htmlwidgets",
         "magrittr"
       ],
-      "Hash": "20395dc2a2525b5c0384223faa9f4f63"
+      "Hash": "f173bc85bfe7fd45ff3c9902df13f364"
     },
     "numDeriv": {
       "Package": "numDeriv",

@@ -323,7 +323,7 @@ mod_workforce_server <- function(id) {
 
 
       # Define views based on the topic
-      if (topic %in% c("FTE_numcat", "employee_numcat",  "a", "b")) {
+      if (topic %in% c("a", "b")) {
         shinyWidgets::updateRadioGroupButtons(
           session, "view",
           choiceNames = list(
@@ -333,6 +333,19 @@ mod_workforce_server <- function(id) {
           choiceValues = c("Bar Graph", "Table"),
           selected = dplyr::case_when(
             selected_view %in% c("Bar Graph", "Table") ~ selected_view,
+            TRUE ~ "Bar Graph")
+        )
+      } else if (topic %in% c("FTE_numcat", "employee_numcat")) {
+        shinyWidgets::updateRadioGroupButtons(
+          session, "view",
+          choiceNames = list(
+            HTML('<i class="fas fa-chart-line"></i>'),  # Line Graph icon
+            HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
+            HTML('<i class="fas fa-table"></i>')         # Table icon
+          ),
+          choiceValues = c("Line Graph", "Bar Graph", "Table"),
+          selected = dplyr::case_when(
+            selected_view %in% c("Line Graph", "Bar Graph", "Table") ~ selected_view,
             TRUE ~ "Bar Graph")
         )
       } else if (topic == "jobs_total") {
@@ -494,7 +507,8 @@ print(selected_filter)
 
     # Generalized data processing for line charts
     process_line_chart_data <- reactive({
-      req(input$topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop"))
+      req(input$topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop",
+                             "FTE_numcat", "employee_numcat"))
 
       # req(updated_inputs())
       classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
@@ -671,10 +685,14 @@ print(selected_filter)
     output$line <- highcharter::renderHighchart({
       # req(updated_inputs())
       req(filter_meta())
-      req(input$view == "Line Graph", !(input$topic %in% c("FTE_numcat", "employee_numcat")))
+      req(input$view == "Line Graph")
 
       data <- process_line_chart_data() %>%
         dplyr::mutate(x_label = NA)
+
+      if (!(input$topic %in% c("FTE_numcat", "employee_numcat"))) {
+
+
 
       naccho.viz::create_grouped_line(
         data = data,
@@ -685,7 +703,7 @@ print(selected_filter)
         select_theme = naccho.viz::basic,
         y_max = filter_meta()$y_max,
         y_label = filter_meta()$y_label,
-        title = filter_meta()$title,
+        title_text = filter_meta()$title,
         tooltip = filter_meta()$tooltip
       )%>%
         viz_options(viz_caption = paste(
@@ -703,6 +721,36 @@ print(selected_filter)
         highcharter::hc_legend(reversed = TRUE)
       # %>%
       #   highcharter::hc_chart(style = list(minHeight = "00px"))
+      } else {
+        data$y <- as.numeric(data$y)
+        data$legend_label <- data$category
+
+
+        naccho.viz::create_grouped_line(
+          data = data,
+          x_variable = "year",
+          x_group = "legend_label",
+          y_variable = "y",
+          x_label = NULL,
+          select_theme = naccho.viz::basic,
+          y_max = filter_meta()$y_max,
+          y_label = filter_meta()$y_label,
+          title_text = filter_meta()$title,
+          tooltip = filter_meta()$tooltip
+        )%>%
+          viz_options(viz_caption = paste(
+            "<b> N: </b>", show_n(data$Responses),
+            "<br>", source_line
+          ),
+          tooltip = filter_meta()$tooltip,
+          )%>%
+          highcharter::hc_title(text = filter_meta()$title)%>%
+          highcharter::hc_yAxis(
+            maxPadding = .09,
+            max = filter_meta()$y_max,
+            endOnTick = TRUE
+          )
+      }
     })
 
     # Proxy for the Line Chart
@@ -710,17 +758,21 @@ print(selected_filter)
 
     observe({
       req(filter_meta())
-      req(input$view == "Line Graph", !(input$topic %in% c("FTE_numcat", "employee_numcat")))
+      req(input$view == "Line Graph", input$topic)
 
      proxy_line %>%
        highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
         highcharter::hcpxy_remove_series(id = "all_lhds_bar_series") %>%
-        highcharter::hcpxy_remove_series(id = "butterfly_series")
+        highcharter::hcpxy_remove_series(id = "butterfly_series") %>%
+       highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
+       highcharter::hcpxy_remove_series(id = "all_lhds_line_series") %>%
+       highcharter::hcpxy_remove_series(id = "all_lhds_line_series_single")
 
       data <- process_line_chart_data() %>%
         dplyr::mutate(x_label = NA)
 
-      if (nrow(data) > 0) {
+      if (nrow(data) > 0 & !(input$topic %in% c("FTE_numcat", "employee_numcat"))
+          & input$filter != "All LHDs") {
         proxy_line %>%
           highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
           highcharter::hcpxy_add_series(
@@ -729,12 +781,41 @@ print(selected_filter)
             data = data,
             type = "line"
           )
+
+      } else if (nrow(data) > 0 & !(input$topic %in% c("FTE_numcat", "employee_numcat"))
+                 & input$filter == "All LHDs") {
+
+        proxy_line %>%
+          highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
+          highcharter::hcpxy_add_series(
+            id = "all_lhds_line_series",
+            name = input$filter,
+            data = data,
+            type = "line"
+          )
+      } else if (nrow(data) > 0 & input$topic %in% c("FTE_numcat", "employee_numcat")
+                 & input$filter == "All LHDs") {
+
+        data$y <- as.numeric(data$y)
+        data$legend_label <- data$category
+
+        proxy_line %>%
+          highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
+          highcharter::hcpxy_add_series(
+            id = "all_lhds_line_series_single",
+            name = input$filter,
+            data = data,
+            type = "line"
+          )
+
       } else {
         message("No data for line graph update.")
       }
 
 
     })
+
+
 
 
     # Table Rendering
@@ -947,6 +1028,20 @@ observe({
 
 
     })
+
+    observe({
+      if (input$topic %in% c("FTE_numcat", "employee_numcat")) {
+        print("Debugging process_line_chart_data() output:")
+        print(head(process_line_chart_data()))
+      }
+
+      if (input$topic %in% c("FTE_numcat", "employee_numcat")) {
+        print("Data passed to create_single_line:")
+        print(head(data))  # Check the structure and values
+      }
+
+    })
+
 
 
 

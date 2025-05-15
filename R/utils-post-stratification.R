@@ -572,97 +572,35 @@ boxplot_data <- function(args, grps = NULL) {
 scatter_data <- function(set_filter = "All LHDs",
                          set_service = "Blood Lead Screening") {
 
+  data <- data.frame(
+    service_type = c(
+      "Average",
+      "Immunization",
+      "Communicable disease screening or treatment",
+      "Maternal and child health services",
+      "Chronic disease",
+      "High blood pressure screening",
+      "Diabetes screening",
+      "Blood lead screening",
+      "Epidemiology and surveillance",
+      "Emergency preparedness",
+      "Mental health",
+      "Environmental health, including food safety",
+      "Tobacco, alcohol, or other drug prevention",
+      "Obesity prevention"
+    ),
+    category = c(rep("Reduced", 14)),
+    x = c(20, 11, 13, 27, 31, 30, 26, 30, 3, 5, 16, 17, 26, 28),
+    y = c(27, 65, 45, 14, 11, 10, 10, 9, 63, 55, 24, 21, 18, 9),
+    Responses = rep("365 to 895", 14),
+    group = rep("All LHDs", 14),
+    stringsAsFactors = FALSE
+  )
 
-  # Step 1: Filter and summarize the data
-  data_xy <- services_change_data %>%
-    dplyr::select(service_type, group, service_provision, y, Responses, filter, Question) %>%
-    dplyr::filter(filter %in% set_filter,
-                  service_type %in% set_service) %>%
-    dplyr::group_by(service_type, filter, group) %>%
-    dplyr::reframe(
-      x = sum(y[service_provision == "Reduced Service"], na.rm = TRUE),
-      y = sum(y[service_provision == "Expanded Service"], na.rm = TRUE),
-      Responses = sum(Responses)
-      # ,
-      # group = group, # Keep Responses as is
-      # .groups = "drop"  # Drop grouping after summarization
-    )
-  # View(data_xy)
+  # Perform case-insensitive matching without modifying the data
+  filtered_data <- data %>%
+    filter(stringr::str_to_lower(service_type) %in% stringr::str_to_lower(set_service))
 
-
-
-
-  # Step 2: Add alignment and short name properties
-  data_clean <- data_xy %>%
-    # Add vertical alignment based on `service_type`
-    dplyr::mutate(
-      verticalAlign = dplyr::case_when(
-        service_type == "Blood Lead Screening" ~ "top",
-        service_type == "Chronic Disease" ~ "bottom",
-        service_type == "Communicable Disease Screening or Treatment" ~ "bottom",
-        service_type == "Diabetes Screening" ~ "top",
-        service_type == "Emergency Preparedness" ~ "top",
-        service_type == "Environmental Health Including Food Safety" ~ "top",
-        service_type == "Epidemiology and Surveillance" ~ "bottom",
-        service_type == "High Blood Pressure Screening" ~ "middle",
-        service_type == "Immunization" ~ "bottom",
-        service_type == "Maternal and Child Health Services" ~ "bottom",
-        service_type == "Mental Health" ~ "middle",
-        service_type == "Obesity Prevention" ~ "top",
-        service_type == "Substance Use Prevention" ~ "bottom"
-      )
-    ) %>%
-
-    # Add horizontal alignment based on `service_type`
-    dplyr::mutate(
-      align = dplyr::case_when(
-        service_type == "Blood Lead Screening" ~ "left",
-        service_type == "Chronic Disease" ~ "left",
-        service_type == "Communicable Disease Screening or Treatment" ~ "center",
-        service_type == "Diabetes Screening" ~ "center",
-        service_type == "Emergency Preparedness" ~ "center",
-        service_type == "Environmental Health Including Food Safety" ~ "center",
-        service_type == "Epidemiology and Surveillance" ~ "center",
-        service_type == "High Blood Pressure Screening" ~ "left",
-        service_type == "Immunization" ~ "center",
-        service_type == "Maternal and Child Health Services" ~ "center",
-        service_type == "Mental Health" ~ "left",
-        service_type == "Obesity Prevention" ~ "center",
-        service_type == "Substance Use Prevention" ~ "center"
-      )
-    ) %>%
-
-    # Create short names for `service_type`
-    dplyr::mutate(
-      service_type_short = dplyr::case_when(
-        service_type == "Blood Lead Screening" ~ "Blood Lead",
-        service_type == "Chronic Disease" ~ "Chronic Disease",
-        service_type == "Communicable Disease Screening or Treatment" ~ "Comm. Disease",
-        service_type == "Diabetes Screening" ~ "Diabetes",
-        service_type == "Emergency Preparedness" ~ "Emergency Prep.",
-        service_type == "Environmental Health Including Food Safety" ~ "Env. Health",
-        service_type == "Epidemiology and Surveillance" ~ "Epi & Surveillance",
-        service_type == "High Blood Pressure Screening" ~ "High Blood Pressure",
-        service_type == "Immunization" ~ "Immunization",
-        service_type == "Maternal and Child Health Services" ~ "MCH",
-        service_type == "Mental Health" ~ "Mental Health",
-        service_type == "Obesity Prevention" ~ "Obesity Prev.",
-        service_type == "Substance Use Prevention" ~ "Substance Use Prev."
-      )
-    )
-
-  # Step 3: Add data label configuration for visualization
-  data <- data_clean
-  # %>%
-  #   dplyr::mutate(
-  #     dataLabels = purrr::map2(
-  #       verticalAlign, align,
-  #       ~ list(enabled = TRUE, verticalAlign = .x, align = .y)
-  #     )
-  #   )
-#
-# View(data)
-
-  # Return the cleaned and formatted dataset
-  return(data)
+  # Return the filtered dataset
+  return(filtered_data)
 }

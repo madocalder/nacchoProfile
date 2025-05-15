@@ -193,6 +193,17 @@ set_column <- function(data,
     highcharter::hc_xAxis(
       title = list(text = ""), # x-axis label
       categories = x_axis_labels
+      # ,
+      # labels = list(
+      #   rotation = -45,
+      #   overflow = "allow"
+        # ,
+        # autoRotationLimit = 120,
+        # autoRotation = -45
+        # autoRotation = c(-45, -90),
+        # # staggerLines = 2,
+        # padding = ".5vw"
+      # )
     ) %>%
     highcharter::hc_yAxis(
       title = list(
@@ -205,7 +216,7 @@ set_column <- function(data,
     ) %>%
     highcharter::hc_plotOptions(
       column = list(
-        pointPadding = 0.3,
+        pointPadding = 0.35,
         groupPadding = .1
     )
     )
@@ -663,13 +674,17 @@ scatter_plot <- function(data, colors) {
   # }
   #
   # req(n)
-data <- data %>%
-  dplyr::mutate(
-    tt_group = dplyr::case_when(
-    group != "All LHDs" ~ tolower(group),
-    TRUE ~ "all"),
-    name = service_type_short
-    )
+# data <- data %>%
+#   dplyr::mutate(
+#     tt_group = dplyr::case_when(
+#     group != "All LHDs" ~ tolower(group),
+#     TRUE ~ "all"),
+#     name = service_type_short
+
+  data <- data %>%
+    dplyr::mutate(name_tt = tolower(service_type))
+
+  # View(data)
 
   highcharter::highchart() %>%
     highcharter::hc_add_series(
@@ -678,9 +693,9 @@ data <- data %>%
       type = "scatter",
       mapping = highcharter::hcaes(x = x,
                                    y = y,
-                                   group = group
+                                   group = group,
                                    # ,
-                                   # name = service_type,
+                                   name = service_type
                                    # data_label = ""
                                    )
 
@@ -718,7 +733,7 @@ data <- data %>%
       useHTML = TRUE,
       # headerFormat = '<span style="font-size: 1.125em; font-weight: bold">{series.name}</span><br>',
       pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of
-      {point.tt_group} LHDS have expanded {point.name} services and {point.x}% have
+      all LHDS have expanded {point.name_tt} services and {point.x}% have
       reduced them.</span>',
       style = list(
         fontFamily = "Heebo",
@@ -963,7 +978,7 @@ data <- data %>%
                   "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
                   "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
                   "</span> <br> <b style='font-size: 1em; line-height: 0.625em;'> N: </b>",
-                  "<span style='font-size: 1em; line-height: 0.625em;'>", show_n(data$Responses), "</span><br>",
+                  "<span style='font-size: 1em; line-height: 0.625em;'> 365 to 895 </span><br>",
                   "<span style='font-size: 1em; line-height: 0.625em;'>", source_line, "</span>"),
 
       useHTML = TRUE,
@@ -1064,7 +1079,7 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
 
     if (topic == "All LHDs") {
 
-      data <- teach_data_all
+      data <- tech_data_all
     } else {
 
       data <- dplyr::full_join(tech_data_all, data_filtered)
@@ -1082,60 +1097,45 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
 
   } else if (topic == "medical") {
     data <- med_data %>%
-      calculate_aggregates(
-        category_col = "category",
-        group_col = "group",
-        extra_cols = c("Question", "subtitle", "y", "filter")
-      )%>%
+
       dplyr::group_by(group) %>%
       dplyr::mutate(tt = dplyr::case_when(
-        (category == "Medical Services Not Provided" & filter == "All LHDs") ~ " all LHDs do not ",
-        (category == "Medical Services Provided" & filter == "All LHDs") ~ " all LHDs ",
-        (category == "Medical Services Not Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs do not "),
-        (category == "Medical Services Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs "),
-        (category == "Medical Services Not Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs do not "),
-        (category == "Medical Services Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ")
-      ),
-      Responses = sum(Responses))%>%
-      dplyr::ungroup()
+        (filter == "All LHDs") ~ paste("all LHDs", tolower(category), "in the medical care category." ),
+        (filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs ", tolower(category), " in the medical care category."),
+
+        (!(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the medical care category."),
+        ( !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the medical care category."),
+      ))%>%
+      dplyr::ungroup() %>%
+      dplyr::filter(filter == filtering)
 
   } else if (topic == "dental") {
     data <- dental_data %>%
-      calculate_aggregates(
-        category_col = "category",
-        group_col = "group",
-        extra_cols = c("Question", "subtitle", "y", "filter")
-      ) %>%
+
       dplyr::group_by(group) %>%
       dplyr::mutate(tt = dplyr::case_when(
-        (category == "Dental Services Not Provided" & filter == "All LHDs") ~ " all LHDs do not ",
-        (category == "Dental Services Provided" & filter == "All LHDs") ~ " all LHDs ",
-        (category == "Dental Services Not Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs do not "),
-        (category == "Dental Services Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs "),
-        (category == "Dental Services Not Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs do not "),
-        (category == "Dental Services Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ")
-        ),
-        Responses = sum(Responses))%>%
-      dplyr::ungroup()
+        (filter == "All LHDs") ~ paste("all LHDs", tolower(category), "in the dental care category." ),
+        (filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs ", tolower(category), " in the dental care category."),
+
+        (!(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the dental care category."),
+        ( !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the dental care category."),
+        ))%>%
+      dplyr::ungroup() %>%
+      dplyr::filter(filter == filtering)
 
   } else if (topic == "behavioral") {
     data <- behav_data %>%
-      calculate_aggregates(
-        category_col = "category",
-        group_col = "group",
-        extra_cols = c("Question", "subtitle", "y", "filter")
-      )%>%
+
       dplyr::group_by(group) %>%
       dplyr::mutate(tt = dplyr::case_when(
-        (category == "Behavioral Services Not Provided" & filter == "All LHDs") ~ " all LHDs do not ",
-        (category == "Behavioral Services Provided" & filter == "All LHDs") ~ " all LHDs ",
-        (category == "Behavioral Services Not Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs do not "),
-        (category == "Behavioral Services Provided" & filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs "),
-        (category == "Behavioral Services Not Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs do not "),
-        (category == "Behavioral Services Provided" & !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ")
-      ),
-      Responses = sum(Responses))%>%
-      dplyr::ungroup()
+        (filter == "All LHDs") ~ paste("all LHDs", tolower(category), "in the behavioral care category." ),
+        (filter == "censusregion") ~ paste0(" ", tolower(group),"ern LHDs ", tolower(category), " in the behavioral care category."),
+
+        (!(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the behavioral care category."),
+        ( !(filter %in% c("All LHDs", "censusregion"))) ~ paste0(" ", tolower(group)," LHDs ", tolower(category), " in the behavioral care category."),
+      ))%>%
+      dplyr::ungroup() %>%
+      dplyr::filter(filter == filtering)
 
 
      } else if (topic %in% c("chachip", "c7q149", "c7q147")) {
@@ -1177,59 +1177,6 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
            dplyr::mutate(
              category = dplyr::case_when(
                stringr::str_detect(category, "Yes, Within") ~
-                 "Completed CHIP within last 3 years",
-               stringr::str_detect(category, "Yes, > 3") ~
-                 "Completed CHIP within the last 3 to 5 years",
-               stringr::str_detect(category, "Yes, > 5") ~
-                 "Completed CHIP more than 5 years ago",
-               TRUE ~ "Has not yet completed CHIP"
-             )
-           ) %>%
-           dplyr::group_by(category, group) %>%
-           dplyr::reframe(
-             y = sum(y),
-             Responses = sum(Responses),
-             group = unique(group),
-             category = unique(category)
-           ) %>%
-           dplyr::mutate(
-             tt = dplyr::case_when(
-               category == "Completed CHIP within last 3 years" & filtering == "All LHDs" ~
-                 " all LHDs completed a CHIP within the last 3 years.",
-               category == "Completed CHIP within the last 3 to 5 years" & filtering == "All LHDs" ~
-                 " all LHDs have completed a CHIP within the last 3 to 5 years.",
-               category == "Completed CHIP more than 5 years ago" & filtering == "All LHDs" ~
-                 " all LHDs have completed a CHIP more than 5 years ago.",
-               category == "Has not yet completed CHIP" & filtering == "All LHDs" ~
-                 " all LHDs have not completed a CHIP.",
-
-               category == "Completed CHIP within last 3 years" & filtering == "censusregion" ~
-                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP within the last 3 years."),
-               category == "Completed CHIP within the last 3 to 5 years" & filtering == "censusregion" ~
-                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP within the last 3 to 5 years."),
-               category == "Completed CHIP more than 5 years ago" & filtering == "censusregion" ~
-                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP more than 5 years ago."),
-               category == "Has not yet completed CHIP" & filtering == "censusregion" ~
-                 paste0(" ", tolower(group),"ern LHDs have not completed a CHIP."),
-
-               category == "Completed CHIP within last 3 years" &  !(filtering %in% c("censusregion", "All LHDs")) ~
-                 paste0(" ", tolower(group)," LHDs have completed a CHIP within the last 3 years."),
-               category == "Completed CHIP within the last 3 to 5 years" & !(filtering %in% c("censusregion", "All LHDs")) ~
-                 paste0(" ", tolower(group)," LHDs have completed a CHIP within the last 3 to 5 years."),
-               category == "Completed CHIP more than 5 years ago" & !(filtering %in% c("censusregion", "All LHDs")) ~
-                 paste0(" ", tolower(group)," LHDs have completed a CHIP more than 5 years ago."),
-               category == "Has not yet completed CHIP" &  !(filtering %in% c("censusregion", "All LHDs")) ~
-                 paste0(" ", tolower(group)," LHDs have not completed a CHIP."),
-
-
-               TRUE ~ NA_character_
-             )
-           )
-       } else {
-         data <- data %>%
-           dplyr::mutate(
-             category = dplyr::case_when(
-               stringr::str_detect(category, "Yes, Within") ~
                  "Completed CHA within last 3 years",
                stringr::str_detect(category, "Yes, > 3") ~
                  "Completed CHA within the last 3 to 5 years",
@@ -1256,7 +1203,6 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
                category == "Has not yet completed CHA" & filtering == "All LHDs" ~
                  " all LHDs have not completed a CHA.",
 
-
                category == "Completed CHA within last 3 years" & filtering == "censusregion" ~
                  paste0(" ", tolower(group),"ern LHDs have completed a CHA within the last 3 years."),
                category == "Completed CHA within the last 3 to 5 years" & filtering == "censusregion" ~
@@ -1266,14 +1212,68 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
                category == "Has not yet completed CHA" & filtering == "censusregion" ~
                  paste0(" ", tolower(group),"ern LHDs have not completed a CHA."),
 
-               category == "Completed CHA within last 3 years" & !(filtering %in% c("censusregion", "All LHDs")) ~
+               category == "Completed CHA within last 3 years" &  !(filtering %in% c("censusregion", "All LHDs")) ~
                  paste0(" ", tolower(group)," LHDs have completed a CHA within the last 3 years."),
                category == "Completed CHA within the last 3 to 5 years" & !(filtering %in% c("censusregion", "All LHDs")) ~
                  paste0(" ", tolower(group)," LHDs have completed a CHA within the last 3 to 5 years."),
                category == "Completed CHA more than 5 years ago" & !(filtering %in% c("censusregion", "All LHDs")) ~
                  paste0(" ", tolower(group)," LHDs have completed a CHA more than 5 years ago."),
-               category == "Has not yet completed CHA" & !(filtering %in% c("censusregion", "All LHDs")) ~
+               category == "Has not yet completed CHA" &  !(filtering %in% c("censusregion", "All LHDs")) ~
                  paste0(" ", tolower(group)," LHDs have not completed a CHA."),
+
+
+               TRUE ~ NA_character_
+             )
+           )
+       } else {
+         data <- data %>%
+           dplyr::mutate(
+             category = dplyr::case_when(
+               stringr::str_detect(category, "Yes, Within") ~
+                 "Completed CHIP within last 3 years",
+               stringr::str_detect(category, "Yes, > 3") ~
+                 "Completed CHIP within the last 3 to 5 years",
+               stringr::str_detect(category, "Yes, > 5") ~
+                 "Completed CHIP more than 5 years ago",
+               TRUE ~ "Has not yet completed CHIP"
+             )
+           ) %>%
+           dplyr::group_by(category, group) %>%
+           dplyr::reframe(
+             y = sum(y),
+             Responses = sum(Responses),
+             group = unique(group),
+             category = unique(category)
+           ) %>%
+           dplyr::mutate(
+             tt = dplyr::case_when(
+               category == "Completed CHIP within last 3 years" & filtering == "All LHDs" ~
+                 " all LHDs completed a CHIP within the last 3 years.",
+               category == "Completed CHIP within the last 3 to 5 years" & filtering == "All LHDs" ~
+                 " all LHDs have completed a CHIP within the last 3 to 5 years.",
+               category == "Completed CHIP more than 5 years ago" & filtering == "All LHDs" ~
+                 " all LHDs have completed a CHIP more than 5 years ago.",
+               category == "Has not yet completed CHIP" & filtering == "All LHDs" ~
+                 " all LHDs have not completed a CHIP.",
+
+
+               category == "Completed CHIP within last 3 years" & filtering == "censusregion" ~
+                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP within the last 3 years."),
+               category == "Completed CHIP within the last 3 to 5 years" & filtering == "censusregion" ~
+                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP within the last 3 to 5 years."),
+               category == "Completed CHIP more than 5 years ago" & filtering == "censusregion" ~
+                 paste0(" ", tolower(group),"ern LHDs have completed a CHIP more than 5 years ago."),
+               category == "Has not yet completed CHIP" & filtering == "censusregion" ~
+                 paste0(" ", tolower(group),"ern LHDs have not completed a CHIP."),
+
+               category == "Completed CHIP within last 3 years" & !(filtering %in% c("censusregion", "All LHDs")) ~
+                 paste0(" ", tolower(group)," LHDs have completed a CHIP within the last 3 years."),
+               category == "Completed CHIP within the last 3 to 5 years" & !(filtering %in% c("censusregion", "All LHDs")) ~
+                 paste0(" ", tolower(group)," LHDs have completed a CHIP within the last 3 to 5 years."),
+               category == "Completed CHIP more than 5 years ago" & !(filtering %in% c("censusregion", "All LHDs")) ~
+                 paste0(" ", tolower(group)," LHDs have completed a CHIP more than 5 years ago."),
+               category == "Has not yet completed CHIP" & !(filtering %in% c("censusregion", "All LHDs")) ~
+                 paste0(" ", tolower(group)," LHDs have not completed a CHIP."),
 
 
                TRUE ~ NA_character_
@@ -1313,19 +1313,30 @@ data <- data %>%
       ) %>%
       dplyr::rename(category = action)
 
-  } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
+  } else if (topic %in% c("formal_part", "any_part")) {
 
 
 
 
+    if (topic == "formal_part") {
+
+      if (filtering == "All LHDs") {
+        data <- partnerships %>%
+          dplyr::filter(
+            filter == "All LHDs",
+            suffix == "work3"
+
+          )
+
+      } else {
 
     data <- partnerships %>%
-      dplyr::filter(partner_type == topic,
+      dplyr::filter(
                     filter %in% c(filtering, "All LHDs"),
-                    suffix == "work3"
+                    suffix == "work3")
+      }
 
-      ) %>%
-
+    data <- data %>%
       dplyr::group_by(partner, group) %>%
       # dplyr::group_by(group) %>%
       # dplyr::group_by(Question) %>%
@@ -1335,8 +1346,54 @@ data <- data %>%
         category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
         TRUE ~ "Checked")) %>%
       dplyr::filter(category == "Checked")   %>%
-      dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
-      dplyr::rename(category = partner)
+      dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+      dplyr::group_by(partner_type, group)%>%
+      dplyr::reframe(category = unique(partner_type),
+                     y = max(y),
+                     Responses = max(Responses),
+                     tt = dplyr::case_when(filtering == "All LHDs" | group == "All LHDs" ~ "all",
+                                           filtering == "censusregion" ~ paste0(tolower(group), "ern"),
+                                           TRUE ~ tolower(group)))
+
+    } else {
+
+
+      if (filtering == "All LHDs") {
+        data <- partnerships %>%
+          dplyr::filter(
+            filter == "All LHDs",
+            suffix == "work"
+
+          )
+
+      } else {
+
+        data <- partnerships %>%
+          dplyr::filter(
+            filter %in% c(filtering, "All LHDs"),
+            suffix == "work")
+      }
+
+      data <- data %>%
+        dplyr::group_by(partner, group) %>%
+        # dplyr::group_by(group) %>%
+        # dplyr::group_by(Question) %>%
+        dplyr::mutate(Responses = sum(Responses)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(category = dplyr::case_when(
+          category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
+          TRUE ~ "Checked")) %>%
+        dplyr::filter(category == "Checked")  %>%
+        dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+        dplyr::group_by(partner_type, group)%>%
+        dplyr::reframe(category = unique(partner_type),
+                       y = max(y),
+                       Responses = max(Responses),
+                       tt = dplyr::case_when(filtering == "All LHDs" | group == "All LHDs" ~ "all",
+                                             filtering == "censusregion" ~ paste0(tolower(group), "ern"),
+                                             TRUE ~ tolower(group)))
+
+    }
 
 
 

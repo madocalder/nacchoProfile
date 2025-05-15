@@ -26,13 +26,13 @@ mod_data_stories_ui <- function(id){
           div(
             class = "row",
             div(
-              class = "col-sm-8",
+              class = "col-sm-7",
               align = "left",
               h1("Data Stories"),
               hr(class = "header-hr")
             ),
             div(
-              class = "col-sm-4 findings-align",
+              class = "col-sm-5 findings-align",
               div(class = "search-input",
                   textInput(ns("search"), NULL, placeholder = "Search tags"),
                   style = "margin-right: 2vw;"
@@ -151,7 +151,7 @@ mod_data_stories_server <- function(id){
         # Workforce Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/workforce_story.png",
+            image = "www/Workforce.jpg",
             date = "1/15/2025"
           ),
           title = actionLink(
@@ -170,7 +170,7 @@ mod_data_stories_server <- function(id){
         # Harassment Story
         list(
           thumbnail = card_thumbnail(
-            image = "www/harassment_story.png",
+            image = "www/Harassment.jpg",
             date = "1/15/2025"
           ),
           title = actionLink(
@@ -232,15 +232,18 @@ mod_data_stories_server <- function(id){
 
         lapply(card_list, function(card) {
           div(class = "col-xl-4 col-lg-6 col-md-6 col-sm-12",
-              style = "padding: 5vh; margin-bottom: 50vmin; height: 20vh",  # Adding padding between cards
+              style = "padding: 2vh 7vw 2vh 7vw; height: fit-content;",  # Adding padding between cards
               div(
-                style = "height: 20vh;",  # Define card height and padding
+                style = "height: fit-content; width: fit-content;",  # Define card height and padding
                 card$thumbnail,
                 card$title,
                 div(
                   p(card$description),
                   class = "scroll-desc",
-                  style = "width: 25vw;"
+                  style = "width: 100%;
+                          min-height: fit-content;
+                          max-height: 100%;
+                          margin-bottom: 1.5%;"
                 ),
                 do.call(tagList, card$tags)
               )

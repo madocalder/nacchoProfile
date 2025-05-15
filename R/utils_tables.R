@@ -11,7 +11,7 @@
 #' @import tidyr
 pivot_data_group <- function(data) {
   data %>%
-    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "filter", "comms_use", "comms_type"))) %>%
+    dplyr::select(category, group, y, Responses, dplyr::any_of(c("subtitle", "filter", "comms_use", "comms_type", "partner_type", "Type"))) %>%
     tidyr::pivot_wider(names_from = group, values_from = c(y, Responses)) %>%
     dplyr::rename_with(standardize_column_names)  # Standardize column names
 }
@@ -385,6 +385,8 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
      } else if (topic == "Reduced/Expanded Services") {
 
 
+
+
        data <- services_change_data%>%
          dplyr::filter(filter == "All LHDs",
                        service_type %in% classifications) %>%
@@ -523,7 +525,8 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
        }
 
        data <- data_all %>%
-         pivot_data_group()
+         pivot_data_group() %>%
+         dplyr::mutate(`Responses_All LHDs` = 927)
 
 
 
@@ -548,19 +551,21 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
      } else if (topic == "Newc12q502") {
 
-       data_n <- new_advocacy_data %>%
-         dplyr::filter(filter == "All LHDs") %>%
-         dplyr::group_by(new_advocacy_type)%>%
-         dplyr::reframe(Responses = sum(Responses))
-
 
        data <- new_advocacy_data %>%
          dplyr::filter(filter == "All LHDs",
-                       category %in% "Checked") %>%
-         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+                       category %in% c("Checked", 1)) %>%
+         # Aggregate duplicates
+         dplyr::group_by(new_advocacy_type, group, subtitle, filter) %>%
+         dplyr::summarise(
+           y = mean(y, na.rm = TRUE),       # Use mean/sum as appropriate
+           Responses = 923,                 # Hardcode total responses
+           .groups = "drop"
+         ) %>%
          dplyr::rename(category = new_advocacy_type) %>%
-         dplyr::mutate(Responses = data_n$Responses) %>%
          pivot_data_group()
+
+
 
 
 
@@ -580,10 +585,12 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
          pivot_data_group()
 
 
-     } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
+     } else if (topic %in%  c("formal_part", "any_part")) {
+
+       if (topic == "formal_part") {
 
        data <- partnerships %>%
-         dplyr::filter(partner_type == topic,
+         dplyr::filter(
                        filter == "All LHDs",
                        suffix == "work3"
 
@@ -597,9 +604,39 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
            category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
            TRUE ~ "Checked")) %>%
          dplyr::filter(category == "Checked")   %>%
-         dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
-         dplyr::rename(category = partner) %>%
+         dplyr::group_by(partner_type)%>%
+         dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+         dplyr::rename(category = partner,
+                       "Type" = partner_type) %>%
          pivot_data_group()
+
+       } else {
+
+         data <- partnerships %>%
+           dplyr::filter(
+             filter == "All LHDs",
+             suffix == "work"
+
+           ) %>%
+
+           dplyr::group_by(partner) %>%
+           # dplyr::group_by(Question) %>%
+           dplyr::mutate(Responses = sum(Responses)) %>%
+           dplyr::ungroup() %>%
+           dplyr::mutate(category = dplyr::case_when(
+             Answer == "no relationship" ~ "Unchecked",
+             TRUE ~ "Checked")) %>%
+           dplyr::filter(category == "Checked")   %>%
+           dplyr::group_by(partner_type, filter, group) %>%
+           dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+           dplyr::rename(category = partner,
+                         "Type" = partner_type) %>%
+           pivot_data_group()
+
+
+       }
+
+
 
 
 
@@ -1036,7 +1073,7 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
             dplyr::mutate(category =
                             dplyr::recode(category,
                                           "Yes" = "Completed both in past 5 years",
-                                          "No" = " Completed one or none in past 5 years"))
+                                          "No" = "Completed one or none in past 5 years"))
 
           data <- data %>%
             dplyr::mutate(category =
@@ -1123,55 +1160,122 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
           pivot_data_group()
 
         data <- data %>%
-          pivot_data_group() %>%
-          add_all_ldh_count(data_all = data_all)
-
-
-
-      } else if (topic %in% c("health_part", "comm_part", "gov_part")) {
-
-
-        data_all <- partnerships %>%
-          dplyr::filter(partner_type == topic,
-                        filter == "All LHDs",
-                        suffix == "work3"
-
-          ) %>%
-
-          dplyr::group_by(partner) %>%
-          # dplyr::group_by(Question) %>%
+          dplyr::group_by(group)%>%
           dplyr::mutate(Responses = sum(Responses)) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(category = dplyr::case_when(
-            category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
-            TRUE ~ "Checked")) %>%
-          dplyr::filter(category == "Checked")   %>%
-          dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
-          dplyr::rename(category = partner) %>%
-          pivot_data_group()%>%
-          dplyr::select(c("category", "y_All LHDs", "Responses_All LHDs"))
+          dplyr::ungroup()%>%
+          pivot_data_group()
+
+        data <- data %>%
+          dplyr::left_join(data_all, by = "category") %>%
+
+          # add_all_ldh_count(data_all = data_all) %>%
+          dplyr::mutate(`Responses_All LHDs` = 927)
 
 
-        data <- partnerships %>%
-          dplyr::filter(partner_type == topic,
-                        filter == filtering,
-                        suffix == "work3"
 
-          ) %>%
+      } else if (topic %in% c("formal_part", "any_part")) {
 
-          dplyr::group_by(partner, group) %>%
-          # dplyr::group_by(group) %>%
-          # dplyr::group_by(Question) %>%
-          dplyr::mutate(Responses = sum(Responses)) %>%
-          dplyr::ungroup() %>%
-          dplyr::mutate(category = dplyr::case_when(
-            category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
-            TRUE ~ "Checked")) %>%
-          dplyr::filter(category == "Checked")   %>%
-          dplyr::select(y, group, subtitle, Responses, filter, partner)%>%
-          dplyr::rename(category = partner) %>%
-          pivot_data_group() %>%
-          dplyr::left_join(data_all, by = "category")
+
+        if (topic == "formal_part") {
+
+          data_all <- partnerships %>%
+            dplyr::filter(
+              filter == "All LHDs",
+              suffix == "work3"
+
+            ) %>%
+
+            dplyr::group_by(partner) %>%
+            # dplyr::group_by(Question) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(category = dplyr::case_when(
+              category == "No Relationship, Exchange Info Or Meetings," ~ "Unchecked",
+              TRUE ~ "Checked")) %>%
+            dplyr::filter(category == "Checked")   %>%
+            # dplyr::group_by(partner_type)%>%
+            dplyr::select(y, group, Responses, partner)%>%
+            dplyr::rename(category = partner) %>%
+            pivot_data_group()
+
+
+          data <- partnerships %>%
+            dplyr::filter(
+                          filter == filtering,
+                          suffix == "work3"
+
+            ) %>%
+
+            dplyr::group_by(partner, group) %>%
+            # dplyr::group_by(group) %>%
+            # dplyr::group_by(Question) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(category = dplyr::case_when(
+              Answer == "no relationship, exchange info or meetings," ~ "Unchecked",
+              TRUE ~ "Checked")) %>%
+            dplyr::filter(category == "Checked")   %>%
+            dplyr::group_by(partner_type, group, filter)%>%
+            dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+            dplyr::rename(category = partner,
+                          "Type" = partner_type) %>%
+            pivot_data_group() %>%
+            dplyr::left_join(data_all, by = "category")
+
+
+
+        } else {
+
+          data_all <- partnerships %>%
+            dplyr::filter(
+              filter == "All LHDs",
+              suffix == "work"
+
+            ) %>%
+
+            dplyr::group_by(partner) %>%
+            # dplyr::group_by(Question) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(category = dplyr::case_when(
+              Answer == "no relationship" ~ "Unchecked",
+              TRUE ~ "Checked")) %>%
+            dplyr::filter(category == "Checked")   %>%
+            # dplyr::group_by(partner_type)%>%
+            dplyr::select(y, group, Responses, partner)%>%
+            dplyr::rename(category = partner) %>%
+            pivot_data_group()
+
+
+          data <- partnerships %>%
+            dplyr::filter(
+              filter == filtering,
+              suffix == "work"
+
+            ) %>%
+
+            dplyr::group_by(partner, group) %>%
+            # dplyr::group_by(group) %>%
+            # dplyr::group_by(Question) %>%
+            dplyr::mutate(Responses = sum(Responses)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(category = dplyr::case_when(
+              Answer == "no relationship" ~ "Unchecked",
+              TRUE ~ "Checked")) %>%
+            dplyr::filter(category == "Checked")   %>%
+            dplyr::group_by(partner_type, group, filter)%>%
+            dplyr::select(y, group, subtitle, Responses, filter, partner, partner_type)%>%
+            dplyr::rename(category = partner,
+                          "Type" = partner_type) %>%
+            pivot_data_group() %>%
+            dplyr::left_join(data_all, by = "category")
+
+
+
+
+        }
+
+
 
 
     } else if (topic == "c12q260") {
@@ -1206,19 +1310,22 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
 
     } else if (topic == "Newc12q502") {
 
-
-
       data_n <- new_advocacy_data %>%
-        dplyr::filter(filter == filtering) %>%
+        dplyr::filter(filter == filtering)%>%
         dplyr::group_by(new_advocacy_type, group)%>%
-        dplyr::reframe(Responses = sum(Responses))
+        dplyr::reframe(Responses = 923)
 
       new_advocacy_data_all <- new_advocacy_data %>%
         dplyr::filter(filter == "All LHDs",
-                      category %in% "Checked") %>%
-        dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+                      category %in% c("Checked", 1)) %>%
+        # Aggregate duplicates
+        dplyr::group_by(new_advocacy_type, group, subtitle, filter) %>%
+        dplyr::summarise(
+          y = mean(y, na.rm = TRUE),       # Use mean/sum as appropriate
+          Responses = 923,                 # Hardcode total responses
+          .groups = "drop"
+        ) %>%
         dplyr::rename(category = new_advocacy_type) %>%
-        dplyr::mutate(Responses = 923) %>%
         pivot_data_group()
 
       data <- new_advocacy_data %>%
@@ -1226,8 +1333,14 @@ process_table_data <- function(topic, filtering, classifications = NULL) {
       dplyr::group_by(new_advocacy_type, group)%>%
         dplyr::mutate(Responses = sum(Responses))%>%
         dplyr::ungroup()%>%
-        dplyr::filter(category %in% "Checked") %>%
+        dplyr::filter(category %in% c("Checked", 1)) %>%
         dplyr::select(y, group, subtitle, Responses, filter, new_advocacy_type)%>%
+        dplyr::group_by(new_advocacy_type, group, subtitle, filter) %>%
+        dplyr::summarise(
+          y = mean(y, na.rm = TRUE),       # Use mean/sum as appropriate
+          Responses = 923,                 # Hardcode total responses
+          .groups = "drop"
+        ) %>%
         dplyr::rename(category = new_advocacy_type) %>%
         pivot_data_group()%>%
         add_all_ldh_count(data_all = new_advocacy_data_all)
@@ -1299,6 +1412,22 @@ create_non_time_table <- function(data, category, colors, topic) {
   data <- data %>%
     dplyr::select(category, everything())
 
+  # Adjust data for specific topics
+  if (topic %in% c("formal_part", "any_part")) {
+    if (!"Type" %in% colnames(data)) {
+      stop("The column 'Type' is missing in the data.")
+    }
+    # Explicit grouping for Type
+    data <- data %>%
+      dplyr::group_by(Type, .add = TRUE) %>%
+      dplyr::ungroup() # Ensure data is not grouped when passed to reactable
+  }
+
+  # Debugging: Print data to verify it includes Type
+  message("Data after grouping by 'Type':")
+  print(head(data))
+
+
   # Helper for formatting numbers
   num_format <- function(x) {
 
@@ -1365,7 +1494,7 @@ create_non_time_table <- function(data, category, colors, topic) {
                             ifelse(topic %in% c("totexp_percap", "rev_percap"), 200,
                                   ifelse(topic == "rev_total", 150000000,
                                          ifelse(topic == "jobs_total", 15000,
-                                                ifelse(topic == "b", 21000, 100))))))),
+                                                ifelse(topic == "b", 21000, 120))))))),
         fill_color = naccho.viz::green,  # Always use naccho.viz::green
         background = 'none',
         number_fmt = num_format
@@ -1428,7 +1557,7 @@ create_non_time_table <- function(data, category, colors, topic) {
   }
 
   # Hide extra columns not needed
-  hidden_columns <- setdiff(colnames(data), c("category", all_lhds_col_name, selected_columns))
+  hidden_columns <- setdiff(colnames(data), c("category", all_lhds_col_name, selected_columns, "Total"))
   hidden_col_definitions <- setNames(
     lapply(hidden_columns, function(col) {
       reactable::colDef(show = FALSE)
@@ -1437,30 +1566,70 @@ create_non_time_table <- function(data, category, colors, topic) {
   )
 
   # Define columns for reactable
-  column_definitions <- list(
-    category = reactable::colDef(
-      name = "Category",
-      align = "center",
-      headerStyle = list(
-        fontWeight = "bold",
-        textAlign = "center",
-        textTransform = "uppercase",
-        fontSize = "calc(10px + .2em + .5vmin)",  # Font size in em
-        lineHeight = "calc(10px + .2em + .5vmin)"
+
+
+  if ("Type" %in% colnames(data)) {
+    column_definitions <- list(
+      category = reactable::colDef(
+        name = "Category",
+        align = "center",
+        headerStyle = list(
+          fontWeight = "bold",
+          textAlign = "center",
+          textTransform = "uppercase",
+          fontSize = "calc(10px + .2em + .5vmin)",  # Font size in em
+          lineHeight = "calc(10px + .2em + .5vmin)"
+        ),
+        style = list(
+          textAlign = "left",
+          fontFamily = "Heebo",
+          fontSize = "calc(10px + .2em + .1vmin)",
+          lineHeight = "calc(10px + .2em + .1vmin)",
+          padding = "calc(.2vh + 4px + .1em) calc(.2vw + 5px + .1em)",
+          vAlign = "center",
+          borderRight = ".2em solid rgba(0, 0, 0, 0.1)"
+        ),
+        minWidth = 100
+        # ,
+        # width = "calc(20px + 2vw + .2em)"
       ),
-      style = list(
-        fontFamily = "Heebo",
-        fontSize = "calc(10px + .2em + .1vmin)",
-        lineHeight = "calc(10px + .2em + .1vmin)",
-        padding = "calc(.2vh + 4px + .1em) calc(.2vw + 5px + .1em)",
-        vAlign = "center",
-        borderRight = ".2em solid rgba(0, 0, 0, 0.1)"
-      ),
-      minWidth = 100
-      # ,
-      # width = "calc(20px + 2vw + .2em)"
+      Type = reactable::colDef(
+        name = "Type",
+        align = "center",
+        headerStyle = list(
+          fontWeight = "bold",
+          textAlign = "center",
+          textTransform = "uppercase"
+        )
+      )
     )
-  )
+  } else {
+    column_definitions <- list(
+      category = reactable::colDef(
+        name = "Category",
+        align = "center",
+        headerStyle = list(
+          fontWeight = "bold",
+          textAlign = "center",
+          textTransform = "uppercase",
+          fontSize = "calc(10px + .2em + .5vmin)",  # Font size in em
+          lineHeight = "calc(10px + .2em + .5vmin)"
+        ),
+        style = list(
+          textAlign = "left",
+          fontFamily = "Heebo",
+          fontSize = "calc(10px + .2em + .1vmin)",
+          lineHeight = "calc(10px + .2em + .1vmin)",
+          padding = "calc(.2vh + 4px + .1em) calc(.2vw + 5px + .1em)",
+          vAlign = "center",
+          borderRight = ".2em solid rgba(0, 0, 0, 0.1)"
+        ),
+        minWidth = 100
+        # ,
+        # width = "calc(20px + 2vw + .2em)"
+      )
+    )
+  }
 
   # Add selected_columns to column definitions
   column_definitions <- c(
@@ -1492,7 +1661,7 @@ create_non_time_table <- function(data, category, colors, topic) {
                                              ifelse(topic %in% c("totexp_percap", "rev_percap"), 200,
                                                     ifelse(topic == "rev_total", 150000000,
                                                            ifelse(topic == "jobs_total", 15000,
-                                                                  ifelse(topic == "b", 21000, 100))))))),
+                                                                  ifelse(topic == "b", 21000, 120))))))),
             fill_color = ifelse(col == all_lhds_col_name, naccho.viz::green, colors[i]),
             background = 'none',
             number_fmt = num_format
@@ -1516,16 +1685,21 @@ create_non_time_table <- function(data, category, colors, topic) {
   # Add hidden columns to column definitions
   column_definitions <- c(column_definitions, hidden_col_definitions)
 
+
+
   # Generate reactable
   reactable::reactable(
     data = data,
     columns = column_definitions,
-    # pagination = FALSE,
+    groupBy = if (topic %in% c("formal_part", "any_part")) "Type" else NULL,
+    defaultExpanded = TRUE,
+    pagination = TRUE,
+    paginateSubRows = TRUE,
     compact = TRUE,
-    defaultPageSize = 7,
+    defaultPageSize = 8,
     filterable = FALSE,
-    # showPageSizeOptions = TRUE,
-    # pageSizeOptions = c(5, 10, 15),
+    showPageSizeOptions = TRUE,
+    pageSizeOptions = c(6, 8, 10, 12),
     striped = FALSE,
     highlight = TRUE,
     searchable = FALSE,
@@ -1612,11 +1786,16 @@ table_n_count <- function(data, topic, col_name = NULL) {
     "c5q37", "fte_bypop", "c5q36", "employee_bypop",
     "Reduced/Expanded Services", "c3q15", "totexp_percap",
     "rev_percap", "rev_total", "comm_channels_1", "comm_channels_2",
-    "comm_channels_3","tech_use", "gov_part", "health_part", "comm_part",
-    "jobs_total", "field", "Newc12q502", "c12q260", "m9q240", "a", "b"
+    "comm_channels_3","tech_use",
+    "jobs_total", "field", "Newc12q502", "c12q260", "m9q240", "a", "b", "chachip",
+    "medical", "dental", "behavioral", "chachip", "c7q149", "c7q147"
   )) {
     # Use `show_n` to calculate range or single value
     show_n(data[[paste0(col_name)]])
+  } else if ( topic %in% c("formal_part", "any_part")) {
+
+    "205 to 485"
+
   } else {
     # Default behavior: sum the Responses column
     sum(data[[paste0(col_name)]], na.rm = TRUE)

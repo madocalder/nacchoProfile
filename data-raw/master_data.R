@@ -222,10 +222,10 @@ master_data <- master_data %>%
                                     rev_percap >= 100 & rev_percap < 150 ~ "$100 to $150",
                                     rev_percap >= 150 ~ "$150 or more")) %>%
 
-  dplyr::mutate(tenure_numcat = dplyr::case_when(tenure < 2 ~ "Less than 2 years",
-                                                 tenure >= 2 & tenure < 6 ~ "2 - 5 years",
-                                                 tenure >= 6 & tenure < 11 ~ "6 - 10 years",
-                                                 tenure >= 11 ~ "11 or more years" )) %>%
+  dplyr::mutate(tenure_numcat = dplyr::case_when(tenure < 2 ~ 1,
+                                                 tenure >= 2 & tenure < 6 ~ 2,
+                                                 tenure >= 6 & tenure < 11 ~ 3,
+                                                 tenure >= 11 ~ 4 )) %>%
 
   dplyr::mutate(exp_total_numcat = haven::as_factor(exp_total_numcat),
                 exp_percap_numcat = haven::as_factor(exp_percap_numcat),
@@ -301,15 +301,15 @@ master_data$rev_percap_numcat <- haven::labelled(
   label = "Per capita revenue, by group, created by LJ"
 )
 
-# master_data$tenure_numcat <- haven::labelled(
-#   master_data$tenure_numcat,
-#   labels = c("Less than 2 years" = 1,
-#              "2 - 5 years" = 2,
-#              "6 - 10 years" = 3,
-#              "11 or more years" = 4
-#   )
-#
-# )
+master_data$tenure_numcat <- haven::labelled(
+  master_data$tenure_numcat,
+  labels = c(
+    "Less than 2 years" = 1,
+    "2 - 5 years" = 2,
+    "6 - 10 years" = 3,
+    "11 or more years" = 4
+  )
+)
 
 
 
@@ -322,6 +322,42 @@ master_data <- master_data %>%
   dplyr::mutate(spec_combined = haven::labelled(spec_combined, c("unchecked" = 0, "checked" = 1)))
 
 
+
+
+# newc12q502_per_id <- master_data %>%
+#   group_by(nacchoid) %>%
+#   summarise(
+#     newc12q502 = case_when(
+#       # If any column is 1, set to 1
+#       any(c_across(c(newc12q502x, newc12q502aa, newc12q502b, newc12q502ab, newc12q502o, newc12q502i,
+#                      newc12q502y, newc12q502ac, newc12q502r, newc12q502m, newc12q502s, newc12q502q,
+#                      newc12q502j, newc12q502l, newc12q502p, newc12q502t, newc12q502k, newc12q502v,
+#                      newc12q502z, newc12q502f)) == 1) ~ 1,
+
+      # # If all columns are NA, set to NA
+      # all(is.na(newc12q502x), is.na(newc12q502aa), is.na(newc12q502b),
+      #     is.na(newc12q502ab), is.na(newc12q502o), is.na(newc12q502i),
+      #     is.na(newc12q502y), is.na(newc12q502ac), is.na(newc12q502r),
+      #     is.na(newc12q502m), is.na(newc12q502s), is.na(newc12q502q),
+      #     is.na(newc12q502j), is.na(newc12q502l), is.na(newc12q502p),
+      #     is.na(newc12q502t), is.na(newc12q502k), is.na(newc12q502v),
+      #     is.na(newc12q502z), is.na(newc12q502f)) ~ NA_real_,
+
+  #     # If all columns are 0 or NA, set to 0
+  #     all(c_across(c(newc12q502x, newc12q502aa, newc12q502b, newc12q502ab, newc12q502o, newc12q502i,
+  #                    newc12q502y, newc12q502ac, newc12q502r, newc12q502m, newc12q502s, newc12q502q,
+  #                    newc12q502j, newc12q502l, newc12q502p, newc12q502t, newc12q502k, newc12q502v,
+  #                    newc12q502z, newc12q502f)) == 0) ~ 0,
+  #
+  #     TRUE ~ 0
+  #   )
+  # ) %>%
+  # ungroup() %>%
+  # mutate(newc12q502 = haven::labelled(newc12q502, c("unchecked" = 0, "checked" = 1)))
+
+# Step 2: Join the result back to the original master_data
+master_data <- master_data %>%
+  left_join(newc12q502_per_id, by = "nacchoid")
 
 
 # print elapsed time

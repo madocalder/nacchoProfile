@@ -186,7 +186,8 @@ mod_overview_server <- function(id){
 
 
       set_column(data,
-                 data_label = "{point.y:,.0f}%") %>%
+                 data_label = "{point.y:,.0f}%",
+                 y_label = "%") %>%
         viz_options(
           viz_title = "% of U.S. Population Served by LHDs",
           viz_caption = "",

@@ -34,7 +34,12 @@
 NULL
 
 # Medical services data ------
-vars <- c("medical")
+vars <- c("m14q301a",
+  "m14q302a",
+  "m14q303a",
+  "m14q304a",
+  "m14q401a"
+  )
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
 
@@ -64,9 +69,27 @@ med_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
 # Join the two datasets -- with filters and without filters
 med_data <- rbind(medical_with_filters, med_no_filter) %>%
   mutate(category = case_when(
-    .data$category == 1 ~ "Medical Services Provided",
-    .data$Answer == 0 ~ "Medical Services Not Provided"
+    Question == "m14q301a" ~ "Assessed the gaps in access to services",
+
+    Question == "m14q302a" ~ "Addressed gaps through direct provision of clinical services",
+
+    Question == "m14q303a" ~ "Implemented strategies to increase accessibility of existing services",
+
+    Question == "m14q304a" ~ "Implemented strategies to target healthcare needs of underserved populations",
+
+    Question == "m14q401a" ~ "Evaluated strategies to target healthcare needs of underserved populations",
+
   ))
+
+med_data_n <- med_data %>%
+  dplyr::group_by(category, group)%>%
+  dplyr::reframe(category = unique(category),
+                 Responses = sum(Responses))
+
+med_data <- med_data %>%
+  dplyr::select(-Responses) %>%
+  dplyr::left_join(med_data_n, by = c("category", "group"))%>%
+  dplyr::filter(Answer == "checked")
 #
 # View(med_data)
 
@@ -74,7 +97,11 @@ med_data <- rbind(medical_with_filters, med_no_filter) %>%
 usethis::use_data(med_data, overwrite = TRUE)
 
 # Dental services ------
-vars <- c("dental")
+vars <- c("m14q301b",
+          "m14q302b",
+          "m14q303b",
+          "m14q304b",
+          "m14q401b")
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
 
@@ -105,16 +132,38 @@ dental_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
 # Join the two datasets -- with filters and without filters
 dental_data <- rbind(dental_with_filters, dental_no_filter) %>%
   mutate(category = case_when(
-    .data$category == 1 ~ "Dental Services Provided",
-    .data$Answer == 0 ~ "Dental Services Not Provided"
+     Question == "m14q301b" ~ "Assessed the gaps in access to services",
+
+   Question == "m14q302b" ~ "Addressed gaps through direct provision of clinical services",
+
+    Question == "m14q303b" ~ "Implemented strategies to increase accessibility of existing services",
+
+   Question == "m14q304b" ~ "Implemented strategies to target healthcare needs of underserved populations",
+
+    Question == "m14q401b" ~ "Evaluated strategies to target healthcare needs of underserved populations",
+
   ))
 
+dental_data_n <- dental_data %>%
+  dplyr::group_by(category, group)%>%
+  dplyr::reframe(category = unique(category),
+                 Responses = sum(Responses))
+
+dental_data <- dental_data %>%
+  dplyr::select(-Responses) %>%
+  dplyr::left_join(dental_data_n, by = c("category", "group"))%>%
+  dplyr::filter(Answer == "checked")
+
 # View and save the dental_data
-# View(dental_data)
+View(dental_data)
 usethis::use_data(dental_data, overwrite = TRUE)
 
 # Behavioral services ------
-vars <- c("behavioral")
+vars <- c("m14q301c",
+          "m14q302c",
+          "m14q303c",
+          "m14q304c",
+          "m14q401c")
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
 
@@ -145,9 +194,27 @@ behav_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
 # Join the two datasets -- with filters and without filters
 behav_data <- rbind(behav_with_filters, behav_no_filter) %>%
   mutate(category = case_when(
-    .data$category == 1 ~ "Behavioral Services Provided",
-    .data$Answer == 0 ~ "Behavioral Services Not Provided"
+    Question == "m14q301c" ~ "Assessed the gaps in access to services",
+
+    Question == "m14q302c" ~ "Addressed gaps through direct provision of clinical services",
+
+    Question == "m14q303c" ~ "Implemented strategies to increase accessibility of existing services",
+
+    Question == "m14q304c" ~ "Implemented strategies to target healthcare needs of underserved populations",
+
+    Question == "m14q401c" ~ "Evaluated strategies to target healthcare needs of underserved populations",
+
   ))
+
+behav_data_n <- behav_data %>%
+  dplyr::group_by(category, group)%>%
+  dplyr::reframe(category = unique(category),
+                 Responses = sum(Responses))
+
+behav_data <- behav_data %>%
+  dplyr::select(-Responses) %>%
+  dplyr::left_join(behav_data_n, by = c("category", "group"))%>%
+  dplyr::filter(Answer == "checked")
 
 # # View and save the behav_data
 # View(behav_data)

@@ -194,7 +194,7 @@ mod_topic_areas_server <- function(id){
       selected_filter <- input$filter
 
       if (input$topic %in% c("comm_channels_1", "comm_channels_2", "comm_channels_3",
-                             "c12q260", "Newc12q502", "m9q240"
+                             "c12q260", "Newc12q502", "m9q240", "formal_part", "any_part"
                              # , "chachip",
                              # "c7q147", "c7q149"
                              )) {
@@ -225,7 +225,8 @@ mod_topic_areas_server <- function(id){
       selected_filter <- input$filter
 
       # Restrict filter to "All LHDs" for specific topics and views
-      if (input$topic %in% c("health_part", "comm_part", "gov_part", "tech_use") &&
+      if ((input$topic %in% c("tech_use",
+                             "medical", "dental", "behavioral")) &
           input$view %in% c("Bar Graph")) {
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1],
@@ -316,6 +317,13 @@ mod_topic_areas_server <- function(id){
 
       # show_n(data$Responses)
 
+      caption <- dplyr::case_when(
+        topic %in% c("formal_part", "any_part") ~ paste0("<b> N: </b> 205 to 485 <br>", source_line),
+        TRUE ~ paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line)
+      )
+
+
+
       # Adjust the bar chart settings for long names
       set_simple_bar(data,
                      # y_label = filter_meta()$y_label,
@@ -326,12 +334,12 @@ mod_topic_areas_server <- function(id){
           theme = naccho.viz::basic,
           viz_title = filter_meta()$title,
           viz_subtitle = filter_meta()$subtitle,
-          viz_caption = paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
+          viz_caption = caption,
           tooltip = filter_meta()$tooltip,
 
           #,
           # legend_enable = FALSE,
-          colors = colors()
+          colors = c(naccho.viz::green, colors())
         ) %>%
         viz_export()%>%
 

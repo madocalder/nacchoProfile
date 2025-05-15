@@ -240,7 +240,7 @@ mod_landscape_server <- function(id){
 
     # update inputs based on selections ---------------------------------------
     observe({
-      if (input$topic %in% c("c2q501")) {
+      if (input$topic %in% c("c2q501", "lboh")) {
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
@@ -438,7 +438,8 @@ mod_landscape_server <- function(id){
                                        ordered = TRUE)
 
           data <- data %>%
-            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")
+            dplyr::mutate(tt = paste0(" all LHD top executives' tenure is ", tolower(category)), ".")%>%
+            dplyr::arrange(tenure_numcat)
 
           data
 
@@ -467,7 +468,8 @@ mod_landscape_server <- function(id){
               input$filter != "censusregion" ~
                 paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
               TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
-            ))
+            )) %>%
+            dplyr::arrange(tenure_numcat)
 
           data
 
@@ -480,13 +482,6 @@ mod_landscape_server <- function(id){
           filtered_data
         )
 
-        # if (input$topic == "tenure"){
-        #
-        #   combined <- combined %>%
-        #     dplyr::mutate(x = seq_along(category)-1,
-        #                   group = category)
-        #
-        # }
 
 
           combined
@@ -569,14 +564,11 @@ mod_landscape_server <- function(id){
       #     )
       # }
 
-      # else if (input$topic == "tenure"  & input$filter != "All LHDs"){
-      #
-      #   bar_chart <- bar_chart %>%
-      #     highcharter::hc_xAxis(
-      #       labels = list(enabled = FALSE),
-      #       title = list(text = NULL)
-      #     )
-      # }
+     if (input$topic == "tenure"){
+
+        bar_chart <- bar_chart %>%
+          highcharter::hc_xAxis(categories = data$tenure_numcat)
+      }
 
 
       bar_chart

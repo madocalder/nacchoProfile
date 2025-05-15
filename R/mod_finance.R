@@ -344,6 +344,7 @@ mod_finance_server <- function(id){
       } else if (input$filter == "censusregion") {
         c(naccho.viz::navy,
           naccho.viz::teal,
+          naccho.viz::teal,
           naccho.viz::terracotta,
           naccho.viz::pink)
       } else if (input$filter %in% c("All LHDs")) {
@@ -374,6 +375,7 @@ mod_finance_server <- function(id){
     # figure output -----------------------------------------------------------
 
     output$figure_line <- highcharter::renderHighchart({
+      req(input$topic != "rev_total_tree")
       req(!is.null(input$topic), !is.null(input$filter))
       req(filter_meta())
       req(input$view == "Line Graph")
@@ -399,7 +401,7 @@ mod_finance_server <- function(id){
 
       if (topic == "totexp_percap") {
         data <- data %>%
-          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita revenue across all LHDs was "))
+          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita expenditures across all LHDs was "))
       } else {
 
         data <- data %>%
@@ -451,6 +453,7 @@ mod_finance_server <- function(id){
     proxy_line <- highcharter::highchartProxy(ns("figure_line"))
 
     observe({
+      req(input$topic != "rev_total_tree")
       req(!is.null(input$topic), !is.null(input$filter))
       req(filter_meta())
       req(input$view == "Line Graph")
@@ -474,7 +477,7 @@ mod_finance_server <- function(id){
 
       if (topic == "totexp_percap") {
         data <- data %>%
-          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita revenue across all LHDs was "))
+          dplyr::mutate(tt = paste0("the ", tolower(category),  " per capita expenditures across all LHDs was "))
       } else {
 
         data <- data %>%
@@ -511,7 +514,7 @@ mod_finance_server <- function(id){
 
 
     process_bar_chart_data <- reactive({
-
+      req(input$topic != "rev_total_tree")
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
 
       req(input$topic %in% c("c3q15", "rev_percap", "rev_total", "budget_changes",
@@ -712,7 +715,7 @@ mod_finance_server <- function(id){
     # used for bar graph
     output$figure <- highcharter::renderHighchart({
 
-
+      req(input$topic != "rev_total_tree")
       req(!is.null(input$topic), !is.null(input$filter), !is.null(input$view))
       req(filter_meta())
       req(process_bar_chart_data())
@@ -768,7 +771,7 @@ mod_finance_server <- function(id){
     proxy_bar <- highcharter::highchartProxy(ns("figure"))
 
     observe({
-
+      req(input$topic != "rev_total_tree")
       req(input$topic %in% c("c3q15", "rev_percap", "rev_total", "budget_changes",
                              "exp_total_numcat"),
           input$filter,
@@ -820,6 +823,7 @@ mod_finance_server <- function(id){
     # used for budget changes
     output$figure_budget <- highcharter::renderHighchart({
       req(input$topic == "budget_changes")
+      req(input$topic != "rev_total_tree")
 
       data <- filtered_butterfly("budget_data")
 
@@ -923,7 +927,7 @@ mod_finance_server <- function(id){
           ) %>%
           viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
                       viz_subtitle = "Estimated Across All LHDs",
-                      viz_caption = source_line,
+                      viz_caption = paste0("<b> N: </b> 134 to 380<br>", source_line),
                       caption_align = "center",
                       tooltip = "{point.value:.0f}% of all LHD revenue came from <b>{point.name} sources.</b>",
                       legend_enable = TRUE)
@@ -1042,7 +1046,7 @@ mod_finance_server <- function(id){
           ) %>%
           viz_options(viz_title = "Revenue Sources as a Share of Total Revenue",
                       viz_subtitle = unique(data$subtitle) ,
-                      viz_caption = source_line,
+                      viz_caption = paste0("<b> N: </b> 134 to 380<br>", source_line),
                       caption_align = "center",
                       tooltip = "",
                       legend_enable = TRUE) %>%
@@ -1124,6 +1128,7 @@ mod_finance_server <- function(id){
     # for Tables -------
     output$data_table <- reactable::renderReactable({
       req(input$view == "Table")
+      req(input$topic != "rev_total_tree")
 
       #add topic value for function
       topic <- input$topic

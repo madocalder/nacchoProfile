@@ -672,7 +672,7 @@ label:not(.material-switch label) {
 
 .key-findings-head {
   padding-top: 2vmin;
-  padding-left: 5vmin;
+  padding-left: calc(2em + 2vw);
   padding-right: 3vmin;
 }
 
@@ -689,14 +689,14 @@ label:not(.material-switch label) {
 
 .carousel-control-next {
   justify-content: right !important;
-  margin-right: -4em !important;
+
 }
 
 @media (max-width: 1300px) {
   .key-findings-head {
-    padding-top: 3vmin;
-    padding-left: 2.5vmin;
-    padding-right: 1.5vmin;
+    padding-top: 2vmin;
+  padding-left: calc(2em + 2vw);
+  padding-right: 3vmin;
   }
 
   .key-findings-content {
@@ -735,6 +735,7 @@ label:not(.material-switch label) {
 
 .findings-align {
   text-align: right;
+ /* width: 25%; */
 }
 
 @media (max-width: 575px) {
@@ -980,7 +981,7 @@ label:not(.material-switch label) {
 .search-input {
   position: relative;
   display: inline-block;
-  margin-left: 10%;
+  /* margin-left: 5%; */
 }
 
 .search-input input[type="text"] {
@@ -1012,7 +1013,7 @@ label:not(.material-switch label) {
   box-shadow: none !important;
   font-size: .7em !important;
   font-weight: 400 !important;
-  margin-bottom: 5em;
+
 }
 
 .my-button:focus, .my-button:hover {
@@ -1196,7 +1197,7 @@ hr .tt {
 
 .header-hr {
   margin-left: 0px;
-  margin-right: 80%;
+  margin-right: 40%;
   border-top: 2px solid !important;
   color: #212F5B !important;
   opacity: 1 !important;
@@ -1459,7 +1460,7 @@ b, strong {
 .form-check, .shiny-input-container .checkbox {
 
     font-size: calc(10px + .1vw + .1em);
-    line-height: calc(12px + .1vw + .2em);
+
     justify-items: center;
     margin-bottom: calc(6px + .2em + .1vh);
 

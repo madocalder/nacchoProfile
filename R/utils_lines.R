@@ -648,6 +648,11 @@ process_line_data <- function(option, filtering, classifications = NULL) {
         combined <- lines_data %>%
           dplyr::filter(topic == "budget_changes")
 
+      } else if (option %in% c("FTE_numcat", "employee_numcat")) {
+
+      combined <- lines_data %>%
+        dplyr::filter(topic == option)
+
        } else {
           stop("ERROR: No matching option identified for All LHDs") }
 

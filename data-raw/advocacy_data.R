@@ -75,13 +75,13 @@ advocacy_no_filter <- map_dfr(vars, return_survey_weighted_counts) %>%
 advocacy_data <- rbind(advocacy_with_filters, advocacy_no_filter) %>%
   dplyr::mutate(advocacy_type = dplyr::case_when(
     Question %in% c("c12q260x") ~ "Climate Change",
-    Question %in% c("c12q260aa") ~ "Emergency preparedness and response",
-    Question %in% c("c12q260n") ~ "Emergency Preparedness Response",
+    Question %in% c("c12q260aa") ~ "COVID-19 Emergency preparedness and response",
+    Question %in% c("c12q260n") ~ "Non-COVID-19 Emergency Preparedness and response",
     Question %in% c("c12q260o") ~ "Food safety",
     Question %in% c("c12q260e") ~ "Funding for access to healthcare",
     Question %in% c("c12q260y") ~ "Funding for local public health",
     Question %in% c("c12q260ac") ~ "COVID-19 Infectious disease",
-    Question %in% c("c12q260w") ~ "Infectious disease",
+    Question %in% c("c12q260w") ~ "Non-COVID-19 Infectious disease",
     Question %in% c("c12q260p") ~ "Injury/violence prevention",
     Question %in% c("c12q260f") ~ "Land use",
     Question %in% c("c12q260q") ~ "Mental health",
@@ -168,13 +168,13 @@ new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>
   dplyr::mutate(new_advocacy_type = dplyr::case_when(
     Question %in% c("newc12q502x") ~ "Climate Change",
     Question %in% c("newc12q502aa") ~ "COVID-19 Emergency preparedness and response",
-    Question %in% c("newc12q502b") ~ "Emergency preparedness and response",
+    Question %in% c("newc12q502b") ~ "Non-COVID-19 Emergency preparedness and response",
     Question %in% c("newc12q502ab") ~ "Declared racism a threat to public health or an emergency",
     Question %in% c("newc12q502o") ~ "Food safety",
     Question %in% c("newc12q502i") ~ "Funding for access to healthcare",
     Question %in% c("newc12q502y") ~ "Funding for local public health",
     Question %in% c("newc12q502ac") ~ "COVID-19 Infectious disease",
-    Question %in% c("newc12q502r") ~ "Infectious disease",
+    Question %in% c("newc12q502r") ~ "Non-COVID-19 Infectious disease",
     Question %in% c("newc12q502m") ~ "Injury/violence prevention",
     Question %in% c("newc12q502s") ~ "Land use planning",
     Question %in% c("newc12q502q") ~ "Mental health",
@@ -188,5 +188,61 @@ new_advocacy_data <- rbind(new_advocacy_with_filters, new_advocacy_no_filter) %>
     Question %in% c("newc12q502f") ~ "Other area"
   ))
 
+
+engagement_data <- tibble::tribble(
+  ~filter,                  ~group,            ~y, ~Responses, ~category, ~new_advocacy_type, ~Question,
+  "All LHDs",              "All LHDs",           33, 923, "Checked", "None", "newc12q502",
+  "c0popcat3", "Small (<50,000)", 27, 923, "Checked", "None",  "newc12q502",
+  "c0popcat3", "Medium (50,000~499,999)", 39, 923, "Checked", "None",  "newc12q502",
+  "c0popcat3", "Large (500,000+)", 64, 923, "Checked", "None",  "newc12q502",
+  "c0govcat",    "State",              19, 923, "Checked", "None",  "newc12q502",
+  "c0govcat",    "Local",              36, 923, "Checked", "None",  "newc12q502",
+  "c0govcat",    "Shared",             38, 923, "Checked", "None", "newc12q502",
+  "censusregion",         "Northeast",          45, 923, "Checked", "None", "newc12q502",
+  "censusregion",         "Midwest",            30, 923, "Checked", "None", "newc12q502",
+  "censusregion",         "South",              24, 923, "Checked", "None", "newc12q502",
+  "censusregion",         "West",               49, 923, "Checked", "None", "newc12q502",
+  "urbanrural2022","Urban",              47, 923, "Checked", "None", "newc12q502",
+  "urbanrural2022","Rural",              21, 923, "Checked", "None", "newc12q502"
+)
+
+# Calculate "No engagement" as 100 - Engagement
+engagement_data <- engagement_data %>%
+  dplyr::mutate(
+    y = 100 - y
+  )
+
+new_advocacy_data <- new_advocacy_data %>%
+  dplyr::bind_rows(new_advocacy_data, engagement_data)
+
+new_advocacy_data <- new_advocacy_data %>%
+dplyr::mutate(
+  new_advocacy_type = factor(new_advocacy_type, levels = c("None", "Climate Change",
+                                         "COVID-19 Emergency preparedness and response",
+                                         "Non-COVID-19 Emergency preparedness and response",
+                                         "Declared racism a threat to public health or an emergency",
+                                         "Food safety",
+                                         "Funding for access to healthcare",
+                                         "Funding for local public health",
+                                         "COVID-19 Infectious disease",
+                                         "Non-COVID-19 Infectious disease",
+                                         "Injury/violence prevention",
+                                         "Land use planning",
+                                         "Mental health",
+                                         "Occupational health and safety",
+                                         "Obesity/physical activity",
+                                         "Oral health",
+                                         "Safe and healthy housing",
+                                         "Tobacco, alcohol, and other drugs",
+                                         "Wastewater/sanitation",
+                                         "Other environmental health",
+                                         "Other area"))  # List all categories
+) %>%
+  # Arrange rows to reflect the factor order
+  dplyr::arrange(new_advocacy_type)
+
+
+
 # Save the new_advocacy_data
 usethis::use_data(new_advocacy_data, overwrite = TRUE)
+

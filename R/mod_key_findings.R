@@ -567,6 +567,7 @@ mod_key_findings_server <- function(id){
     # policy engagement -------------------------------------------------------
     output$finding_five <- highcharter::renderHighchart({
 
+      # Define the data
       data <- data.frame(
         value = c(8, 2),
         description = c("Involved in policy activities", "Not involved in policy activities"),
@@ -574,19 +575,107 @@ mod_key_findings_server <- function(id){
         percent = c(80, 20)
       )
 
-      naccho.viz::create_icon_item(
-        data = data,
-        y_variable = "value",
-        item_group = "description",
-        legend_enable = TRUE,
-        tooltip = "{point.percent:.0f}\u0025 of LHDs were {point.description_tt} <br> related to COVID\u221219 in 2022",
-        color_one = naccho.viz::terracotta,
-        color_two = "#ddd",
-        title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
-        subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219.",
-        caption_align = "left",
-        allow_export = FALSE
-      )%>% highcharter::hc_add_theme(naccho.viz::basic)
+      # Create the Highchart with square markers
+      hc <- highcharter::hchart(
+        data,
+        type = "item",
+        highcharter::hcaes(
+          y = value,
+          label = description,
+          name = description
+        ),
+        layout = "vertical",
+        showInLegend = TRUE
+      ) %>%
+        highcharter::hc_add_dependency("modules/accessibility.js") %>%
+        highcharter::hc_plotOptions(
+          series = list(
+            item = list(
+              rows = 2  # Specify two rows for the icons
+            ),
+            marker = list(
+              symbol = "square",  # Use square markers
+              lineWidth = 1
+              # ,
+              # lineColor = "#000"  # Optional: Add border to squares
+            )
+          ),
+          accessibility = list(
+            enabled = TRUE,
+            description = "Chart showing involvement in policy activities",
+            keyboardNavigation = list(
+              enabled = TRUE
+            )
+          )
+        ) %>%
+        highcharter::hc_colors(
+          colors = c("#AB6143", "#ddd")  # Colors for the series
+        ) %>%
+        highcharter::hc_chart(
+          inverted = TRUE
+        ) %>%
+        highcharter::hc_title(
+          text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
+          margin = 40,
+          widthAdjust = -60
+        ) %>%
+        highcharter::hc_subtitle(
+          text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219."
+        ) %>%
+        # highcharter::hc_caption(
+        #   text = "<span style='color:gray;'>Source: Example Data</span>",
+        #   useHTML = TRUE,
+        #   margin = 20,
+        #   align = "left"
+        # ) %>%
+        highcharter::hc_legend(
+          enabled = TRUE,
+          reversed = TRUE,
+          layout = "horizontal",
+          align = "center",
+          verticalAlign = "bottom",
+          itemMarginBottom = 3,
+          itemMarginTop = 3,
+          margin = 22
+          # ,
+          # title = list(
+          #   text = "Legend"
+          # )
+        ) %>%
+        highcharter::hc_tooltip(
+          pointFormat = "{point.percent:.0f}% of LHDs were {point.description_tt} <br> related to COVID\u221219 in 2022",
+          useHTML = TRUE
+        ) %>%
+        highcharter::hc_exporting(
+          enabled = FALSE
+        )  %>%
+        highcharter::hc_add_theme(naccho.viz::basic) %>%
+        highcharter::hc_plotOptions(
+          series = list(
+            item = list(
+              rows = 2  # Explicitly set rows
+            )
+          )
+        )
+
+      hc
+
+      # naccho.viz::create_icon_item(
+      #   data = data,
+      #   y_variable = "value",
+      #   item_group = "description",
+      #   legend_enable = TRUE,
+      #   tooltip = "{point.percent:.0f}\u0025 of LHDs were {point.description_tt} <br> related to COVID\u221219 in 2022",
+      #   color_one = naccho.viz::terracotta,
+      #   color_two = "#ddd",
+      #   title_text = "<span style='color:#AB6143;font-weight:bold;'>Over 8 in ten LHDs</span> were involved in policy activities addressing COVID\u221219 emergency preparedness/response and infectious disease.",
+      #   subtitle_text = "Just six in 10 were involved in these same kinds of policy areas not related to COVID\u221219.",
+      #   caption_align = "left",
+      #   allow_export = FALSE
+      # )
+
+
+
     })
 
 
@@ -747,7 +836,7 @@ mod_key_findings_server <- function(id){
 
 
       # Build the chart
-      highchart() %>%
+      highcharter::highchart() %>%
         highcharter::hc_chart(type = "pie") %>%
         # Add the first pie chart (2008)
         highcharter::hc_add_series(
@@ -798,8 +887,8 @@ mod_key_findings_server <- function(id){
         # Add year labels in the center of each pie
         highcharter::hc_add_series(
           data = list(
-            list(name = "2008", y = 0, x = 10),  # Year label for 2008
-            list(name = "2022", y = 0, x = 20)   # Year label for 2022
+            list(name = "2008", y = 100, x = 10),  # Year label for 2008
+            list(name = "2022", y = -100, x = 20)   # Year label for 2022
           ),
           type = "scatter",
           marker = list(enabled = FALSE),  # Disable markers

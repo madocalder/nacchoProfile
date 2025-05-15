@@ -269,18 +269,19 @@ mod_services_server <- function(id) {
       selected_view <- input$view
       selected_filter <- input$filter
 
-      if (topic == "Reduced/Expanded Services" && selected_view == "Butterfly Graph") {
+      if (topic == "Reduced/Expanded Services") {
         updateSelectInput(
           session, "filter",
           choices = landscape_filters[1]
         )
       }
-      # else {
-      #   updateSelectInput(
-      #     session, "filter",
-      #     choices = landscape_filters
-      #   )
-      # }
+      else {
+        updateSelectInput(
+          session, "filter",
+          choices = landscape_filters,
+          selected = selected_filter
+        )
+      }
     })
 
     # Dynamically switch between single-select and multi-select
@@ -521,7 +522,7 @@ mod_services_server <- function(id) {
         dplyr::summarize(Responses = sum(Responses, na.rm = TRUE)) %>%
         dplyr::ungroup()
 
-      set_column(data,
+     bar_chart <- set_column(data,
                  y_label = filter_meta()$y_label,
                  y_format = filter_meta()$y_format,
                  data_label = filter_meta()$data_label) %>%
@@ -533,8 +534,120 @@ mod_services_server <- function(id) {
           colors = colors(),
           theme = naccho.viz::basic,
           tooltip = filter_meta()$tooltip
-        )
+        )%>%
+        viz_export()
+
+     if (services ==  "Epidemiology and Surveillance") {
+       bar_chart <- bar_chart %>%
+         highcharter::hc_xAxis(
+           labels = list(
+             rotation = -45,
+             overflow = "allow"
+           )
+         )
+     }
+
+     bar_chart
     })
+
+
+    proxy_bar <- highcharter::highchartProxy(ns("figure_bar"))
+
+    observeEvent(list(input$topic, input$filter, input$services), {
+      req(input$topic, input$filter, input$services, input$view == "Bar Graph")
+
+      req(input$topic, input$filter, input$services)
+      req(filter_meta())
+
+
+
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      topic <- input$topic
+      services <- input$services
+      filtering <- input$filter
+
+      data <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic,
+          Answer == "checked"
+        ) %>%
+        dplyr::mutate(category = service_type) %>%
+        dplyr::group_by(Group) %>%
+        dplyr::mutate(x = seq_along(category) - 1) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(group_tt = dplyr::case_when(
+          group != "All LHDs" & group != "censusregion" ~ tolower(group),
+          group == "censusregion" ~ paste0(tolower(group), "ern"),
+          TRUE ~ "all"
+        ),
+        category_tt = dplyr::case_when(service_type == "Air Polution" ~ "services to address air polution",
+                                       service_type == "COVID-19 Adult Immunizations" ~ "COVID-19 adult immunizations",
+                                       service_type == "COVID-19 Child Immunizations" ~ "COVID-19 child immunizations",
+                                       service_type == "BMI Screening" ~ "BMI screening",
+                                       service_type == "HIV/AIDs Screening" ~ "HIV/AIDs screening",
+                                       service_type == "Other STDs Screening"   ~ "other STD screening" ,
+                                       service_type == "HIV/AIDs Treatment"   ~ "HIV/AIDs treatment" ,
+                                       service_type ==  "Other STD Treatment"   ~  "other STD treatment" ,
+                                       service_type == "EPSDT" ~ "early and periodic screening, diagnostic and treatment (EPSDT)",
+                                       service_type == "WIC" ~ "WIC",
+                                       service_type == "Behavioral Risk Factors" ~ "behavioral risk factor surveillance services",
+                                       service_type == "Chronic Disease"  ~ "chronic disease surveillance services",
+                                       service_type == "Communicable/Infectious Disease "  ~ "communicable/infectious disease surveillance services",
+                                       service_type == "Maternal and Child Health" ~ "maternal and child health surveillance services",
+                                       service_type == "Mental Illness" ~ "mental illness prevention activities",
+                                       service_type == "Nutrition" ~ "nutrition services",
+                                       service_type == "Opioids" ~ "opioid prevention activities",
+                                       service_type == "Injury" ~ "injury prevention activities",
+                                       service_type == "Physical Activity" ~ "physical activity services",
+                                       service_type == "Substance Abuse Other Than Opioids" ~ "substance abuse (other than opioids) prevention activities",
+                                       service_type == "Tobacco" ~ "tobacco prevention activities",
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type != "Lead Inspections"  ~  paste(tolower(service_type), "regulation, inspection, and/or licensing activities"),
+                                       service_classification ==  "Regulation, Inspection, Licensing" & service_type == "Lead Inspections"  ~  "lead inspection activities",
+                                       service_type == "Hazmat Response" ~ "hazmat response services",
+                                       service_type == "Indoor Air Quality" ~ "indoor air quality control/improvement services",
+                                       service_type == "Noise Pollution"  ~ "noise polution control/improvement services",
+                                       service_type == "Radiation Control"   ~ "radiation control services",
+                                       service_type ==  "Vector Control"    ~ "vector control services",
+                                       TRUE ~ tolower(service_type)
+
+        )
+        )
+
+      data_n <- services_data %>%
+        dplyr::filter(
+          service_classification %in% services,
+          filter == filtering,
+          service_provision == topic
+        ) %>%
+        dplyr::group_by(service_type) %>%
+        dplyr::summarize(Responses = sum(Responses, na.rm = TRUE)) %>%
+        dplyr::ungroup()
+
+      proxy_bar %>%
+        highcharter::hcpxy_update(data = data)
+
+      if (services ==  "Epidemiology and Surveillance") {
+        proxy_bar %>%
+          highcharter::hcpxy_update(
+            xAxis = list(
+            labels = list(
+              rotation = -45,
+              overflow = "allow"
+            )
+            )
+          )
+      }
+
+
+
+
+    })
+
 
     output$figure_scatter <- highcharter::renderHighchart({
       req(updated_inputs())
@@ -550,7 +663,35 @@ mod_services_server <- function(id) {
 
       data <- scatter_data(set_filter = filtering, set_service = services)
 
-      scatter_plot(data, colors = colors())
+      scatter_plot(data, colors = colors())%>%
+        viz_export()
+
+    })
+
+    proxy_scatter <- highcharter::highchartProxy(ns("figure_scatter"))
+
+    observeEvent(list(input$topic, input$filter, input$services), {
+      req(input$topic, input$filter, input$services, input$view == "Scatter Plot")
+
+      # Debug messages for tracking input values
+      message("input$topic = ", input$topic)
+      message("input$filter = ", input$filter)
+      message("input$services = ", input$services)
+
+      # Extract inputs
+      services <- input$services
+      filtering <- input$filter
+
+      # Update the scatter plot
+      data <- scatter_data(set_filter = filtering, set_service = services)
+
+      # Send updated data to the scatter plot
+      proxy_scatter %>%
+        highcharter::hcpxy_update(
+        id = "figure_scatter", # The ID of the highchart proxy
+        data = data
+      )
+
     })
 
     output$figure_butterfly <- highcharter::renderHighchart({
@@ -595,7 +736,8 @@ mod_services_server <- function(id) {
           viz_subtitle = paste(unique(data$service_type)),
           tooltip = "<b> {series.name}: </b>{point.y:.0f}% <br>",
           theme = naccho.viz::butterfly
-        )
+        )%>%
+        viz_export()
     })
 
     # Event Handling =========================================================
