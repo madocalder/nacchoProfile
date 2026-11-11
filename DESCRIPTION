@@ -36,7 +36,6 @@ Imports:
     pkgload,
     purrr,
     reactable,
-    reactablefmtr,
     readxl,
     renv,
     rmarkdown,
@@ -64,6 +63,7 @@ Remotes:
     the-y-company/bsutils,
     the-y-company/flexlayout,
     github::madalder/custom.map,
+    kcuilla/reactablefmtr,
     yonicd/covrpage
 Config/testthat/edition: 3
 Encoding: UTF-8
