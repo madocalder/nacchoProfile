@@ -86,7 +86,7 @@ mod_topic_areas_ui <- function(id){
                                               width = "auto"
                    ),
 
-                   HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+                   uiOutput(ns("table_source"))
 
               )
             ),
@@ -280,6 +280,32 @@ mod_topic_areas_server <- function(id){
                       stringr::str_detect(filter, input$filter))
 
     })
+
+    output$table_source <- renderUI({
+
+      req(input$topic)
+
+      selected_source <- if (
+        input$topic %in% c(
+          "tech_use",
+          "comm_channels_1",
+          "comm_channels_2",
+          "comm_channels_3"
+        )
+      ) {
+        source_line_2022
+      } else {
+        source_line
+      }
+
+      HTML(
+        '<div style="font-size: calc(5px + .2em + .8vmin);">',
+        selected_source,
+        '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>'
+      )
+
+    })
+
     #table titles---------------------------------------------------------------
     output$table_title <- renderUI({
       # Ensure input$topic exists before using it
@@ -315,11 +341,26 @@ mod_topic_areas_server <- function(id){
 
 
 
-      # show_n(data$Responses)
+      # Select source based on topic
+      selected_source <- if (
+        topic %in% c(
+          "tech_use",
+          "comm_channels_1",
+          "comm_channels_2",
+          "comm_channels_3"
+        )
+      ) {
+        source_line_2022
+      } else {
+        source_line
+      }
 
-      caption <- dplyr::case_when(
-        topic %in% c("formal_part", "any_part") ~ paste0("<b> N: </b> 205 to 485 <br>", source_line),
-        TRUE ~ paste0("<b> N: </b>", show_n(data$Responses), "<br>", source_line)
+      # Bar graph caption
+      caption <- paste0(
+        "<b> N: </b>",
+        show_n(data$Responses),
+        "<br>",
+        selected_source
       )
 
 

@@ -21,101 +21,101 @@ mod_workforce_ui <- function(id) {
         left = NULL,
         center = div(
           class = "main-content",
-   #        style = "display: grid !important;
-   #  grid-template-rows: minmax(75px, 8%) minmax(40px, 4%) minmax(350px, 75vh);
-   #  grid-template-columns: minmax(40%, auto) minmax(40%, auto);
-   #  gap: clamp(3px, 2.5vh, 30px) 5%;
-   #  width: clamp(50vw, 100%, 95vw);
-   #  height: calc(100vh - 4rem);
-   #  padding-left: 4vw;
-   # /*  padding-bottom: 3em; */
-   #  padding-right: 1vw;
-   #  min-width: 70%;
-   #  max-width: 95%;
-   #  align-items: start;
-   #  /* justify-content: center !important;  */
-   #  /* padding-top: 1em; */
-   #  max-height: calc(100vh - 4rem);
-   #  /* margin-top: -10px; */;
-   #        ",
+          #        style = "display: grid !important;
+          #  grid-template-rows: minmax(75px, 8%) minmax(40px, 4%) minmax(350px, 75vh);
+          #  grid-template-columns: minmax(40%, auto) minmax(40%, auto);
+          #  gap: clamp(3px, 2.5vh, 30px) 5%;
+          #  width: clamp(50vw, 100%, 95vw);
+          #  height: calc(100vh - 4rem);
+          #  padding-left: 4vw;
+          # /*  padding-bottom: 3em; */
+          #  padding-right: 1vw;
+          #  min-width: 70%;
+          #  max-width: 95%;
+          #  align-items: start;
+          #  /* justify-content: center !important;  */
+          #  /* padding-top: 1em; */
+          #  max-height: calc(100vh - 4rem);
+          #  /* margin-top: -10px; */;
+          #        ",
 
           openMenu(),
 
-            div(
-              class = "topic-select",
-              # style = "max-height: 10vh",
-              # style = "grid-area: 1 / 1 / 2 / 2;
-              # justify-self: center;
-              # display: block;
-              # /* align-self: end; */
-              # /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
-              # br(),
-              selectInput(
-                inputId = ns("topic"),
-                strong("Topic"),
-                choices = workforce_topics,
-                selectize = TRUE,
-                selected = workforce_topics[[1]][3]
-              )
-            ),
-            div(
-              class = "filter-select",
+          div(
+            class = "topic-select",
+            # style = "max-height: 10vh",
+            # style = "grid-area: 1 / 1 / 2 / 2;
+            # justify-self: center;
+            # display: block;
+            # /* align-self: end; */
+            # /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
+            # br(),
+            selectInput(
+              inputId = ns("topic"),
+              strong("Topic"),
+              choices = workforce_topics,
+              selectize = TRUE,
+              selected = workforce_topics[[1]][3]
+            )
+          ),
+          div(
+            class = "filter-select",
 
 
-              selectInput(
-                inputId = ns("filter"),
-                strong("Filter"),
-                choices = landscape_filters,
-                selectize = TRUE
-              )
+            selectInput(
+              inputId = ns("filter"),
+              strong("Filter"),
+              choices = landscape_filters,
+              selectize = TRUE
+            )
 
-           ),
+          ),
 
-            div(
-              class = "viz-view",
-             #  style = "grid-column: 1 / -1; display: grid;
+          div(
+            class = "viz-view",
+            #  style = "grid-column: 1 / -1; display: grid;
 
-    #           style = "grid-area: 2 / 1 / 3 / 3;
-    # /* justify-self: center; */
-    # /* align-self: start; */
-    # display: unset !important;
-    # position: relative;
-    # background: linear-gradient(to right, #008A96 100%, transparent 0%)
-    #          no-repeat center / 100% 1.5px;
-    # padding-right: 30%;
-    # padding-left: 30%;
-    # justify-self: center;
-    # align-self: center;
-    # /* margin-bottom: clamp(5px, 3%, 30px); */
-    # margin-top: clamp(-2px, -2.5%, -8px);",
+            #           style = "grid-area: 2 / 1 / 3 / 3;
+            # /* justify-self: center; */
+            # /* align-self: start; */
+            # display: unset !important;
+            # position: relative;
+            # background: linear-gradient(to right, #008A96 100%, transparent 0%)
+            #          no-repeat center / 100% 1.5px;
+            # padding-right: 30%;
+            # padding-left: 30%;
+            # justify-self: center;
+            # align-self: center;
+            # /* margin-bottom: clamp(5px, 3%, 30px); */
+            # margin-top: clamp(-2px, -2.5%, -8px);",
 
-              shinyWidgets::radioGroupButtons(
-                inputId = ns("view"),
-                "",
-                choiceNames = list(
-                  HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
-                  HTML('<i class="fas fa-chart-line"></i>'),    # Line Graph icon
-                  HTML('<i class="fas fa-table"></i>')          # Table icon
-                ),
-                choiceValues = c("Bar Graph", "Line Graph", "Table"),
-                selected = "Table",
-                # size = "lg", # Optional: Adjust button size
-                direction = "horizontal" # Ensure buttons are in a single row
-              )
+            shinyWidgets::radioGroupButtons(
+              inputId = ns("view"),
+              "",
+              choiceNames = list(
+                HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
+                HTML('<i class="fas fa-chart-line"></i>'),    # Line Graph icon
+                HTML('<i class="fas fa-table"></i>')          # Table icon
+              ),
+              choiceValues = c("Bar Graph", "Line Graph", "Table"),
+              selected = "Table",
+              # size = "lg", # Optional: Adjust button size
+              direction = "horizontal" # Ensure buttons are in a single row
+            )
 
           ),
           # Visualization content area
           div(
             class = "viz-content",
-    #       style = "grid-area: 3 / 1 / 3 / 3;
-    # justify-self: center;
-    # align-self: start;
-    # overflow-y: visible;
-    # overflow-x: clip;
-    # width: clamp(50vw, 100%, 90vw);
-    # height: clamp(50vh, 100%, 70vh);
-    # padding-bottom: 1em;
-    # /* margin-top: 1%; */",
+            #       style = "grid-area: 3 / 1 / 3 / 3;
+            # justify-self: center;
+            # align-self: start;
+            # overflow-y: visible;
+            # overflow-x: clip;
+            # width: clamp(50vw, 100%, 90vw);
+            # height: clamp(50vh, 100%, 70vh);
+            # padding-bottom: 1em;
+            # /* margin-top: 1%; */",
 
 
 
@@ -130,14 +130,14 @@ mod_workforce_ui <- function(id) {
 
             ),
 
-          conditionalPanel(
-            condition =paste0('input[\'', ns('view'), '\'] != \'Table\'
+            conditionalPanel(
+              condition =paste0('input[\'', ns('view'), '\'] != \'Table\'
                                 && input[\'', ns('view'), '\'] != \'Line Graph\'
                                 && input[\'', ns('view'), '\'] == \'Bar Graph\'
                                 && input[\'', ns('topic'), '\'] == \'jobs_total\''),
 
-            highcharter::highchartOutput(ns("butterfly"), height = "100%"),
-            style = "height: 100%"
+              highcharter::highchartOutput(ns("butterfly"), height = "100%"),
+              style = "height: 100%"
             ),
 
             conditionalPanel(
@@ -155,19 +155,19 @@ mod_workforce_ui <- function(id) {
               div( class = "table-grid",
 
 
-                div(class = "table-title-grid",
+                   div(class = "table-title-grid",
 
 
-                uiOutput(ns("table_title")),
-                csvDownloadButton(ns("data_table"), filename = "workforceNACCHO.csv")
-                ),
+                       uiOutput(ns("table_title")),
+                       csvDownloadButton(ns("data_table"), filename = "workforceNACCHO.csv")
+                   ),
 
-                reactable::reactableOutput(ns("data_table"),
-                                           height = "100%",
-                                           width = "auto"
-                                           ),
+                   reactable::reactableOutput(ns("data_table"),
+                                              height = "100%",
+                                              width = "auto"
+                   ),
 
-                HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+                   HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
 
               )
             )
@@ -179,22 +179,22 @@ mod_workforce_ui <- function(id) {
             class = "row color-block-header",
 
             # uiOutput(ns("class_icon_container")),
-           conditionalPanel(condition = paste0('input[\'', ns('topic'), '\'] == \'a\'
+            conditionalPanel(condition = paste0('input[\'', ns('topic'), '\'] == \'a\'
                                 | input[\'', ns('topic'), '\'] == \'b\''),
 
-                              class = "col hover-text-side",
-                              align = "center",
-                              br(),
-                              actionLink(
-                                ns("get_class"),
-                                "",
-                                icon = tags$i(class = "fa-light fa-filter",
-                                              style = "font-size: calc(28px + .2em); text-align: center;"),
-                                class = "link-no-underline action-link-2"
-                              ),
-                              span(class = "hover-text-content-side", "Select Occupation Classification")
+                             class = "col hover-text-side",
+                             align = "center",
+                             br(),
+                             actionLink(
+                               ns("get_class"),
+                               "",
+                               icon = tags$i(class = "fa-light fa-filter",
+                                             style = "font-size: calc(28px + .2em); text-align: center;"),
+                               class = "link-no-underline action-link-2"
+                             ),
+                             span(class = "hover-text-content-side", "Select Occupation Classification")
 
-                            ),
+            ),
             div(
               class = "col hover-text-side",
               align = "center",
@@ -240,9 +240,9 @@ mod_workforce_ui <- function(id) {
 
             shinyjs::hidden(div(id = ns("toggle_get_class"),
                                 class = "context-content",
-              uiOutput(ns("show_class_input"))
-              )
-              ),
+                                uiOutput(ns("show_class_input"))
+            )
+            ),
 
             shinyjs::hidden(div(id = ns("toggle_takeaway"),
                                 class = "context-content",
@@ -323,8 +323,19 @@ mod_workforce_server <- function(id) {
 
 
       # Define views based on the topic
-      if (topic %in% c("a", "b")) {
+      if (topic == "jobsgoneany") {
+
         shinyWidgets::updateRadioGroupButtons(
+          session, "view",
+          choiceNames = list(
+            HTML('<i class="fas fa-chart-line"></i>')
+          ),
+          choiceValues = "Line Graph",
+          selected = "Line Graph"
+        )
+
+      } else if (topic %in% c("a", "b")) {
+          shinyWidgets::updateRadioGroupButtons(
           session, "view",
           choiceNames = list(
             HTML('<i class="fas fa-chart-simple"></i>'),  # Bar Graph icon
@@ -393,17 +404,17 @@ mod_workforce_server <- function(id) {
       selected_view <- input$view
       selected_filter <- unlist(input$filter)
 
-print(selected_filter)
+      print(selected_filter)
 
       if (input$topic %in% c("c5q37", "c5q36", "fte_bypop")) {
         updateSelectInput(session, "filter",
                           choices = c(landscape_filters[1], landscape_filters[4]),
                           selected = dplyr::case_when(selected_filter == "All LHDs" ~ landscape_filters[1],
-                                                       selected_filter == "c0popcat3" ~ landscape_filters[4],
+                                                      selected_filter == "c0popcat3" ~ landscape_filters[4],
                                                       TRUE ~ landscape_filters[1]))
 
 
-      } else if (input$topic %in% c("FTE_numcat", "employee_numcat", "employee_bypop")) {
+      } else if (input$topic %in% c("FTE_numcat", "employee_numcat", "employee_bypop", "jobsgoneany")) {
 
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1])
@@ -476,8 +487,8 @@ print(selected_filter)
     })
 
     # Generalized data processing for tables
-   table_data <- reactive({
-     # req(updated_inputs())
+    table_data <- reactive({
+      # req(updated_inputs())
 
       topic <- input$topic
       filtering <- input$filter
@@ -490,6 +501,18 @@ print(selected_filter)
       }
 
       table_data <- process_table_data(topic, filtering, classifications)
+
+      # Correct 2025 All LHDs mean employees across all table filters
+      if (topic == "c5q36" && "y_All LHDs" %in% names(table_data)) {
+        table_data <- table_data %>%
+          dplyr::mutate(
+            `y_All LHDs` = dplyr::if_else(
+              category == "Mean",
+              73,
+              `y_All LHDs`
+            )
+          )
+      }
 
 
       # table_data %>% dplyr::mutate(
@@ -508,7 +531,7 @@ print(selected_filter)
     # Generalized data processing for line charts
     process_line_chart_data <- reactive({
       req(input$topic %in% c("c5q37", "fte_bypop", "c5q36", "employee_bypop",
-                             "FTE_numcat", "employee_numcat"))
+                             "FTE_numcat", "employee_numcat", "jobsgoneany"))
 
       # req(updated_inputs())
       classifications <- if (!is.null(input$classifications) && length(input$classifications) > 0) {
@@ -551,22 +574,22 @@ print(selected_filter)
 
       bar_chart <- highcharter::highchart()
 
-        bar_chart <- set_column(data,
-                                y_label = filter_meta()$y_label,
-                                y_format = filter_meta()$y_format,
-                                data_label = filter_meta()$data_label) %>%
-          viz_options(
-            viz_title = filter_meta()$title,
-            viz_caption = paste("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
-            tooltip = filter_meta()$tooltip
-          ) %>%
-          viz_export()%>%
-          highcharter::hc_yAxis(
-            maxPadding = .09,
-            max = filter_meta()$y_max,
-            endOnTick = TRUE
-          )%>%
-          highcharter::hc_legend(reversed = TRUE)
+      bar_chart <- set_column(data,
+                              y_label = filter_meta()$y_label,
+                              y_format = filter_meta()$y_format,
+                              data_label = filter_meta()$data_label) %>%
+        viz_options(
+          viz_title = filter_meta()$title,
+          viz_caption = paste("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
+          tooltip = filter_meta()$tooltip
+        ) %>%
+        viz_export()%>%
+        highcharter::hc_yAxis(
+          maxPadding = .09,
+          max = filter_meta()$y_max,
+          endOnTick = TRUE
+        )%>%
+        highcharter::hc_legend(reversed = TRUE)
 
 
       bar_chart
@@ -598,23 +621,23 @@ print(selected_filter)
       if (input$filter != "All LHDs") {
 
         proxy_bar %>%
-        highcharter::hcpxy_add_series(
-          id = "filtered_bar_series",
-          name = input$filter,
-          data = data,
-          type = "column",  # Ensure this is a column chart (bar graph)
-          selected = TRUE
-        )
+          highcharter::hcpxy_add_series(
+            id = "filtered_bar_series",
+            name = input$filter,
+            data = data,
+            type = "column",  # Ensure this is a column chart (bar graph)
+            selected = TRUE
+          )
 
       } else {
-          proxy_bar %>%
-            highcharter::hcpxy_add_series(
-              id = "all_lhds_bar_series",
-              name = input$filter,
-              data = data,
-              type = "column",  # Ensure this is a column chart (bar graph)
-              selected = TRUE
-            )
+        proxy_bar %>%
+          highcharter::hcpxy_add_series(
+            id = "all_lhds_bar_series",
+            name = input$filter,
+            data = data,
+            type = "column",  # Ensure this is a column chart (bar graph)
+            selected = TRUE
+          )
       }
 
     })
@@ -683,47 +706,15 @@ print(selected_filter)
 
     # Line Graph Rendering
     output$line <- highcharter::renderHighchart({
-      # req(updated_inputs())
       req(filter_meta())
       req(input$view == "Line Graph")
 
       data <- process_line_chart_data() %>%
         dplyr::mutate(x_label = NA)
 
-      if (!(input$topic %in% c("FTE_numcat", "employee_numcat"))) {
+      if (!(input$topic %in% c("FTE_numcat", "employee_numcat",
+                               "c5q37", "fte_bypop", "c5q36", "employee_bypop", "jobsgoneany"))) {
 
-
-
-      naccho.viz::create_grouped_line(
-        data = data,
-        x_variable = "year",
-        x_group = "legend_label",
-        y_variable = "y",
-        x_label = NULL,
-        select_theme = naccho.viz::basic,
-        y_max = filter_meta()$y_max,
-        y_label = filter_meta()$y_label,
-        title_text = filter_meta()$title,
-        tooltip = filter_meta()$tooltip
-      )%>%
-        viz_options(viz_caption = paste(
-          "<b> N: </b>", show_n(data$Responses),
-          "<br>", source_line
-        ),
-        tooltip = filter_meta()$tooltip,
-        )%>%
-        highcharter::hc_title(text = filter_meta()$title)%>%
-        highcharter::hc_yAxis(
-          maxPadding = .09,
-          max = filter_meta()$y_max,
-          endOnTick = TRUE
-        )%>%
-        highcharter::hc_legend(reversed = TRUE)
-      # %>%
-      #   highcharter::hc_chart(style = list(minHeight = "00px"))
-      } else {
-        data$y <- as.numeric(data$y)
-        data$legend_label <- data$category
 
 
         naccho.viz::create_grouped_line(
@@ -749,24 +740,96 @@ print(selected_filter)
             maxPadding = .09,
             max = filter_meta()$y_max,
             endOnTick = TRUE
-          )
+          )%>%
+          highcharter::hc_legend(reversed = TRUE)
+        # %>%
+        #   highcharter::hc_chart(style = list(minHeight = "00px"))
+      } else {
+        # Build all six workforce line topics using the working executive-chart approach.
+        # Retain the prepared legend_label for multi-series topics.
+        if (!("legend_label" %in% names(data))) {
+          data$legend_label <- as.character(data$category)
+        }
+        data <- data %>%
+          dplyr::mutate(
+            year = as.numeric(as.character(year)),
+            y = as.numeric(as.character(y)),
+            legend_label = as.character(legend_label)
+          ) %>%
+          dplyr::arrange(year)
+
+        line_graph <- highcharter::highchart() %>%
+          highcharter::hc_chart(type = "line") %>%
+          highcharter::hc_xAxis(
+            type = "linear",
+            title = list(text = "Year"),
+            tickPositions = sort(unique(data$year))
+          ) %>%
+          highcharter::hc_yAxis(
+            title = list(text = filter_meta()$y_label),
+            min = 0,
+            max = NULL,
+            endOnTick = TRUE
+          ) %>%
+          highcharter::hc_plotOptions(
+            line = list(lineWidth = 4, marker = list(enabled = TRUE))
+          ) %>%
+          highcharter::hc_colors(naccho.viz::colors)
+
+        for (series_name in unique(data$legend_label)) {
+          group_data <- data %>%
+            dplyr::filter(legend_label == series_name) %>%
+            dplyr::arrange(year)
+
+          line_graph <- line_graph %>%
+            highcharter::hc_add_series(
+              name = series_name,
+              type = "line",
+              data = lapply(seq_len(nrow(group_data)), function(i) {
+                point <- as.list(group_data[i, , drop = FALSE])
+                point$x <- as.numeric(group_data$year[i])
+                point$y <- as.numeric(group_data$y[i])
+                point$name <- as.character(group_data$year[i])
+                point
+              })
+            )
+        }
+
+        line_graph %>%
+          viz_options(
+            viz_caption = paste(
+              "<b> N: </b>", show_n(data$Responses),
+              "<br>", source_line
+            ),
+            tooltip = filter_meta()$tooltip
+          ) %>%
+          highcharter::hc_title(text = filter_meta()$title) %>%
+          highcharter::hc_legend(reversed = TRUE) %>%
+          highcharter::hc_chart(style = list(minHeight = "50vh")) %>%
+          viz_export()
       }
     })
+
 
     # Proxy for the Line Chart
     proxy_line <- highcharter::highchartProxy(ns("line"))
 
     observe({
       req(filter_meta())
-      req(input$view == "Line Graph", input$topic)
+      req(
+        input$view == "Line Graph",
+        input$topic,
+        !(input$topic %in% c("FTE_numcat", "employee_numcat",
+                             "c5q37", "fte_bypop", "c5q36", "employee_bypop", "jobsgoneany"))
+      )
 
-     proxy_line %>%
-       highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
+      proxy_line %>%
+        highcharter::hcpxy_remove_series(id = "filtered_bar_series") %>%
         highcharter::hcpxy_remove_series(id = "all_lhds_bar_series") %>%
         highcharter::hcpxy_remove_series(id = "butterfly_series") %>%
-       highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
-       highcharter::hcpxy_remove_series(id = "all_lhds_line_series") %>%
-       highcharter::hcpxy_remove_series(id = "all_lhds_line_series_single")
+        highcharter::hcpxy_remove_series(id = "filtered_line_series") %>%
+        highcharter::hcpxy_remove_series(id = "all_lhds_line_series") %>%
+        highcharter::hcpxy_remove_series(id = "all_lhds_line_series_single")
 
       data <- process_line_chart_data() %>%
         dplyr::mutate(x_label = NA)
@@ -816,8 +879,6 @@ print(selected_filter)
     })
 
 
-
-
     # Table Rendering
     output$data_table <- reactable::renderReactable({
       # req(updated_inputs())
@@ -848,16 +909,16 @@ print(selected_filter)
     })
 
     # Show Occupation Classifications
-observe({
-    output$show_class_input <- renderUI({
+    observe({
+      output$show_class_input <- renderUI({
 
-      if(input$filter != "All LHDs" && input$view != "Table") {
+        if(input$filter != "All LHDs" && input$view != "Table") {
 
-        # div(
-        #   p(htmltools::HTML(
-        #     "<b>Select an Occupation Classification:</b> <br>")),
-        #
-        #   # radioButtons(
+          # div(
+          #   p(htmltools::HTML(
+          #     "<b>Select an Occupation Classification:</b> <br>")),
+          #
+          #   # radioButtons(
           #   inputId = ns("classifications"),
           #   label = "",
           #   choices = workforce_classifications,  # List of services
@@ -866,19 +927,19 @@ observe({
 
 
           selectInput(inputId = ns("classifications"),
-                             label = "Select an Occupation Classification:",
-                             choices =  workforce_classifications,
-                             multiple = FALSE,
-                             selected =  workforce_classifications[1],
-                            selectize = TRUE)
-        # )
+                      label = "Select an Occupation Classification:",
+                      choices =  workforce_classifications,
+                      multiple = FALSE,
+                      selected =  workforce_classifications[1],
+                      selectize = TRUE)
+          # )
 
 
-      } else {
+        } else {
 
-        # div(
-        #   p(htmltools::HTML(
-        #     "<b>Select Occupation Classification(s):</b> <br>")),
+          # div(
+          #   p(htmltools::HTML(
+          #     "<b>Select Occupation Classification(s):</b> <br>")),
 
           checkboxGroupInput(
             inputId = ns("classifications"),
@@ -897,13 +958,13 @@ observe({
           #                   selectize = FALSE)
 
 
-        # )
+          # )
 
-      }
+        }
 
 
+      })
     })
-})
 
     observeEvent(input$get_class, {
 
@@ -911,7 +972,7 @@ observe({
                              c("toggle_takeaway", "toggle_context",
                                "toggle_definitions", "toggle_get_class"))
 
-      })
+    })
 
 
 
@@ -937,8 +998,8 @@ observe({
     observeEvent(input$context, {
 
       toggle_sidebar_content("toggle_context",
-                               c("toggle_takeaway", "toggle_context",
-                                 "toggle_definitions", "toggle_get_class"))
+                             c("toggle_takeaway", "toggle_context",
+                               "toggle_definitions", "toggle_get_class"))
 
 
       output$show_context <- renderUI({
@@ -1016,8 +1077,8 @@ observe({
 
       if (input$topic %in% c("a", "b")) {
 
-      toggle_sidebar_content("toggle_get_class",
-                             c("toggle_takeaway", "toggle_context",
+        toggle_sidebar_content("toggle_get_class",
+                               c("toggle_takeaway", "toggle_context",
                                  "toggle_definitions", "toggle_get_class"))
 
         session$sendCustomMessage("triggerClick", ns("get_class"))
@@ -1030,16 +1091,15 @@ observe({
     })
 
     observe({
-      if (input$topic %in% c("FTE_numcat", "employee_numcat")) {
-        print("Debugging process_line_chart_data() output:")
-        print(head(process_line_chart_data()))
-      }
+      req(input$topic %in% c("FTE_numcat", "employee_numcat"))
 
-      if (input$topic %in% c("FTE_numcat", "employee_numcat")) {
-        print("Data passed to create_single_line:")
-        print(head(data))  # Check the structure and values
-      }
+      line_data <- process_line_chart_data()
 
+      cat("\nTopic:", input$topic, "\n")
+      cat("Filter:", input$filter, "\n")
+      cat("Data passed to line chart:\n")
+
+      print(line_data)
     })
 
 

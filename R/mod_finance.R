@@ -311,11 +311,11 @@ mod_finance_server <- function(id){
       selected_filter <- input$filter
 
       if ( (selected_view == "Line Graph" &
-          topic %in% c("totexp_percap", "budget_changes")) |
-          (selected_view == "Bar Graph" &
-           topic == "exp_total_numcat") | topic == "rev_total_tree" |
-          topic == "exp_total_numcat" & selected_view == "Table"
-          ) {
+            topic %in% c("totexp_percap", "budget_changes")) |
+           (selected_view == "Bar Graph" &
+            topic == "exp_total_numcat") | topic == "rev_total_tree" |
+           topic == "exp_total_numcat" & selected_view == "Table"
+      ) {
 
         updateSelectInput(session, "filter",
                           choices = landscape_filters[1],
@@ -416,31 +416,110 @@ mod_finance_server <- function(id){
       # View(data)
 
 
-      naccho.viz::create_grouped_line(
-        data = data,
-        x_variable = "year",
-        x_group = "category",
-        y_variable = "y",
-        x_label = NULL,
-        select_theme = naccho.viz::basic,
-        y_max = filter_meta()$y_max,
-        y_label = filter_meta()$y_label,
-        title = filter_meta()$title,
-        tooltip = filter_meta()$tooltip
-      ) %>%
-        viz_options(viz_caption = paste(
-          "<b> N: </b>", show_n(data$Responses),
-          "<br>", source_line
-        ),
-        tooltip = filter_meta()$tooltip,
+      if (topic == "budget_changes") {
+
+        # Build the line series directly: the original grouped-line helper
+        # does not render this historical dataset reliably.
+        years <- sort(unique(as.numeric(as.character(data$year))))
+        categories <- unique(as.character(data$category))
+
+        chart <- highcharter::highchart() %>%
+          highcharter::hc_chart(type = "line") %>%
+          highcharter::hc_xAxis(
+            categories = as.character(years),
+            title = list(text = NULL)
+          ) %>%
+          highcharter::hc_yAxis(
+            title = list(text = filter_meta()$y_label),
+            maxPadding = .09,
+            max = filter_meta()$y_max,
+            endOnTick = TRUE
+          ) %>%
+          highcharter::hc_plotOptions(
+            line = list(marker = list(enabled = TRUE))
+          )
+
+        # Preserve original NACCHO palette and all point fields needed by
+        # metadata tooltip templates, including tt, one, and two.
+        palette <- c(naccho.viz::navy, naccho.viz::terracotta)
+
+        for (i in seq_along(categories)) {
+          category_name <- categories[[i]]
+          rows <- data[
+            as.character(data$category) == category_name, ,
+            drop = FALSE
+          ]
+          rows <- rows[
+            match(years, as.numeric(as.character(rows$year))), ,
+            drop = FALSE
+          ]
+
+          points <- lapply(seq_along(years), function(j) {
+            if (is.na(rows$year[j])) return(NULL)
+            point <- lapply(as.list(rows[j, , drop = FALSE]), function(v) {
+              if (is.factor(v)) as.character(v) else unname(v)
+            })
+            point$x <- j - 1L
+            point$y <- as.numeric(rows$y[j])
+            point$name <- as.character(years[j])
+            point
+          })
+
+          chart <- highcharter::hc_add_series(
+            chart,
+            name = category_name,
+            data = points,
+            type = "line",
+            color = palette[(i - 1L) %% length(palette) + 1L]
+          )
+        }
+
+        chart %>%
+          viz_options(
+            viz_caption = paste(
+              "<b> N: </b>", show_n(data$Responses),
+              "<br>", source_line
+            ),
+            tooltip = filter_meta()$tooltip,
+            theme = naccho.viz::basic
+          ) %>%
+          highcharter::hc_title(text = filter_meta()$title) %>%
+          highcharter::hc_tooltip(
+            useHTML = TRUE,
+            shared = FALSE,
+            headerFormat = "",
+            pointFormat = filter_meta()$tooltip
+          ) %>%
+          highcharter::hc_legend(reversed = TRUE)
+
+      } else {
+
+        naccho.viz::create_grouped_line(
+          data = data,
+          x_variable = "year",
+          x_group = "category",
+          y_variable = "y",
+          x_label = NULL,
+          select_theme = naccho.viz::basic,
+          y_max = filter_meta()$y_max,
+          y_label = filter_meta()$y_label,
+          title = filter_meta()$title,
+          tooltip = filter_meta()$tooltip
         ) %>%
-        highcharter::hc_title(text = filter_meta()$title)%>%
-        highcharter::hc_yAxis(
-          maxPadding = .09,
-          max = filter_meta()$y_max,
-          endOnTick = TRUE
-        )%>%
-        highcharter::hc_legend(reversed = TRUE)
+          viz_options(viz_caption = paste(
+            "<b> N: </b>", show_n(data$Responses),
+            "<br>", source_line
+          ),
+          tooltip = filter_meta()$tooltip
+          ) %>%
+          highcharter::hc_title(text = filter_meta()$title) %>%
+          highcharter::hc_yAxis(
+            maxPadding = .09,
+            max = filter_meta()$y_max,
+            endOnTick = TRUE
+          ) %>%
+          highcharter::hc_legend(reversed = TRUE)
+      }
       # %>%
       #   highcharter::hc_chart(style = list(minHeight = "00px"))
 
@@ -457,7 +536,7 @@ mod_finance_server <- function(id){
       req(!is.null(input$topic), !is.null(input$filter))
       req(filter_meta())
       req(input$view == "Line Graph")
-      req(input$topic %in% c("totexp_percap", "budget_changes"))
+      req(input$topic == "totexp_percap")
       req(input$filter == "All LHDs")
 
       topic <- input$topic
@@ -557,14 +636,14 @@ mod_finance_server <- function(id){
                               TRUE ~ paste0("The ",
                                             tolower(category),
                                             " total expenditures across all LHDs is ")
-                                                  )
+                            )
               )
 
 
           } else {
             data <- data %>%
               dplyr::mutate(x = dplyr::case_when(category == "Mean" ~ 0,
-                                                     TRUE ~ 1),
+                                                 TRUE ~ 1),
                             y = dplyr::case_when(
                               (y >= 10000000) ~ round_up(y, -5),
                               (9999999 > y & y >= 100000) ~ round_up(y, -4),
@@ -596,7 +675,7 @@ mod_finance_server <- function(id){
                                                 category == "$10,000,000 to $24,999,999" ~ "had total expenditures between $10,000,000 and $24,999,999.",
                                                 category == "$25,000,000 or more" ~  "had total expenditures equal to or greater than $25,000,000.",
                                                 TRUE ~ "did not report their total expenditures"
-                                                  )
+                          )
             )
 
         } else if (topic == "budget_changes") {
@@ -670,22 +749,22 @@ mod_finance_server <- function(id){
 
 
           } else {
-             data <- data %>%
-               dplyr::mutate( tt = dplyr::case_when(
-                 topic == "rev_percap" & filtering != "censusregion"
-                 ~ paste0("The ", tolower(category), " per capita revenue across ", tolower(group), " LHDs is "),
+            data <- data %>%
+              dplyr::mutate( tt = dplyr::case_when(
+                topic == "rev_percap" & filtering != "censusregion"
+                ~ paste0("The ", tolower(category), " per capita revenue across ", tolower(group), " LHDs is "),
 
-                 topic == "rev_percap" & filtering == "censusregion" ~
-                   paste0("The ", tolower(category)," per capita expenditures across ", tolower(group), "ern LHDs is "),
+                topic == "rev_percap" & filtering == "censusregion" ~
+                  paste0("The ", tolower(category)," per capita expenditures across ", tolower(group), "ern LHDs is "),
 
-               ))
+              ))
           }
 
         } else if (topic %in% c("exp_total_numcat")) {
 
           data <- return_survey_weighted_counts(topic, filtering)%>%
             dplyr::mutate(Responses = sum(Responses)) %>%
-              dplyr::mutate(x = as.numeric(factor(category, levels = unique(category))) - 1)
+            dplyr::mutate(x = as.numeric(factor(category, levels = unique(category))) - 1)
 
         } else if (topic == "budget_changes") {
 
@@ -792,8 +871,8 @@ mod_finance_server <- function(id){
 
       data <- process_bar_chart_data()
 
-#
-#       View(data)
+      #
+      #       View(data)
 
       if (input$filter != "All LHDs") {
 
@@ -971,8 +1050,8 @@ mod_finance_server <- function(id){
         data <- data %>%
           mutate(color = ifelse(!is.na(parent) & parent == "Overall", color_mapping[id], NA))
 
-#
-#         View(data)
+        #
+        #         View(data)
 
         # Create the grouped treemap with specified colors
         highcharter::highchart() %>%
@@ -1276,7 +1355,7 @@ mod_finance_server <- function(id){
           if (length(links) == 0) {
             paste("No relevant definitions.")
           } else {
-           links
+            links
           }
         )
       })

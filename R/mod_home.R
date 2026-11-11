@@ -16,7 +16,7 @@ mod_home_ui <- function(id){
       div(
         class = "home-content",
         openMenu(),
-        p("welcome to the", style = "font-size: 4vh; font-weight: 400 !important; margin-bottom: 1vh;"),
+        p("Welcome to the", style = "font-size: 4vh; font-weight: 400 !important; margin-bottom: 1vh;"),
         h1(HTML("NACCHO Profile <br> Study Dashboard"), style = "font-size: 7vh;
     text-transform: none !important;
     line-height: 7.5vh;
@@ -25,6 +25,25 @@ mod_home_ui <- function(id){
         # br(),
         # br(),
         # br(),
+
+        tags$style(HTML("
+  #cord .accordion-item,
+  #cord .accordion-header,
+  #cord .accordion-button {
+    border-radius: 0 !important;
+  }
+
+  #cord .accordion-item {
+    border: 0 !important;
+    border-bottom: 1px solid #008b99 !important;
+  }
+
+  #cord .accordion-button {
+    border-bottom: none !important;
+    box-shadow: none !important;
+  }
+")),
+
         bslib::accordion(
           id = "cord",
           open = FALSE,
@@ -50,29 +69,33 @@ mod_home_ui <- function(id){
           bslib::accordion_panel(
             title = h2("Methods"),
             value = "cord_methods",
-            "For the 2022 Profile Study, a total of 2,512 local health
+            "For the 2025 Profile Study, a total of 2,493 local health
                 departments were included in the study population. Rhode Island
                 was excluded from the study because the state health agency
                 operates on behalf of local public health and has no sub-state
                 units. All local health departments in the study population
                 received the Core questionnaire. A random sample of local
                 health departments also received one of the two sets of
-                supplemental questions. NACCHO administered the survey from June
-                through September 2022. Overall, 942 local health departments
-                responded, for a response rate of 38%. ",
-            tags$a(href="https://www.naccho.org/uploads/downloadable-resources/NACCHO-2022-Profile-Report.pdf#page=11",
-                   "For a full description of the methods, read our comprehensive report.",
+                supplemental questions. NACCHO administered the survey from May
+                through September 2025. Overall, 1,061 local health departments
+                responded, for a response rate of 43%. Survey weights are used to
+                generate nationally representative estimates. Note that some
+                estimates presented in this dashboard may differ slightly from
+                other publications due to differences in how R and Stata apply
+                survey weights.",
+            tags$a(href="https://www.naccho.org/resources/lhd-research/national-profile-of-local-health-departments",
+                   "For a full description of the study, read our comprehensive report.",
                    style = "text-decoration: underline !important;")
           ),
 
           bslib::accordion_panel(
             title = h2("Access the Data"),
             value = "cord_access",
-            "Deidentified data from the 2022 Profile Study will be made
+            "Deidentified data from the 2025 Profile Study will be made
                 publicly available through ICSPR's data repository in late
-                2024. For access to prior years' Profile data and data use
+                2027. For access to prior years' Profile data and data use
                 policies for Profile data, please visit",
-            tags$a(href="https://url.us.m.mimecastprotect.com/s/kfg8C4xLl4IJ943rfxh9T4mqza?domain=icpsr.umich.edu",
+            tags$a(href="https://www.icpsr.umich.edu/sites/icpsr/search/studies?q=National+Profile+of+Local+Health+Departments&sort=score+desc",
                    "ICPSR's website.",
                    style = "text-decoration: underline !important;")
           ),
@@ -97,17 +120,12 @@ br(),
           bslib::accordion_panel(
             title = h2("Funding and Development Acknowledgments"),
             value = "cord_ack",
-            "The 2022 Profile Study was supported by grant
-                #6NU38OT000306-03-06 awarded to the National Association of
-                County and City Health Officials and funded by the Centers for
-                Disease Control and Prevention, as well as grant #78802 awarded
-                to the National Association of County and City Health Officials
-                and funded by the Robert Wood Johnson Foundation. The contents
-                of this publication are solely the responsibility of the authors
-                and do not necessarily represent the official views of the
-                Centers for Disease Control and Prevention, the U.S. Department
-                of Health and Human Services, or the Robert Wood Johnson
-                Foundation.",
+            "This project is supported by the Centers for Disease Control
+            and Prevention of the U.S. Department of Health and Human Services (HHS)
+            as part of a financial assistance award totaling $415,000 with
+            100 percent funded by CDC/HHS. The contents are those of the
+            author(s) and do not necessarily represent the official views of,
+            nor an endorsement, by CDC/HHS, or the U.S. Government.",
             br(),
             br(),
 
@@ -128,7 +146,7 @@ br(),
           bslib::accordion_panel(
             title = h2("Contact and Questions"),
             value = "cord_contact",
-            "For more information about the 2022 Profile Study, please
+            "For more information about the Profile Study, please
                 reach out to our Research team at",
             tags$a(href="mailto: profile@naccho.org",
                    "profile@naccho.org.",

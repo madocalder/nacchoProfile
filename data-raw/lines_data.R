@@ -23,20 +23,21 @@
 #' @keywords internal
 #' @name lines_data
 
-  lines_data <- utils::read.csv("data-raw/time_data.csv") %>%
-    dplyr::mutate(
-      category = dplyr::case_when(
-        category %in% c("Under 30", "30-39") ~ "Under 40",
-        TRUE ~ category
-      ),
-      subtitle = dplyr::case_when(
-        filter == "c0govcat" ~ "By Governance",
-        filter == "urbanrural2022" ~ "By Rurality",
-        filter == "c0popcat3" ~ "By LHD Size",
-        filter == "censusregion" ~ "By Region",
-        TRUE ~ ""
-      )
+# Load the CSV and keep only topics with 2025 data
+lines_data <- utils::read.csv("data-raw/time_data.csv") %>%
+  dplyr::mutate(
+    category = dplyr::case_when(
+      category %in% c("Under 30", "30-39") ~ "Under 40",
+      TRUE ~ category
+    ),
+    subtitle = dplyr::case_when(
+      filter == "c0govcat" ~ "By Governance",
+      filter == "urbanrural2022" ~ "By Rurality",
+      filter == "c0popcat3" ~ "By LHD Size",
+      filter == "censusregion" ~ "By Region",
+      TRUE ~ ""
     )
+  )
 
-  # Save the processed data for package use
-  usethis::use_data(lines_data, overwrite = TRUE)
+# Save all historical data
+usethis::use_data(lines_data, overwrite = TRUE)

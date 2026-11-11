@@ -733,7 +733,7 @@ scatter_plot <- function(data, colors) {
       useHTML = TRUE,
       # headerFormat = '<span style="font-size: 1.125em; font-weight: bold">{series.name}</span><br>',
       pointFormat = '<span style="font-size: 1em; line-height: 0.625em">{point.y}% of
-      all LHDS have expanded {point.name_tt} services and {point.x}% have
+      all LHDS have expanded <u>{point.name_tt}</u> services and {point.x}% have
       reduced them.</span>',
       style = list(
         fontFamily = "Heebo",
@@ -751,7 +751,7 @@ scatter_plot <- function(data, colors) {
                      }")
         ),
         dataLabels = list(
-          enabled = TRUE,
+          enabled = FALSE,
           allowOverlap = FALSE,
           crop = FALSE,
           overflow = "allow",
@@ -806,19 +806,19 @@ scatter_plot <- function(data, colors) {
     # ) %>%
     highcharter::hc_xAxis(
       min = 0,
-      max = 35,
+      max = 20,
       title = list(
         text = "% of LHDs reducing service",
         align = "high"
       ),
       plotLines = list(
         list(
-          value = 20,
+          value = 5,
           color = "gray",
           width = 2,
           dashStyle = "ShortDash",
           label = list(
-            text = "Average % reduced (20%)",
+            text = "Average % reduced (5%)",
             style = list(
               fontFamily = "Heebo",
               fontSize = "1em"
@@ -828,8 +828,8 @@ scatter_plot <- function(data, colors) {
       ),
       plotBands = list(
         list(
-          from = 20,
-          to = 35,
+          from = 5,
+          to = 20,
           color = "rgba(171, 97, 67, 0.2)",
           label = list(
             text = "",
@@ -840,18 +840,18 @@ scatter_plot <- function(data, colors) {
     ) %>%
     highcharter::hc_yAxis(
       min = 0,
-      max = 100,
+      max = 40,
       title = list(
         text = "% of LHDs expanding service"
       ),
       plotLines = list(
         list(
-          value = 27,
+          value = 19,
           color = "gray",
           width = 2,
           dashStyle = "ShortDash",
           label = list(
-            text = "Average % expanded (27%)",
+            text = "Average % expanded (19%)",
             style = list(
               fontFamily = "Heebo",
               fontSize = "1em"
@@ -862,7 +862,7 @@ scatter_plot <- function(data, colors) {
       plotBands = list(
         list(
           from = 0,
-          to = 27,
+          to = 19,
           color = "rgba(236, 229, 225, 0.3)",
           label = list(
             text = "",
@@ -870,7 +870,7 @@ scatter_plot <- function(data, colors) {
             align = "right")
         ),
         list(
-          from = 27,
+          from = 19,
           to = 100,
           color = "rgba(0, 138, 150, 0.2)",
           label = list(
@@ -978,7 +978,7 @@ scatter_plot <- function(data, colors) {
                   "In the bottom left quadrant, services are <span style='color: #B8B3AE; font-weight: bold;'>stable</span>. ",
                   "In the bottom right quadrant, services are <span style='color: #AB6143; font-weight: bold;'>shrinking</span>. ",
                   "</span> <br> <b style='font-size: 1em; line-height: 0.625em;'> N: </b>",
-                  "<span style='font-size: 1em; line-height: 0.625em;'> 365 to 895 </span><br>",
+                  "<span style='font-size: 1em; line-height: 0.625em;'> 459 to 1026 </span><br>",
                   "<span style='font-size: 1em; line-height: 0.625em;'>", source_line, "</span>"),
 
       useHTML = TRUE,
@@ -986,7 +986,7 @@ scatter_plot <- function(data, colors) {
       align = "center"
     ) %>%
     highcharter::hc_chart(spacingBottom = 0) %>%
-    highcharter::hc_legend(enabled = TRUE,
+    highcharter::hc_legend(enabled = FALSE,
                            align = "right",  # Align legend to the right of the chart
                            verticalAlign = "middle",
                            layout = "vertical",
@@ -1176,13 +1176,15 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
          data <- data %>%
            dplyr::mutate(
              category = dplyr::case_when(
-               stringr::str_detect(category, "Yes, Within") ~
+               category == "Yes, Within Last 3 Years" ~
                  "Completed CHA within last 3 years",
-               stringr::str_detect(category, "Yes, > 3") ~
+               category == "Yes, More Than 3 Years, Within 5 Years" ~
                  "Completed CHA within the last 3 to 5 years",
-               stringr::str_detect(category, "Yes, > 5") ~
+               category == "Yes, More Than 5 Years" ~
                  "Completed CHA more than 5 years ago",
-               TRUE ~ "Has not yet completed CHA"
+              category %in% c("No", "No, But Plan To Within Next Year") ~
+                 "Has not yet completed CHA",
+              TRUE ~ NA_character_
              )
            ) %>%
            dplyr::group_by(category, group) %>%
@@ -1229,13 +1231,19 @@ get_bar_data <- function(topic, filtering = "All LHDs") {
          data <- data %>%
            dplyr::mutate(
              category = dplyr::case_when(
-               stringr::str_detect(category, "Yes, Within") ~
+               category == "Yes, Within Last 3 Years" ~
                  "Completed CHIP within last 3 years",
-               stringr::str_detect(category, "Yes, > 3") ~
+
+               category == "Yes, More Than 3 Years, Within 5 Years" ~
                  "Completed CHIP within the last 3 to 5 years",
-               stringr::str_detect(category, "Yes, > 5") ~
+
+               category == "Yes, More Than 5 Years" ~
                  "Completed CHIP more than 5 years ago",
-               TRUE ~ "Has not yet completed CHIP"
+
+               category %in% c("No", "No, But Plan To Within Next Year") ~
+                 "Has not yet completed CHIP",
+
+               TRUE ~ NA_character_
              )
            ) %>%
            dplyr::group_by(category, group) %>%
@@ -1454,7 +1462,8 @@ process_classification_data <- function(topic, classifications, filtering) {
 
     data_all_class <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
-      dplyr::filter(category == "Yes", filter == "All LHDs") %>%
+      dplyr::filter(category == if (topic == "a") "Checked" else "Yes",
+                    filter == "All LHDs") %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(Question)]),
                     group = dplyr::case_when(group %in% c("13", "All Lhds") ~ "All LHDs", TRUE ~ group))
 
@@ -1500,7 +1509,8 @@ process_classification_data <- function(topic, classifications, filtering) {
 
     data_filtered <- selected_data %>%
       dplyr::filter(Question %in% selected_vars) %>%
-      dplyr::filter(category == "Yes", filter == filtering) %>%
+      dplyr::filter(category == if (topic == "a") "Checked" else "Yes",
+                    filter == filtering) %>%
       dplyr::mutate(category = stringr::str_to_title(q_remap[as.character(.data$Question)]),
                     y = round_up(Percentage, 0)) %>%
       dplyr::select(-Responses) %>%

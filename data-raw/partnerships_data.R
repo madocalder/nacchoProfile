@@ -171,11 +171,12 @@ case_when_mappings <- tibble(
 
 
 relevant_columns <- unique(case_when_mappings$base_variable)
+
 data <- master_data %>%
   select(matches(paste0("^(", paste(relevant_columns, collapse = "|"), ")([a-z]|work|work2|work3)?$")))
 
-
 vars <- colnames(data)
+
 
 #filtered data ----
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
@@ -204,7 +205,11 @@ for (filter in filters) {
         warning(paste("No data returned for q_label =", q_label, "and grps =", grps))
         return(tibble())
       }
-      result %>% mutate(filter = grps)
+      result %>%
+        mutate(
+          Answer = as.character(Answer),
+          filter = grps
+        )
     }
   )
 
@@ -217,6 +222,8 @@ collab_with_filter <- bind_rows(collab_filter_list)
 # Process Data Without Filters -----------------------------------
 collab_no_filter <- purrr::map_dfr(vars, function(q_label) {
   cat("Processing without filters for q_label:", q_label, "\n")
+
+
 
   # Call return_survey_weighted_counts with the current q_label
   result <- tryCatch(
@@ -234,7 +241,8 @@ collab_no_filter <- purrr::map_dfr(vars, function(q_label) {
   }
 
   # Return the result
-  result
+  result %>%
+    mutate(Answer = as.character(Answer))
 })
 
 collab_no_filter$filter <- "All LHDs"

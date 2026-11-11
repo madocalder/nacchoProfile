@@ -166,13 +166,28 @@ services_change_data <- services_change_data %>%
 # Categorize service provision changes
 services_change_data <- services_change_data %>%
   dplyr::mutate(service_provision = dplyr::case_when(
-    Answer == "n/a" ~ "Service Not Provided",
+    Answer == "N/A-did not provide service" ~ "Service Not Provided",
     Answer == "reduced services" ~ "Reduced Service",
-    Answer == "little/no change in service" ~ "No Change",
+    Answer == "little/no change in services" ~ "No Change",
     Answer == "expanded services" ~ "Expanded Service",
     Answer == "don't know" ~ "Unknown"
   )) %>%
   dplyr::filter(service_provision %in% c("Reduced Service", "No Change", "Expanded Service"))
+
+# Recalculate percentages excluding Don't Know and N/A --------------------
+
+services_change_data <- services_change_data %>%
+  dplyr::group_by(Question, group, filter) %>%
+  dplyr::mutate(
+    denominator = sum(N, na.rm = TRUE),
+    Percentage = (N / denominator) * 100,
+    y = Percentage
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(
+    Percentage = round_up(Percentage),
+    y = round_up(y)
+  )
 
 # # Summarize total counts for each service and group
 # services_change_data_n <- services_change_data %>%

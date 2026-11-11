@@ -2,7 +2,9 @@
 
 export("%>%")
 export(add_all_counts_long)
+export(add_all_counts_long_2022)
 export(add_weights)
+export(add_weights_2022)
 export(boxplot_data)
 export(card_thumbnail)
 export(class_data)
@@ -30,6 +32,7 @@ export(proxy_to_scatter_single)
 export(proxy_to_single)
 export(reorder_factor_levels)
 export(return_survey_weighted_counts)
+export(return_survey_weighted_counts_2022)
 export(return_survey_weighted_statistics)
 export(right_button)
 export(round_up)
@@ -52,54 +55,74 @@ import(reactable)
 import(reactablefmtr)
 import(shiny)
 import(tidyr)
-importFrom(dplyr,across)
-importFrom(dplyr,all_of)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,case_when)
-importFrom(dplyr,filter)
-importFrom(dplyr,group_by)
-importFrom(dplyr,group_by_at)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,n)
-importFrom(dplyr,rename)
-importFrom(dplyr,rename_all)
-importFrom(dplyr,select)
-importFrom(dplyr,starts_with)
-importFrom(dplyr,summarise)
-importFrom(dplyr,ungroup)
-importFrom(dplyr,where)
+importFrom(dplyr,
+  across,
+  all_of,
+  bind_rows,
+  case_when,
+  filter,
+  group_by,
+  group_by_at,
+  left_join,
+  mutate,
+  n,
+  rename,
+  rename_all,
+  select,
+  starts_with,
+  summarise,
+  ungroup,
+  where
+)
 importFrom(flexlayout,defineGlobal)
-importFrom(golem,activate_js)
-importFrom(golem,add_resource_path)
-importFrom(golem,bundle_resources)
-importFrom(golem,favicon)
-importFrom(golem,with_golem_options)
+importFrom(golem,
+  activate_js,
+  add_resource_path,
+  bundle_resources,
+  favicon,
+  with_golem_options
+)
 importFrom(haven,as_factor)
-importFrom(highcharter,highchartOutput)
-importFrom(highcharter,highchartProxy)
+importFrom(highcharter,
+  highchartOutput,
+  highchartProxy
+)
 importFrom(magrittr,"%>%")
-importFrom(purrr,map_dfr)
-importFrom(purrr,pmap_dfr)
-importFrom(reactable,reactableOutput)
-importFrom(reactable,renderReactable)
-importFrom(rlang,.data)
-importFrom(rlang,sym)
+importFrom(purrr,
+  map_dfr,
+  pmap_dfr
+)
+importFrom(reactable,
+  reactableOutput,
+  renderReactable
+)
+importFrom(rlang,
+  .data,
+  sym
+)
 importFrom(scales,percent_format)
-importFrom(shiny,NS)
-importFrom(shiny,moduleServer)
-importFrom(shiny,observeEvent)
-importFrom(shiny,req)
-importFrom(shiny,shinyApp)
-importFrom(shiny,tagList)
-importFrom(shinyWidgets,radioGroupButtons)
-importFrom(shinyWidgets,updateRadioGroupButtons)
-importFrom(srvyr,as_survey_design)
-importFrom(srvyr,survey_count)
-importFrom(srvyr,survey_mean)
-importFrom(srvyr,survey_quantile)
-importFrom(srvyr,survey_total)
-importFrom(tibble,as_tibble)
-importFrom(tibble,tibble)
+importFrom(shiny,
+  NS,
+  moduleServer,
+  observeEvent,
+  req,
+  shinyApp,
+  tagList
+)
+importFrom(shinyWidgets,
+  radioGroupButtons,
+  updateRadioGroupButtons
+)
+importFrom(srvyr,
+  as_survey_design,
+  survey_count,
+  survey_mean,
+  survey_quantile,
+  survey_total
+)
+importFrom(tibble,
+  as_tibble,
+  tibble
+)
 importFrom(tidyr,pivot_wider)
 importFrom(tippy,tippy)

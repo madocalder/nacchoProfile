@@ -162,21 +162,21 @@ app_ui <- function(request) {
         tags$a(
           href = "https://www.naccho.org/resources/lhd-research", "NACCHO Research", target="_blank"),
         HTML("&nbsp", " | ", "&nbsp"),
-        tags$a(
-          href = "https://www.naccho.org/uploads/downloadable-resources/NACCHO_2022_Profile_Report.pdf", "2022 Profile Report", target="_blank"),
-        HTML("&nbsp", " | ", "&nbsp"),
-        tags$a(
-          href = "mailto:info@naccho.org", "Contact Us"),
-        HTML("&nbsp", " | ", "&nbsp"),
         actionLink(
           inputId = "citation",
           "Citation"),
         HTML("&nbsp", " | ", "&nbsp"),
-          actionButton("linkedin",
-                       label="",
-                       class = "linkedin-button",
-                       icon = icon("linkedin"),
-                       onclick ="window.open('https://www.linkedin.com/showcase/naccho-research', '_blank')"),
+        actionButton("linkedin",
+                     label = "",
+                     class = "linkedin-button",
+                     icon = icon("linkedin"),
+                     onclick = "window.open('https://www.linkedin.com/showcase/naccho-research', '_blank')"),
+        actionButton("instagram",
+                     label = "",
+                     class = "instagram-button",
+                     icon = icon("instagram"),
+                     style = "background-color: transparent !important; color: white !important; border: none !important;",
+                     onclick = "window.open('https://www.instagram.com/nacchoalerts', '_blank')"),
         style = "font-size: 1.4em; font-weight: 700; color: white !important;")
       ),
 
@@ -189,9 +189,9 @@ app_ui <- function(request) {
         )
       ),
       bsutils::modalBody(
-        p("2022 National Profile of Local Health Departments. National
+        p("2025 National Profile of Local Health Departments. National
         Association of County and City Health Officials. Washington, DC.
-        (2024). Accessed from www.naccho.org/profile on [date]."
+        (2026). Accessed from www.naccho.org/profile on [date]."
         )
       )
     )
