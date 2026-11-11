@@ -26,10 +26,10 @@ mod_overview_ui <- function(id) {
         ),
         div(
           class = "key-findings-head",
-              align = "left",
-              h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
-              hr(class = "header-hr")
-            ),
+          align = "left",
+          h1(HTML("<br> About the Study Population: <br> Local Health Departments in the U.S.")),
+          hr(class = "header-hr")
+        ),
 
         div(
           class = "key-findings-content",
@@ -56,7 +56,7 @@ mod_overview_ui <- function(id) {
                           classified as large, they served more
                           than half of the U.S. population. </span> <br> <br>
                           <span style = 'font-size: 1.8vmin;'>
-                           <b> N: </b>2,512 <br>", source_line, "</span>")
+                           <b> N: </b>2,493 <br>", source_line, "</span>")
                     ),
                     div(
                       class = "col-sm-8",
@@ -81,18 +81,18 @@ mod_overview_ui <- function(id) {
                     div(
                       class = "col-sm-5 color-carousel-2",
                       HTML("<span style = 'font-size: 2.4vmin; font-weight: 600; color: #212F5B; line-height: 3vmin;'>
-                          Of the 2,512 LHDs included in the 2022
+                          Of the 2,493 LHDs included in the 2025
                           Profile study population, 1,928 were
-                          locally governed, 467 were units of the
-                          state health agency, and 117 have shared
-                          governance. In 30 states, all LHDs were locally
+                          locally governed, 463 were units of the
+                          state health agency, and 102 have shared
+                          governance. In 29 states, all LHDs were locally
                           governed. <br> <br> In most states with mixed governance,
                           units of the state health agency serve
                           most parts of the state, while a small
                           number of large metropolitan areas
                           have locally governed LHDs.</span> <br> <br>
                           <span style = 'font-size: 1.8vmin;'>
-                           <b> N: </b>2,512 <br>", source_line, "</span>")
+                           <b> N: </b>2,493 <br>", source_line, "</span>")
                     ),
                     div(
                       class = "col-sm-7",
@@ -132,7 +132,7 @@ mod_overview_ui <- function(id) {
                           <span style = 'font-size: 1.8vmin;'>
                           *County includes city-counties.
                           <br>
-                           <b> N: </b>2,512 <br>", source_line, "</span>")
+                           <b> N: </b>2,493 <br>", source_line, "</span>")
                     ),
                     div(
                       class = "col-sm-7",
@@ -169,20 +169,20 @@ mod_overview_server <- function(id){
 
       data <- data.frame(
         x = c(0, 1, 2, 0, 1, 2),
-        y = c(9, 37, 53, 62, 32, 6),
+        y = c(9, 37, 54, 61, 33, 6),
         category = c("Small", "Medium", "Large",
                      "Small", "Medium", "Large"),
         group = c("Population served by LHDs", "Population served by LHDs", "Population served by LHDs",
                   "All LHDs", "All LHDs", "All LHDs"),
         tt = c("the population served by LHDs are served by ", "the population served by LHDs are served by ",
-                  "the population served by LHDs are served by ",
+               "the population served by LHDs are served by ",
                "all LHDs are ", "all LHDs are ", "all LHDs are ")
       )
 
       data <- data %>%
-            dplyr::mutate(tooltip =
-                      paste0(y,"% of ", tt,
-                            tolower(category), " LHDs."))
+        dplyr::mutate(tooltip =
+                        paste0(y,"% of ", tt,
+                               tolower(category), " LHDs."))
 
 
       set_column(data,
@@ -203,80 +203,118 @@ mod_overview_server <- function(id){
 
 
     # map output --------------------------------------------------------------
-    # used for the map only, displayed in the UI using a conditional panel
+    # State governance: more than one observed governance category = Mixed.
     output$map <- highcharter::renderHighchart({
 
-      # data
-      join <- data.frame(
-        fips = c(33, 10, 44, 02, 11),
-        state_name = c("New Hampshire", "Deleware", "Rhode Island",
-                       "Alaska", "District of Columbia"),
-        grouping = c("Local", "State", "NA" , "Local", "State")
+      # State names and numeric FIPS codes used by custom.map
+      state_lookup <- data.frame(
+        c0state = c(state.abb, "DC"),
+        state_name = c(state.name, "District of Columbia"),
+        fips = c(
+          1, 2, 4, 5, 6, 8, 9, 10, 12, 13,
+          15, 16, 17, 18, 19, 20, 21, 22,
+          23, 24, 25, 26, 27, 28, 29, 30,
+          31, 32, 33, 34, 35, 36, 37, 38,
+          39, 40, 41, 42, 44, 45, 46, 47,
+          48, 49, 50, 51, 53, 54, 55, 56,
+          11
+        ),
+        stringsAsFactors = FALSE
       )
 
-      data <- master_data %>%
-        haven::as_factor() %>%
-        dplyr::distinct(fips, .keep_all = TRUE) %>%
-        dplyr::mutate(grouping = c0govcatn) %>%
-        dplyr::select(fips, state_name, grouping) %>%
-        dplyr::mutate(grouping = dplyr::case_when(
-          state_name %in% c("Wyoming", "Louisiana",
-                            "Oklahoma", "Tennessee", "Texas", "Alabama",
-                            "Virginia", "Maryland", "Pennsylvania", "Maine", "South Dakota") ~ "Mixed",
-          state_name == "Delaware" ~ "Shared",
-          state_name == "District of Columbia" ~ "State",
-          state_name == "Rhode Island" ~ "NA",
-          grouping == "shared" ~ "Shared",
-          grouping == "local" ~ "Local",
-          grouping == "state" ~ "State",
-          grouping == "mixed" ~ "Mixed",
-          TRUE ~ grouping))
+      # Use the actual assigned governance categories in the dataset.
+      # A state is Mixed when it contains two or more distinct categories.
+      state_governance <- master_data %>%
+        dplyr::transmute(
+          c0state = as.character(c0state),
+          govcat = tolower(trimws(as.character(c0govcat)))
+        ) %>%
+        dplyr::filter(
+          !is.na(c0state),
+          !is.na(govcat),
+          govcat %in% c("local", "state", "shared")
+        ) %>%
+        dplyr::group_by(c0state) %>%
+        dplyr::summarise(
+          grouping = if (dplyr::n_distinct(govcat) > 1L) {
+            "Mixed"
+          } else {
+            switch(
+              dplyr::first(govcat),
+              local = "Local",
+              state = "State",
+              shared = "Shared"
+            )
+          },
+          .groups = "drop"
+        )
 
-      data <-  dplyr::bind_rows(data, join)
+      # Include all states in the map; states with no observations are NA.
+      data <- state_lookup %>%
+        dplyr::left_join(state_governance, by = "c0state") %>%
+        dplyr::mutate(
+          grouping = dplyr::coalesce(grouping, "NA"),
+          value_tt = dplyr::if_else(
+            state_name == "Rhode Island",
+            paste(
+              "NA. Rhode Island was excluded from the study because",
+              "the state health agency operates on behalf of local",
+              "public health and has no sub-state units"
+            ),
+            dplyr::if_else(
+              grouping == "NA",
+              "not available in the dataset",
+              tolower(grouping)
+            )
+          )
+        )
 
-      data$value_tt <-  dplyr::case_when(data$state_name == "Rhode Island" ~ "NA. Rhode Island was excluded from the study because the state health agency operates on behalf of local public health and has no sub-state units",
-                      TRUE ~ paste(tolower(data$grouping)))
-
-
-      data$grouping <- factor(data$grouping, levels = c("Local", "State", "Shared", "Mixed", "NA"))
-
-      # Add the color mapping, explicitly defining colors for each category
       colors <- c(
         "Local" = naccho.viz::green,
         "State" = naccho.viz::navy,
         "Shared" = naccho.viz::terracotta,
         "Mixed" = naccho.viz::teal,
-        "NA" = naccho.viz::grey  # Define "NA" as grey
+        "NA" = naccho.viz::grey
       )
 
-      # View(data)
-      # uses a function from the naccho.viz package
-      naccho.viz::create_cat_map(
-        data = data,
-        fips_column = "fips",
-        selected_value = "grouping",
-        title_text = "Governance of LHDs",
-        subtitle_text = "",
-        tooltip = "In 2022, {point.state_name}'s governance structure was {point.value_tt}.",
-        caption_text = "",
-        accessible_desc = ""
-      )%>%
+      # Numeric category values make Highcharter's categorical color axis
+      # deterministic while retaining the human-readable grouping column.
+      categories <- names(colors)
+      data <- data %>%
+        dplyr::mutate(
+          map_value = as.integer(match(grouping, categories)) - 1L
+        )
+
+      highcharter::highchart(type = "map") %>%
+        custom.map::hc_add_custom_map_cat(
+          data = data,
+          value = "map_value",
+          joinBy = "fips",
+          mapType = "b",
+          type = "map",
+          name = "Governance",
+          borderColor = "#020202",
+          borderWidth = 0.25,
+          dataLabels = list(enabled = FALSE)
+        ) %>%
         highcharter::hc_colorAxis(
-          dataClasses = lapply(names(colors), function(grouping) {
+          dataClasses = lapply(seq_along(categories), function(i) {
             list(
-              name = grouping,
-              color = colors[[grouping]]
+              name = categories[i],
+              from = i - 1L,
+              to = i - 1L,
+              color = unname(colors[i])
             )
           })
-        )
-      # %>%
-      #   highcharter::hc_chart(
-      #     spacing = "1vmin 1vmin 1vmin 1vmin"
-      #   )
-      # %>%
-      #   highcharter::hc_legend(
-      #     margin = "2.5vmin"
-      #   )
+        ) %>%
+        highcharter::hc_title(text = "Governance of LHDs") %>%
+        highcharter::hc_tooltip(
+          pointFormat = paste0(
+            "In 2025, {point.state_name}'s governance structure ",
+            "was {point.value_tt}."
+          )
+        ) %>%
+        highcharter::hc_legend(enabled = TRUE)
 
     })
 
@@ -285,10 +323,10 @@ mod_overview_server <- function(id){
     output$cities <- highcharter::renderHighchart({
 
       data <- data.frame(
-        y = c(69, 21, 8, 3,
-              69, 26.7, 2.9, 1.4,
-              68, 12, 14, 6,
-              69, 7, 23, 1),
+        y = c(69, 20, 8, 3,
+              69, 26, 3, 1,
+              69, 12, 13, 6,
+              70, 7, 22, 1),
         category = c("All LHDs", "All LHDs", "All LHDs", "All LHDs",
                      "Small", "Small", "Small", "Small",
                      "Medium", "Medium", "Medium", "Medium",
@@ -323,18 +361,18 @@ mod_overview_server <- function(id){
           enabled = TRUE,
           overflow = "allow",
           format = '{point.y:.0f}%',
-        #   formatter = JS(
-        #     "
-        # function () {
-        #   if (this.y > 0 && this.y < 1) {
-        #     roundedValue = this.y.toFixed(1);
-        #   } else {
-        #     roundedValue = this.y.toFixed(0);
-        #   }
-        #   return roundedValue + '%';
-        # }
-        # "
-        #   ),
+          #   formatter = JS(
+          #     "
+          # function () {
+          #   if (this.y > 0 && this.y < 1) {
+          #     roundedValue = this.y.toFixed(1);
+          #   } else {
+          #     roundedValue = this.y.toFixed(0);
+          #   }
+          #   return roundedValue + '%';
+          # }
+          # "
+          #   ),
           overflow = TRUE,
           distance = 5,
           padding = 2,
@@ -391,8 +429,8 @@ mod_overview_server <- function(id){
               estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
               while still covering all local jurisdictions uniquely.
               NACCHO is in frequent contact and consultation with state and local
-              officials to update the denominator. There were 2,512 LHDs included
-              in the 2022 Profile study population.</p>"),
+              officials to update the denominator. There were 2,493 LHDs included
+              in the 2025 Profile study population.</p>"),
         easyClose = TRUE,
         footer = modalButton("Close")
       ))

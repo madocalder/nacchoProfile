@@ -468,7 +468,7 @@ mod_services_server <- function(id) {
           service_classification %in% services,
           filter == filtering,
           service_provision == topic,
-          Answer == "checked"
+          category %in% c("Checked", "1")
         ) %>%
         dplyr::mutate(category = service_type) %>%
         dplyr::group_by(Group) %>%
@@ -574,7 +574,7 @@ mod_services_server <- function(id) {
           service_classification %in% services,
           filter == filtering,
           service_provision == topic,
-          Answer == "checked"
+          category %in% c("Checked", "1")
         ) %>%
         dplyr::mutate(category = service_type) %>%
         dplyr::group_by(Group) %>%

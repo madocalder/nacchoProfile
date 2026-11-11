@@ -792,12 +792,15 @@ label:not(.material-switch label) {
 
 /*-------------------------------------------- footer and links in the footer */
 /* this changes the color of the links in the footer */
-.linkedin-button {
+.linkedin-button,
+.instagram-button,
+.facebook-button {
   background-color: transparent !important;
   font-size: 13px !important;
   color: white !important;
   border: none !important;
   padding: 0px !important;
+  margin: 0 2px !important;
 }
 
 

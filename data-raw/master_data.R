@@ -6,7 +6,7 @@ devtools::load_all()
 
 start_time <- Sys.time() # get start time
 
-master_data <- haven::read_dta("data-raw/Profile2022_dashboarddataset2.dta")
+master_data <- haven::read_dta("data-raw/Profile2025_dashboarddataset.dta")
 
 
 # rename factor labels ----------------------------------------------------
@@ -35,59 +35,12 @@ master_data$lboh <- haven::labelled(master_data$lboh, labels = c("None" = 0, "Ad
 
 
 
-# creating race and ethnicity variables --------------------------------------------------
-race <- master_data %>%
-  haven::as_factor() %>%
-  dplyr::select(tidyselect::starts_with("c4q27"), c4q28, nacchoid)
-
-# race$c4q28 <- dplyr::na_if(race$c4q28, "Prefer not to answer")
-
-race <- race %>%
-  dplyr::mutate(
-    # Assign a value to the race based on the checked categories
-    race = dplyr::case_when(
-      c4q27a == "checked" & c4q27b == "unchecked" & c4q27c == "unchecked" &
-        c4q27d == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" ~ "White",
-
-      c4q27b == "checked" & c4q27a == "unchecked" & c4q27c == "unchecked" &
-        c4q27d == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" ~ "Black or African American",
-
-      c4q27c == "checked" & c4q27a == "unchecked" & c4q27b == "unchecked" &
-        c4q27d == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" ~ "American Indian or Alaska Native",
-
-      c4q27d == "checked" & c4q27a == "unchecked" & c4q27b == "unchecked" &
-        c4q27c == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" ~ "Asian",
-
-      c4q27e == "checked" & c4q27a == "unchecked" & c4q27b == "unchecked" &
-        c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27f == "unchecked" ~ "Native Hawaiian or Other Pacific Islander",
-
-      c4q27f == "checked"  ~ "Mixed Identity or Other Race",
-
-      # Multiple races checked are classified as Mixed Identity/Other
-      (c4q27a == "checked" | c4q27b == "checked" | c4q27c == "checked" |
-         c4q27d == "checked" | c4q27e == "checked" | c4q27f == "checked") &
-        (c4q27a == "checked" & (c4q27b == "checked" | c4q27c == "checked" | c4q27d == "checked" |
-                                  c4q27e == "checked" | c4q27f == "checked")) ~ "Mixed Identity or Other Race",
-      c4q27g == "checked" & c4q28 == "Prefer not to answer" ~ NA,
-      TRUE ~ NA
-    ),
-    ethnicity = c4q28
-  )%>%
-  dplyr::select(nacchoid, race, ethnicity)
-
-
 # add fips code -----------------------------------------------------------
 fips <- usmap::fips_info() %>%
   dplyr::mutate(state_name = full,
                 c0state = abbr) %>%
   dplyr::select(c0state, fips, state_name) %>%
   dplyr::mutate(fips = as.numeric(fips))
-
-
-# join race and fips to master file ------------------------------------------------
-master_data <- dplyr::left_join(master_data, race, by = "nacchoid")
-master_data <- dplyr::left_join(master_data, fips, by = "c0state")
-
 
 
 # add employee by pop -----------------------------------------------------
@@ -222,11 +175,6 @@ master_data <- master_data %>%
                                     rev_percap >= 100 & rev_percap < 150 ~ "$100 to $150",
                                     rev_percap >= 150 ~ "$150 or more")) %>%
 
-  dplyr::mutate(tenure_numcat = dplyr::case_when(tenure < 2 ~ 1,
-                                                 tenure >= 2 & tenure < 6 ~ 2,
-                                                 tenure >= 6 & tenure < 11 ~ 3,
-                                                 tenure >= 11 ~ 4 )) %>%
-
   dplyr::mutate(exp_total_numcat = haven::as_factor(exp_total_numcat),
                 exp_percap_numcat = haven::as_factor(exp_percap_numcat),
                 rev_total_numcat = haven::as_factor(rev_total_numcat),
@@ -301,25 +249,6 @@ master_data$rev_percap_numcat <- haven::labelled(
   label = "Per capita revenue, by group, created by LJ"
 )
 
-master_data$tenure_numcat <- haven::labelled(
-  master_data$tenure_numcat,
-  labels = c(
-    "Less than 2 years" = 1,
-    "2 - 5 years" = 2,
-    "6 - 10 years" = 3,
-    "11 or more years" = 4
-  )
-)
-
-
-
-master_data <- master_data %>%
-  dplyr::mutate(spec_combined = case_when(
-    c4q502a == 1 | c4q502b == 1 | c4q502c == 1 ~ 1,
-    TRUE ~ 0
-  )) %>%
-  # Apply labels to the new variable
-  dplyr::mutate(spec_combined = haven::labelled(spec_combined, c("unchecked" = 0, "checked" = 1)))
 
 
 
@@ -355,9 +284,9 @@ master_data <- master_data %>%
   # ungroup() %>%
   # mutate(newc12q502 = haven::labelled(newc12q502, c("unchecked" = 0, "checked" = 1)))
 
-# Step 2: Join the result back to the original master_data
-master_data <- master_data %>%
-  left_join(newc12q502_per_id, by = "nacchoid")
+# # Step 2: Join the result back to the original master_data
+# master_data <- master_data %>%
+#  left_join(newc12q502_per_id, by = "nacchoid")
 
 
 # print elapsed time
@@ -369,21 +298,3 @@ print(end_time) # 6 seconds
 # save data ---------------------------------------------------------------
 usethis::use_data(master_data, overwrite = TRUE)
 devtools::document()
-
-
-
-# ONLY USE BELOW IF...
-# you want to display race categories differently
-# race <- race %>%
-#   dplyr::filter(c4q27g != "checked" & c4q28 != "Hispanic or Latino") %>%
-#   dplyr::mutate(white = dplyr::case_when(c4q27a == "checked" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "white",
-#                                          TRUE ~ "Other")) %>%
-#   dplyr::mutate(race = dplyr::case_when(white == "white" ~ "white",
-#                                         white == "Other" & c4q27c == "checked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "AIAN",
-#                                         white == "Other" & c4q27c == "unchecked" & c4q27d == "checked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Asian",
-#                                         white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "checked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Black or African American",
-#                                         white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "checked" & c4q27f == "unchecked" & c4q28 == "not Hispanic/Latino" ~ "Native Hawaiin or Pacific Islander",
-#                                         white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "checked" & c4q28 == "not Hispanic/Latino" ~ "Other",
-#                                         white == "Other" & c4q27c == "unchecked" & c4q27d == "unchecked" & c4q27b == "unchecked" & c4q27e == "unchecked" & c4q27f == "unchecked" & c4q28 == "Hispanic/Latino" ~ "Hispanic or Latino",
-#                                         TRUE ~ "Mixed Race/Ethnicity")) %>%
-#   dplyr::select(nacchoid, race, white)

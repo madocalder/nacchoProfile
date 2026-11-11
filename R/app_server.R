@@ -55,8 +55,8 @@ app_server <- function(input, output, session) {
               estimation purposes will always be smaller than the actual number of LHDs in the U.S.,
               while still covering all local jurisdictions uniquely.
               NACCHO is in frequent contact and consultation with state and local
-              officials to update the denominator. There were 2,512 LHDs included
-              in the 2022 Profile study population.</p>"),
+              officials to update the denominator. There were 2,493 LHDs included
+              in the 2025 Profile study population.</p>"),
         easyClose = TRUE,
         footer = modalButton("Close")
       ))

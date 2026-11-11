@@ -17,6 +17,16 @@
 #' @return tibble
 add_weights <- function(q_label, popcat = "c0popcat7") {
 
+  if (!q_label %in% names(master_data)) {
+    stop(paste("Variable not found:", q_label))
+  }
+
+  if (all(is.na(master_data[[q_label]]))) {
+    message(paste("Skipping", q_label,
+                  "- no responses collected in 2025"))
+    return(NULL)
+  }
+
     grps <- c(popcat, "core_denom")
 
     master_data %>%
@@ -41,6 +51,59 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
 
 }
 
+#' Calculate Weights - 2022
+#'
+#' @inheritParams add_weights
+#' @return tibble
+#' @export
+
+add_weights_2022 <- function(q_label, popcat = "c0popcat7") {
+
+  if (!q_label %in% names(master_data22)) {
+    stop(paste("Variable not found in 2022 data:", q_label))
+  }
+
+  if (all(is.na(master_data22[[q_label]]))) {
+    message(paste(
+      "Skipping", q_label,
+      "- no responses collected in 2022"
+    ))
+    return(NULL)
+  }
+
+  grps <- c(popcat, "core_denom")
+
+  master_data22 %>%
+    haven::as_factor() %>%
+    tibble::as_tibble() %>%
+    dplyr::group_by_at(grps) %>%
+    dplyr::summarise(
+      resp = sum(!is.na(.data[[q_label]]), na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(
+      core_denom_total = sum(.data$core_denom),
+      tot_resp = sum(.data$resp)
+    ) %>%
+    dplyr::mutate(
+      prop_lhd = .data$core_denom / .data$core_denom_total,
+      prop_lhd_resp = .data$resp / .data$tot_resp
+    ) %>%
+    dplyr::mutate(
+      weights = dplyr::if_else(
+        .data$prop_lhd_resp > 0,
+        .data$prop_lhd / .data$prop_lhd_resp,
+        NA_real_
+      ),
+      weights_static = dplyr::if_else(
+        .data$resp > 0,
+        .data$core_denom / .data$resp,
+        NA_real_
+      )
+    )
+}
+
+
 #' Weighted Counts
 #'
 #' @description Calculate weighted results for categorical questions.
@@ -62,6 +125,28 @@ add_weights <- function(q_label, popcat = "c0popcat7") {
 #'
 #' @return tibble
 return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popcat7", wtype = "weights") {
+
+  if (all(is.na(master_data[[q_label]]))) {
+    message(paste("Skipping", q_label,
+                  "- no responses collected in 2025"))
+
+    return(tibble::tibble(
+      Question = character(),
+      Group = character(),
+      Answer = character(),
+      NA.RM = logical(),
+      N = numeric(),
+      SE = numeric(),
+      Percentage = numeric(),
+      x = numeric(),
+      y = numeric(),
+      category = character(),
+      group = character(),
+      subtitle = character(),
+      x_label = character(),
+      Responses = numeric()
+    ))
+  }
 
   if (is.null(grps)) {
 
@@ -156,6 +241,190 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 }
 
 
+#' Weighted Counts - 2022
+#'
+#' @inheritParams return_survey_weighted_counts
+#' @return tibble
+#' @export
+return_survey_weighted_counts_2022 <- function(
+    q_label,
+    grps = NULL,
+    popcat = "c0popcat7",
+    wtype = "weights") {
+
+  # Check whether the variable exists in the 2022 dataset
+  if (!q_label %in% names(master_data22)) {
+    stop(paste("Variable", q_label, "not found in 2022 data"))
+  }
+
+  # Handle variables with no responses
+  if (all(is.na(master_data22[[q_label]]))) {
+    message(paste("Skipping", q_label,
+                  "- no responses available in 2022"))
+
+    return(tibble::tibble(
+      Question = character(),
+      Group = character(),
+      Answer = character(),
+      NA.RM = logical(),
+      N = numeric(),
+      SE = numeric(),
+      Percentage = numeric(),
+      x = numeric(),
+      y = numeric(),
+      category = character(),
+      group = character(),
+      subtitle = character(),
+      x_label = character(),
+      Responses = numeric()
+    ))
+  }
+
+  if (is.null(grps)) {
+
+    new_names <- c(
+      "Answer",
+      "NA.RM",
+      "N",
+      "SE",
+      "Percentage",
+      "Question",
+      "Group"
+    )
+
+    data <- master_data22 %>%
+      haven::as_factor() %>%
+      dplyr::left_join(
+        add_weights_2022(q_label, popcat = popcat),
+        by = c(popcat, "core_denom")
+      ) %>%
+      srvyr::as_survey_design(
+        strata = popcat,
+        weights = wtype
+      ) %>%
+      dplyr::filter(!is.na(.data[[q_label]])) %>%
+      srvyr::survey_count(
+        .data[[q_label]],
+        na.rm = TRUE
+      ) %>%
+      dplyr::mutate(
+        Percentage = (n / sum(n, na.rm = TRUE)) * 100
+      ) %>%
+      dplyr::mutate(
+        Question = q_label,
+        Group = "All LHDs"
+      ) %>%
+      dplyr::rename_all(~new_names) %>%
+      dplyr::select(
+        dplyr::all_of(c(
+          "Question", "Group", "Answer",
+          "NA.RM", "N", "SE", "Percentage"
+        ))
+      ) %>%
+      dplyr::mutate(
+        Answer = .data$Answer,
+        x = as.numeric(as.factor(Answer)) - 1,
+        y = round_up(Percentage),
+        category = sapply(Answer, custom_str_to_title),
+        group = Group,
+        subtitle = "All LHDs",
+        x_label = NA
+      )
+
+    add_responses <- master_data22 %>%
+      haven::as_factor() %>%
+      tibble::as_tibble() %>%
+      dplyr::group_by_at(q_label) %>%
+      dplyr::summarise(
+        Responses = sum(
+          !is.na(.data[[q_label]]),
+          na.rm = TRUE
+        ),
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(Answer = .data[[q_label]])
+
+    dplyr::left_join(
+      data,
+      add_responses,
+      by = "Answer"
+    )
+
+  } else {
+
+    new_names <- c(
+      "Group",
+      "Answer",
+      "NA.RM",
+      "N",
+      "SE",
+      "Percentage",
+      "Question"
+    )
+
+    data <- master_data22 %>%
+      haven::as_factor() %>%
+      dplyr::left_join(
+        add_weights_2022(q_label, popcat = popcat),
+        by = c(popcat, "core_denom")
+      ) %>%
+      srvyr::as_survey_design(
+        strata = popcat,
+        weights = wtype
+      ) %>%
+      dplyr::filter(!is.na(.data[[q_label]])) %>%
+      dplyr::group_by_at(grps) %>%
+      srvyr::survey_count(
+        .data[[q_label]],
+        na.rm = TRUE
+      ) %>%
+      dplyr::mutate(
+        Percentage = (n / sum(n, na.rm = TRUE)) * 100
+      ) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        Question = q_label
+      ) %>%
+      dplyr::rename_all(~new_names) %>%
+      dplyr::select(
+        "Question", "Group", "Answer",
+        "NA.RM", "N", "SE", "Percentage"
+      ) %>%
+      dplyr::mutate(
+        Answer = .data$Answer,
+        x = as.numeric(as.factor(Answer)) - 1,
+        y = round_up(Percentage),
+        category = sapply(Answer, custom_str_to_title),
+        group = sapply(Group, custom_str_to_title),
+        subtitle = paste0(
+          "By ",
+          names(landscape_filters[landscape_filters == grps])
+        ),
+        x_label = NA
+      )
+
+    add_responses <- master_data22 %>%
+      haven::as_factor() %>%
+      dplyr::group_by_at(c(q_label, grps)) %>%
+      dplyr::summarise(
+        Responses = sum(
+          !is.na(.data[[q_label]]),
+          na.rm = TRUE
+        ),
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(
+        Answer = .data[[q_label]],
+        Group = .data[[grps]]
+      )
+
+    dplyr::left_join(
+      data,
+      add_responses,
+      by = c("Answer", "Group")
+    )
+  }
+}
 
 
 
@@ -180,6 +449,16 @@ return_survey_weighted_counts <- function(q_label, grps = NULL, popcat = "c0popc
 #'
 #' @return tibble
 add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights") {
+
+  if (!q_label %in% names(master_data)) {
+    stop(paste("Variable not found:", q_label))
+  }
+
+  if (all(is.na(master_data[[q_label]]))) {
+    message(paste("Skipping", q_label,
+                  "- no responses collected in 2025"))
+    return(tibble::tibble())
+  }
 
   new_names <- c(
     "Answer",
@@ -220,6 +499,99 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
   tidyr::pivot_wider(data, names_from = group, values_from = c(y, Responses))
 }
 
+
+#' Weighted All LHD Counts Wide - 2022
+#'
+#' @description Calculate 2022 weighted categorical results
+#' for use in tables.
+#'
+#' @param q_label Question variable name
+#' @param popcat Population category variable
+#' @param wtype Weight variable
+#'
+#' @return tibble
+#' @export
+add_all_counts_long_2022 <- function(
+    q_label,
+    popcat = "c0popcat7",
+    wtype = "weights") {
+
+  if (!q_label %in% names(master_data22)) {
+    stop(paste("Variable not found in 2022 data:", q_label))
+  }
+
+  if (all(is.na(master_data22[[q_label]]))) {
+    message(paste(
+      "Skipping", q_label,
+      "- no responses collected in 2022"
+    ))
+    return(tibble::tibble())
+  }
+
+  new_names <- c(
+    "Answer",
+    "NA.RM",
+    "N",
+    "SE",
+    "Percentage",
+    "Group"
+  )
+
+  data <- master_data22 %>%
+    haven::as_factor() %>%
+    dplyr::left_join(
+      add_weights_2022(q_label, popcat = popcat),
+      by = c(popcat, "core_denom")
+    ) %>%
+    srvyr::as_survey_design(
+      strata = popcat,
+      weights = wtype
+    ) %>%
+    dplyr::filter(!is.na(.data[[q_label]])) %>%
+    srvyr::survey_count(
+      .data[[q_label]],
+      na.rm = TRUE
+    ) %>%
+    dplyr::mutate(
+      Percentage = (n / sum(n, na.rm = TRUE)) * 100,
+      Group = "All LHDs"
+    ) %>%
+    dplyr::rename_all(~new_names) %>%
+    dplyr::select(
+      dplyr::all_of(c("Group", "Percentage", "Answer"))
+    ) %>%
+    dplyr::mutate(
+      y = round_up(Percentage, 1),
+      category = sapply(Answer, custom_str_to_title),
+      group = Group,
+      subtitle = "All LHDs"
+    )
+
+  add_responses <- master_data22 %>%
+    haven::as_factor() %>%
+    tibble::as_tibble() %>%
+    dplyr::group_by_at(q_label) %>%
+    dplyr::summarise(
+      Responses = sum(!is.na(.data[[q_label]])),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(Answer = .data[[q_label]])
+
+  data <- dplyr::left_join(
+    data,
+    add_responses,
+    by = "Answer"
+  ) %>%
+    dplyr::select(category, group, y, Responses)
+
+  tidyr::pivot_wider(
+    data,
+    names_from = group,
+    values_from = c(y, Responses)
+  )
+}
+
+
 #' Weighted Statistics
 #'
 #' @description Calculate weighted statistics results: total, mean, and quantiles.
@@ -241,6 +613,16 @@ add_all_counts_long <- function(q_label, popcat = "c0popcat7", wtype = "weights"
 #'
 #' @return tibble
 return_survey_weighted_statistics <- function(q_label, grps = NULL, popcat = "c0popcat7", wtype = "weights") {
+
+  if (!q_label %in% names(master_data)) {
+    stop(paste("Variable not found:", q_label))
+  }
+
+  if (all(is.na(master_data[[q_label]]))) {
+    message(paste("Skipping", q_label,
+                  "- no responses collected in 2025"))
+    return(tibble::tibble())
+  }
 
   if (is.null(grps)) {
 
@@ -586,20 +968,26 @@ scatter_data <- function(set_filter = "All LHDs",
       "Emergency preparedness",
       "Mental health",
       "Environmental health, including food safety",
-      "Tobacco, alcohol, or other drug prevention",
+      "Substance use prevention",
       "Obesity prevention"
     ),
     category = c(rep("Reduced", 14)),
-    x = c(20, 11, 13, 27, 31, 30, 26, 30, 3, 5, 16, 17, 26, 28),
-    y = c(27, 65, 45, 14, 11, 10, 10, 9, 63, 55, 24, 21, 18, 9),
-    Responses = rep("365 to 895", 14),
+    x = c(5, 11, 6, 6, 5, 6, 7, 4, 6, 4, 5, 3, 3, 5),
+    y = c(19, 21, 18, 21, 15, 19, 15, 18, 16, 16, 25, 19, 30, 9),
+    Responses = rep("459 to 1026", 14),
     group = rep("All LHDs", 14),
     stringsAsFactors = FALSE
   )
 
   # Perform case-insensitive matching without modifying the data
   filtered_data <- data %>%
-    filter(stringr::str_to_lower(service_type) %in% stringr::str_to_lower(set_service))
+    filter(
+      stringr::str_to_lower(
+        gsub("[^a-zA-Z0-9]", "", service_type)
+      ) %in% stringr::str_to_lower(
+        gsub("[^a-zA-Z0-9]", "", set_service)
+      )
+    )
 
   # Return the filtered dataset
   return(filtered_data)

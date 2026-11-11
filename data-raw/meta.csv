@@ -406,7 +406,7 @@ totpop,,Line Graph,,Percent of U.S. Population Served by LHDs,"<span style=""col
 totpop,,Table,,Percent of U.S. Population Served by LHDs,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of the U.S. population is served by {point.category} LHDs",,,% of Population,,"{value:,.0f}%",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
-budget_changes,workforce,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",LHD Budget Change in 2022,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
+budget_changes,workforce,Table,"c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"", ""All LHDs"")",LHD Budget Change in 2025,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
 budget_changes,workforce,Line Graph,All LHDs,LHD Budget Change Over Time,"<span style=""color:{point.color}"">●</span>In {point.year}, {point.y:,.0f}% of LHDs {point.tt}",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
 chachip,other topics,"Bar Graph, Table",All LHDs,Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
 chachip,other topics,"Bar Graph, Table","c( ""c0popcat3"", ""urbanrural2022"", ""c0govcat"", ""censusregion"")",Participation in a Community Health Assessment (CHA) and/or Community Health Improvement Plan (CHIP) ,"<span style=""color:{point.color}"">●</span> {point.y:,.0f}% of {point.tt}",,,,,"{value:,.0f}%",,"{point.y:,.0f}%",,,
@@ -428,3 +428,4 @@ FTE_numcat,workforce,Line Graph,All LHDs,Estimated Total FTEs Across LHDs Over T
 employee_numcat,workforce,Line Graph,All LHDs,Estimated Total Employees Across LHDs Over Time,"<span style=""color:{point.color}"">●</span> In {point.year}, the size of the LHD worforce was estimated to be  {point.y:,.0f}  employees.",,,Employees,200000,"{value:,.0f}",,"{point.y:,.0f}%",,,"<b> Source: </b> 2022 National Profile of Local Health
           Departments. National Association of County and City Health Officials.
           Washington, DC. (2024)."
+jobsgoneany,workforce,Line Graph,All LHDs,At Least One Job Lost in Previous Calendar Year,"<span style=""color:{point.color}"">●</span> In calendar year {point.year}, {point.y:,.0f}% of LHDs lost at least one job.",,,% of LHDs,,"{value:,.0f}%",,"{point.y:,.0f}%",,,

@@ -40,8 +40,6 @@ start_time <- Sys.time()  # Get start time
 case_when_text <- "
 stringr::str_detect(Question, \"c6q55\") ~ \"Routine Adult Immunizations\",
 stringr::str_detect(Question, \"c6q56\") ~ \"Routine Childhood Immunizations\",
-stringr::str_detect(Question, \"c6q147\") ~ \"COVID-19 Adult Immunizations\",
-stringr::str_detect(Question, \"c6q148\") ~ \"COVID-19 Child Immunizations\",
 stringr::str_detect(Question, \"c6q142\") ~ \"BMI Screening\",
 stringr::str_detect(Question, \"c6q60\") ~ \"Cancer Screening\",
 stringr::str_detect(Question, \"c6q61\") ~ \"Cardiovascular Disease Screening\",
@@ -156,7 +154,11 @@ for (filter in filters) {
         warning(paste("No data returned for q_label =", q_label, "and grps =", grps))
         return(tibble())
       }
-      result %>% mutate(filter = grps)
+      result %>%
+        mutate(
+          Answer = as.character(Answer),
+          filter = grps
+        )
     }
   )
 
@@ -185,7 +187,8 @@ services_no_filter <- purrr::map_dfr(vars, function(q_label) {
   }
 
   # Return the result
-  result
+  result %>%
+    mutate(Answer = as.character(Answer))
 })
 
 services_no_filter$filter <- "All LHDs"
@@ -219,7 +222,7 @@ services_data <- services_data %>%
                          "service_provision"))) %>%
   dplyr::mutate(service_classification = case_when(
     # Immunization
-    stringr::str_detect(Question, "c6q55|c6q56|c6q147|c6q148") ~ "Immunization",
+    stringr::str_detect(Question, "c6q55|c6q56") ~ "Immunization",
 
     # Disease/Risk Factor Screening
     stringr::str_detect(Question, "c6q142|c6q60|c6q61|c6q62|c6q63|c6q57|c6q58|c6q59") ~ "Disease/Risk Factor Screening",

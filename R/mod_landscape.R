@@ -35,38 +35,38 @@ mod_landscape_ui <- function(id) {
           ",
           openMenu(),
 
-              div( class = "topic-select",
-                style = "grid-area: 1 / 1 / 2 / 2;
+          div( class = "topic-select",
+               style = "grid-area: 1 / 1 / 2 / 2;
               justify-self: center;
               display: block;
               /* align-self: end; */
               /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
-                selectInput(
-                  inputId = ns("topic"),
-                  strong("Topic"),
-                  choices = landscape_topics,
-                  selectize = TRUE,
-                  selected = landscape_topics[2]
-                )
-              ),
-              div( class = "filter-select",
-                style = "grid-area: 1 / 2 / 2 / 3;
+               selectInput(
+                 inputId = ns("topic"),
+                 strong("Topic"),
+                 choices = landscape_topics,
+                 selectize = TRUE,
+                 selected = landscape_topics[2]
+               )
+          ),
+          div( class = "filter-select",
+               style = "grid-area: 1 / 2 / 2 / 3;
               justify-self: center;
               display: block;
               /* align-self: end; */
               /* margin-bottom: clamp(2px, 2.5%, 8px);*/",
-                selectInput(
-                  inputId = ns("filter"),
-                  strong("Filter"),
-                  choices = landscape_filters
-                )
-              ),
+               selectInput(
+                 inputId = ns("filter"),
+                 strong("Filter"),
+                 choices = landscape_filters
+               )
+          ),
 
 
-            # Visualization Toggles
-            div(
-              class = "viz-view",
-              style = "grid-area: 2 / 1 / 3 / 3;
+          # Visualization Toggles
+          div(
+            class = "viz-view",
+            style = "grid-area: 2 / 1 / 3 / 3;
     /* justify-self: center; */
     /* align-self: start; */
     display: unset !important;
@@ -79,18 +79,18 @@ mod_landscape_ui <- function(id) {
     align-self: center;
     /* margin-bottom: clamp(5px, 3%, 30px); */
     margin-top: clamp(-2px, -2.5%, -8px);",
-              shinyWidgets::radioGroupButtons(
-                ns("view"),
-                "",
-                choiceNames = list(
-                  HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
-                  HTML('<i class="fas fa-chart-line"></i>'),    # Line graph icon
-                  HTML('<i class="fas fa-table"></i>')         # Table icon
-                ),
-                choiceValues = c('Bar Graph', 'Line Graph', 'Table'),
-                selected = 'Bar Graph'
-              )
-            ),
+            shinyWidgets::radioGroupButtons(
+              ns("view"),
+              "",
+              choiceNames = list(
+                HTML('<i class="fas fa-chart-simple"></i>'),  # Chart icon
+                HTML('<i class="fas fa-chart-line"></i>'),    # Line graph icon
+                HTML('<i class="fas fa-table"></i>')          # Table icon
+              ),
+              choiceValues = c('Bar Graph', 'Line Graph', 'Table'),
+              selected = 'Bar Graph'
+            )
+          ),
 
           # Bottom Section: Visualization content
           div(
@@ -110,8 +110,8 @@ mod_landscape_ui <- function(id) {
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), '\'] != \'Map\' && input[\'', ns('view'), '\'] != \'Table\' && input[\'', ns('view'), "\'] != \'Line Graph\'"),
               # div(
-                highcharter::highchartOutput(ns("figure"), height = "100%"),
-                style = "height: 100%"
+              highcharter::highchartOutput(ns("figure"), height = "100%"),
+              style = "height: 100%"
               # )
             ),
 
@@ -119,22 +119,22 @@ mod_landscape_ui <- function(id) {
             conditionalPanel(
               condition = paste0('input[\'', ns('view'), "\'] == \'Table\'"),
 
-                div( class = "table-grid",
+              div( class = "table-grid",
 
 
-                     div(class = "table-title-grid",
+                   div(class = "table-title-grid",
 
 
-                         uiOutput(ns("table_title")),
-                         csvDownloadButton(ns("data_table"), filename = "landscapeNACCHO.csv")
-                     ),
+                       uiOutput(ns("table_title")),
+                       csvDownloadButton(ns("data_table"), filename = "landscapeNACCHO.csv")
+                   ),
 
-                     reactable::reactableOutput(ns("data_table"),
-                                                height = "100%",
-                                                width = "auto"
-                     ),
+                   reactable::reactableOutput(ns("data_table"),
+                                              height = "100%",
+                                              width = "auto"
+                   ),
 
-                     HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
+                   HTML('<div style="font-size: calc(5px + .2em + .8vmin);">', source_line, '<br> <b> N: </b> Hover over a column\'s header to view the respective N count. </div>')
 
 
               )
@@ -237,6 +237,36 @@ mod_landscape_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    # Topics that should display 2022 weighted results
+    topics_2022 <- c(
+      "age_cat",
+      "c4q29",
+      "c4q34",
+      "ethnicity",
+      "field",
+      "race",
+      "tenure"
+    )
+
+    selected_source <- reactive({
+      if (input$topic %in% c("age_cat", "c4q29", "c4q34",
+                             "ethnicity", "field", "race", "tenure")) {
+        source_line_2022
+      } else {
+        source_line
+      }
+    })
+
+    # Select the appropriate weighted-count function
+    get_weighted_counts <- function(q_label, grps = NULL) {
+
+      if (q_label %in% topics_2022) {
+        return_survey_weighted_counts_2022(q_label, grps)
+      } else {
+        return_survey_weighted_counts(q_label, grps)
+      }
+
+    }
 
     # update inputs based on selections ---------------------------------------
     observe({
@@ -253,10 +283,9 @@ mod_landscape_server <- function(id){
         shinyWidgets::updateRadioGroupButtons(session, "view",
                                               choiceNames = list(
                                                 HTML('<i class="fas fa-chart-simple"></i>'),
-                                                HTML('<i class="fas fa-chart-line"></i>'),
-                                                HTML('<i class="fas fa-table"></i>')
+                                                HTML('<i class="fas fa-chart-line"></i>')
                                               ),
-                                              choiceValues = c("Bar Graph", "Line Graph", "Table"))
+                                              choiceValues = c("Bar Graph", "Line Graph"))
       }
     })
 
@@ -408,7 +437,7 @@ mod_landscape_server <- function(id){
 
         } else if (input$topic == "tenure"){
 
-          data <- return_survey_weighted_counts("tenure_numcat")
+          data <- return_survey_weighted_counts_2022("tenure_numcat")
 
           data$category <- factor(data$category,
                                   levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -420,7 +449,7 @@ mod_landscape_server <- function(id){
           data
 
         } else {
-          return_survey_weighted_counts(input$topic)
+          get_weighted_counts(input$topic)
         }
       } else {
         all_data <- if (input$topic == "field") {
@@ -430,7 +459,7 @@ mod_landscape_server <- function(id){
 
         } else if  (input$topic == "tenure"){
 
-          data <- return_survey_weighted_counts("tenure_numcat")
+          data <- return_survey_weighted_counts_2022("tenure_numcat")
 
           data$tenure_numcat <- factor(data$tenure_numcat,
                                        levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -444,7 +473,7 @@ mod_landscape_server <- function(id){
           data
 
         } else {
-          return_survey_weighted_counts(input$topic)
+          get_weighted_counts(input$topic)
         }
 
         filtered_data <- if (input$topic == "field") {
@@ -456,7 +485,7 @@ mod_landscape_server <- function(id){
 
         } else if (input$topic == "tenure") {
 
-          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+          data <- return_survey_weighted_counts_2022("tenure_numcat", input$filter)
 
           data$tenure_numcat <- factor(data$tenure_numcat,
                                        levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -474,7 +503,7 @@ mod_landscape_server <- function(id){
           data
 
         } else {
-          return_survey_weighted_counts(input$topic, input$filter)
+          get_weighted_counts(input$topic, input$filter)
         }
 
         combined <- dplyr::bind_rows(
@@ -484,7 +513,7 @@ mod_landscape_server <- function(id){
 
 
 
-          combined
+        combined
 
 
       }
@@ -492,11 +521,11 @@ mod_landscape_server <- function(id){
 
       if (input$filter != "All LHDs"){
         if(input$topic != "field") {
-        combined_data <- combined_data %>%
-          dplyr::mutate(Responses = dplyr::case_when(
-            group == "All LHDs" ~ 0,
-            TRUE ~ Responses),
-            N = sum(Responses)
+          combined_data <- combined_data %>%
+            dplyr::mutate(Responses = dplyr::case_when(
+              group == "All LHDs" ~ 0,
+              TRUE ~ Responses),
+              N = sum(Responses)
             )
         } else {
           combined_data <- combined_data %>%
@@ -506,10 +535,10 @@ mod_landscape_server <- function(id){
 
       if (input$filter == "All LHDs"){
         if(input$topic != "field") {
-        combined_data <- combined_data %>%
-          dplyr::mutate(
-            N = sum(Responses)
-          )
+          combined_data <- combined_data %>%
+            dplyr::mutate(
+              N = sum(Responses)
+            )
         } else {
           combined_data <- combined_data %>%
             dplyr::mutate(N = Responses)
@@ -539,19 +568,25 @@ mod_landscape_server <- function(id){
           viz_title = filter_meta()$title,
           viz_caption = paste(
             "<b> N: </b>", show_n(combined_data$N),
-            "<br>", source_line
+            "<br>", selected_source()
           ),
           tooltip = filter_meta()$tooltip
         )%>%
         highcharter::hc_yAxis(
-          maxPadding = .09,
-          # tickPositioner = JS("function() { return [0, 25, 50, 75, 100]; }"), # Define custom tick positions
-          max = filter_meta()$y_max,
-          endOnTick = TRUE
+          maxPadding = if (input$topic %in% c("age_cat", "race", "ethnicity")) 0 else .09,
+
+          max = dplyr::case_when(
+            input$topic == "age_cat" ~ 50,
+            input$topic == "ethnicity" ~ 120,
+            input$topic == "race" ~ ceiling(max(combined_data$y, na.rm = TRUE) * 1.10),
+            TRUE ~ filter_meta()$y_max
+          ),
+
+          endOnTick = if (input$topic %in% c("age_cat", "race", "ethnicity")) FALSE else TRUE
           # ,
           # labels = list(
           #   format = "{value}%"
-          )%>%
+        )%>%
         highcharter::hc_legend(reversed = TRUE)%>%
         viz_export()
 
@@ -564,10 +599,21 @@ mod_landscape_server <- function(id){
       #     )
       # }
 
-     if (input$topic == "tenure"){
+      if (input$topic == "tenure") {
+
+        tenure_categories <- c(
+          "Less Than 2 Years",
+          "2 - 5 Years",
+          "6 - 10 Years",
+          "11 Or More Years"
+        )
 
         bar_chart <- bar_chart %>%
-          highcharter::hc_xAxis(categories = data$tenure_numcat)
+          highcharter::hc_xAxis(
+            categories = tenure_categories,
+            labels = list(enabled = TRUE),
+            title = list(text = NULL)
+          )
       }
 
 
@@ -597,7 +643,7 @@ mod_landscape_server <- function(id){
 
         } else if (input$topic == "tenure"){
 
-          data <- return_survey_weighted_counts("tenure_numcat")
+          data <- return_survey_weighted_counts_2022("tenure_numcat")
 
           data$tenure_numcat <- factor(data$tenure_numcat,
                                        levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -611,17 +657,17 @@ mod_landscape_server <- function(id){
           data
 
         } else {
-          return_survey_weighted_counts(input$topic)
+          get_weighted_counts(input$topic)
         }
 
       } else {
         all_data <- if (input$topic == "field") {
 
-         all_data <- spec_data_all%>%
+          all_data <- spec_data_all%>%
             dplyr::filter(Question == "spec_combined")
 
         } else if (input$topic == "tenure") {
-          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+          data <- return_survey_weighted_counts_2022("tenure_numcat", input$filter)
 
           data$tenure_numcat <- factor(data$tenure_numcat,
                                        levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -630,24 +676,24 @@ mod_landscape_server <- function(id){
 
           data <- data %>%
             dplyr::mutate(tt = dplyr::case_when(
-            input$filter != "censusregion" ~
-              paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
-            TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
-          ))
+              input$filter != "censusregion" ~
+                paste0(" ", tolower(group), " LHD top executives' tenure is ", tolower(category), "."),
+              TRUE ~  paste0(" ", tolower(group), "ern LHD top executives' tenure is ", tolower(category), ".")
+            ))
 
           data
 
         } else {
-          return_survey_weighted_counts(input$topic)
+          get_weighted_counts(input$topic)
         }
 
         filtered_data <- if (input$topic == "field") {
-        spec_data %>% dplyr::filter(filter == input$filter,
+          spec_data %>% dplyr::filter(filter == input$filter,
                                       category == group)
 
         } else if (input$topic == "tenure"){
 
-          data <- return_survey_weighted_counts("tenure_numcat", input$filter)
+          data <- return_survey_weighted_counts_2022("tenure_numcat", input$filter)
 
           data$tenure_numcat <- factor(data$tenure_numcat,
                                        levels = c("Less Than 2 Years", "2 - 5 Years",
@@ -658,7 +704,7 @@ mod_landscape_server <- function(id){
 
 
         } else {
-          return_survey_weighted_counts(input$topic, input$filter)
+          get_weighted_counts(input$topic, input$filter)
         }
 
         combined <- dplyr::bind_rows(
@@ -674,7 +720,7 @@ mod_landscape_server <- function(id){
         #
         # }
 
-          combined
+        combined
 
       }
 
@@ -732,7 +778,7 @@ mod_landscape_server <- function(id){
 
 
       # Dynamically update the bar chart with new data
-       proxy_bar %>%
+      proxy_bar %>%
         highcharter::hcpxy_add_series(
           id = "filtered_bar_series",
           name = input$filter,
@@ -767,79 +813,130 @@ mod_landscape_server <- function(id){
       #
       # }
 
-   })
+    })
 
 
     # Line Output-------------------
-    # Line Graph output with proxy
     output$line <- highcharter::renderHighchart({
-      req(input$view == "Line Graph", input$topic != "c2q501", input$filter)
+
+      req(input$view == "Line Graph",
+          input$topic != "c2q501",
+          input$filter)
+
       req(filter_meta())
+
       meta_data <- filter_meta()
-      req(meta_data, nrow(meta_data) > 0) # Ensure there is valid metadata
+      req(meta_data, nrow(meta_data) > 0)
 
-      # Process data for the line graph
+      # Retrieve historical and current data, where available
       data <- process_line_data(input$topic, input$filter)
-      req(data, nrow(data) > 0)
 
-      message("Line graph data rows: ", nrow(data))
-
-     line_graph <-  if (nrow(data) > 0) {
-        naccho.viz::create_grouped_line(
-          data = data,
-          x_variable = "year",
-          x_group = "legend_label",
-          y_variable = "y",
-          y_label = meta_data$y_label,
-          y_max = meta_data$y_max,
-          x_label = "Year",
-          select_theme = naccho.viz::basic,
-          tooltip = meta_data$tooltip
-        ) %>%
-          viz_options(
-            viz_caption = paste("<b> N: </b>", show_n(data$Responses), "<br>", source_line),
-            tooltip = meta_data$tooltip
-          ) %>%
-          highcharter::hc_title(text = meta_data$title) %>%
-          highcharter::hc_yAxis(
-            maxPadding = .01,
-            max = meta_data$y_max,
-            endOnTick = TRUE
-          ) %>%
-          highcharter::hc_legend(reversed = TRUE) %>%
-          highcharter::hc_chart(style = list(minHeight = "50vh"))%>%
-         viz_export()
-
-      } else {
-        highcharter::highchart()  # Return an empty chart if no data
+      # Remove duplicate age-category points for the same year
+      if (input$topic == "age_cat") {
+        data <- data %>%
+          dplyr::group_by(year, legend_label) %>%
+          dplyr::slice(1) %>%
+          dplyr::ungroup()
       }
 
-     line_graph
+      req(data, nrow(data) > 0)
+
+      # Convert year to numeric for plotting
+      data <- data %>%
+        dplyr::mutate(
+          year = as.numeric(as.character(year)),
+          legend_label = as.character(legend_label)
+        )
+
+      # Build chart
+      line_graph <- highcharter::highchart() %>%
+        highcharter::hc_chart(type = "line") %>%
+        highcharter::hc_xAxis(
+          type = "linear",
+          title = list(text = "Year"),
+          tickPositions = sort(unique(data$year))
+        ) %>%
+        highcharter::hc_yAxis(
+          title = list(text = meta_data$y_label),
+          min = 0,
+          max = meta_data$y_max,
+          endOnTick = TRUE
+        ) %>%
+        highcharter::hc_plotOptions(
+          line = list(
+            lineWidth = 4,
+            marker = list(enabled = TRUE)
+          )
+        ) %>%
+        highcharter::hc_colors(naccho.viz::colors)
+
+      # Add one line for each category
+      for (series_name in unique(data$legend_label)) {
+
+        group_data <- data %>%
+          dplyr::filter(legend_label == series_name) %>%
+          dplyr::arrange(year)
+
+        line_graph <- line_graph %>%
+          highcharter::hc_add_series(
+            name = series_name,
+            type = "line",
+            data = lapply(seq_len(nrow(group_data)), function(i) {
+              point <- as.list(group_data[i, , drop = FALSE])
+
+              # Preserve all original fields for custom tooltips
+              point$x <- as.numeric(group_data$year[i])
+              point$y <- as.numeric(group_data$y[i])
+              point$name <- as.character(group_data$year[i])
+
+              point
+            })
+          )
+      }
+
+      # Apply dashboard formatting
+      line_graph <- line_graph %>%
+        viz_options(
+          viz_caption = paste(
+            "<b> N: </b>",
+            show_n(data$Responses),
+            "<br>",
+            selected_source()
+          ),
+          tooltip = meta_data$tooltip
+        ) %>%
+        highcharter::hc_title(text = meta_data$title) %>%
+        highcharter::hc_legend(reversed = TRUE) %>%
+        highcharter::hc_chart(
+          style = list(minHeight = "50vh")
+        ) %>%
+        viz_export()
+
+      line_graph
     })
 
 
     # Proxy for the Line Chart
-    proxy_line <- highcharter::highchartProxy(ns("line"))
+    # proxy_line <- highcharter::highchartProxy(ns("line"))
 
-    observe({
-      req(input$topic, input$filter)
+    # observe({
+    #  req(input$topic, input$filter)
 
-      line_data <- process_line_data(input$topic, input$filter)
+    # line_data <- process_line_data(input$topic, input$filter)
+    # if (is.null(line_data) || nrow(line_data) == 0) {
+    #   showNotification("No data available for line chart.", type = "warning")
+    #  return()
+    # }
 
-      if (is.null(line_data) || nrow(line_data) == 0) {
-        showNotification("No data available for line chart.", type = "warning")
-        return()
-      }
-
-      proxy_line %>%
-        highcharter::hcpxy_update(
-          series = list(
-            id = "line_series",
-            data = line_data,
-            name = paste("Line for", input$filter)
-          )
-        )
-    })
+    # proxy_line %>%
+    #   highcharter::hcpxy_update(
+    #     series = list(
+    #       id = "line_series",
+    #       data = line_data,
+    #       name = paste("Line for", input$filter)
+    #     )
+    #   )
+    # })
 
 
 
@@ -974,7 +1071,7 @@ mod_landscape_server <- function(id){
             notes$survey_response,
             "<br> <br> <b> Notes: </b>",
             notes$notes
-))
+          ))
         }
       })
     })

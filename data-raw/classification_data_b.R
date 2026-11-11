@@ -7,16 +7,16 @@ devtools::load_all()
 start_time <- Sys.time() # get start time
 
 vars <- c(
-  "newc5q63b", "newc5q62b",
-  "newc5q52b", "newc5q64b",
-  "newc5q61b", "newc5q55b",
-  "newc5q47b", "newc5q48b",
-  "newc5q50b", "newc5q60b",
-  "newc5q57b", "newc5q58b",
-  "newc5q49b", "newc5q65b",
-  "newc5q59b", "newc5q56b",
-  "newc5q44b", "newc5q51b",
-  "newc5q43b")
+  "c5q63b", "c5q62b",
+  "c5q52b", "c5q64b",
+  "c5q61b", "c5q68b", "c5q55b",
+  "c5q47b", "c5q48b",
+  "c5q50b", "c5q60b",
+  "c5q57b", "c5q58b",
+  "c5q49b", "c5q65b",
+  "c5q59b", "c5q56b",
+  "c5q44b", "c5q51b",
+  "c5q43b")
 
 filters <- c("urbanrural2022", "c0govcat", "c0popcat3", "censusregion")
 
@@ -42,16 +42,16 @@ class_b_with_filter <- do.call(rbind, class_b_list)
 class_b_no_filter <- class_data_b(
   list(
     c(
-      "newc5q63b", "newc5q62b",
-      "newc5q52b", "newc5q64b",
-      "newc5q61b", "newc5q55b",
-      "newc5q47b", "newc5q48b",
-      "newc5q50b", "newc5q60b",
-      "newc5q57b", "newc5q58b",
-      "newc5q49b", "newc5q65b",
-      "newc5q59b", "newc5q56b",
-      "newc5q44b", "newc5q51b",
-      "newc5q43b"),
+      "c5q63b", "c5q62b",
+      "c5q52b", "c5q64b",
+      "c5q61b", "c5q68b", "c5q55b",
+      "c5q47b", "c5q48b",
+      "c5q50b", "c5q60b",
+      "c5q57b", "c5q58b",
+      "c5q49b", "c5q65b",
+      "c5q59b", "c5q56b",
+      "c5q44b", "c5q51b",
+      "c5q43b"),
     wtype = "weights_static"
   )
 ) %>%
