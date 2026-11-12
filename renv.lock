@@ -40,7 +40,7 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-60.0.1",
+      "Version": "7.3-60",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -50,8 +50,7 @@
         "methods",
         "stats",
         "utils"
-      ],
-      "Hash": "b765b28387acc8ec9e9c1530713cb19c"
+      ]
     },
     "Matrix": {
       "Package": "Matrix",
@@ -548,7 +547,7 @@
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "custom.map",
-      "RemoteUsername": "madalder",
+      "RemoteUsername": "madocalder",
       "RemoteRef": "HEAD",
       "RemoteSha": "9b73b83528788f190551bf1ef0af167038636b16",
       "Requirements": [
@@ -1287,11 +1286,11 @@
       "Package": "naccho.viz",
       "Version": "0.0.0.9000",
       "Source": "GitHub",
-      "Remotes": "madalder/custom.map",
+      "Remotes": "madocalder/custom.map",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "naccho.viz",
-      "RemoteUsername": "madalder",
+      "RemoteUsername": "madocalder",
       "RemoteRef": "HEAD",
       "RemoteSha": "05754c5a97a9c403a41de2c3c476a13263874229",
       "Requirements": [
