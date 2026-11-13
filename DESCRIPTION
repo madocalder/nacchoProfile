@@ -36,7 +36,9 @@ Imports:
     pkgload,
     purrr,
     reactable,
+    reactablefmtr,
     readxl,
+    rlang,
     renv,
     rmarkdown,
     rsconnect,
@@ -57,7 +59,7 @@ Imports:
     waiter
 Suggests: 
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 4.1.0)
 Remotes:
     github::madocalder/naccho.viz,
     the-y-company/bsutils,
