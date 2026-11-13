@@ -59,7 +59,7 @@ Imports:
     waiter
 Suggests: 
     spelling,
-    testthat (>= 4.1.0)
+    testthat (>= 3.0.0)
 Remotes:
     github::madocalder/naccho.viz,
     the-y-company/bsutils,
