@@ -25,7 +25,7 @@ golem::fill_desc(
   author_first_name = "Madoc", # Your First Name
   author_last_name = "Alder", # Your Last Name
   author_email = "mmarshall@astho.org", # Your Email
-  repo_url =" https://github.com/madalder/nacchoProfile", # The URL of the GitHub Repo (optional),
+  repo_url =" https://github.com/madocalder/nacchoProfile", # The URL of the GitHub Repo (optional),
   pkg_version = "0.0.0.9000" # The Version of the package containing the App
 )
 
